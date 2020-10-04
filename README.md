@@ -50,20 +50,20 @@ This module has a built-in microcontroller that independently solves all issues 
 This module communicates with the main processor via the <b>UART interface.</b><br>
 If the use of a wireless sensor is not planned, then this module can not be installed.<br>
 
-<center>
+<p align="center">
   <img src="/img/review26-3.jpg">
-</center><br><br>
+</p><br><br>
 
 The weather monitor can read temperature, pressure, humidity and ambient light sensors.<br>
 The following sensors are supported:<br>
-<li>
-  <ul><b>BME280</b></ul>
-  <ul><b>BMP180</b></ul>
-  <ul><b>DHT22</b></ul>
-  <ul><b>SHT21</b></ul>
-  <ul><b>BH1750</b></ul>
-  <ul><b>MAX44009</b></ul>
-</li>
+<ul>
+  <li><b>BME280</b></li>
+  <li><b>BMP180</b></li>
+  <li><b>DHT22</b></li>
+  <li><b>SHT21</b></li>
+  <li><b>BH1750</b></li>
+  <li><b>MAX44009</b></li>
+</ul>
 You can connect one, none, several or all at once from this list.<br><br>
 
 Печатную плату заказывал в Китае, так как возиться с лазерным утюгом не было никакого желания. Платы у меня плохо получаются.<br>
