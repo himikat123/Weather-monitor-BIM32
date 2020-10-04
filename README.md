@@ -5,33 +5,32 @@
   <img src="/img/20200928_221642.jpg">
 </center> 
 
-Краткий список возможностей монитора погоды:<br><br>
+A short list of weather monitor features:<br><br>
 
-Подключение к домашней WiFi сети 2.4 гГц<br>
-Отображение текущей погоды и прогноза погоды на 3 дня<br>
-Отображение почасового прогноза погоды на 5 дней<br>
-Отображение истории погоды (почасово) на 1 день назад<br>
-Посторение графиков изменения температуры, влажности и вероятности осадков<br>
-Отображение температуры и влажности дома<br>
-Отображение фазы луны<br>
-Часы (маленькие/большие/с секундами/стрелочные) с синхронизацией NTP<br>
-Календарь с возможностью перелистывания на до плюс/минус бесконечности<br>
-Отправка и/или прием данных по протоколу MQTT<br>
-Отправка и/или прием данных с/на сервис thingspeak<br>
-Отправка данных на народный мониторинг<br>
-Беспроводной датчик температуры/давлени/влажности/освещенности<br>
-Поддержка проводных датчиков температуры/давлени/влажности/освещенности<br>
-Авторегулировка яркости подсветки экрана (по датчику освещенности, по времени или по факту рассвета и заката)<br>
-Цветной сенсорный дисплей 3,5 дюйма<br><br>
- 
+Connecting to your home network WiFi 2.4 GHz<br>
+Display of the current weather and 3-day forecast<br>
+Display 5-day hourly weather forecast<br>
+Show weather history (hourly) 1 day ago<br>
+Building graphs of temperature, humidity and probability of precipitation<br>
+Home temperature and humidity display<br>
+Moon phase display<br>
+Clock (small/large/with seconds/arrow) with NTP synchronization<br>
+Calendar with the ability to scroll to plus/minus infinity<br>
+Sending and/or receiving data using the MQTT protocol<br>
+Sending and/or receiving data from/to thingspeak.com<br>
+Sending data to narodmon.ru<br>
+Wireless temperature/pressure/humidity/ambient light sensor<br>
+Support for wired temperature/pressure/humidity/ambient light sensors<br>
+Auto adjustment of screen backlight brightness (by light sensor, by time or by sunrise and sunset)<br>
 
-Схема монитора погоды<br>
+## Schematic diagram of a weather monitor<br>
 
-Благодаря применению модулей, схема прибора получилась простой как совковый утюг. Применен WiFi модуль Nodemcu 32S 30pin. 
-Это сердце и душа прибора, вся основная логика работы монитора погоды выполняется этим модулем. Данный модуль представляет 
-собой микросхему SoC ESP32 со всей необходимой обвзякой, флеш памятью, USB->UART конвертером и стабилизатором напряжения питания. <br>
+I used ready-made modules, so the device schematic is very simple. WiFi module <b>Nodemcu 32S</b> 30pin is applied.
+This is the heart and soul of the device, all the basic logic of the weather monitor is performed by this module. This module is an ESP32 SoC chip with all the necessary wiring, flash memory, USB-> UART converter and a power supply voltage regulator.<br>
 
-nodemcu32s<br><br>
+<center>
+  <img src="/img/">
+</center><br><br>
 
 Модуль дисплея Nextion enhanced 3.5 дюймов. Представляет собой дисплей HMI TFT, со встроенным графическим процессором, 
 с 16 Мб флэш-памяти, 1024 байт EEPROM и ОЗУ 3584 байт. Дисплей берет на себя задачи прорисовки графики, и обработки 
