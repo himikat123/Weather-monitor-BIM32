@@ -69,30 +69,41 @@ You can connect one, none, several or all at once from this list.<br><br>
 I ordered a PCB in China, because there was no desire to torment with a homemade one.<br>
 
 <p align="center">
-  <img src="/img/review26-3.jpg">
+  <img src="/img/BIM32_t.png">
 </p><br><br>
 
+Watch a video overview of the weather monitor. The review is made in Russian, but you can turn on subtitles.<br>
 
-Посмотрите видеообзор монитора погоды, это поможет не только ознакомиться с ним, но так же внесет ясность в методику настройки параметров прибора.<br>
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=fijWaK1R-Vs">
+    <img src="/img/yt.png">
+  </a>
+</p><br><br>
 
-Видеообзор монитора погоды
+To flash the weather monitor you need a micro-sd card, micro-USB cable and a computer.<br>
+To flash the <b>display</b>, you need to copy the display firmware file (file with the <b>.tft</b> extension) to the micro-sd card
+(the card must be formatted with the <b>FAT32</b> file system). Then insert the micro-sd card into the micro-sd slot of the display
+and turn him on. The display itself will be flashed from the micro-sd card, the flashing process can be watched on the screen.<br>
 
-Для прошивки монитора погоды понадобится micro-sd карта, micro-USB кабель и компьютер.<br>
-Чтоб прошить дисплей, нужно скопировать файл прошивки дисплея (файл с расширением .tft) на micro-sd карту 
-(карта должна быть отформатирована в файловой системе FAT32). Затем вставить флешку в слот micro-sd дисплея 
-и подать ему питание. Дисплей сам прошьется с флешки, процесс прошивки можно будет наблюдать на экране.<br>
+To flash the <b>ESP32</b>, download the <b>Flash Download Tools</b> and configure everything as in the screenshot. Specify 
+the <b>BIM32_ESP32.bin</b> file on the line at the top, and <b>BIM32_ESP32_SPIFFS.bin</b> on the line below. <b>COM port</b> specify the one on
+which your ESP32 actually sits.<br>
 
-Чтоб прошить ESP32 скачайте программу Flash Download Tools и настройте все как на скриншоте. То есть, в верхней 
-строке укажите файл BIM32_ESP32.bin, а в строке ниже - BIM32_ESP32_SPIFFS.bin. COM-порт укажите тот, на 
-котором реально сидит ваша ESP32. <br>
+<p align="center">
+  <img src="/img/downloadtool.png">
+</p><br><br>
 
-download tool<br><br>
+And of course, lastly, a couple of photos of the device in action.<br>
 
-Ну и конечно, на последок, парочка фотографий устройства в деле.<br>
-
-1<br>
-2<br>
-3<br>
-4<br>
-5<br>
-6<br><br>
+<p align="center">
+  <img src="/img/20200918_165534.jpg">
+</p><br>
+<p align="center">
+  <img src="/img/20200918_165717.jpg">
+</p><br>
+<p align="center">
+  <img src="/img/20200918_165741.jpg">
+</p><br>
+<p align="center">
+  <img src="/img/20200918_170005.jpg">
+</p><br>
