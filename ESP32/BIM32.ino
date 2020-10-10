@@ -1,4 +1,10 @@
-/*     1.9 MB APP with OTA / 190 kB SPIFFS  */
+/* 
+ *  Weather Monitor BIM32 v1.0
+ *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020
+ */
+ 
+        // 1.9 MB APP with OTA / 190 kB SPIFFS
+        
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <TimeLib.h>
@@ -36,46 +42,7 @@ void setup(){
   Serial1.begin(9600);
   Serial2.begin(9600);
   myNex.writeStr("rest");
-  
-  if(SD.begin()){
-    cardType = SD.cardType();
-    if(cardType != CARD_NONE){
-      File updateBin = SD.open("/BIM32.bin");
-      if(updateBin){
-        size_t updateSize = updateBin.size();
-        if(updateSize > 0){
-          myNex.writeStr("page page26");
-          delay(200);
-          myNex.writeStr("page page26");
-          Serial.println("Begin updating");
-          if(Update.begin(updateSize)){
-            size_t written = Update.writeStream(updateBin);
-            if(written == updateSize){
-              Serial.println("Written : " + String(written) + " successfully");
-              myNex.writeNum("j0.val", 100);
-              myNex.writeStr("t2.txt", "Done!");
-            }
-            else{
-              Serial.println("Written only : " + String(written) + "/" + String(updateSize) + ". Try to retry");
-              myNex.writeNum("j0.val", 100);
-              myNex.writeStr("t2.txt", "Error!");
-            }
-            if(Update.end()){
-              Serial.println("OTA done!");
-              if(Update.isFinished()) Serial.println("Update successfully completed. Rebooting.");
-              else Serial.println("Update not finished? Something went wrong!");
-            }
-            else Serial.println("Error Occurred. Error #: " + String(Update.getError()));
-          }
-          else Serial.println("Not enough space to begin OTA");
-        }
-        else Serial.println("Error, file is empty");
-        updateBin.close();
-        SD.remove("/BIM32.bin");
-      }
-      else Serial.println("Could not load BIM32_ESP32.bin from sd root");
-    }
-  }
+    
   WiFi.mode(WIFI_STA);
   SPIFFS.begin();
 
@@ -147,7 +114,7 @@ void TaskDisplay(void *pvParameters){
         else datas.bright = config.brnight;
       }
       if(config.brt == 1){
-        datas.bright = round(datas.light);
+        datas.bright = round(datas.light) * 2;
       }
       if(config.brt == 2){
         uint16_t sunrise = config.hd * 60 + config.md;
@@ -221,6 +188,7 @@ void TaskSensors(void *pvParameters){
     if((millis() - cloud_send) > (config.tupd * 60000)){
       if(config.thngsend) thingspk_send();
       if(config.nrdmsend) narodmon_send();
+      vTaskDelay(200);
       if(config.mqttsend) datas.mqtt_sending = true;
       cloud_send = millis();
     }
@@ -589,12 +557,12 @@ void TaskHC12rcv(void *pvParameters){
           float umin = 3.3;
           float umax = 5.0;
           if(config.bat_type == 0){
-            umin = 3.4;
+            umin = 3.5;
             umax = 4.5;
           }
           if(config.bat_type == 1){
-            umin = 3.3;
-            umax = 4.1;
+            umin = 3.5;
+            umax = 3.9;
           }
           float stp = (umax - umin) / 4;
           if(datas.bat_voltage < (umin + stp)) datas.bat_level = 1;

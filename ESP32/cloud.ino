@@ -73,6 +73,7 @@ void narodmon_send(void){
   }
   Serial.println(buf);
   Serial.println();
+  client.stop();
 }
 
 void thingspk_recv(void){
