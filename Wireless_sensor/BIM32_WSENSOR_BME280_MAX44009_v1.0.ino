@@ -1,5 +1,5 @@
 /* 
- *  Wireless Sensor BIM v1.0
+ *  Wireless Sensor BIM (BME280 MAX44009) v1.0
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020
  */
 
