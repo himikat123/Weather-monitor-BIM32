@@ -85,8 +85,7 @@ To flash the <b>display</b>, you need to copy the display firmware file (file wi
 (the card must be formatted with the <b>FAT32</b> file system). Then insert the micro-sd card into the micro-sd slot of the display
 and turn him on. The display itself will be flashed from the micro-sd card, the flashing process can be watched on the screen.<br>
 
-To flash the <b>ESP32</b>, download the <b>Flash Download Tools</b> and configure everything as in the screenshot. Specify 
-the <b>BIM32_ESP32.bin</b> file on the line at the top, and <b>BIM32_ESP32_SPIFFS.bin</b> on the line below. <b>COM port</b> specify the one on
+To flash the <b>ESP32</b>, download the <b>Flash Download Tools</b> and configure everything as in the screenshot. <b>COM port</b> specify the one on
 which your ESP32 actually sits.<br>
 
 <p align="center">
