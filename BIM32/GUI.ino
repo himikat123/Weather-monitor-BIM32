@@ -10,10 +10,10 @@ void showForecast(int tempDay, int tempNight, uint8_t icon, uint8_t w_speed, uin
 
 void page1_send(void){
   // home temperature and humidity
-  int ht = round(datas.temp[1] * 10);
+  int ht = round(datas.temp[1]/* * 10*/);
   if(datas.temp[1] < 100.0 and datas.temp[1] > -55.0){
-    myNex.writeStr("ht0.txt", String(ht % 10) + "°");
-    myNex.writeStr("ht1.txt", String(ht / 10) + ".");
+    myNex.writeStr("ht0.txt", /*String(ht % 10) +*/ "°C");
+    myNex.writeStr("ht1.txt", String(ht/* / 10*/)/* + "."*/);
   }
   else{
     myNex.writeStr("ht0.txt", "");

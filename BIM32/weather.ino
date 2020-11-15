@@ -117,24 +117,4 @@ void getWeatherDaily(void){
     }
   }
   delete[] ow_fcast5;
-
-  String urli = "http://b-i-m.online/api/list.php?mac=";
-  urli += WiFi.macAddress();
-  urli += "&ip=" + WiFi.localIP().toString();
-  urli += "&country=" + String(datas.country);
-  urli += "&city=" + String(datas.city);
-  urli += "&fw=" + String(fw);
-  urli += "&lang="; urli += String(config.lang);
-  HTTPClient client;
-  client.begin(urli);
-  Serial.println(urli);
-  int httpCode = client.GET();
-  Serial.println(httpCode);
-  if(httpCode > 0){
-    if(httpCode == HTTP_CODE_OK){
-      httpData = client.getString();
-      Serial.println(httpData);
-    }
-  }
-  client.end();
 }

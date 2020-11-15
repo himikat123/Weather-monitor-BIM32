@@ -158,7 +158,7 @@ void TaskDisplay(void *pvParameters){
 
 void TaskSensors(void *pvParameters){
   (void) pvParameters;
-  wifi_connect();
+  if(config.ssid != "") wifi_connect();
   setSyncProvider(getTime);
   setSyncInterval(300);
   ThingSpeak.begin(client);
@@ -174,18 +174,20 @@ void TaskSensors(void *pvParameters){
       sensors_read();
     }
 
-    if(WiFi.status() != WL_CONNECTED){
-      datas.net_connected = false;
-      wifi_connect();
-    }
-    else{
-      datas.net_connected = true;
-      if(String(WiFi.SSID()) != String(config.ssid)){
-        WiFi.disconnect();
+    if(config.ssid != ""){
+      if(WiFi.status() != WL_CONNECTED){
         datas.net_connected = false;
         wifi_connect();
       }
-      scan_nets();
+      else{
+        datas.net_connected = true;
+        if(String(WiFi.SSID()) != String(config.ssid)){
+          WiFi.disconnect();
+          datas.net_connected = false;
+          wifi_connect();
+        }
+        scan_nets();
+      }
     }
 
     if(config.thngrcv){
