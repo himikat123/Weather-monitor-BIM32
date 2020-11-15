@@ -575,7 +575,8 @@ void TaskHC12rcv(void *pvParameters){
           uint8_t wtemp_sens = root["t"][1].as<uint8_t>();
           datas.hum_wsens = root["h"][0].as<float>() + config.wsens_hum_corr;
           uint8_t whum_sens = root["h"][1].as<uint8_t>();
-          datas.pres_wsens = root["p"][0].as<float>() * 0.75 + config.wsens_pres_corr;
+          uint16_t prs = root["p"][0].as<float>() * 0.75 + config.wsens_pres_corr;
+          if(prs > 500 and prs < 1200) datas.pres_wsens = prs;
           uint8_t wpres_sens = root["p"][1].as<uint8_t>();
           datas.light_wsens = root["l"][0].as<float>() + config.wsens_light_corr;
           uint8_t wlight_sens = root["l"][1].as<uint8_t>();

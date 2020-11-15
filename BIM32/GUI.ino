@@ -71,6 +71,7 @@ void page1_send(void){
   // outside pressure
   if(datas.pres < 1200 and datas.pres > 500){
     uint16_t pres = round(datas.pres);
+    if(pres > 850) pres *= 0.75;
     myNex.writeStr("op.txt", String(pres));
   }
   else myNex.writeStr("op.txt", "--");
