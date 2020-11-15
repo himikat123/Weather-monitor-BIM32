@@ -49,10 +49,10 @@ void page1_send(void){
   
   // outside temperature
   myNex.writeStr("trm.txt", (datas.temp[0] >= 0.0) ? "+" : "-");
-  int ot = round(datas.temp[0] * 10);
+  int ot = round(datas.temp[0]/* * 10*/);
   if(datas.temp[0] < 100.0 and datas.temp[0] > -55.0){
-    myNex.writeStr("ot0.txt", String(ot % 10) + "°");
-    myNex.writeStr("ot1.txt", String(ot / 10) + ".");
+    myNex.writeStr("ot0.txt", /*String(ot % 10) + */"°C");
+    myNex.writeStr("ot1.txt", String(ot/* / 10*/)/* + "."*/);
   }
   else{
     myNex.writeStr("ot0.txt", "");

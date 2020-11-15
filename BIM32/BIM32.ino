@@ -287,28 +287,28 @@ void data_ordering(void){
 }
 
 void wifi_connect(void){
-  int i = 0;
-  WiFi.begin(config.ssid, config.pass);
-  while(WiFi.status() != WL_CONNECTED){
-    i++;
-    vTaskDelay(500);
-    if(i > 100) ESP.restart();
-  }
-  WiFi.setAutoConnect(true);
-  WiFi.setAutoReconnect(true);
-  if(config.type){
-    IPAddress ip;
-    IPAddress subnet;
-    IPAddress gateway;
-    IPAddress dns1;
-    IPAddress dns2;
-    if(ip.fromString(config.ip) and
-       gateway.fromString(config.gw) and
-       subnet.fromString(config.mask) and
-       dns1.fromString(config.dns1) and
-       dns2.fromString(config.dns2)
-    ){
-      WiFi.config(ip, gateway, subnet, dns1, dns2);
+  if(config.ssid != ""){
+    int i = 0;
+    WiFi.begin(config.ssid, config.pass);
+    while(WiFi.status() != WL_CONNECTED){
+      i++;
+      vTaskDelay(500);
+      if(i > 100) ESP.restart();
+    }
+    WiFi.setAutoConnect(true);
+    WiFi.setAutoReconnect(true);
+    if(config.type){
+      IPAddress ip;
+      IPAddress subnet;
+      IPAddress gateway;
+      IPAddress dns1;
+      IPAddress dns2;
+      if(ip.fromString(config.ip) and
+         gateway.fromString(config.gw) and
+         subnet.fromString(config.mask) and
+         dns1.fromString(config.dns1) and
+         dns2.fromString(config.dns2)
+      ) WiFi.config(ip, gateway, subnet, dns1, dns2);
     }
   }
 }
