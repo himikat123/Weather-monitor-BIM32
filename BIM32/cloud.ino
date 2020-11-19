@@ -63,7 +63,7 @@ void narodmon_send(void){
   if(temp_in > -55.0 and temp_in < 125.0) buf += "\n#TI" + mac + "#" + String(temp_in);
   if(hum_in > -1.0 and hum_in < 101.0) buf += "\n#HI" + mac + "#" + String(hum_in);
   if(light >= 0.0 and light < 200000.0) buf += "\n#L" + mac + "#" + String(light);
-  if(datas.bat_voltage >= 1.0) buf += "\n#B" + mac + "#" + String(datas.bat_voltage);
+  if(datas.wbat_voltage >= 1.0) buf += "\n#B" + mac + "#" + String(datas.wbat_voltage);
   buf += "\n##\r\n";
   if(!client.connect("narodmon.ru", 8283)) Serial.println("send to narodmon failed");
   else client.print(buf);
@@ -89,6 +89,8 @@ void thingspk_recv(void){
   if(ThingSpeak.getLastReadStatus() == 200) datas.thng_pres_out = field;
   field = ThingSpeak.readFloatField(config.chid, config.tli, config.rdkey);
   if(ThingSpeak.getLastReadStatus() == 200) datas.thng_light_in = field;
+  field = ThingSpeak.readFloatField(config.chid, config.tbt, config.rdkey);
+  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_bat_disp = field;
 }
 
 void thingspk_send(void){
@@ -107,7 +109,7 @@ void thingspk_send(void){
     else if(config.f1[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f1[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f1[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f1[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f1[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
   }
   if(config.f1[0] == 2){
@@ -158,7 +160,7 @@ void thingspk_send(void){
     else if(config.f2[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f2[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f2[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f2[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f2[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
   }
   if(config.f2[0] == 2){
@@ -209,7 +211,7 @@ void thingspk_send(void){
     else if(config.f3[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f3[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f3[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f3[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f3[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
   }
   if(config.f3[0] == 2){
@@ -260,7 +262,7 @@ void thingspk_send(void){
     else if(config.f4[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f4[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f4[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f4[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f4[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
   }
   if(config.f4[0] == 2){
@@ -311,7 +313,7 @@ void thingspk_send(void){
     else if(config.f5[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f5[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f5[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f5[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f5[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
   }
   if(config.f5[0] == 2){
@@ -362,7 +364,7 @@ void thingspk_send(void){
     else if(config.f6[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f6[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f6[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f6[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f6[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
   }
   if(config.f6[0] == 2){
@@ -413,7 +415,7 @@ void thingspk_send(void){
     else if(config.f7[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f7[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f7[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f7[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f7[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
   }
   if(config.f7[0] == 2){
@@ -464,7 +466,7 @@ void thingspk_send(void){
     else if(config.f8[1] == 1) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
     else if(config.f8[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f8[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-    else if(config.f8[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+    else if(config.f8[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
     if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
   }
   if(config.f8[0] == 2){
@@ -668,7 +670,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd1[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd1[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd1[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd1[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd1[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic1.publish(str);
@@ -745,7 +747,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd2[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd2[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd2[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd2[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd2[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic2.publish(str);
@@ -822,7 +824,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd3[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd3[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd3[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd3[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd3[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic3.publish(str);
@@ -899,7 +901,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd4[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd4[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd4[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd4[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd4[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic4.publish(str);
@@ -976,7 +978,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd5[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd5[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd5[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd5[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd5[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic5.publish(str);
@@ -1053,7 +1055,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd6[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd6[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd6[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd6[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd6[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic6.publish(str);
@@ -1130,7 +1132,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd7[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd7[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd7[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd7[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd7[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic7.publish(str);
@@ -1207,7 +1209,7 @@ void TaskHC12MQTT(void *pvParameters){
           else if(config.fd8[1] == 1) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.hum_wsens:4040.0;
           else if(config.fd8[1] == 2) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
           else if(config.fd8[1] == 3) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
-          else if(config.fd8[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.bat_voltage:4040.0;
+          else if(config.fd8[1] == 4) val=((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
           if(val != 202 and val != 404.0 and val != 4040.0){
             dtostrf(val, 6, 2, str);
             topic8.publish(str);

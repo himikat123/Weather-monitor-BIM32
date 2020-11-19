@@ -388,6 +388,7 @@ void disp_receive(void){
           config.temp_in = root["temp_in"] | config.temp_in;
           config.hum_in = root["hum_in"] | config.hum_in;
           config.light_in = root["light_in"] | config.light_in;
+          config.bat_disp = root["bat_disp"] | config.bat_disp;
 
           config.utc = root["utc"] | config.utc;
           config.daylight = root["dlst"] | config.daylight;
@@ -508,6 +509,7 @@ void disp_receive(void){
           config.tti = root["tti"] | config.tti;
           config.thi = root["thi"] | config.thi;
           config.tli = root["tli"] | config.tli;
+          config.tbt = root["tbt"] | config.tbt;
 
           strlcpy(config.mqttT1, root["mqttT1"] | config.mqttT1, sizeof(config.mqttT1));
           strlcpy(config.mqttT2, root["mqttT2"] | config.mqttT2, sizeof(config.mqttT2));
@@ -581,7 +583,7 @@ void TaskHC12rcv(void *pvParameters){
           datas.light_wsens = root["l"][0].as<float>() + config.wsens_light_corr;
           uint8_t wlight_sens = root["l"][1].as<uint8_t>();
           datas.bat_adc = root["b"].as<int>();
-          datas.bat_voltage = (float)datas.bat_adc / (float)config.bat_k;
+          datas.wbat_voltage = (float)datas.bat_adc / (float)config.bat_k;
           String wrs = root["s"][wtemp_sens].as<String>();
           wrs.toCharArray(datas.wtemp_sens, wrs.length() + 1);
           wrs = root["s"][whum_sens].as<String>();
@@ -599,7 +601,7 @@ void TaskHC12rcv(void *pvParameters){
           Serial.print("datas.hum_wsens="); Serial.println(datas.hum_wsens);
           Serial.print("datas.pres_wsens="); Serial.println(datas.pres_wsens);
           Serial.print("datas.light_wsens="); Serial.println(datas.light_wsens);
-          Serial.print("datas.bat_voltage="); Serial.println(datas.bat_voltage);
+          Serial.print("datas.bat_voltage="); Serial.println(datas.wbat_voltage);
           Serial.print("datas.wtemp_wsens="); Serial.println(datas.temp_wsens);
           Serial.print("datas.whum_sens="); Serial.println(datas.whum_sens);
           Serial.print("datas.wpres_sens="); Serial.println(datas.wpres_sens);
@@ -616,10 +618,10 @@ void TaskHC12rcv(void *pvParameters){
             umax = 3.9;
           }
           float stp = (umax - umin) / 4;
-          if(datas.bat_voltage < (umin + stp)) datas.bat_level = 1;
-          else if(datas.bat_voltage < (umin + stp * 2)) datas.bat_level = 2;
-          else if(datas.bat_voltage < (umin + stp * 3)) datas.bat_level = 3;
-          else datas.bat_level = 4;
+          if(datas.wbat_voltage < (umin + stp)) datas.wbat_level = 1;
+          else if(datas.wbat_voltage < (umin + stp * 2)) datas.wbat_level = 2;
+          else if(datas.wbat_voltage < (umin + stp * 3)) datas.wbat_level = 3;
+          else datas.wbat_level = 4;
         }
       }
       if(wsensor.lastIndexOf("OK+RC") != -1){
@@ -699,6 +701,7 @@ void save_config(void){
   conf["temp_in"] = config.temp_in;
   conf["hum_in"] = config.hum_in;
   conf["light_in"] = config.light_in;
+  conf["bat_disp"] = config.bat_disp;
 
   conf["utc"] = config.utc;
   conf["dlst"] = config.daylight;
@@ -837,6 +840,7 @@ void save_config(void){
   conf["tti"] = config.tti;
   conf["thi"] = config.thi;
   conf["tli"] = config.tli;
+  conf["tbt"] = config.tbt;
 
   conf["tq1"] = config.tq1;
   conf["tq2"] = config.tq2;
@@ -921,6 +925,7 @@ void read_config(void){
       config.temp_in = conf["temp_in"];
       config.hum_in = conf["hum_in"];
       config.light_in = conf["light_in"];
+      config.bat_disp = conf["bat_disp"];
 
       config.utc = conf["utc"];
       config.daylight = conf["dlst"].as<bool>();
@@ -1039,6 +1044,7 @@ void read_config(void){
       config.tti = conf["tti"];
       config.thi = conf["thi"];
       config.tli = conf["tli"];
+      config.tbt = conf["tbt"];
 
       strlcpy(config.mqttT1, conf["mqttT1"], sizeof(config.mqttT1));
       strlcpy(config.mqttT2, conf["mqttT2"], sizeof(config.mqttT2));
@@ -1199,6 +1205,13 @@ void read_config(void){
       Serial.print("config.ds[3]="); Serial.println(config.ds[3]);
       Serial.print("config.ds[4]="); Serial.println(config.ds[4]);
       Serial.print("config.ds[5]="); Serial.println(config.ds[5]);
+      Serial.print("config.tto="); Serial.println(config.tto);
+      Serial.print("config.tho="); Serial.println(config.tho);
+      Serial.print("config.tpo="); Serial.println(config.tpo);
+      Serial.print("config.tti="); Serial.println(config.tti);
+      Serial.print("config.thi="); Serial.println(config.thi);
+      Serial.print("config.tli="); Serial.println(config.tli);
+      Serial.print("config.tbt="); Serial.println(config.tbt);
       Serial.println();
     }
     else Serial.println("deserialisation error");

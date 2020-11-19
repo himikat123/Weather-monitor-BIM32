@@ -27,13 +27,31 @@ void page1_send(void){
   else myNex.writeNum("hh.font", 2);
 
   // battery
-  if((now() - datas.time_wsens) < (config.wexpire * 60)){
+  Serial.print("config.bat_disp="); Serial.println(config.bat_disp);
+  if(config.bat_disp == 1){
+    Serial.print("now()-datas.time_wsens="); Serial.println(now()-datas.time_wsens);
+    Serial.print("datas.wbat_voltage="); Serial.println(datas.wbat_voltage);
+    Serial.print("datas.wbat_level="); Serial.println(datas.wbat_level);
+    if((now() - datas.time_wsens) < (config.wexpire * 60)){
+      myNex.writeNum("lbat.val", datas.wbat_voltage >= 0.0 ? datas.wbat_level : -1);
+      myNex.writeStr("ubat.txt", String(round(datas.wbat_voltage * 10) / 10, 1));
+    }
+    else{
+      myNex.writeNum("lbat.val", -1);
+      myNex.writeStr("ubat.txt", "0");
+    }
+  }
+  if(config.bat_disp == 9 and datas.thng_bat_disp < 20.0){
+    datas.bat_voltage = datas.thng_bat_disp;
+    float umin = 3.5;
+    float umax = 3.9;
+    float stp = (umax - umin) / 4;
+    if(datas.bat_voltage < (umin + stp)) datas.bat_level = 1;
+    else if(datas.bat_voltage < (umin + stp * 2)) datas.bat_level = 2;
+    else if(datas.bat_voltage < (umin + stp * 3)) datas.bat_level = 3;
+    else datas.bat_level = 4;
     myNex.writeNum("lbat.val", datas.bat_voltage >= 0.0 ? datas.bat_level : -1);
     myNex.writeStr("ubat.txt", String(round(datas.bat_voltage * 10) / 10, 1));
-  }
-  else{
-    myNex.writeNum("lbat.val", -1);
-    myNex.writeStr("ubat.txt", "0");
   }
     
   // antenna
@@ -229,6 +247,7 @@ void page10_send(void){
     myNex.writeNum("hi" + String(i) + ".val", config.hum_in == i ? 1 : 0);
     myNex.writeNum("po" + String(i) + ".val", config.pres_out == i ? 1 : 0);
     myNex.writeNum("li" + String(i) + ".val", config.light_in == i ? 1 : 0);
+    myNex.writeNum("b" + String(i) + ".val", config.bat_disp == i ? 1 : 0);
   }
   myNex.writeNum("upd.val", 1);
 }
@@ -447,13 +466,14 @@ void page22_send(void){
 }
 
 void page23_send(void){
-  for(uint8_t i = 0; i < 8; i++){
+  for(uint8_t i = 1; i < 9; i++){
     myNex.writeNum("f" + String(i) + "0.val", config.tto == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "1.val", config.tho == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "2.val", config.tpo == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "3.val", config.tti == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "4.val", config.thi == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "5.val", config.tli == i ? 1 : 0);
+    myNex.writeNum("f" + String(i) + "6.val", config.tbt == i ? 1 : 0);
   }
   myNex.writeNum("va0.val", 1);
 }

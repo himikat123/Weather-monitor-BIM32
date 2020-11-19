@@ -33,17 +33,19 @@ struct{
   uint8_t mn = 0; // might start minutes
   
   uint8_t temp_out = 0; // temperature source for displaying outdoor temperature
-  // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180, 4 = SHT21, 5 = DHT22
+  // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180, 4 = SHT21, 5 = DHT22, 8 = MQTT, 9 = ThingSpeak
   uint8_t hum_out = 0; // humidity source for outdoor humidity display
-  // 0 = internet, 1 = wireless sensor, 2 = BME280, 4 = SHT21, 5 = DHT22
+  // 0 = internet, 1 = wireless sensor, 2 = BME280, 4 = SHT21, 5 = DHT22, 8 = MQTT, 9 = ThingSpeak
   uint8_t pres_out = 0; // pressure source for displaying outdoor pressure
-  // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180
+  // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180, 8 = MQTT, 9 = ThingSpeak
   uint8_t temp_in = 1; // temperature source for displaying temperature in the house
-  // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180, 4 = SHT21, 5 = DHT22
+  // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180, 4 = SHT21, 5 = DHT22, 8 = MQTT, 9 = ThingSpeak
   uint8_t hum_in = 1; // humidity source for displaying humidity in the house
-  // 0 = internet, 1 = wireless sensor, 2 = BME280, 4 = SHT21, 5 = DHT22
+  // 0 = internet, 1 = wireless sensor, 2 = BME280, 4 = SHT21, 5 = DHT22, 8 = MQTT, 9 = ThingSpeak
   uint8_t light_in = 1; // light source for backlight brightness control
-  // 1 = wireless sensor, 8 = MAX44009, 9 = BH1750
+  // 1 = wireless sensor, 6 = MAX44009, 7 = BH1750, 8 = MQTT, 9 = ThingSpeak
+  uint8_t bat_disp = 1; // battery voltage source for displaying
+  // 1 = wireless sensor, 8 = MQTT, 9 = ThingSpeak
   
   int utc = 0; // Timezone
   bool daylight = false; // auto daylight saving time
@@ -124,6 +126,7 @@ struct{
   uint8_t tti = 0; // 
   uint8_t thi = 0; // 
   uint8_t tli = 0; // 
+  uint8_t tbt = 0; //
 
   bool tq1 = false; // 
   bool tq2 = false; // 
@@ -166,6 +169,8 @@ struct{
   uint16_t bat_adc = 0;
   uint8_t bat_level = 0;
   float bat_voltage = -1.0;
+  uint8_t wbat_level = 0;
+  float wbat_voltage = -1.0;
   //uint32_t upd_sens = 1500;
   time_t w_updated = 0;
   char description[128] = "";
@@ -217,6 +222,8 @@ struct{
   float thng_hum_in = 404.0;
   float thng_pres_out = 404.0;
   float thng_light_in = 404.0;
+  float thng_bat_disp = 404.0;
+  uint8_t thng_bat_levl = 0;
   uint8_t clock_dig[4] = {10,10,10,10};
 } datas;
 
