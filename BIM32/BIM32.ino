@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v1.0
+ *  Weather Monitor BIM32 v1.1.4
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020
  */
  
@@ -74,6 +74,7 @@ void TaskDisplay(void *pvParameters){
   (void) pvParameters;
   uint32_t but = 0;
   uint32_t old_bright = millis();
+  vTaskDelay(1000);
   myNex.writeStr("page page1");
   datas.page = 1;
   while(1){
