@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v1.1.4
+ *  Weather Monitor BIM32 v1.1.6
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020
  */
  
@@ -753,12 +753,8 @@ void save_config(void){
 
   conf["mqttServer"] = config.mqttServer;
   conf["mqttPort"] = config.mqttPort;
-  String str = String(config.mqttLogin);
-  str.replace("-", "_");
-  conf["mqttLogin"] = str;
-  str = String(config.mqttPass);
-  str.replace("-", "_");
-  conf["mqttPass"] = str;
+  conf["mqttLogin"] = config.mqttLogin;
+  conf["mqttPass"] = config.mqttPass;
   conf["fq1"] = config.fq1;
   conf["fq2"] = config.fq2;
   conf["fq3"] = config.fq3;

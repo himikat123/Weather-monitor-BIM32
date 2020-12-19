@@ -4,12 +4,13 @@ void getWeatherNow(void){
   String url;
   url = "http://api.openweathermap.org/data/2.5/weather";
   if(config.citysearch == 0) url += "?q="+String(config.city);
-  if(config.citysearch == 1) url += "?lat="+String(config.lat) + "&lon="+String(config.lon);
-  if(config.citysearch == 2) url += "?id="+String(config.cityid);
+  if(config.citysearch == 1) url += "?id="+String(config.cityid);
+  if(config.citysearch == 2) url += "?lat="+String(config.lat) + "&lon="+String(config.lon);
   url += "&units=metric";
   url += "&appid=" + String(config.appid);
   url += "&lang=" + String(config.lang);
   String httpData = weatherNowRequest(url);
+  Serial.println(url);
   parseWeatherNow(httpData);
 }
 

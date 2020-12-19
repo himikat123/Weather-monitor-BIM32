@@ -2,7 +2,7 @@
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v1.1.4";
+char fw[7] = "v1.1.6";
 
 struct{
   char lang[5] = "ru";
