@@ -10,10 +10,10 @@ void showForecast(int tempDay, int tempNight, uint8_t icon, uint8_t w_speed, uin
 
 void page1_send(void){
   // home temperature and humidity
-  int ht = round(datas.temp[1]/* * 10*/);
+  int ht = round(datas.temp[1]);
   if(datas.temp[1] < 100.0 and datas.temp[1] > -55.0){
-    myNex.writeStr("ht0.txt", /*String(ht % 10) +*/ "°C");
-    myNex.writeStr("ht1.txt", String(ht/* / 10*/)/* + "."*/);
+    myNex.writeStr("ht0.txt", "°C");
+    myNex.writeStr("ht1.txt", String(ht));
   }
   else{
     myNex.writeStr("ht0.txt", "");
@@ -29,7 +29,7 @@ void page1_send(void){
   // battery
   Serial.print("config.bat_disp="); Serial.println(config.bat_disp);
   if(config.bat_disp == 1){
-    Serial.print("now()-datas.time_wsens="); Serial.println(now()-datas.time_wsens);
+    Serial.print("now()-datas.time_wsens="); Serial.println(now() - datas.time_wsens);
     Serial.print("datas.wbat_voltage="); Serial.println(datas.wbat_voltage);
     Serial.print("datas.wbat_level="); Serial.println(datas.wbat_level);
     if((now() - datas.time_wsens) < (config.wexpire * 60)){
@@ -67,10 +67,10 @@ void page1_send(void){
   
   // outside temperature
   myNex.writeStr("trm.txt", (datas.temp[0] >= 0.0) ? "+" : "-");
-  int ot = round(datas.temp[0]/* * 10*/);
+  int ot = round(datas.temp[0]);
   if(datas.temp[0] < 100.0 and datas.temp[0] > -55.0){
-    myNex.writeStr("ot0.txt", /*String(ot % 10) + */"°C");
-    myNex.writeStr("ot1.txt", String(ot/* / 10*/)/* + "."*/);
+    myNex.writeStr("ot0.txt", "°C");
+    myNex.writeStr("ot1.txt", String(ot));
   }
   else{
     myNex.writeStr("ot0.txt", "");
@@ -123,23 +123,23 @@ void page1_send(void){
 
   // comfort ratio
   if(datas.temp[1] < 100.0 and datas.hum[1] <= 100){
-    if(datas.temp[1] > 21.9 and datas.temp[1] < 27.0 and datas.hum[1] > 30 and datas.hum[1] < 60)
+    if(datas.temp[1] >= 22.0 and datas.temp[1] <= 27.0 and datas.hum[1] >= 30 and datas.hum[1] <= 60)
       myNex.writeNum("cfrt.val", 0);
-    if(datas.temp[1] > 26.9 and datas.hum[1] > 30 and datas.hum[1] < 60)
+    if(datas.temp[1] > 27.0 and datas.hum[1] >= 30 and datas.hum[1] <= 60)
       myNex.writeNum("cfrt.val", 1);
-    if(datas.temp[1] < 22.0 and datas.hum[1] > 30 and datas.hum[1] < 60)
+    if(datas.temp[1] < 22.0 and datas.hum[1] >= 30 and datas.hum[1] <= 60)
       myNex.writeNum("cfrt.val", 2);
-    if(datas.temp[1] > 21.9 and datas.temp[1] < 26.0 and datas.hum[1] < 31)
+    if(datas.temp[1] >= 22.0 and datas.temp[1] <= 27.0 and datas.hum[1] < 30)
       myNex.writeNum("cfrt.val", 3);
-    if(datas.temp[1] > 21.9 and datas.temp[1] < 26.0 and datas.hum[1] > 59)
+    if(datas.temp[1] >= 22.0 and datas.temp[1] <= 27.0 and datas.hum[1] > 60)
       myNex.writeNum("cfrt.val", 4);
-    if(datas.temp[1] > 26.9 and datas.hum[1] > 59)
+    if(datas.temp[1] > 27.0 and datas.hum[1] > 60)
       myNex.writeNum("cfrt.val", 5);
-    if(datas.temp[1] > 26.9 and datas.hum[1] < 31)
+    if(datas.temp[1] > 27.0 and datas.hum[1] < 30)
       myNex.writeNum("cfrt.val", 6);
-    if(datas.temp[1] < 22.0 and datas.hum[1] > 59)
+    if(datas.temp[1] < 22.0 and datas.hum[1] > 60)
       myNex.writeNum("cfrt.val", 7);
-    if(datas.temp[1] < 22.0 and datas.hum[1] < 31)
+    if(datas.temp[1] < 22.0 and datas.hum[1] < 30)
       myNex.writeNum("cfrt.val", 8);
   }
   else myNex.writeNum("cfrt.val", -1);
@@ -155,39 +155,43 @@ void page1_send(void){
   datas.old_temp_d = datas.temp[2];
   datas.old_temp_n = datas.temp[3];
 
-  char dat[20] = "";
-  char temp[4] = "";
+  char dat[21] = "";
+  char temp[5] = "";
   deg = 0;
   Serial1.flush();
   Serial1.print("page4.data0.txt=\"");
-  for(uint8_t i = 0; i < 40; i++){
-    uint16_t t = round(datas.temp3hourly[i] * 10);
-    sprintf(temp, "%03d", t);
-    for(uint8_t k = 0; k < 3; k++) dat[k] = temp[k];
-    sprintf(temp, "%03d", datas.pres3hourly[i]);
-    for(uint8_t k = 0; k < 3; k++) dat[3 + k] = temp[k];
-    sprintf(temp, "%02d", datas.icon3hourly[i]);
-    for(uint8_t k = 0; k < 2; k++) dat[6 + k] = temp[k];
-    sprintf(temp, "%d", weekday(datas.date3hourly[i]) - 1);
-    dat[8] = temp[0];
-    sprintf(temp, "%02d", day(datas.date3hourly[i]));
-    for(uint8_t k = 0; k < 2; k++) dat[9 + k] = temp[k];
-    sprintf(temp, "%02d", month(datas.date3hourly[i]) - 1);
-    for(uint8_t k = 0; k < 2; k++) dat[11 + k] = temp[k];
-    sprintf(temp, "%02d", hour(datas.date3hourly[i]));
-    for(uint8_t k = 0; k < 2; k++) dat[13 + k] = temp[k];
-    uint8_t wind = round(datas.wspd3hourly[i]);
-    sprintf(temp, "%02d", wind);
-    for(uint8_t k = 0; k < 2; k++) dat[15 + k] = temp[k];
-    deg = round(datas.wdeg3hourly[i] / 45);
-    if(deg > 7) deg -= 8;
-    sprintf(temp, "%d", deg);
-    dat[17] = temp[0];
-    sprintf(temp, "%02d", datas.prec3hourly[i]);
-    for(uint8_t k = 0; k < 2; k++) dat[18 + k] = temp[k];
-    for(uint8_t k = 0; k < 20; k++) Serial1.print(dat[k]);
+  if(config.provider == 0){
+    for(uint8_t i = 0; i < 40; i++){
+      int16_t t = round(datas.temp3hourly[i] * 10);
+      sprintf(temp, "%04d", t);
+      for(uint8_t k = 0; k < 4; k++) dat[k] = temp[k];
+      sprintf(temp, "%03d", datas.pres3hourly[i]);
+      for(uint8_t k = 0; k < 3; k++) dat[4 + k] = temp[k];
+      sprintf(temp, "%02d", datas.icon3hourly[i]);
+      for(uint8_t k = 0; k < 2; k++) dat[7 + k] = temp[k];
+      sprintf(temp, "%d", weekday(datas.date3hourly[i]) - 1);
+      dat[9] = temp[0];
+      sprintf(temp, "%02d", day(datas.date3hourly[i]));
+      for(uint8_t k = 0; k < 2; k++) dat[10 + k] = temp[k];
+      sprintf(temp, "%02d", month(datas.date3hourly[i]) - 1);
+      for(uint8_t k = 0; k < 2; k++) dat[12 + k] = temp[k];
+      sprintf(temp, "%02d", hour(datas.date3hourly[i]));
+      for(uint8_t k = 0; k < 2; k++) dat[14 + k] = temp[k];
+      uint8_t wind = round(datas.wspd3hourly[i]);
+      sprintf(temp, "%02d", wind);
+      for(uint8_t k = 0; k < 2; k++) dat[16 + k] = temp[k];
+      deg = round(datas.wdeg3hourly[i] / 45);
+      if(deg > 7) deg -= 8;
+      sprintf(temp, "%d", deg);
+      dat[18] = temp[0];
+      sprintf(temp, "%02d", datas.prec3hourly[i]);
+      for(uint8_t k = 0; k < 2; k++) dat[19 + k] = temp[k];
+      for(uint8_t k = 0; k < 21; k++) Serial1.print(dat[k]);
+    }
   }
-  Serial1.flush();
+  if(config.provider == 1){
+    Serial1.print("-1");
+  }
   Serial1.print("\"");
   Serial1.write(0xFF);
   Serial1.write(0xFF);
@@ -200,6 +204,7 @@ void page1_send(void){
       if(fd > 4) break;
     }
   }
+  myNex.writeNum("upd.val", 1);
 }
 
 void page3_send(void){
@@ -267,19 +272,36 @@ void page12_send(void){
   myNex.writeStr("apid.txt", String(config.appid));
   if(config.citysearch == 0){
     myNex.writeNum("c0.val", 1);
+    myNex.writeNum("c1.val", 0);
+    myNex.writeNum("c2.val", 0);
     myNex.writeNum("city.pco", 65535);
   }
   if(config.citysearch == 1){
+    myNex.writeNum("c0.val", 0);
     myNex.writeNum("c1.val", 1);
+    myNex.writeNum("c2.val", 0);
     myNex.writeNum("cityid.pco", 65535);
   }
   if(config.citysearch == 2){
+    myNex.writeNum("c0.val", 0);
+    myNex.writeNum("c1.val", 0);
     myNex.writeNum("c2.val", 1);
     myNex.writeNum("lat.pco", 65535);
     myNex.writeNum("lon.pco", 65535);
     myNex.writeNum("t5.pco", 65535);
     myNex.writeNum("t6.pco", 65535);
   }
+  if(config.provider == 0){
+    myNex.writeNum("c3.val", 1);
+    myNex.writeNum("c4.val", 0);
+    myNex.writeStr("t9.txt", "APPID");
+  }
+  if(config.provider == 1){
+    myNex.writeNum("c3.val", 0);
+    myNex.writeNum("c4.val", 1);
+    myNex.writeStr("t9.txt", "KEY");
+  }
+  myNex.writeNum("upd.val", 1);
 }
 
 void page13_send(void){
@@ -294,6 +316,7 @@ void page13_send(void){
   myNex.writeStr("bmpp.txt", String(sensors.bmp180_pres_corr));
   myNex.writeStr("max.txt", String(sensors.max44009_light_corr, 1));
   myNex.writeStr("bh.txt", String(sensors.bh1750_light_corr, 1));
+  myNex.writeNum("upd.val", 1);
 }
 
 void sens_data_send(void){
@@ -320,6 +343,7 @@ void page14_send(void){
   myNex.writeNum("bat1.val", config.bat_type == 1 ? 1 : 0);
   myNex.writeStr("chnum.txt", String(config.wsens_channel));
   myNex.writeStr("wexpire.txt", String(config.wexpire));
+  myNex.writeNum("upd.val", 1);
 }
 
 void wsens_data_send(void){
@@ -353,6 +377,7 @@ void page15_send(void){
   String mac = "BIM" + WiFi.macAddress();
   mac.replace(":", "");
   myNex.writeStr("monmac.txt", mac);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page16_send(void){
@@ -375,7 +400,7 @@ void page16_send(void){
     myNex.writeNum("f8" + String(i) + ".val", config.fd8[0] == i ? 1 : 0);
     if(i < 6 and config.fd8[0] == i) myNex.writeNum("f8" + String(i) + ".pco", color[config.fd8[1]]);
   }
-  myNex.writeNum("va0.val", 1);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page17_send(void){
@@ -398,7 +423,7 @@ void page17_send(void){
     myNex.writeNum("f8" + String(i) + ".val", config.f8[0] == i ? 1 : 0);
     if(i < 6 and config.f8[0] == i) myNex.writeNum("f8" + String(i) + ".pco", color[config.f8[1]]);
   }
-  myNex.writeNum("va0.val", 1);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page18_send(void){
@@ -416,6 +441,7 @@ void page18_send(void){
   }
   myNex.writeStr("lat.txt", String(config.lat));
   myNex.writeStr("lon.txt", String(config.lon));
+  myNex.writeNum("upd.val", 1);
 }
 
 void page19_send(void){
@@ -439,18 +465,20 @@ void page19_send(void){
   myNex.writeNum("f6.val", config.fq6 ? 1 : 0);
   myNex.writeNum("f7.val", config.fq7 ? 1 : 0);
   myNex.writeNum("f8.val", config.fq8 ? 1 : 0);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page20_send(void){
   myNex.writeStr("rdkey.txt", String(config.rdkey));
   myNex.writeStr("wrkey.txt", String(config.wrkey));
   myNex.writeStr("chid.txt", String(config.chid));
+  myNex.writeNum("upd.val", 1);
 }
 
 void page21_send(void){
   myNex.writeNum("mqttrcv.val", config.mqttrcv ? 1 : 0);
   myNex.writeNum("thngrcv.val", config.thngrcv ? 1 : 0);
-  myNex.writeNum("va0.val", 1);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page22_send(void){
@@ -462,7 +490,7 @@ void page22_send(void){
     myNex.writeNum("f" + String(i) + "4.val", config.mhi == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "5.val", config.mli == i ? 1 : 0);
   }
-  myNex.writeNum("va0.val", 1);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page23_send(void){
@@ -475,7 +503,7 @@ void page23_send(void){
     myNex.writeNum("f" + String(i) + "5.val", config.tli == i ? 1 : 0);
     myNex.writeNum("f" + String(i) + "6.val", config.tbt == i ? 1 : 0);
   }
-  myNex.writeNum("va0.val", 1);
+  myNex.writeNum("upd.val", 1);
 }
 
 void page24_send(void){
@@ -489,12 +517,8 @@ void page24_send(void){
     }
     if(++k > 6) k = 0;
   }
-  myNex.writeNum("va3.val", 1);
-}
-
-void page24a_send(void){
   for(uint8_t k = 0; k < 6; k++){
     myNex.writeStr("t" + String(k + 1) + ".txt", String(config.dp[k]));
-    Serial.println("t" + String(k + 1) + ".txt=" + String(config.dp[k]));
   }
+  myNex.writeNum("upd.val", 1);
 }

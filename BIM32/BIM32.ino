@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v1.1.6
+ *  Weather Monitor BIM32 v1.2
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020
  */
  
@@ -92,7 +92,7 @@ void TaskDisplay(void *pvParameters){
       but = millis();
     }
     disp_receive();
-    if(datas.page == 1){
+    if(datas.page == 1 or datas.old_ant == 0){
       int8_t ant_diff = (datas.old_ant > datas.ant) ? (datas.old_ant - datas.ant) : (datas.ant - datas.old_ant);
       if(datas.old_htemp != datas.temp[1] or
          datas.old_hhum != datas.hum[1] or
@@ -218,7 +218,7 @@ void TaskWeather(void *pvParameters){
     if(datas.net_connected){
       getWeatherNow();
       getWeatherDaily();
-
+      datas.old_ant = 0;
       vTaskDelay(1200000);
     }
     else vTaskDelay(10);
@@ -296,7 +296,7 @@ void wifi_connect(void){
     while(WiFi.status() != WL_CONNECTED){
       i++;
       vTaskDelay(500);
-      if(i > 100) ESP.restart();
+      if(i > 100) break;
     }
     WiFi.setAutoConnect(true);
     WiFi.setAutoReconnect(true);
@@ -337,6 +337,7 @@ void disp_receive(void){
             );
             page1_send();
           }
+          //if(datas.page == 1) datas.old_ant = datas.ant;
           if(datas.page == 3) page3_send();
           if(datas.page == 8) page8_send();
           if(datas.page == 9) page9_send();
@@ -362,7 +363,6 @@ void disp_receive(void){
           if(datas.page == 22) page22_send();
           if(datas.page == 23) page23_send();
           if(datas.page == 24) page24_send();
-          if(datas.page == 240) page24a_send();
         }
         if(disp.lastIndexOf("save") != -1){
           strlcpy(config.ssid, root["ssid"] | config.ssid, sizeof(config.ssid));
@@ -401,6 +401,7 @@ void disp_receive(void){
           strlcpy(config.lon, root["lon"] | config.lon, sizeof(config.lon));
           strlcpy(config.appid, root["appid"] | config.appid, sizeof(config.appid));
           config.citysearch = root["citysearch"] | config.citysearch;
+          config.provider = root["provider"] | config.provider;
 
           sensors.bme280_temp_corr = root["bmet"] | sensors.bme280_temp_corr;
           sensors.bmp180_temp_corr = root["bmpt"] | sensors.bmp180_temp_corr;
@@ -714,6 +715,7 @@ void save_config(void){
   conf["lon"] = config.lon;
   conf["appid"] = config.appid;
   conf["citysearch"] = config.citysearch;
+  conf["provider"] = config.provider;
 
   conf["bmet"] = sensors.bme280_temp_corr;
   conf["bmpt"] = sensors.bmp180_temp_corr;
@@ -883,7 +885,7 @@ void save_config(void){
 
   serializeJson(conf, json);
   File file = SPIFFS.open("/config.json", FILE_WRITE);
-  if(file.print(json)) myNex.writeStr("vis ok,0");
+  if(file.print(json)) myNex.writeNum("ok.pic",133);
   else Serial.println("ERROR Write file");
   file.close();
   Serial.println(json);
@@ -934,6 +936,7 @@ void read_config(void){
       strlcpy(config.lon, conf["lon"], sizeof(config.lon));
       strlcpy(config.appid, conf["appid"], sizeof(config.appid));
       config.citysearch = conf["citysearch"];
+      config.provider = conf["provider"];
 
       sensors.bme280_temp_corr = conf["bmet"];
       sensors.bmp180_temp_corr = conf["bmpt"];

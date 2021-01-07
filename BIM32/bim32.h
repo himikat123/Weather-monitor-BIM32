@@ -2,7 +2,7 @@
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v1.1.6";
+char fw[7] = "v1.2";
 
 struct{
   char lang[5] = "ru";
@@ -56,6 +56,7 @@ struct{
   char lon[32] = "37.617"; // lоngitude
   char appid[40] = ""; // APPID
   uint8_t citysearch = 0; // the way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
+  uint8_t provider = 0; // weather forecast provider. 0 = openweathermap.org, 1 = weatherbit.io
   
   uint8_t tupd = 5;       // period of sending data to the cloud, in minutes
   bool mqttsend = false;  // whether to send data over MQTT 
