@@ -2,7 +2,7 @@
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v1.2";
+char fw[7] = "v1.2.1";
 
 struct{
   char lang[5] = "ru";
@@ -54,7 +54,8 @@ struct{
   char cityid[12] = "6609999"; // City ID
   char lat[32] = "55.751"; // latitude
   char lon[32] = "37.617"; // lоngitude
-  char appid[40] = ""; // APPID
+  char appid[40] = ""; // APPID openweathermap.org
+  char appkey[40] = ""; // KEY weatherbit.io
   uint8_t citysearch = 0; // the way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
   uint8_t provider = 0; // weather forecast provider. 0 = openweathermap.org, 1 = weatherbit.io
   
@@ -194,7 +195,7 @@ struct{
   uint8_t icon[5] = {0, 0, 0, 0, 0};
   uint8_t old_icon = 0;
   float w_speed[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
-  uint8_t w_dir[5] = {-1, -1, -1, -1, -1};
+  uint16_t w_dir[5] = {-1, -1, -1, -1, -1};
   time_t sunrise = 0;
   time_t sunset = 0;
   char country[5] = "";

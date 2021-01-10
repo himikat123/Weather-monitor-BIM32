@@ -27,7 +27,7 @@ void getWeatherNow(void){
   }
   if(config.provider == 1){
     url = "http://api.weatherbit.io/v2.0/current?key=";
-    url += String(config.appid);
+    url += String(config.appkey);
     if(config.citysearch == 0) url += "&city=" + String(config.city);
     if(config.citysearch == 1) url += "&lat=" + String(config.lat) + "&lon=" + String(config.lon);
     if(config.citysearch == 2) url += "&city_id=" + String(config.cityid);
@@ -127,6 +127,10 @@ void getWeatherDaily(void){
   if(config.provider == 0){
     OWM_fiveForecast *ow_fcast5 = new OWM_fiveForecast[40];
     byte entries = owF5.updateForecast(ow_fcast5, 40, config.appid, datas.country, datas.city, "metric");
+    datas.w_dir[1] = 0;
+    datas.w_dir[2] = 0;
+    datas.w_dir[3] = 0;
+    datas.w_dir[4] = 0;
     for(byte i = 0; i <= entries; ++i){ 
       datas.date3hourly[i] = ow_fcast5[i].dt.toInt();
       datas.icon3hourly[i] = ow_fcast5[i].icon.toInt();
@@ -184,7 +188,7 @@ void getWeatherDaily(void){
   }
   if(config.provider == 1){
     String url = "http://api.weatherbit.io/v2.0/forecast/daily?key=";
-    url += String(config.appid);
+    url += String(config.appkey);
     if(config.citysearch == 0) url += "&city=" + String(config.city);
     if(config.citysearch == 1) url += "&lat=" + String(config.lat) + "&lon=" + String(config.lon);
     if(config.citysearch == 2) url += "&city_id=" + String(config.cityid);

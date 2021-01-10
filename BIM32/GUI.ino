@@ -1,11 +1,11 @@
 void showForecast(int tempDay, int tempNight, uint8_t icon, uint8_t w_speed, uint8_t w_dir, uint8_t day){
-  myNex.writeNum("icon" + String(day) + ".val", icon);                                      // icon
-  myNex.writeStr("wn" + String(day) + ".txt", (w_speed > 50) ? "--" : String(w_speed));     // wind speed
-  myNex.writeNum("wi" + String(day) + ".val", (w_dir == -1) ? -1 : round(w_dir / 45));      // wind direction
-  if(tempDay > 99 or tempDay < -50) myNex.writeStr("td" + String(day) + ".txt", "--");      // max temp
-  else myNex.writeStr("td" + String(day) + ".txt", String(tempDay) + "°");                  // max temp
-  if(tempNight > 99 or tempNight < -50) myNex.writeStr("tn" + String(day) + ".txt", "--");  // min temp
-  else myNex.writeStr("tn" + String(day) + ".txt", String(tempNight) + "°");                // min temp
+  myNex.writeNum("icon" + String(day) + ".val", icon);                                         // icon
+  myNex.writeStr("wn" + String(day) + ".txt", (w_speed > 50) ? "--" : String(w_speed));        // wind speed
+  myNex.writeNum("wi" + String(day) + ".val", (w_dir == -1) ? -1 : round(float(w_dir) / 45.0));// wind direction
+  if(tempDay > 99 or tempDay < -50) myNex.writeStr("td" + String(day) + ".txt", "--");         // max temp
+  else myNex.writeStr("td" + String(day) + ".txt", String(tempDay) + "°");                     // max temp
+  if(tempNight > 99 or tempNight < -50) myNex.writeStr("tn" + String(day) + ".txt", "--");     // min temp
+  else myNex.writeStr("tn" + String(day) + ".txt", String(tempNight) + "°");                   // min temp
 }
 
 void page1_send(void){
@@ -98,10 +98,10 @@ void page1_send(void){
   uint8_t wsp = round(datas.w_speed[0]);
   if(wsp > 50) myNex.writeStr("wn.txt", "--");
   else myNex.writeStr("wn.txt", String(wsp));
-  uint8_t deg = round(datas.w_dir[0] / 45);
-  if(deg > 7) deg -= 8;
+  uint8_t deg = round(float(datas.w_dir[0]) / 45.0);
+  if(deg > 7) deg = 0;
   myNex.writeNum("wi0.val", deg);
-
+  
   // weather description
   myNex.writeStr("descr.txt", datas.description);
   
@@ -114,7 +114,14 @@ void page1_send(void){
   // weather forecast
   uint8_t wd = weekday() - 1;
   for(uint8_t i = 1; i < 5; i++){
-    showForecast(round(datas.temp[(i*2)]), round(datas.temp[((i*2)+1)]), datas.icon[i], datas.w_speed[i], datas.w_dir[i], i);
+    showForecast(
+      round(datas.temp[(i*2)]),
+      round(datas.temp[((i*2)+1)]),
+      datas.icon[i],
+      datas.w_speed[i],
+      datas.w_dir[i] > 360 ? 0 : datas.w_dir[i],
+      i
+    );
     if(++wd > 6) wd = 0;
   }
   
@@ -180,8 +187,8 @@ void page1_send(void){
       uint8_t wind = round(datas.wspd3hourly[i]);
       sprintf(temp, "%02d", wind);
       for(uint8_t k = 0; k < 2; k++) dat[16 + k] = temp[k];
-      deg = round(datas.wdeg3hourly[i] / 45);
-      if(deg > 7) deg -= 8;
+      deg = round(float(datas.wdeg3hourly[i]) / 45.0);
+      if(deg > 7) deg = 0;
       sprintf(temp, "%d", deg);
       dat[18] = temp[0];
       sprintf(temp, "%02d", datas.prec3hourly[i]);
@@ -270,6 +277,7 @@ void page12_send(void){
   myNex.writeStr("lat.txt", String(config.lat));
   myNex.writeStr("lon.txt", String(config.lon));
   myNex.writeStr("apid.txt", String(config.appid));
+  myNex.writeStr("key.txt", String(config.appkey));
   if(config.citysearch == 0){
     myNex.writeNum("c0.val", 1);
     myNex.writeNum("c1.val", 0);
