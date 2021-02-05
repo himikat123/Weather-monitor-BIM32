@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="update.css">
+    <style media="screen" id="stl"></style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="update.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body onload="loaded()">
+    <div id="loading" class="active">Загрузка...</div>
+    <div id="logout">
+      <a href=# title="Выход" onclick="logout()">
+        <img src="logout.png" alt="Выход">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Статус</a>
+        <li><a href="network.htm">Сеть</a>
+        <li><a href="sensors.htm">Сенсоры</a>
+        <li><a href="weather.htm">Погода</a>
+        <li><a href="disp.htm">Дисплей</a>
+        <li><a href="clock.htm">Часы</a>
+        <li><a href="send.htm">Отправка данных</a>
+        <li><a href="receive.htm">Прием данных</a>
+        <li><a href="backup.htm">Резервная копия</a>
+        <li><a href="default.htm">Сброс настроек</a>
+        <li><a href="user.htm">Пользователь</a>
+        <li><a href="update.htm">Прошивка</a>
+        <li><a href="filesystem.htm">Файловая система</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <h2 class="hh">Обновление прошивки</h2><hr>
+      <form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
+        <h4 class="hds">Прошивка файлом</h4>
+        <div class="dd">
+          <label for="fl" class="flup">
+            <span class="btn btn-primary">Выберите файл</span>
+          </label>
+          <input id="fl" type="file" name="update" />
+        </div>
+        <div class="dd">
+          <input id="sm" type="submit" value="Обновить" class="btn btn-primary" />
+        </div>
+        <div id="fnm" class="hds"></div>
+      </form>
+      <div id="kr" class="progress-circle p0">
+        <span id="prg">0%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div><hr>
+    </main>
+  </body>
+</html>

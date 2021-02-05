@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+#mqtt_recv,
+#thng_recv{
+  display:none;
+}
+
+.kurz{
+  width: 70%;
+  margin: auto;
+}

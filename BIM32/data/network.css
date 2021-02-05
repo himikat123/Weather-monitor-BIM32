@@ -1,0 +1,57 @@
+@charset "UTF-8";
+
+#ssids{
+  width: 300px;
+  max-height: 400px;
+  background-color: #FFF;
+  border: 1px solid #000;
+  border-radius:0.5em;
+  margin-left: calc(50% - 200px);
+  display: none;
+  position: absolute;
+  z-index: 100;
+  padding: 0 5px;
+}
+
+#ssids div{
+  padding: 5px 0 5px 25px;
+  text-align: left;
+  word-wrap: break-word;
+  background-repeat: no-repeat;
+}
+
+#ssids div:hover{
+  background-color: #DDD;
+}
+
+.ss{
+  color: blue;
+  font-size: 1em;
+  padding: 5px 0;
+}
+
+#cnv{
+  display: none;
+}
+
+.passw{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.password{
+	position: relative;
+  width: 300px;
+  text-align: center;
+}
+
+.tab{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hid{
+  display: none;
+}

@@ -1,0 +1,19 @@
+@charset "UTF-8";
+
+.sen{
+  display: flex;
+  justify-content: center;
+}
+
+.sen input{
+  width: 70px;
+}
+
+.sen td:first-child{
+  text-align: right;
+}
+
+.data{
+  font-weight: bold;
+  color: #00F;
+}

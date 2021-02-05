@@ -1,4 +1,6 @@
-let config, sig, dbmet, dbmeh, dbmep, dbmpt, dbmpp, dshtt, dshth, ddhtt, ddhth, mnph, mnicn;
+let config, sig, dbmet, dbmeh, dbmep, dbmpt, dbmpp, dshtt, dshth, ddhtt, ddhth;
+let mnph, mnicn, wtemp, whum, wpres, wlight, wubat, wlbat;
+let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32/data/';
 
 function status_update(){
   $.getJSON("esp/status.php",function(json){
@@ -16,6 +18,12 @@ function status_update(){
     ddhth = json['ddhth'];
     mnph = json['moon_phase'];
     mnicn = json['moon_icon'];
+    wtemp = json['temp_wsens'];
+    whum = json['hum_wsens'];
+    wpres = json['pres_wsens'];
+    wlight = json['light_wsens'];
+    wlbat = json['wbat_level'];
+    wubat = json['wbat_voltage'];
     $('#loading').removeClass('active');
   });
 }
@@ -57,22 +65,22 @@ function clock_upd(context){
   clock_hr0.onload = function(){
     context.drawImage(clock_hr0, 2, 2);
   };
-  clock_hr0.src = `${hr0}.png`;
+  clock_hr0.src = `${git}${hr0}.png?raw=true`;
   let clock_hr1 = new Image();
   clock_hr1.onload = function(){
     context.drawImage(clock_hr1, 48, 2);
   };
-  clock_hr1.src = `${hr1}.png`;
+  clock_hr1.src = `${git}${hr1}.png?raw=true`;
   let clock_mn0 = new Image();
   clock_mn0.onload = function(){
     context.drawImage(clock_mn0, 116, 2);
   };
-  clock_mn0.src = `${mn0}.png`;
+  clock_mn0.src = `${git}${mn0}.png?raw=true`;
   let clock_mn1 = new Image();
   clock_mn1.onload = function(){
     context.drawImage(clock_mn1, 162, 2);
   };
-  clock_mn1.src = `${mn1}.png`;
+  clock_mn1.src = `${git}${mn1}.png?raw=true`;
 
   context.fillStyle = "black";
   context.fillRect(211, 0, 60, 57);
@@ -106,14 +114,14 @@ function clock_upd(context){
   ant.onload = function(){
     context.drawImage(ant, 431, 1);
   };
-  ant.src = `ant${ant_level}.png`;
+  ant.src = `${git}ant${ant_level}.png?raw=true`;
 
   if(mnicn != undefined){
     let moon_icon = new Image();
     moon_icon.onload = function(){
       context.drawImage(moon_icon, 450, 193);
     };
-    moon_icon.src = `moon${mnicn}.png`;
+    moon_icon.src = `${git}moon${mnicn}.png?raw=true`;
   }
   moon = ['Новолуние', 'Молодая луна', 'Первая четверть', 'Прибывающая луна',
           'Полнолуние', 'Убывающая луна', 'Последняя четверть', 'Старая луна'];
@@ -127,24 +135,26 @@ function clock_upd(context){
 }
 
 function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum_weather, pres_weather){
+  let cf = ['Комфортно', 'Жарко', 'Холодно', 'Слишком сухо', 'Слишком влажно',
+            'Жарко и влажно', 'Жарко и сухо', 'Холодно и влажно', 'Холодно и сухо'];
   if(icon == '03d') icon = '02d';
   if(icon == '03n') icon = '02n';
   let icon_img = new Image();
   icon_img.onload = function(){
     context.drawImage(icon_img, 0, 116);
   };
-  icon_img.src = `${icon}.png`;
+  icon_img.src = `${git}${icon}.png?raw=true`;
 
   let wind_icon = new Image();
   wind_icon.onload = function(){
     context.drawImage(wind_icon, 97, 194);
   };
-  wind_icon.src = "wind.png";
+  wind_icon.src = `${git}wind.png?raw=true`;
   let temp_icon = new Image();
   temp_icon.onload = function(){
     context.drawImage(temp_icon, 99, 140);
   };
-  temp_icon.src = "temp.png";
+  temp_icon.src = `${git}temp.png?raw=true`;
 
   let wind_dir = new Image();
   wind_dir.onload = function(){
@@ -152,13 +162,13 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   };
   let deg = Math.round(w_dir / 45.0) + 1;
   if(deg > 7) deg = 0;
-  wind_dir.src = `w${deg}.png`;
+  wind_dir.src = `${git}w${deg}.png?raw=true`;
 
-  let temp_out, temp_in, hum_out, hum_in, pres_out;
+  let temp_out, temp_in, hum_out, hum_in, pres_out, ubat, lbat;
   if(config != undefined){
     switch(Number(config['temp_out'])){
       case 0: temp_out = temp_weather; break;
-      case 1: temp_out = '--'; break;
+      case 1: temp_out = wtemp; break;
       case 2: temp_out = dbmet; break;
       case 3: temp_out = dbmpt; break;
       case 4: temp_out = dshtt; break;
@@ -167,7 +177,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
     }
     switch(Number(config['temp_in'])){
       case 0: temp_in = temp_weather; break;
-      case 1: temp_in = '--'; break;
+      case 1: temp_in = wtemp; break;
       case 2: temp_in = dbmet; break;
       case 3: temp_in = dbmpt; break;
       case 4: temp_in = dshtt; break;
@@ -176,7 +186,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
     }
     switch(Number(config['hum_out'])){
       case 0: hum_out = hum_weather; break;
-      case 1: hum_out = '--'; break;
+      case 1: hum_out = whum; break;
       case 2: hum_out = dbmeh; break;
       case 4: hum_out = dshth; break;
       case 5: hum_out = ddhth; break;
@@ -184,7 +194,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
     }
     switch(Number(config['hum_in'])){
       case 0: hum_in = hum_weather; break;
-      case 1: hum_in = '--'; break;
+      case 1: hum_in = whum; break;
       case 2: hum_in = dbmeh; break;
       case 4: hum_in = dshth; break;
       case 5: hum_in = ddhth; break;
@@ -192,18 +202,20 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
     }
     switch(Number(config['pres_out'])){
       case 0: pres_out = pres_weather; break;
-      case 1: pres_out = '--'; break;
+      case 1: pres_out = wpres; break;
       case 2: pres_out = dbmep; break;
       case 3: pres_out = dbmpp; break;
       default: pres_out = '--'; break;
     }
   }
 
-  temp_out = (temp_out == undefined) ? '--' : Math.round(temp_out) + '°';
-  temp_in = (temp_in == undefined) ? '--' : Math.round(temp_in) + '°';
-  hum_out = (hum_out == undefined) ? '--' : (hum_out > 99) ? Math.round(hum_out) : Math.round(hum_out) + '%';
-  hum_in = (hum_in == undefined) ? '--' : Math.round(hum_in) + '%';
-  pres_out = (pres_out == undefined) ? '--' : Math.round(pres_out) + 'мм';
+  temp_out = (temp_out == undefined || temp_out > 99 || temp_out < -49) ? '--' : Math.round(temp_out) + '°';
+  temp_in = (temp_in == undefined || temp_in > 99 || temp_in < -49) ? '--' : Math.round(temp_in) + '°';
+  hum_out = (hum_out == undefined || hum_out > 100 || hum_out < 0) ? '--' : (hum_out > 99) ? Math.round(hum_out) : Math.round(hum_out) + '%';
+  hum_in = (hum_in == undefined || hum_in > 100 || hum_in < 0) ? '--' : Math.round(hum_in) + '%';
+  pres_out = (pres_out == undefined || pres_out > 800 || pres_out < 500) ? '--' : Math.round(pres_out) + 'мм';
+  ubat = (wubat == undefined || wubat > 20 || wubat < 0) ? '' : Math.round(wubat * 10) / 10;
+  lbat = (wlbat == undefined || wlbat > 4 || wlbat < 1) ? 0 : wlbat;
 
   context.fillStyle = "black";
   context.fillRect(98, 109, 381, 29);
@@ -213,6 +225,8 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   context.fillRect(116, 143, 100, 48);
   context.fillRect(262, 143, 58, 48);
   context.fillRect(372, 143, 98, 48);
+  context.fillRect(340, 12, 30, 16);
+  context.fillRect(272, 35, 157, 22);
   context.font = '40px Ubuntu';
   context.fillStyle = "rgb(255, 255, 0)";
   context.fillText(temp_out, 160 - context.measureText(temp_out).width / 2, 185);
@@ -227,6 +241,30 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   context.fillText(descript, 288 - context.measureText(descript).width / 2, 131);
   context.font = '20px Ubuntu';
   context.fillText(`${w_speed}м/с`, 167, 215);
+  let bat = new Image();
+  bat.onload = function(){
+    context.drawImage(bat, 377, 1);
+  };
+  bat.src = `${git}bat${lbat}.png?raw=true`;
+  context.fillStyle = "rgb(0, 255, 0)";
+  context.font = '14px Ubuntu';
+  if(ubat != '') context.fillText(`${ubat}в`, 340, 26);
+
+  context.fillStyle = "white";
+  context.font = '16px Ubuntu';
+  if(temp_in != '--' && hum_in != '--'){
+    let cfrt = 0;
+    if(temp_in >= 22.0 && temp_in <= 27.0 && hum_in >= 30 && hum_in <= 60) cfrt = 0;
+    if(temp_in > 27.0 && hum_in >= 30 && hum_in <= 60) cfrt = 1;
+    if(temp_in < 22.0 && hum_in >= 30 && hum_in <= 60) cfrt = 2;
+    if(temp_in >= 22.0 && temp_in <= 27.0 && hum_in < 30) cfrt = 3;
+    if(temp_in >= 22.0 && temp_in <= 27.0 && hum_in > 60) cfrt = 4;
+    if(temp_in > 27.0 && hum_in > 60) cfrt = 5;
+    if(temp_in > 27.0 && hum_in < 30) cfrt = 6;
+    if(temp_in < 22.0 && hum_in > 60) cfrt = 7;
+    if(temp_in < 22.0 && hum_in < 30) cfrt = 8;
+    context.fillText(cf[cfrt], 350 - context.measureText(cf[cfrt]).width / 2, 50);
+  }
 }
 
 function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_daily){
@@ -235,25 +273,25 @@ function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_d
   icon1_img.onload = function(){
     context.drawImage(icon1_img, 3, 247);
   };
-  icon1_img.src = `i${icon_daily[0]}.png`;
+  icon1_img.src = `${git}i${icon_daily[0]}.png?raw=true`;
   if(icon_daily[1] == 3) icon_daily[1] = 2;
   let icon2_img = new Image();
   icon2_img.onload = function(){
     context.drawImage(icon2_img, 123, 247);
   };
-  icon2_img.src = `i${icon_daily[1]}.png`;
+  icon2_img.src = `${git}i${icon_daily[1]}.png?raw=true`;
   if(icon_daily[2] == 3) icon_daily[2] = 2;
   let icon3_img = new Image();
   icon3_img.onload = function(){
     context.drawImage(icon3_img, 243, 247);
   };
-  icon3_img.src = `i${icon_daily[2]}.png`;
+  icon3_img.src = `${git}i${icon_daily[2]}.png?raw=true`;
   if(icon_daily[3] == 3) icon_daily[3] = 2;
   let icon4_img = new Image();
   icon4_img.onload = function(){
     context.drawImage(icon4_img, 363, 247);
   };
-  icon4_img.src = `i${icon_daily[3]}.png`;
+  icon4_img.src = `${git}i${icon_daily[3]}.png?raw=true`;
 
   context.fillStyle = "black";
   context.fillRect(52, 236, 66, 28);
@@ -310,7 +348,7 @@ function weather(){
     ground.onload = function(){
       context.drawImage(ground, 0, 0);
     };
-    ground.src = "disp.png";
+    ground.src = `${git}disp.png?raw=true`;
 
     setInterval(function(){
       clock_upd(context);
