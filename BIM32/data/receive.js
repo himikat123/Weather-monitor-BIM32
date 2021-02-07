@@ -100,6 +100,7 @@ $(function(){
     config.tti = Number($('#tti').val());
     config.thi = Number($('#thi').val());
     config.tli = Number($('#tli').val());
+    config.tbt = Number($('#tbt').val());
     $.ajax({
 	    url: 'esp/save.php',
 	    method: 'post',

@@ -157,7 +157,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed){
   icon_img.onload = function(){
     context.drawImage(icon_img, 0, 116);
   };
-  icon_img.src = `${git}${icon}.png?raw=true`;
+  if(icon != undefined) icon_img.src = `${git}${icon}.png?raw=true`;
 
   let wind_dir = new Image();
   wind_dir.onload = function(){
@@ -165,16 +165,16 @@ function curr_weather(context, icon, w_dir, descript, w_speed){
   };
   let deg = Math.round(w_dir / 45.0) + 1;
   if(deg > 7) deg = 0;
-  wind_dir.src = `${git}w${deg}.png?raw=true`;
+  if(deg > 0 && deg < 100) wind_dir.src = `${git}w${deg}.png?raw=true`;
 
   context.fillStyle = "black";
   context.fillRect(98, 109, 381, 29);
   context.fillRect(167, 195, 50, 25);
   context.font = '24px Ubuntu';
   context.fillStyle = "white";
-  context.fillText(descript, 288 - context.measureText(descript).width / 2, 130);
+  if(descript != undefined) context.fillText(descript, 288 - context.measureText(descript).width / 2, 130);
   context.font = '20px Ubuntu';
-  context.fillText(`${w_speed}м/с`, 167, 215);
+  if(w_speed != undefined) context.fillText(`${w_speed}м/с`, 167, 215);
 }
 
 function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_daily){
@@ -183,25 +183,25 @@ function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_d
   icon1_img.onload = function(){
     context.drawImage(icon1_img, 3, 247);
   };
-  icon1_img.src = `${git}i${icon_daily[0]}.png?raw=true`;
+  if(icon_daily[0] > 0 && icon_daily[0] <= 50) icon1_img.src = `${git}i${icon_daily[0]}.png?raw=true`;
   if(icon_daily[1] == 3) icon_daily[1] = 2;
   let icon2_img = new Image();
   icon2_img.onload = function(){
     context.drawImage(icon2_img, 123, 247);
   };
-  icon2_img.src = `${git}i${icon_daily[1]}.png?raw=true`;
+  if(icon_daily[1] > 0 && icon_daily[1] <= 50) icon2_img.src = `${git}i${icon_daily[1]}.png?raw=true`;
   if(icon_daily[2] == 3) icon_daily[2] = 2;
   let icon3_img = new Image();
   icon3_img.onload = function(){
     context.drawImage(icon3_img, 243, 247);
   };
-  icon3_img.src = `${git}i${icon_daily[2]}.png?raw=true`;
+  if(icon_daily[2] > 0 && icon_daily[2] <= 50) icon3_img.src = `${git}i${icon_daily[2]}.png?raw=true`;
   if(icon_daily[3] == 3) icon_daily[3] = 2;
   let icon4_img = new Image();
   icon4_img.onload = function(){
     context.drawImage(icon4_img, 363, 247);
   };
-  icon4_img.src = `${git}i${icon_daily[3]}.png?raw=true`;
+  if(icon_daily[3] > 0 && icon_daily[3] <= 50) icon4_img.src = `${git}i${icon_daily[3]}.png?raw=true`;
 
   context.fillStyle = "black";
   context.fillRect(52, 236, 66, 28);
@@ -218,21 +218,45 @@ function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_d
   context.fillRect(380, 296, 80, 23);
   context.font = '26px Ubuntu';
   context.fillStyle = "rgb(255, 255, 0)";
-  context.fillText(`${temp_max_daily[0]}°`, 86 - context.measureText(`${temp_max_daily[0]}°`).width / 2, 262);
-  context.fillText(`${temp_max_daily[1]}°`, 206 - context.measureText(`${temp_max_daily[1]}°`).width / 2, 262);
-  context.fillText(`${temp_max_daily[2]}°`, 326 - context.measureText(`${temp_max_daily[2]}°`).width / 2, 262);
-  context.fillText(`${temp_max_daily[3]}°`, 446 - context.measureText(`${temp_max_daily[3]}°`).width / 2, 262);
+  if(temp_max_daily[0] > -50 && temp_max_daily[0] < 100){
+    context.fillText(`${temp_max_daily[0]}°`, 86 - context.measureText(`${temp_max_daily[0]}°`).width / 2, 262);
+  }
+  if(temp_max_daily[1] > -50 && temp_max_daily[1] < 100){
+    context.fillText(`${temp_max_daily[1]}°`, 206 - context.measureText(`${temp_max_daily[1]}°`).width / 2, 262);
+  }
+  if(temp_max_daily[2] > -50 && temp_max_daily[2] < 100){
+    context.fillText(`${temp_max_daily[2]}°`, 326 - context.measureText(`${temp_max_daily[2]}°`).width / 2, 262);
+  }
+  if(temp_max_daily[2] > -50 && temp_max_daily[2] < 100){
+    context.fillText(`${temp_max_daily[3]}°`, 446 - context.measureText(`${temp_max_daily[3]}°`).width / 2, 262);
+  }
   context.fillStyle = "rgb(255, 127, 0)";
-  context.fillText(`${temp_min_daily[0]}°`, 86 - context.measureText(`${temp_min_daily[0]}°`).width / 2, 289);
-  context.fillText(`${temp_min_daily[1]}°`, 206 - context.measureText(`${temp_min_daily[1]}°`).width / 2, 289);
-  context.fillText(`${temp_min_daily[2]}°`, 326 - context.measureText(`${temp_min_daily[2]}°`).width / 2, 289);
-  context.fillText(`${temp_min_daily[3]}°`, 446 - context.measureText(`${temp_min_daily[3]}°`).width / 2, 289);
+  if(temp_min_daily[0] > -50 && temp_min_daily[0] < 100){
+    context.fillText(`${temp_min_daily[0]}°`, 86 - context.measureText(`${temp_min_daily[0]}°`).width / 2, 289);
+  }
+  if(temp_min_daily[1] > -50 && temp_min_daily[1] < 100){
+    context.fillText(`${temp_min_daily[1]}°`, 206 - context.measureText(`${temp_min_daily[1]}°`).width / 2, 289);
+  }
+  if(temp_min_daily[2] > -50 && temp_min_daily[2] < 100){
+    context.fillText(`${temp_min_daily[2]}°`, 326 - context.measureText(`${temp_min_daily[2]}°`).width / 2, 289);
+  }
+  if(temp_min_daily[3] > -50 && temp_min_daily[3] < 100){
+    context.fillText(`${temp_min_daily[3]}°`, 446 - context.measureText(`${temp_min_daily[3]}°`).width / 2, 289);
+  }
   context.font = '22px Ubuntu';
   context.fillStyle = "white";
-  context.fillText(`${w_speed_daily[0]}м/с`, 63 - context.measureText(`${w_speed_daily[0]}м/с`).width / 2, 314);
-  context.fillText(`${w_speed_daily[1]}м/с`, 183 - context.measureText(`${w_speed_daily[1]}м/с`).width / 2, 314);
-  context.fillText(`${w_speed_daily[2]}м/с`, 303 - context.measureText(`${w_speed_daily[2]}м/с`).width / 2, 314);
-  context.fillText(`${w_speed_daily[3]}м/с`, 423 - context.measureText(`${w_speed_daily[3]}м/с`).width / 2, 314);
+  if(w_speed_daily[0] >= 0 && w_speed_daily[0] < 100){
+    context.fillText(`${w_speed_daily[0]}м/с`, 63 - context.measureText(`${w_speed_daily[0]}м/с`).width / 2, 314);
+  }
+  if(w_speed_daily[1] >= 0 && w_speed_daily[1] < 100){
+    context.fillText(`${w_speed_daily[1]}м/с`, 183 - context.measureText(`${w_speed_daily[1]}м/с`).width / 2, 314);
+  }
+  if(w_speed_daily[2] >= 0 && w_speed_daily[2] < 100){
+    context.fillText(`${w_speed_daily[2]}м/с`, 303 - context.measureText(`${w_speed_daily[2]}м/с`).width / 2, 314);
+  }
+  if(w_speed_daily[3] >= 0 && w_speed_daily[3] < 100){
+    context.fillText(`${w_speed_daily[3]}м/с`, 423 - context.measureText(`${w_speed_daily[3]}м/с`).width / 2, 314);
+  }
 }
 
 $(function(){
@@ -243,9 +267,9 @@ $(function(){
   context.fillStyle = 'black';
   context.fill();
   let temp_max_daily = [-50, -50, -50, -50],
-      temp_min_daily = [50, 50, 50, 50],
-      icon_daily = [1, 1, 1, 1],
-      w_speed_daily = [0, 0, 0, 0],
+      temp_min_daily = [100, 100, 100, 100],
+      icon_daily = [0, 0, 0, 0],
+      w_speed_daily = [-1, -1, -1, -1],
       descript, icon, w_speed, w_dir;
 
   $.getJSON(`config.json?R=${Math.random()}`,function(json){
