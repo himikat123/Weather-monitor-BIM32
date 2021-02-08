@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="clock.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id=cnv></div>
+    <div id="loading" class="active">Loading...</div>
+    <div id="logout">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Sensors</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <form action="#" method="post">
+        <h2 class="hd1">Clock</h2><hr>
+        <h2 class="ttl">Timezone:</h2>
+        <div class="indiv">
+          <input id="utc" class="inp" style="text-align:center" maxlength="3" type="number" min="-12" max="12" required>
+        </div><hr>
+        <h2 class="ttl">Automatic daylight saving time:</h2>
+        <div class="indiv">
+          <input type="radio" name="dlst" id="no" value="false" checked>
+          <label for="no">No</label>
+          <input type="radio" name="dlst" id="yes" value="true">
+          <label for="yes">Yes</label>
+        </div><hr>
+        <h2 class="ttl">NTP server:</h2>
+        <div class="indiv">
+          <input id="ntp" class="inp" maxlength="32" style="text-align:center" required>
+        </div><hr>
+        <div class="indiv">
+          <button class="btn btn-primary" type="submit" name="button">Save</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>

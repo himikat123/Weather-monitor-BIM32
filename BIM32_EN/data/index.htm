@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="status.css">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="status.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id="loading" class="active">Loading...</div>
+    <div id="logout">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Sensors</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <h2 class="hh">Status</h2><hr>
+      <div class="lt">Firmware version:</div> <div id="fw" class="rt">--</div>
+      <div class="lt">ESP32 temperature:</div> <div id="int_temp" class="rt">--</div><hr>
+      <div class="canv">
+        <canvas id="display_canvas" width="480" height="320"></canvas>
+      </div>
+    </main>
+  </body>
+</html>

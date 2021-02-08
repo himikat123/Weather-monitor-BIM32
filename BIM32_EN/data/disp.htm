@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="disp.css">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="disp.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id="loading" class="active">Loading...</div>
+    <div id="logout">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Sensors</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <form action="#" method="post">
+        <h2 class="hd1">Display</h2><hr>
+        <h2 class="ttl">Display brightness:</h2>
+        <div class="tab">
+          <table>
+            <tr>
+              <td>
+                <label for="auto">Automatically</label><br>
+                <input type="radio" name="brt" id="auto" value="0" checked>
+              </td>
+              <td>
+                <label>Brightness during the day</label><br>
+                <input id="auto_day" type="range" min="1" max="100"><br>
+                <label>Brightness during the night</label><br>
+                <input id="auto_night" type="range" min="1" max="100"><br>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">By time</label><br>
+                <input type="radio" name="brt" id="time" value="1">
+              </td>
+              <td>
+                <label>Day mode</label><br>
+                <input id="day_time" class="inp tm" type="time" required disabled><br>
+                <input id="time_day" type="range" min="1" max="100" disabled><br>
+                <label>Night mode</label><br>
+                <input id="night_time" class="inp tm" type="time" required disabled><br>
+                <input id="time_night" type="range" min="1" max="100" disabled><br>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">By ambient light sensor</label><br>
+                <input type="radio" name="brt" id="sens" value="2"></td>
+              <td>
+                <label>Sensor type</label><br>
+                <select id="light_in" class="inp tm" disabled>
+                  <option value="1">Wireless sensor</option>
+                  <option value="6">MAX44009</option>
+                  <option value="7">BH1750</option>
+                  <option value="8">MQTT</option>
+                  <option value="9">Thingspeak</option>
+                </select>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">Constant brightness</label><br>
+                <input type="radio" name="brt" id="const" value="3">
+              </td>
+              <td>
+                <label>Brightness</label><br>
+                <input id="const_day" type="range" min="1" max="100" disabled><br>
+              </td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">Selecting sensors for display:</h2>
+        <div class="disp">
+          <div class="displ">
+            <canvas id="display_canvas" width="480" height="320"></canvas>
+            <select id="temp_out" class="sel">
+              <option disabled>Outdoor temperature</option>
+              <option value="0">Internet</option>
+              <option value="1">Wireless sensor</option>
+              <option value="2">BME280</option>
+              <option value="3">BMP180</option>
+              <option value="4">SHT21</option>
+              <option value="5">DHT22</option>
+              <option value="8">MQTT</option>
+              <option value="9">Thingspeak</option>
+            </select>
+            <select id="temp_in" class="sel">
+              <option disabled>Indoor temperature</option>
+              <option value="0">Internet</option>
+              <option value="1">Wireless sensor</option>
+              <option value="2">BME280</option>
+              <option value="3">BMP180</option>
+              <option value="4">SHT21</option>
+              <option value="5">DHT22</option>
+              <option value="8">MQTT</option>
+              <option value="9">Thingspeak</option>
+            </select>
+            <select id="hum_out" class="sel">
+              <option disabled>Outdoor humidity</option>
+              <option value="0">Internet</option>
+              <option value="1">Wireless sensor</option>
+              <option value="2">BME280</option>
+              <option value="4">SHT21</option>
+              <option value="5">DHT22</option>
+              <option value="8">MQTT</option>
+              <option value="9">Thingspeak</option>
+            </select>
+            <select id="hum_in" class="sel">
+              <option disabled>Indoor humidity</option>
+              <option value="0">Internet</option>
+              <option value="1">Wireless sensor</option>
+              <option value="2">BME280</option>
+              <option value="4">SHT21</option>
+              <option value="5">DHT22</option>
+              <option value="8">MQTT</option>
+              <option value="9">Thingspeak</option>
+            </select>
+            <select id="pres_out" class="sel">
+              <option disabled>Atmosphere pressure</option>
+              <option value="0">Internet</option>
+              <option value="1">Wireless sensor</option>
+              <option value="2">BME280</option>
+              <option value="3">BMP180</option>
+              <option value="8">MQTT</option>
+              <option value="9">Thingspeak</option>
+            </select>
+            <select id="bat_disp" class="sel">
+              <option disabled>Wireless sensor battery</option>
+              <option value="1">Wireless sensor</option>
+              <option value="9">Thingspeak</option>
+            </select>
+          </div>
+        </div><hr>
+        <h2 class="ttl">Customizing the Big Clock Display (WS2812b):</h2>
+        <div class="tab">
+          <table class="clck">
+            <tr>
+              <td></td>
+              <td>D1</td>
+              <td>D2</td>
+              <td>D3</td>
+              <td>D4</td>
+              <td>D5</td>
+              <td>D6</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Duration</td>
+              <td>
+                <input id="dp0" class="dp" type="number" min="0" max="99" required>
+              </td>
+              <td>
+                <input id="dp1" class="dp" type="number" min="0" max="99" required>
+              </td>
+              <td>
+                <input id="dp2" class="dp" type="number" min="0" max="99" required>
+              </td>
+              <td>
+                <input id="dp3" class="dp" type="number" min="0" max="99" required>
+              </td>
+              <td>
+                <input id="dp4" class="dp" type="number" min="0" max="99" required>
+              </td>
+              <td>
+                <input id="dp5" class="dp" type="number" min="0" max="99" required>
+              </td>
+              <td>seconds</td>
+            </tr>
+            <tr>
+              <td>Clock</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_0" type="radio" name="dt0" value="0" hidden>
+                  <input id="dt0_1" class="dt" type="radio" name="dt0" value="1" checked>
+                  <div id="dc0_1" class="dc"></div>
+                </div>
+                <select id="ds0_1" class="ds" required disabled>
+                  <option value="C">Time</option>
+                  <option value="D">Date</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_0" type="radio" name="dt1" value="0" hidden>
+                  <input id="dt1_1" class="dt" type="radio" name="dt1" value="1" checked>
+                  <div id="dc1_1" class="dc"></div>
+                </div>
+                <select id="ds1_1" class="ds" required disabled>
+                  <option value="C">Time</option>
+                  <option value="D">Date</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_0" type="radio" name="dt2" value="0" hidden>
+                  <input id="dt2_1" class="dt" type="radio" name="dt2" value="1" checked>
+                  <div id="dc2_1" class="dc"></div>
+                </div>
+                <select id="ds2_1" class="ds" required disabled>
+                  <option value="C">Time</option>
+                  <option value="D">Date</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_0" type="radio" name="dt3" value="0" hidden>
+                  <input id="dt3_1" class="dt" type="radio" name="dt3" value="1" checked>
+                  <div id="dc3_1" class="dc"></div>
+                </div>
+                <select id="ds3_1" class="ds" required disabled>
+                  <option value="C">Time</option>
+                  <option value="D">Date</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_0" type="radio" name="dt4" value="0" hidden>
+                  <input id="dt4_1" class="dt" type="radio" name="dt4" value="1" checked>
+                  <div id="dc4_1" class="dc"></div>
+                </div>
+                <select id="ds4_1" class="ds" required disabled>
+                  <option value="C">Time</option>
+                  <option value="D">Date</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_0" type="radio" name="dt5" value="0" hidden>
+                  <input id="dt5_1" class="dt" type="radio" name="dt5" value="1" checked>
+                  <div id="dc5_1" class="dc"></div>
+                </div>
+                <select id="ds5_1" class="ds" required disabled>
+                  <option value="C">Time</option>
+                  <option value="D">Date</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Internet</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_2" class="dt" type="radio" name="dt0" value="2">
+                  <div id="dc0_2" class="dc"></div>
+                </div>
+                <select id="ds0_2" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_2" class="dt" type="radio" name="dt1" value="2">
+                  <div id="dc1_2" class="dc"></div>
+                </div>
+                <select id="ds1_2" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_2" class="dt" type="radio" name="dt2" value="2">
+                  <div id="dc2_2" class="dc"></div>
+                </div>
+                <select id="ds2_2" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_2" class="dt" type="radio" name="dt3" value="2">
+                  <div id="dc3_2" class="dc"></div>
+                </div>
+                <select id="ds3_2" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_2" class="dt" type="radio" name="dt4" value="2">
+                  <div id="dc4_2" class="dc"></div>
+                </div>
+                <select id="ds4_2" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_2" class="dt" type="radio" name="dt5" value="2">
+                  <div id="dc5_2" class="dc"></div>
+                </div>
+                <select id="ds5_2" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Wireless<br>sensor</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_3" class="dt" type="radio" name="dt0" value="3">
+                  <div id="dc0_3" class="dc"></div>
+                </div>
+                <select id="ds0_3" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_3" class="dt" type="radio" name="dt1" value="3">
+                  <div id="dc1_3" class="dc"></div>
+                </div>
+                <select id="ds1_3" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_3" class="dt" type="radio" name="dt2" value="3">
+                  <div id="dc2_3" class="dc"></div>
+                </div>
+                <select id="ds2_3" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_3" class="dt" type="radio" name="dt3" value="3">
+                  <div id="dc3_3" class="dc"></div>
+                </div>
+                <select id="ds3_3" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_3" class="dt" type="radio" name="dt4" value="3">
+                  <div id="dc4_3" class="dc"></div>
+                </div>
+                <select id="ds4_3" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_3" class="dt" type="radio" name="dt5" value="3">
+                  <div id="dc5_3" class="dc"></div>
+                </div>
+                <select id="ds5_3" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>BME280</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_4" class="dt" type="radio" name="dt0" value="4">
+                  <div id="dc0_4" class="dc"></div>
+                </div>
+                <select id="ds0_4" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_4" class="dt" type="radio" name="dt1" value="4">
+                  <div id="dc1_4" class="dc"></div>
+                </div>
+                <select id="ds1_4" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_4" class="dt" type="radio" name="dt2" value="4">
+                  <div id="dc2_4" class="dc"></div>
+                </div>
+                <select id="ds2_4" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_4" class="dt" type="radio" name="dt3" value="4">
+                  <div id="dc3_4" class="dc"></div>
+                </div>
+                <select id="ds3_4" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_4" class="dt" type="radio" name="dt4" value="4">
+                  <div id="dc4_4" class="dc"></div>
+                </div>
+                <select id="ds4_4" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_4" class="dt" type="radio" name="dt5" value="4">
+                  <div id="dc5_4" class="dc"></div>
+                </div>
+                <select id="ds5_4" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>BMP180</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_5" class="dt" type="radio" name="dt0" value="5">
+                  <div id="dc0_5" class="dc"></div>
+                </div>
+                <select id="ds0_5" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_5" class="dt" type="radio" name="dt1" value="5">
+                  <div id="dc1_5" class="dc"></div>
+                </div>
+                <select id="ds1_5" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_5" class="dt" type="radio" name="dt2" value="5">
+                  <div id="dc2_5" class="dc"></div>
+                </div>
+                <select id="ds2_5" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_5" class="dt" type="radio" name="dt3" value="5">
+                  <div id="dc3_5" class="dc"></div>
+                </div>
+                <select id="ds3_5" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_5" class="dt" type="radio" name="dt4" value="5">
+                  <div id="dc4_5" class="dc"></div>
+                </div>
+                <select id="ds4_5" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_5" class="dt" type="radio" name="dt5" value="5">
+                  <div id="dc5_5" class="dc"></div>
+                </div>
+                <select id="ds5_5" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="P">Pressure</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>SHT21</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_6" class="dt" type="radio" name="dt0" value="6">
+                  <div id="dc0_6" class="dc"></div>
+                </div>
+                <select id="ds0_6" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_6" class="dt" type="radio" name="dt1" value="6">
+                  <div id="dc1_6" class="dc"></div>
+                </div>
+                <select id="ds1_6" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_6" class="dt" type="radio" name="dt2" value="6">
+                  <div id="dc2_6" class="dc"></div>
+                </div>
+                <select id="ds2_6" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_6" class="dt" type="radio" name="dt3" value="6">
+                  <div id="dc3_6" class="dc"></div>
+                </div>
+                <select id="ds3_6" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_6" class="dt" type="radio" name="dt4" value="6">
+                  <div id="dc4_6" class="dc"></div>
+                </div>
+                <select id="ds4_6" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_6" class="dt" type="radio" name="dt5" value="6">
+                  <div id="dc5_6" class="dc"></div>
+                </div>
+                <select id="ds5_6" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>DHT22</td>
+              <td>
+                <div class="clr">
+                  <input id="dt0_7" class="dt" type="radio" name="dt0" value="7">
+                  <div id="dc0_7" class="dc"></div>
+                </div>
+                <select id="ds0_7" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt1_7" class="dt" type="radio" name="dt1" value="7">
+                  <div id="dc1_7" class="dc"></div>
+                </div>
+                <select id="ds1_7" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt2_7" class="dt" type="radio" name="dt2" value="7">
+                  <div id="dc2_7" class="dc"></div>
+                </div>
+                <select id="ds2_7" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt3_7" class="dt" type="radio" name="dt3" value="7">
+                  <div id="dc3_7" class="dc"></div>
+                </div>
+                <select id="ds3_7" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt4_7" class="dt" type="radio" name="dt4" value="7">
+                  <div id="dc4_7" class="dc"></div>
+                </div>
+                <select id="ds4_7" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td>
+                <div class="clr">
+                  <input id="dt5_7" class="dt" type="radio" name="dt5" value="7">
+                  <div id="dc5_7" class="dc"></div>
+                </div>
+                <select id="ds5_7" class="ds" required disabled>
+                  <option value="T">Temperature</option>
+                  <option value="H">Humidity</option>
+                </select>
+              </td>
+              <td></td>
+            </tr>
+          </table>
+        </div><hr>
+        <div class="indiv">
+          <button class="btn btn-primary" type="submit" name="button">Save</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>
