@@ -1,0 +1,90 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <title>BIM32 Login</title>
+    <style>
+      html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background-color:#DDD}
+      #pr{display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+      #bl{width:400px;height:350px;background:#EEE;text-align:center;border:2px solid #00695c;border-radius:15px;box-shadow:0 0 10px rgba(0,0,0,0.5)}
+      form{padding-top:70px}
+      img{float:right;width:20px;margin-right:15px}
+      hr{margin:22px 0;height:1px;border:0;background-image:-webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));background-image:-moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));background-image:-ms-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));background-image:linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0))}
+      .inp{color:blue;width:200px;height:25px;padding-left:10px;border-radius:0.5em;border:0;outline:0;box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12)}
+      .inp:focus{box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15)}
+      .password-control{position:absolute;top:3px;right:103px;display:inline-block;width:20px;height:20px;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAABEUlEQVQ4jd3UMUpDQRSF4c+giJ2JYOIDRXtX4RoCljbiHiy0MKBbSUrtXUAaRSUowWihYGeTzkIt3hVkGE2UFOKBW8ybOz9nzrwZ/rvqOEBlUrAe3tAa1VzFDk5wj9eoO2wlsF6Ms5rDPobRnFYHxbiwNZwngFs0w3E1AytwiEYKW8FjBlb71JNus0A7xv1ggFlcZrbXHAHrJP1dTIvMcnnNB2wRV/HtGkvhPLdmt4KXfKSmAnaKddxgA08xl9OMsNn1s9PczLi7iPhQBtqPifYIWA2DBPaA5dRuA0cZWBGQhXCWws6w+kUEY53mRw2xp7wMY8Hqyms2wHPUAMfYVv7o36oln9mvVVE+RROB/V29A/fQeynOGpetAAAAAElFTkSuQmCC') 0 0 no-repeat}
+      .password-control.view{background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAA90lEQVQ4je3TTU4CQRAF4E83yAIislf0NBI3JASPoNFLoOFA6kWIPxuWOuMJ0MSlLqaMpNOD48IdL6lN16vX9aq62eC/0Mcl7lDiI6KMswvsNRHawQzv+Pwl3nCNVp3YIZ6SogJjdCJGWCScBxykYkd4zYjlbPUit8otMfgmtPGYsTSO/ElcVmIYZ5MM/z5G5qpmRp0oLpOuoVtTM93OWGqCrXXJdrSb3jaK/DC6LHAcZ6cZ/lxYptpwmRAWqgWk6Ge4hcymB6onkBInqpl1o7NUbI79Ovst1ZKWGUtpLDG15mGvoodz3OLFz9d7xg3OsNtEaIO/4wtlK3KNaQfEYAAAAABJRU5ErkJggg==') 0 0 no-repeat}
+      .password{position:relative;width:100%;display:flex;justify-content:center}
+      .but{min-width:100px;border-radius:10em;border:0;color:#fff!important;margin:6px;white-space:normal!important;word-wrap:break-word;display:inline-block;line-height:1.25;text-align:center;vertical-align:middle;cursor:pointer;user-select:none;padding:.5rem 1rem;font-size:1rem;font-weight:400;box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);transition:box-shadow .2s ease-out;border:2px solid #2BBBAD;color:#00695c!important;background-color:transparent}
+      .but:hover{box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15)}
+      *{outline:0 !important}
+      #error{color:red;display:none}
+    </style>
+    <script type="text/javascript">
+      function ajax(url,opts){
+        var req;
+        if(window.XMLHttpRequest) req=new XMLHttpRequest();
+        else req=new ActiveXObject("Microsoft.XMLHTTP");
+        req.onreadystatechange=function(){
+          if(req.readyState==4){
+            if(/^2/.test(req.status) && opts.success) opts.success(req);
+            else if(/^5/.test(req.status) && opts.fail) opts.fail(req);
+            else if(opts.other) opts.other(req);
+          }
+        };
+        req.open(opts.method||'POST',url,true);
+        req.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+        req.send(opts.data);
+      }
+
+      function logout(){
+        ajax('esp/logout.php',{
+          method:'POST',
+          success:function(r){}
+        });
+        document.cookie='auth=0';
+      }
+
+      function load(){
+        var get=window.location.search.replace('?','');
+        if(get=='error'){
+          document.getElementById('error').style.display='block';
+        }
+
+        document.getElementById('eye').addEventListener('click',function(e){
+          if(document.getElementById('pass').getAttribute("type")=="password"){
+            document.getElementById('eye').classList.add('view');
+            document.getElementById('pass').setAttribute("type","text");
+          }
+          else{
+            document.getElementById('eye').classList.remove('view');
+            document.getElementById('pass').setAttribute("type","password");
+          }
+        });
+      }
+    </script>
+  </head>
+  <body onload="load()">
+    <div id="pr">
+      <div id="bl">
+        <br>BIM32 Weather monitor
+        <a href=# title="Logout" onclick="logout()">
+          <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoBAMAAAB+0KVeAAAAHlBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC3KG9qAAAACXRSTlMAUN9wj0CvvyBSXuGWAAAAcUlEQVQoz83RIQ6AMBBE0RIwOCyOO6BwPUIvgcD1Km2BMLclTSoqviAkJIzZ5KndWVPSq8obnPLoAEd9jHKEgVAz4T4CaiXUUKFUkghlCU9CecL4GAOhA7xoeTwT8LCAC7SUoOTYAnp88W/RbISmyXgDwcUDj/J63r8AAAAASUVORK5CYII=" alt="Выход">
+        </a>
+        <form method="post" action="esp/login.php">
+          <b>Username:</b><br>
+          <input class="inp" name="LOGIN" maxlength="32" required><br>
+          <b>Password:</b><br>
+          <div class="password">
+            <input id="pass" class="inp" name="PASSW" type="password" maxlength="32" autocomplete="off">
+            <a id="eye" href="#" class="password-control"></a>
+          </div><br><br>
+          <input class="but" type="submit" value="Login"><hr>
+          <div id="error">Wrong login or password</div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
