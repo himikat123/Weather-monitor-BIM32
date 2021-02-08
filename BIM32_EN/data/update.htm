@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="update.css">
+    <style media="screen" id="stl"></style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="update.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body onload="loaded()">
+    <div id="loading" class="active">Loading...</div>
+    <div id="logout">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Sensors</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <h2 class="hh">Firmware upgrade</h2><hr>
+      <form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
+        <h4 class="hds">Using a file</h4>
+        <div class="dd">
+          <label for="fl" class="flup">
+            <span class="btn btn-primary">Select a file</span>
+          </label>
+          <input id="fl" type="file" name="update" />
+        </div>
+        <div class="dd">
+          <input id="sm" type="submit" value="Upgrade" class="btn btn-primary" />
+        </div>
+        <div id="fnm" class="hds"></div>
+      </form>
+      <div id="kr" class="progress-circle p0">
+        <span id="prg">0%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div><hr>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="weather.css">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="weather.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id="loading" class="active">Loading...</div>
+    <div id="logout">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Sensors</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <form action="#" method="post">
+        <h2 class="hd1">Weather forecast</h2><hr>
+        <h2 class="ttl">Weather forecast source:</h2>
+        <div class="tab">
+          <table>
+            <tr>
+              <td>
+                <input type="radio" name="provider" id="openw" value="0" checked>
+              </td>
+              <td>
+                <label for="openw">
+                  <a href="http://openweathermap.org" target="_blank">openweathermap.org</a>
+                </label><br>
+                <input id="appid" class="inp" maxlength="40" placeholder="APID"><hr>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="radio" name="provider" id="weatb" value="1"></td>
+              <td>
+                <label for="weatb">
+                  <a href="http://weatherbit.io" target="_blank">weatherbit.io</a>
+                </label><br>
+                <input id="appkey" class="inp" maxlength="40" placeholder="KEY" disabled><hr>
+              </td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">City identification:</h2>
+        <div class="tab">
+          <table>
+            <tr>
+              <td>
+                <input type="radio" name="citysearch" id="icity" value="0" checked>
+              </td>
+              <td>
+                <label for="icity">City name</label><br>
+                <input id="city" class="inp" maxlength="40" placeholder="City"><hr>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="radio" name="citysearch" id="icoord" value="1">
+              </td>
+              <td>
+                <label for="icoord">Latitude</label><br>
+                <input id="lat" class="inp" maxlength="10" placeholder="Latitude" disabled><br>
+                <label for="icoord">Longitude</label><br>
+                <input id="lon" class="inp" maxlength="10" placeholder="Longitude" disabled><hr>
+              </td>
+            </tr>
+            <tr>
+              <td><input type="radio" name="citysearch" id="icityid" value="2"></td>
+              <td>
+                <label for="icityid">City ID</label><br>
+                <input id="cityid" class="inp" maxlength="40" placeholder="City ID" disabled><hr>
+              </td>
+            </tr>
+          </table>
+        </div><hr>
+        <div class="indiv">
+          <button class="btn btn-primary" type="submit" name="button">Save</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>

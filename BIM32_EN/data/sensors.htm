@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="sensors.css">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="sensors.js"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id="loading" class="active">Loading...</div>
+    <div id="logout">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Sensors</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <form action="#" method="post">
+        <h2 class="hd1">Sensors</h2><hr>
+        <h2 class="ttl">BME280:</h2>
+        <div class="sen">
+          <table>
+            <tr>
+              <td></td><td>Correction</td>
+            </tr>
+            <tr>
+              <td>Temperature <span id="dbmet" class="data">--</span>°C</td>
+              <td><input id="bmet" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Humidity <span id="dbmeh" class="data">--</span>%</td>
+              <td><input id="bmeh" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Pressure <span id="dbmep" class="data">--</span>mmHg</td>
+              <td><input id="bmep" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">BMP180:</h2>
+        <div class="sen">
+          <table>
+            <tr>
+              <td></td><td>Correction</td>
+            </tr>
+            <tr>
+              <td>Temperature <span id="dbmpt" class="data">--</span>°C</td>
+              <td><input id="bmpt" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Pressure <span id="dbmpp" class="data">--</span>mmHg</td>
+              <td><input id="bmpp" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">SHT21:</h2>
+        <div class="sen">
+          <table>
+            <tr>
+              <td></td><td>Correction</td>
+            </tr>
+            <tr>
+              <td>Temperature <span id="dshtt" class="data">--</span>°C</td>
+              <td><input id="shtt" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Humidity <span id="dshth" class="data">--</span>%</td>
+              <td><input id="shth" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">DHT22:</h2>
+        <div class="sen">
+          <table>
+            <tr>
+              <td></td><td>Correction</td>
+            </tr>
+            <tr>
+              <td>Temperature <span id="ddhtt" class="data">--</span>°C</td>
+              <td><input id="dhtt" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+            <tr>
+              <td>Humidity <span id="ddhth" class="data">--</span>%</td>
+              <td><input id="dhth" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">MAX44009:</h2>
+        <div class="sen">
+          <table>
+            <tr>
+              <td></td><td>Correction</td>
+            </tr>
+            <tr>
+              <td>Ambient light <span id="dmax" class="data">--</span> Lux</td>
+              <td><input id="max" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+          </table>
+        </div><hr>
+        <h2 class="ttl">BH1750:</h2>
+        <div class="sen">
+          <table>
+            <tr>
+              <td></td><td>Correction</td>
+            </tr>
+            <tr>
+              <td>Ambient light <span id="dbh" class="data">--</span> Lux</td>
+              <td><input id="bh" class="inp" value="0" type="number" step="0.1"></td>
+            </tr>
+          </table>
+        </div><hr>
+        <div class="indiv">
+          <button class="btn btn-primary" type="submit" name="button">Save</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>

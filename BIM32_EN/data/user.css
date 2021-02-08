@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+.passw{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.password{
+	position: relative;
+  width: 300px;
+  text-align: center;
+}
