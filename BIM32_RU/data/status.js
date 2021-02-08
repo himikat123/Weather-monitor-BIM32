@@ -161,7 +161,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
     context.drawImage(wind_dir, 222, 195);
   };
   let deg = Math.round(w_dir / 45.0) + 1;
-  if(deg > 7) deg = 0;
+  if(deg > 7) deg = 1;
   wind_dir.src = `${git}w${deg}.png?raw=true`;
 
   let temp_out, temp_in, hum_out, hum_in, pres_out, ubat, lbat;

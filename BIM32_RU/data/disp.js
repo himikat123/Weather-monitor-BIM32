@@ -164,7 +164,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed){
     context.drawImage(wind_dir, 222, 195);
   };
   let deg = Math.round(w_dir / 45.0) + 1;
-  if(deg > 7) deg = 0;
+  if(deg > 7) deg = 1;
   if(deg > 0 && deg < 100) wind_dir.src = `${git}w${deg}.png?raw=true`;
 
   context.fillStyle = "black";
