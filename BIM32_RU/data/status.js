@@ -1,6 +1,6 @@
 let config, sig, dbmet, dbmeh, dbmep, dbmpt, dbmpp, dshtt, dshth, ddhtt, ddhth;
 let mnph, mnicn, wtemp, whum, wpres, wlight, wubat, wlbat;
-let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32/data/';
+let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
 
 function status_update(){
   $.getJSON("esp/status.php",function(json){

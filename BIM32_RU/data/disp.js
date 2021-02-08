@@ -1,4 +1,4 @@
-let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32/data/';
+let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
 
 function bright_type(c){
   if(c == 0){
