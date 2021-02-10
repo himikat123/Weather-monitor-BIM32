@@ -50,7 +50,9 @@ $(function(){
         $('#wlighttp').text(data.wlighttp);
         let dte = Date.parse(data.time);
         let w_dt = new Date(dte);
-        $('#time').text(data.time);
+        let ndt = w_dt.getFullYear();
+        if(ndt > 2020) $('#time').text(data.time);
+        else $('#time').text('--');
         $('#loading').removeClass('active');
 	    }
     });
