@@ -30,21 +30,26 @@ $(function(){
   });
 
   setInterval(function(){
+    let now_date = new Date();
     $.ajax({
 	    url: 'esp/wsensor.php',
 	    method: 'get',
+      data: `H=${now_date.getHours()}&I=${now_date.getMinutes()}&S=${now_date.getSeconds()}&D=${now_date.getDate()}&M=${Number(now_date.getMonth()) + 1}&Y=${now_date.getFullYear()}`,
 	    dataType: 'json',
 	    success: function(dt){
         data = dt;
-        $('#wtemp').text((Math.round((data.wtemp + Number($('#wtempc').val())) * 10) / 10).toFixed(1));
-        $('#whum').text((Math.round((data.whum + Number($('#whumc').val())) * 10) / 10).toFixed(1));
-        $('#wpres').text((Math.round((data.wpres + Number($('#wpresc').val())) * 10) / 10).toFixed(1));
-        $('#wlight').text((Math.round((data.wlight + Number($('#wlightc').val())) * 10) / 10).toFixed(1));
-        $('#wbat').text((Math.round(data.adc / Number($('#wbatc').val()) * 100) / 100).toFixed(2));
+        if(data.wtemp > -55 && data.wtemp < 100) $('#wtemp').text((Math.round((data.wtemp + Number($('#wtempc').val())) * 10) / 10).toFixed(1));
+        else $('#wtemp').text('--');
+        if(data.whum >= 0 && data.whum <= 100) $('#whum').text((Math.round((data.whum + Number($('#whumc').val())) * 10) / 10).toFixed(1));
+        if(data.wpres > 500 && data.wpres < 1200) $('#wpres').text((Math.round((data.wpres + Number($('#wpresc').val())) * 10) / 10).toFixed(1));
+        if(data.wlight >= 0 && data.wlight < 50000) $('#wlight').text((Math.round((data.wlight + Number($('#wlightc').val())) * 10) / 10).toFixed(1));
+        if(data.adc > 0) $('#wbat').text((Math.round(data.adc / Number($('#wbatc').val()) * 100) / 100).toFixed(2));
         $('#wtemptp').text(data.wtemptp);
         $('#whumtp').text(data.whumtp);
         $('#wprestp').text(data.wprestp);
         $('#wlighttp').text(data.wlighttp);
+        let dte = Date.parse(data.time);
+        let w_dt = new Date(dte);
         $('#time').text(data.time);
         $('#loading').removeClass('active');
 	    }
@@ -74,22 +79,22 @@ $(function(){
   });
 
   $('#wtempc').change(function(){
-    if(data.wtemp == undefined) $('#wtemp').text('--');
+    if(data.wtemp == undefined || data.wtemp < -55 || data.wtemp > 100) $('#wtemp').text('--');
     else $('#wtemp').text((Math.round((data.wtemp + Number($('#wtempc').val())) * 10) / 10).toFixed(1));
   });
 
   $('#whumc').change(function(){
-    if(data.whum == undefined) $('#whum').text('--');
+    if(data.whum == undefined || data.whum < 0 || data.whum > 100) $('#whum').text('--');
     else $('#whum').text((Math.round((data.whum + Number($('#whumc').val())) * 10) / 10).toFixed(1));
   });
 
   $('#wpresc').change(function(){
-    if(data.wpres == undefined) $('#wpres').text('--');
+    if(data.wpres == undefined || data.wpres < 500 || data.wpres > 1200) $('#wpres').text('--');
     else $('#wpres').text((Math.round((data.wpres + Number($('#wpresc').val())) * 10) / 10).toFixed(1));
   });
 
   $('#wlightc').change(function(){
-    if(data.wlight == undefined) $('#wlight').text('--');
+    if(data.wlight == undefined || data.wlight < 0 || data.wtemp > 50000) $('#wlight').text('--');
     else $('#wlight').text((Math.round((data.wlight + Number($('#wlightc').val())) * 10) / 10).toFixed(1));
   });
 
