@@ -1,13 +1,8 @@
 let config = {}, error = false;
 
 function logout(){
-  $.ajax({
-    type:"POST",
-    url:"esp/logout.php",
-    cache:false
-  }).done();
   document.cookie='auth=0';
-  window.location='http://radiokot.ru';
+  window.location='login.htm';
 }
 
 $(function(){
@@ -35,7 +30,7 @@ $(function(){
       catch(e){
         error = true;
         $('#restore').attr('disabled', true);
-        alert("Invalid file selected");
+        alert("Выбран неверный файл");
       }
     };
     reader.readAsText($("#configfile")[0].files[0], "UTF-8");

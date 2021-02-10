@@ -1,6 +1,6 @@
 let config, sig, dbmet, dbmeh, dbmep, dbmpt, dbmpp, dshtt, dshth, ddhtt, ddhth;
 let mnph, mnicn, wtemp, whum, wpres, wlight, wubat, wlbat;
-let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_EN/data/';
+let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
 
 function status_update(){
   $.getJSON("esp/status.php",function(json){
@@ -29,13 +29,8 @@ function status_update(){
 }
 
 function logout(){
-  $.ajax({
-    type:"POST",
-    url:"esp/logout.php",
-    cache:false
-  }).done();
   document.cookie='auth=0';
-  window.location='http://radiokot.ru';
+  window.location='login.htm';
 }
 
 function weatherbit_icon(code){
@@ -53,7 +48,7 @@ function weatherbit_icon(code){
 }
 
 function clock_upd(context){
-  let days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
   let now = new Date();
   let hr0 = Math.floor(now.getHours() / 10);
   let hr1 = now.getHours() % 10;
@@ -123,8 +118,8 @@ function clock_upd(context){
     };
     moon_icon.src = `${git}moon${mnicn}.png?raw=true`;
   }
-  moon = ['New moon', 'Waxing crescent', 'First quarter', 'Waxing gibbous',
-          'Full moon', 'Waning gibbous', 'Last quarter', 'Waning crescent'];
+  moon = ['Новолуние', 'Молодая луна', 'Первая четверть', 'Прибывающая луна',
+          'Полнолуние', 'Убывающая луна', 'Последняя четверть', 'Старая луна'];
   if(mnph != undefined){
     context.fillStyle = "black";
     context.fillRect(249, 200, 200, 20);
@@ -135,8 +130,8 @@ function clock_upd(context){
 }
 
 function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum_weather, pres_weather){
-  let cf = ['Comfortable', 'Hot', 'Coldly', 'Too dry', 'Too humid',
-            'Hot and humid', 'Hot and dry', 'Cold and humid', 'Cold and dry'];
+  let cf = ['Комфортно', 'Жарко', 'Холодно', 'Слишком сухо', 'Слишком влажно',
+            'Жарко и влажно', 'Жарко и сухо', 'Холодно и влажно', 'Холодно и сухо'];
   if(icon == '03d') icon = '02d';
   if(icon == '03n') icon = '02n';
   let icon_img = new Image();
@@ -213,7 +208,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   temp_in = (temp_in == undefined || temp_in > 99 || temp_in < -49) ? '--' : Math.round(temp_in) + '°';
   hum_out = (hum_out == undefined || hum_out > 100 || hum_out < 0) ? '--' : (hum_out > 99) ? Math.round(hum_out) : Math.round(hum_out) + '%';
   hum_in = (hum_in == undefined || hum_in > 100 || hum_in < 0) ? '--' : Math.round(hum_in) + '%';
-  pres_out = (pres_out == undefined || pres_out > 800 || pres_out < 500) ? '--' : Math.round(pres_out) + 'mmHg';
+  pres_out = (pres_out == undefined || pres_out > 800 || pres_out < 500) ? '--' : Math.round(pres_out) + 'мм';
   ubat = (wubat == undefined || wubat > 20 || wubat < 0) ? '' : Math.round(wubat * 10) / 10;
   lbat = (wlbat == undefined || wlbat > 4 || wlbat < 1) ? 0 : wlbat;
 
@@ -240,7 +235,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   context.fillStyle = "white";
   context.fillText(descript, 288 - context.measureText(descript).width / 2, 131);
   context.font = '20px Ubuntu';
-  context.fillText(`${w_speed}m/s`, 167, 215);
+  context.fillText(`${w_speed}м/с`, 167, 215);
   let bat = new Image();
   bat.onload = function(){
     context.drawImage(bat, 377, 1);
@@ -248,7 +243,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   bat.src = `${git}bat${lbat}.png?raw=true`;
   context.fillStyle = "rgb(0, 255, 0)";
   context.font = '14px Ubuntu';
-  if(ubat != '') context.fillText(`${ubat}v`, 340, 26);
+  if(ubat != '') context.fillText(`${ubat}в`, 340, 26);
 
   context.fillStyle = "white";
   context.font = '16px Ubuntu';
@@ -319,10 +314,10 @@ function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_d
   context.fillText(`${temp_min_daily[3]}°`, 446 - context.measureText(`${temp_min_daily[3]}°`).width / 2, 289);
   context.font = '22px Ubuntu';
   context.fillStyle = "white";
-  context.fillText(`${w_speed_daily[0]}m/s`, 63 - context.measureText(`${w_speed_daily[0]}m/s`).width / 2, 314);
-  context.fillText(`${w_speed_daily[1]}m/s`, 183 - context.measureText(`${w_speed_daily[1]}m/s`).width / 2, 314);
-  context.fillText(`${w_speed_daily[2]}m/s`, 303 - context.measureText(`${w_speed_daily[2]}m/s`).width / 2, 314);
-  context.fillText(`${w_speed_daily[3]}m/s`, 423 - context.measureText(`${w_speed_daily[3]}m/s`).width / 2, 314);
+  context.fillText(`${w_speed_daily[0]}м/с`, 63 - context.measureText(`${w_speed_daily[0]}м/с`).width / 2, 314);
+  context.fillText(`${w_speed_daily[1]}м/с`, 183 - context.measureText(`${w_speed_daily[1]}м/с`).width / 2, 314);
+  context.fillText(`${w_speed_daily[2]}м/с`, 303 - context.measureText(`${w_speed_daily[2]}м/с`).width / 2, 314);
+  context.fillText(`${w_speed_daily[3]}м/с`, 423 - context.measureText(`${w_speed_daily[3]}м/с`).width / 2, 314);
 }
 
 function weather(){

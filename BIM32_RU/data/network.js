@@ -28,13 +28,8 @@ function ssid_sel(name){
 }
 
 function logout(){
-  $.ajax({
-    type:"POST",
-    url:"esp/logout.php",
-    cache:false
-  }).done();
   document.cookie='auth=0';
-  window.location='http://radiokot.ru';
+  window.location='login.htm';
 }
 
 function ip_type(t){

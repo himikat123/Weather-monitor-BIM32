@@ -95,7 +95,7 @@ function del(){
   var sl=document.getElementsByClassName("sl")[0];
   if(sl!=undefined){
     sl=document.querySelector(".sl").getAttribute("id");
-    if(confirm(`Are you sure you want to delete "${sl}" ?`)){
+    if(confirm(`Вы уверены что хотите удалить "${sl}" ?`)){
       get('loading').classList.add('active');
       ajax(`esp/del.php?d=${sl}`,{
         method:'GET',
@@ -195,7 +195,7 @@ function opn(s){
       viewer(wv);
       var v=wv.appendChild(document.createElement('div'));
       v.classList.add('un');
-      v.appendChild(document.createTextNode("unsupported format"));
+      v.appendChild(document.createTextNode("неподдерживаемый формат"));
       get('loading').classList.remove('active');
     }
   }
@@ -217,7 +217,7 @@ function list(){
     method:'GET',
     success:function(r){
       var d,data=JSON.parse(r.responseText);
-      var r="<tr><th>Name</th><th>Type</th><th>Size</th></tr>";
+      var r="<tr><th>Имя</th><th>Тип</th><th>Размер</th></tr>";
       var tbl=get("tb");
       data.fl.sort(function(a,b){
         if(a.name<b.name){return -1;}
@@ -228,8 +228,8 @@ function list(){
         var name=data.fl[d].name.slice(1);
         r+=`<tr id="${name}" onmousedown="select('${name}')" ondblclick="opn()" class="${data.fl[d].type}">`;
         r+=`<td><img src="${(isTextFile(name))?"textfile.png":(isImageFile(name))?"imagefile.png":"unknown.png"}"><span id="${name}$0">${name}</span></td>`;
-        r+=`<td class="td1">File "${name.split(".")[1].toUpperCase()}"</td>`;
-        r+=`<td class="td2">${(Math.round((data.fl[d].size/1024)*100)/100)}kB</td></tr>`;
+        r+=`<td class="td1">Файл "${name.split(".")[1].toUpperCase()}"</td>`;
+        r+=`<td class="td2">${(Math.round((data.fl[d].size/1024)*100)/100)}кБ</td></tr>`;
         tbl.innerHTML=r;
       }
       for(var b in data.fs){
@@ -268,7 +268,7 @@ function loaded(){
   j.defaultValue="/";
   get(d).appendChild(j);
   var k=document.createElement("button");
-  k.innerHTML='Upload';
+  k.innerHTML='Загрузить';
   k.className="but";
   get(d).appendChild(k);
 
@@ -324,11 +324,6 @@ function loaded(){
 }
 
 function logout(){
-  $.ajax({
-    type:"POST",
-    url:"esp/logout.php",
-    cache:false
-  }).done();
   document.cookie='auth=0';
-  window.location='http://radiokot.ru';
+  window.location='login.htm';
 }

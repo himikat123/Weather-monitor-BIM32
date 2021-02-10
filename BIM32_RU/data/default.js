@@ -1,11 +1,6 @@
 function logout(){
-  $.ajax({
-    type:"POST",
-    url:"esp/logout.php",
-    cache:false
-  }).done();
   document.cookie='auth=0';
-  window.location='http://radiokot.ru';
+  window.location='login.htm';
 }
 
 $(function(){
@@ -17,7 +12,7 @@ $(function(){
   });
 
   $('#restore').click(function(){
-    if(confirm('Attention! All weather monitor settings will be reset to null. Are you sure you want to reset everything?')){
+    if(confirm('Внимание! Все настройки монитора погоды обнулятся. Вы действительно хотите всё сбросить?')){
       $('#loading').addClass('active');
       let config = `{
         "ssid": "",

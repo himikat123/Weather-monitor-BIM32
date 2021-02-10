@@ -31,13 +31,8 @@ function city_ident(c){
 }
 
 function logout(){
-  $.ajax({
-    type:"POST",
-    url:"esp/logout.php",
-    cache:false
-  }).done();
   document.cookie='auth=0';
-  window.location='http://radiokot.ru';
+  window.location='login.htm';
 }
 
 $(function(){
@@ -64,7 +59,7 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
-    config.lang = 'en';
+    config.lang = 'ru';
     config.appid = $('#appid').val();
     config.appkey = $('#appkey').val();
     config.city = $('#city').val();
