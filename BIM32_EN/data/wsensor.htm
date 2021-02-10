@@ -49,22 +49,22 @@
             </tr>
             <tr>
               <td>Temperature <span id="wtemp" class="data">--</span> °C</td>
-              <td><input id="wtempc" class="inp" value="0" type="number" step="0.1"></td>
+              <td><input id="wtempc" class="inp" value="0" type="number" step="0.1" required></td>
               <td><span id="wtemptp" class="wtp">--</td>
             </tr>
             <tr>
               <td>Humidity <span id="whum" class="data">--</span> %</td>
-              <td><input id="whumc" class="inp" value="0" type="number" step="0.1"></td>
+              <td><input id="whumc" class="inp" value="0" type="number" step="0.1" required></td>
               <td><span id="whumtp" class="wtp">--</td>
             </tr>
             <tr>
               <td>Pressure <span id="wpres" class="data">--</span> mmHg</td>
-              <td><input id="wpresc" class="inp" value="0" type="number" step="0.1"></td>
+              <td><input id="wpresc" class="inp" value="0" type="number" step="0.1" required></td>
               <td><span id="wprestp" class="wtp">--</td>
             </tr>
             <tr>
               <td>Ambient light <span id="wlight" class="data">--</span> Lux</td>
-              <td><input id="wlightc" class="inp" value="0" type="number" step="0.1"></td>
+              <td><input id="wlightc" class="inp" value="0" type="number" step="0.1" required></td>
               <td><span id="wlighttp" class="wtp">--</td>
             </tr>
             <tr>
@@ -72,7 +72,7 @@
             </tr>
             <tr>
               <td colspan="2"><input id="wbat_c" type="range" min="50" max="250"><br></td>
-              <td><input id="wbatc" class="inp" value="0" type="number" min="0" max="300" step="1"></td>
+              <td><input id="wbatc" class="inp" value="0" type="number" min="0" max="300" step="1" required></td>
             </tr>
           </table>
         </div><hr>
@@ -91,11 +91,11 @@
         </div><hr class="kurz">
         <h2 class="ttl">Channel number:</h2>
         <div class="indiv">
-          <input id="chnum" class="inp" value="0" type="number">
+          <input id="chnum" class="inp" value="0" type="number" min="1" max="100" required>
         </div><hr class="kurz">
         <h2 class="ttl">Data expiration date:</h2>
         <div class="indiv">
-          <input id="wexpire" class="inp" value="0" type="number"> munites
+          <input id="wexpire" class="inp" value="0" type="number" min="1" max="100" required> munites
         </div><hr>
         <div class="indiv">
           <button class="btn btn-primary" type="submit" name="button">Save</button>
