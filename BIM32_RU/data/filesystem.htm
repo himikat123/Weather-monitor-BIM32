@@ -12,49 +12,50 @@
     <title>BIM32 Weather monitor</title>
   </head>
   <body onload="loaded()">
-    <div id="loading" class="active">Загрузка...</div>
+    <div id="loading" class="active">Loading...</div>
     <div id="logout">
-      <a href=# title="Выход" onclick="logout()">
-        <img src="logout.png" alt="Выход">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
       </a>
     </div>
     <input type="checkbox" id="nav-toggle" hidden>
     <nav id="navmenu" class="nav">
       <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
       <ul>
-        <li><a href="index.htm">Статус</a>
-        <li><a href="network.htm">Сеть</a>
-        <li><a href="sensors.htm">Сенсоры</a>
-        <li><a href="weather.htm">Погода</a>
-        <li><a href="disp.htm">Дисплей</a>
-        <li><a href="clock.htm">Часы</a>
-        <li><a href="send.htm">Отправка данных</a>
-        <li><a href="receive.htm">Прием данных</a>
-        <li><a href="backup.htm">Резервная копия</a>
-        <li><a href="default.htm">Сброс настроек</a>
-        <li><a href="user.htm">Пользователь</a>
-        <li><a href="update.htm">Прошивка</a>
-        <li><a href="filesystem.htm">Файловая система</a>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Wired sensors</a>
+        <li><a href="wsensor.htm">Wireless sensor</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
       </ul>
     </nav>
     <main role="main">
       <div id=menu>
         <div id="uploader"></div>
         <div id=bts>
-          <a href=# id=op class="but dis" onclick=opn()><span id=opn>&#9658;</span><span id=i2>Открыть</span></a>
-          <a href=# id=dn class="but dis" onclick=down()><span id=dnl>&#128190;</span><span id=i3>Скачать</span></a>
-          <a href=# id=dl class="but dis" onclick=del()><span id=dlt>&#215;</span><span id=i4>Удалить</span></a>
-          <a href=# id=rn class="but dis" onclick=rename()><span id=rnm>&#9998;</span><span id=i5>Переименовать</span></a>
+          <a href=# id=op class="but dis" onclick=opn()><span id=opn>&#9658;</span><span id=i2>Open</span></a>
+          <a href=# id=dn class="but dis" onclick=down()><span id=dnl>&#128190;</span><span id=i3>Download</span></a>
+          <a href=# id=dl class="but dis" onclick=del()><span id=dlt>&#215;</span><span id=i4>Delete</span></a>
+          <a href=# id=rn class="but dis" onclick=rename()><span id=rnm>&#9998;</span><span id=i5>Rename</span></a>
         </div>
       </div>
       <table id=fs>
         <tr>
-          <td id=i6>Всего:</td>
-          <td><span id=total></span> <span id=kb>кБ</span></td>
+          <td id=i6>Total:</td>
+          <td><span id=total></span> <span id=kb>kB</span></td>
         </tr>
         <tr>
-          <td id=i7>Занято:</td>
-          <td><span id=used></span> <span id=kb2>кБ</span></td>
+          <td id=i7>Used:</td>
+          <td><span id=used></span> <span id=kb2>kB</span></td>
         </tr>
       </table>
       <div id=main>
@@ -65,27 +66,27 @@
       <table id="submenu" class="menu">
         <tr id=op_mn class="menu-item disabled" onclick="opn();hideMenu();">
           <td class="menu-btn opn">&#9658;</td>
-          <td class="menu-btn" id=i8>Открыть</td>
+          <td class="menu-btn" id=i8>Open</td>
         </tr>
         <tr id=dn_mn class="menu-item disabled" onclick="down();hideMenu();">
           <td class="menu-btn dnl">&#128190;</td>
-          <td class="menu-btn" id=i9>Скачать</td>
+          <td class="menu-btn" id=i9>Download</td>
         </tr>
         <tr id=dl_mn class="menu-item disabled" onclick="del();hideMenu();">
           <td class="menu-btn dlt">&#215;</td>
-          <td class="menu-btn" id=i10>Удалить</td>
+          <td class="menu-btn" id=i10>Delete</td>
         </tr>
         <tr id=rn_mn class="menu-item disabled" onclick="rename();hideMenu();">
           <td class="menu-btn rnm">&#9998;</td>
-          <td class="menu-btn menu-text" id=i11>Переименовать</td>
+          <td class="menu-btn menu-text" id=i11>Rename</td>
         </tr>
       </table>
       <script>
-        var menu=document.querySelector('.menu');
+        var menu = document.querySelector('.menu');
 
         function showMenu(x,y){
-          menu.style.left=x+'px';
-          menu.style.top=y+'px';
+          menu.style.left = x + 'px';
+          menu.style.top = y + 'px';
           menu.classList.add('show-menu');
         }
 
@@ -95,17 +96,17 @@
 
         function onContextMenu(e){
           e.preventDefault();
-          var b=document.getElementById("main");
-          var w=b.clientWidth || b.offsetWidth;
-          var h=window.innerHeight;
-          var x=e.pageX;
-          var y=e.pageY;
-          if(w-e.pageX<140) x=w-140;
-          if(h-e.pageY<130) y=h-130;
-          showMenu(x,y);
+          var b = document.getElementById("main");
+          var w = b.clientWidth || b.offsetWidth;
+          var h = window.innerHeight;
+          var x = e.pageX;
+          var y = e.pageY;
+          if(w - e.pageX < 140) x = w - 140;
+          if(h - e.pageY < 130) y = h - 130;
+          showMenu(x, y);
         }
 
-        document.addEventListener('contextmenu',onContextMenu,false);
+        document.addEventListener('contextmenu', onContextMenu, false);
       </script>
     </main>
   </body>

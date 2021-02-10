@@ -17,7 +17,7 @@ $(function(){
   });
 
   $('#restore').click(function(){
-    if(confirm('Внимание! Все настройки монитора погоды обнулятся. Вы действительно хотите всё сбросить?')){
+    if(confirm('Attention! All weather monitor settings will be reset to null. Are you sure you want to reset everything?')){
       $('#loading').addClass('active');
       let config = `{
         "ssid": "",

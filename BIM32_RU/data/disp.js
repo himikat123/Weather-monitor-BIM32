@@ -1,4 +1,4 @@
-let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
+let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_EN/data/';
 
 function bright_type(c){
   if(c == 0){
@@ -98,7 +98,7 @@ function weatherbit_icon(code){
 }
 
 function clock_upd(context){
-  let days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  let days = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
   let now = new Date();
   let hr0 = Math.floor(now.getHours() / 10);
   let hr1 = now.getHours() % 10;
@@ -174,7 +174,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed){
   context.fillStyle = "white";
   if(descript != undefined) context.fillText(descript, 288 - context.measureText(descript).width / 2, 130);
   context.font = '20px Ubuntu';
-  if(w_speed != undefined) context.fillText(`${w_speed}м/с`, 167, 215);
+  if(w_speed != undefined) context.fillText(`${w_speed}m/s`, 167, 215);
 }
 
 function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_daily){
@@ -246,16 +246,16 @@ function forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_d
   context.font = '22px Ubuntu';
   context.fillStyle = "white";
   if(w_speed_daily[0] >= 0 && w_speed_daily[0] < 100){
-    context.fillText(`${w_speed_daily[0]}м/с`, 63 - context.measureText(`${w_speed_daily[0]}м/с`).width / 2, 314);
+    context.fillText(`${w_speed_daily[0]}m/s`, 63 - context.measureText(`${w_speed_daily[0]}m/s`).width / 2, 314);
   }
   if(w_speed_daily[1] >= 0 && w_speed_daily[1] < 100){
-    context.fillText(`${w_speed_daily[1]}м/с`, 183 - context.measureText(`${w_speed_daily[1]}м/с`).width / 2, 314);
+    context.fillText(`${w_speed_daily[1]}m/s`, 183 - context.measureText(`${w_speed_daily[1]}m/s`).width / 2, 314);
   }
   if(w_speed_daily[2] >= 0 && w_speed_daily[2] < 100){
-    context.fillText(`${w_speed_daily[2]}м/с`, 303 - context.measureText(`${w_speed_daily[2]}м/с`).width / 2, 314);
+    context.fillText(`${w_speed_daily[2]}m/s`, 303 - context.measureText(`${w_speed_daily[2]}m/s`).width / 2, 314);
   }
   if(w_speed_daily[3] >= 0 && w_speed_daily[3] < 100){
-    context.fillText(`${w_speed_daily[3]}м/с`, 423 - context.measureText(`${w_speed_daily[3]}м/с`).width / 2, 314);
+    context.fillText(`${w_speed_daily[3]}m/s`, 423 - context.measureText(`${w_speed_daily[3]}m/s`).width / 2, 314);
   }
 }
 

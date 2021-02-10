@@ -11,36 +11,37 @@
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
-    <div id="loading" class="active">Загрузка...</div>
+    <div id="loading" class="active">Loading...</div>
     <div id="logout">
-      <a href=# title="Выход" onclick="logout()">
-        <img src="logout.png" alt="Выход">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
       </a>
     </div>
     <input type="checkbox" id="nav-toggle" hidden>
     <nav id="navmenu" class="nav">
       <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
       <ul>
-        <li><a href="index.htm">Статус</a>
-        <li><a href="network.htm">Сеть</a>
-        <li><a href="sensors.htm">Сенсоры</a>
-        <li><a href="weather.htm">Погода</a>
-        <li><a href="disp.htm">Дисплей</a>
-        <li><a href="clock.htm">Часы</a>
-        <li><a href="send.htm">Отправка данных</a>
-        <li><a href="receive.htm">Прием данных</a>
-        <li><a href="backup.htm">Резервная копия</a>
-        <li><a href="default.htm">Сброс настроек</a>
-        <li><a href="user.htm">Пользователь</a>
-        <li><a href="update.htm">Прошивка</a>
-        <li><a href="filesystem.htm">Файловая система</a>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Wired sensors</a>
+        <li><a href="wsensor.htm">Wireless sensor</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
       </ul>
     </nav>
     <main role="main">
-      <h2 class="hd1">Сброс настроек</h2><hr>
-      <h2 class="ttl">Сброс на заводские настройки:</h2>
+      <h2 class="hd1">Default settings</h2><hr>
+      <h2 class="ttl">Factory reset:</h2>
       <div class="indiv">
-        <button id="restore" class="btn btn-primary">Сбросить</button>
+        <button id="restore" class="btn btn-primary">Reset</button>
       </div><hr>
     </main>
   </body>

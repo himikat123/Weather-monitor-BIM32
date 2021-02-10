@@ -35,7 +35,7 @@ $(function(){
       catch(e){
         error = true;
         $('#restore').attr('disabled', true);
-        alert("Выбран неверный файл");
+        alert("Invalid file selected");
       }
     };
     reader.readAsText($("#configfile")[0].files[0], "UTF-8");

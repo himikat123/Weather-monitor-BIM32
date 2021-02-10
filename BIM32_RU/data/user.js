@@ -56,7 +56,7 @@ $(function(){
 	    method: 'post',
       data: `name=${name}&oldpass=${oldpass}&newpass=${newpass}`,
 	    success: function(answ){
-        if(answ != "OK") alert("Неверный старый пароль");
+        if(answ != "OK") alert("Invalid old password");
         $('#loading').removeClass('active');
 	    }
     });

@@ -12,195 +12,195 @@
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
-    <div id=cnv></div>
-    <div id="loading" class="active">Загрузка...</div>
+    <div id="loading" class="active">Loading...</div>
     <div id="logout">
-      <a href=# title="Выход" onclick="logout()">
-        <img src="logout.png" alt="Выход">
+      <a href=# title="Logout" onclick="logout()">
+        <img src="logout.png" alt="Logout">
       </a>
     </div>
     <input type="checkbox" id="nav-toggle" hidden>
     <nav id="navmenu" class="nav">
       <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
       <ul>
-        <li><a href="index.htm">Статус</a>
-        <li><a href="network.htm">Сеть</a>
-        <li><a href="sensors.htm">Сенсоры</a>
-        <li><a href="weather.htm">Погода</a>
-        <li><a href="disp.htm">Дисплей</a>
-        <li><a href="clock.htm">Часы</a>
-        <li><a href="send.htm">Отправка данных</a>
-        <li><a href="receive.htm">Прием данных</a>
-        <li><a href="backup.htm">Резервная копия</a>
-        <li><a href="default.htm">Сброс настроек</a>
-        <li><a href="user.htm">Пользователь</a>
-        <li><a href="update.htm">Прошивка</a>
-        <li><a href="filesystem.htm">Файловая система</a>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Network</a>
+        <li><a href="sensors.htm">Wired sensors</a>
+        <li><a href="wsensor.htm">Wireless sensor</a>
+        <li><a href="weather.htm">Weather</a>
+        <li><a href="disp.htm">Display</a>
+        <li><a href="clock.htm">Clock</a>
+        <li><a href="send.htm">Data send</a>
+        <li><a href="receive.htm">Data receive</a>
+        <li><a href="backup.htm">Backup</a>
+        <li><a href="default.htm">Default settings</a>
+        <li><a href="user.htm">User</a>
+        <li><a href="update.htm">Firmware update</a>
+        <li><a href="filesystem.htm">Filesystem</a>
       </ul>
     </nav>
     <main role="main">
       <form action="#" method="post">
-        <h2 class="hd1">Прием данных</h2><hr>
+        <h2 class="hd1">Data receive</h2><hr>
         <h2 class="ttl">
           <input type="checkbox" id="mqttrcv">
-          Принимать данные с MQTT сервера:
+          Receive data from MQTT server:
         </h2>
         <div id="mqtt_recv">
-          <h2 class="ttl">Брокер:</h2>
+          <h2 class="ttl">Broker:</h2>
           <div class="indiv">
             <input id="mqttServer" class="inp" maxlength="32">
           </div>
-          <h2 class="ttl">Номер порта:</h2>
+          <h2 class="ttl">Port number:</h2>
           <div class="indiv">
             <input id="mqttPort" class="inp" type="number" min="0" maxlength="10">
           </div>
-          <h2 class="ttl">Логин:</h2>
+          <h2 class="ttl">Login:</h2>
           <div class="indiv">
             <input id="mqttLogin" class="inp" maxlength="32">
           </div>
-          <h2 class="ttl">Пароль:</h2>
+          <h2 class="ttl">Password:</h2>
           <div class="indiv">
             <input id="mqttPass" class="inp" maxlength="32">
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="tq1">
-            Топик 1:
+            Topic 1:
           </h2>
           <div class="indiv">
             <input id="mqttT1" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq2">
-            Топик 2:
+            Topic 2:
           </h2>
           <div class="indiv">
             <input id="mqttT2" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq3">
-            Топик 3:
+            Topic 3:
           </h2>
           <div class="indiv">
             <input id="mqttT3" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq4">
-            Топик 4:
+            Topic 4:
           </h2>
           <div class="indiv">
             <input id="mqttT4" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq5">
-            Топик 5:
+            Topic 5:
           </h2>
           <div class="indiv">
             <input id="mqttT5" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq6">
-            Топик 6:
+            Topic 6:
           </h2>
           <div class="indiv">
             <input id="mqttT6" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq7">
-            Топик 7:
+            Topic 7:
           </h2>
           <div class="indiv">
             <input id="mqttT7" class="inp" maxlength="32" disabled><br><br>
           </div>
           <h2 class="ttl">
             <input type="checkbox" id="tq8">
-            Топик 8:
+            Topic 8:
           </h2>
           <div class="indiv">
             <input id="mqttT8" class="inp" maxlength="32" disabled><br><br>
           </div><hr class="kurz">
-          <h2 class="ttl">Топик уличной температуры:</h2>
+          <h2 class="ttl">Outdoor temperature topic:</h2>
           <div class="indiv">
             <select class="inp" id="mto">
-              <option value="1">Топик 1</option>
-              <option value="2">Топик 2</option>
-              <option value="3">Топик 3</option>
-              <option value="4">Топик 4</option>
-              <option value="5">Топик 5</option>
-              <option value="6">Топик 6</option>
-              <option value="7">Топик 7</option>
-              <option value="8">Топик 8</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+              <option value="3">Topic 3</option>
+              <option value="4">Topic 4</option>
+              <option value="5">Topic 5</option>
+              <option value="6">Topic 6</option>
+              <option value="7">Topic 7</option>
+              <option value="8">Topic 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Топик уличной влажности:</h2>
+          <h2 class="ttl">Outdoor humidity topic:</h2>
           <div class="indiv">
             <select class="inp" id="mho">
-              <option value="1">Топик 1</option>
-              <option value="2">Топик 2</option>
-              <option value="3">Топик 3</option>
-              <option value="4">Топик 4</option>
-              <option value="5">Топик 5</option>
-              <option value="6">Топик 6</option>
-              <option value="7">Топик 7</option>
-              <option value="8">Топик 8</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+              <option value="3">Topic 3</option>
+              <option value="4">Topic 4</option>
+              <option value="5">Topic 5</option>
+              <option value="6">Topic 6</option>
+              <option value="7">Topic 7</option>
+              <option value="8">Topic 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Топик атмосферного давления:</h2>
+          <h2 class="ttl">Pressure topic:</h2>
           <div class="indiv">
             <select class="inp" id="mpo">
-              <option value="1">Топик 1</option>
-              <option value="2">Топик 2</option>
-              <option value="3">Топик 3</option>
-              <option value="4">Топик 4</option>
-              <option value="5">Топик 5</option>
-              <option value="6">Топик 6</option>
-              <option value="7">Топик 7</option>
-              <option value="8">Топик 8</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+              <option value="3">Topic 3</option>
+              <option value="4">Topic 4</option>
+              <option value="5">Topic 5</option>
+              <option value="6">Topic 6</option>
+              <option value="7">Topic 7</option>
+              <option value="8">Topic 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Топик комнатной температуры:</h2>
+          <h2 class="ttl">Indoor temperature topic:</h2>
           <div class="indiv">
             <select class="inp" id="mti">
-              <option value="1">Топик 1</option>
-              <option value="2">Топик 2</option>
-              <option value="3">Топик 3</option>
-              <option value="4">Топик 4</option>
-              <option value="5">Топик 5</option>
-              <option value="6">Топик 6</option>
-              <option value="7">Топик 7</option>
-              <option value="8">Топик 8</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+              <option value="3">Topic 3</option>
+              <option value="4">Topic 4</option>
+              <option value="5">Topic 5</option>
+              <option value="6">Topic 6</option>
+              <option value="7">Topic 7</option>
+              <option value="8">Topic 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Топик комнатной влажности:</h2>
+          <h2 class="ttl">Indoor humidity topic:</h2>
           <div class="indiv">
             <select class="inp" id="mhi">
-              <option value="1">Топик 1</option>
-              <option value="2">Топик 2</option>
-              <option value="3">Топик 3</option>
-              <option value="4">Топик 4</option>
-              <option value="5">Топик 5</option>
-              <option value="6">Топик 6</option>
-              <option value="7">Топик 7</option>
-              <option value="8">Топик 8</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+              <option value="3">Topic 3</option>
+              <option value="4">Topic 4</option>
+              <option value="5">Topic 5</option>
+              <option value="6">Topic 6</option>
+              <option value="7">Topic 7</option>
+              <option value="8">Topic 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Топик уровня освещенности:</h2>
+          <h2 class="ttl">Ambient light topic:</h2>
           <div class="indiv">
             <select class="inp" id="mli">
-              <option value="1">Топик 1</option>
-              <option value="2">Топик 2</option>
-              <option value="3">Топик 3</option>
-              <option value="4">Топик 4</option>
-              <option value="5">Топик 5</option>
-              <option value="6">Топик 6</option>
-              <option value="7">Топик 7</option>
-              <option value="8">Топик 8</option>
+              <option value="1">Topic 1</option>
+              <option value="2">Topic 2</option>
+              <option value="3">Topic 3</option>
+              <option value="4">Topic 4</option>
+              <option value="5">Topic 5</option>
+              <option value="6">Topic 6</option>
+              <option value="7">Topic 7</option>
+              <option value="8">Topic 8</option>
             </select>
           </div><hr class="kurz">
         </div><hr>
 
         <h2 class="ttl">
           <input type="checkbox" id="thngrcv">
-          Принимать данные с thingspeak.com:
+          Receive data from thingspeak.com:
         </h2>
         <div id="thng_recv">
           <h2 class="ttl">Channel ID:</h2>
@@ -215,100 +215,100 @@
           <div class="indiv">
             <input id="rdkey" class="inp" maxlength="32">
           </div><hr class="kurz">
-          <h2 class="ttl">Поле уличной температуры:</h2>
+          <h2 class="ttl">Outdoor temperature field:</h2>
           <div class="indiv">
             <select class="inp" id="tto">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Поле уличной влажности:</h2>
+          <h2 class="ttl">Outdoor humidity field:</h2>
           <div class="indiv">
             <select class="inp" id="tho">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Поле атмосферного давления:</h2>
+          <h2 class="ttl">Pressure field:</h2>
           <div class="indiv">
             <select class="inp" id="tpo">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Поле комнатной температуры:</h2>
+          <h2 class="ttl">Indoor temperature field:</h2>
           <div class="indiv">
             <select class="inp" id="tti">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Поле комнатной влажности:</h2>
+          <h2 class="ttl">Indoor humidity field:</h2>
           <div class="indiv">
             <select class="inp" id="thi">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Поле уровня освещенности:</h2>
+          <h2 class="ttl">Ambient light field:</h2>
           <div class="indiv">
             <select class="inp" id="tli">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Поле уровня батарейки:</h2>
+          <h2 class="ttl">Battery level field:</h2>
           <div class="indiv">
             <select class="inp" id="tbt">
-              <option value="1">Поле 1</option>
-              <option value="2">Поле 2</option>
-              <option value="3">Поле 3</option>
-              <option value="4">Поле 4</option>
-              <option value="5">Поле 5</option>
-              <option value="6">Поле 6</option>
-              <option value="7">Поле 7</option>
-              <option value="8">Поле 8</option>
+              <option value="1">Field 1</option>
+              <option value="2">Field 2</option>
+              <option value="3">Field 3</option>
+              <option value="4">Field 4</option>
+              <option value="5">Field 5</option>
+              <option value="6">Field 6</option>
+              <option value="7">Field 7</option>
+              <option value="8">Field 8</option>
             </select>
           </div>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Сохранить</button>
+          <button class="btn btn-primary" type="submit" name="button">Save</button>
         </div><br>
       </form>
     </main>
