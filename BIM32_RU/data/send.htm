@@ -12,69 +12,70 @@
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
-    <div id="loading" class="active">Loading...</div>
+    <div id=cnv></div>
+    <div id="loading" class="active">Загрузка...</div>
     <div id="logout">
-      <a href=# title="Logout" onclick="logout()">
-        <img src="logout.png" alt="Logout">
+      <a href=# title="Выход" onclick="logout()">
+        <img src="logout.png" alt="Выход">
       </a>
     </div>
     <input type="checkbox" id="nav-toggle" hidden>
     <nav id="navmenu" class="nav">
       <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
       <ul>
-        <li><a href="index.htm">Status</a>
-        <li><a href="network.htm">Network</a>
-        <li><a href="sensors.htm">Wired sensors</a>
-        <li><a href="wsensor.htm">Wireless sensor</a>
-        <li><a href="weather.htm">Weather</a>
-        <li><a href="disp.htm">Display</a>
-        <li><a href="clock.htm">Clock</a>
-        <li><a href="send.htm">Data send</a>
-        <li><a href="receive.htm">Data receive</a>
-        <li><a href="backup.htm">Backup</a>
-        <li><a href="default.htm">Default settings</a>
-        <li><a href="user.htm">User</a>
-        <li><a href="update.htm">Firmware update</a>
-        <li><a href="filesystem.htm">Filesystem</a>
+        <li><a href="index.htm">Статус</a>
+        <li><a href="network.htm">Сеть</a>
+        <li><a href="sensors.htm">Проводные датчики</a>
+        <li><a href="wsensor.htm">Беспроводной датчик</a>
+        <li><a href="weather.htm">Погода</a>
+        <li><a href="disp.htm">Дисплей</a>
+        <li><a href="clock.htm">Часы</a>
+        <li><a href="send.htm">Отправка данных</a>
+        <li><a href="receive.htm">Прием данных</a>
+        <li><a href="backup.htm">Резервная копия</a>
+        <li><a href="default.htm">Сброс настроек</a>
+        <li><a href="user.htm">Пользователь</a>
+        <li><a href="update.htm">Прошивка</a>
+        <li><a href="filesystem.htm">Файловая система</a>
       </ul>
     </nav>
     <main role="main">
       <form action="#" method="post">
-        <h2 class="hd1">Data send</h2><hr>
-        <h2 class="ttl">Data sending period:</h2>
+        <h2 class="hd1">Отправка данных</h2><hr>
+        <h2 class="ttl">Период отправки данных:</h2>
         <div class="indiv">
-          <input id="tupd" class="inp tupd" maxlength="2" type="number" min="1" max="60" required> minutes
+          <input id="tupd" class="inp tupd" maxlength="2" type="number" min="1" max="60" required> минут
         </div><hr>
         <h2 class="ttl">
           <input type="checkbox" id="mqttsend">
-          Send data to MQTT server:
+          Отправлять данные на MQTT сервер:
         </h2>
         <div id="mqtt_send">
-          <h2 class="ttl">Broker:</h2>
+          <h2 class="ttl">Брокер:</h2>
           <div class="indiv">
             <input id="mqttServer" class="inp" maxlength="32">
           </div>
-          <h2 class="ttl">Port number:</h2>
+          <h2 class="ttl">Номер порта:</h2>
           <div class="indiv">
             <input id="mqttPort" class="inp" type="number" min="0" maxlength="10">
           </div>
-          <h2 class="ttl">Login:</h2>
+          <h2 class="ttl">Логин:</h2>
           <div class="indiv">
             <input id="mqttLogin" class="inp" maxlength="32">
           </div>
-          <h2 class="ttl">Password:</h2>
+          <h2 class="ttl">Пароль:</h2>
           <div class="indiv">
             <input id="mqttPass" class="inp" maxlength="32">
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq1">
-            Topic 1:
+            Топик 1:
           </h2>
           <div class="indiv">
             <input id="mqttF1" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd1_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -83,22 +84,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd1_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq2">
-            Topic 2:
+            Топик 2:
           </h2>
           <div class="indiv">
             <input id="mqttF2" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd2_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -107,22 +108,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd2_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq3">
-            Topic 3:
+            Топик 3:
           </h2>
           <div class="indiv">
             <input id="mqttF3" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd3_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -131,22 +132,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd3_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq4">
-            Topic 4:
+            Топик 4:
           </h2>
           <div class="indiv">
             <input id="mqttF4" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd4_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -155,22 +156,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd4_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq5">
-            Topic 5:
+            Топик 5:
           </h2>
           <div class="indiv">
             <input id="mqttF5" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd5_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -179,22 +180,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd5_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq6">
-            Topic 6:
+            Топик 6:
           </h2>
           <div class="indiv">
             <input id="mqttF6" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd6_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -203,22 +204,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd6_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq7">
-            Topic 7:
+            Топик 7:
           </h2>
           <div class="indiv">
             <input id="mqttF7" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd7_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -227,22 +228,22 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd7_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
           <h2 class="ttl">
             <input type="checkbox" id="fq8">
-            Topic 8:
+            Топик 8:
           </h2>
           <div class="indiv">
             <input id="mqttF8" class="inp" maxlength="32" disabled><br><br>
             <select class="inp top" id="fd8_s" disabled>
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -251,18 +252,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="fd8_t" disabled>
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div>
         </div><hr>
 
         <h2 class="ttl">
           <input type="checkbox" id="thngsend">
-          Send data to thingspeak.com::
+          Отправлять данные на thingspeak.com:
         </h2>
         <div id="thng_send">
           <h2 class="ttl">Channel ID:</h2>
@@ -277,11 +278,11 @@
           <div class="indiv">
             <input id="rdkey" class="inp" maxlength="32">
           </div><hr class="kurz">
-          <h2 class="ttl">Field 1:</h2>
+          <h2 class="ttl">Поле 1:</h2>
           <div class="indiv">
             <select class="inp top" id="f1_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -290,18 +291,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f1_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 2:</h2>
+          <h2 class="ttl">Поле 2:</h2>
           <div class="indiv">
             <select class="inp top" id="f2_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -310,18 +311,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f2_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 3:</h2>
+          <h2 class="ttl">Поле 3:</h2>
           <div class="indiv">
             <select class="inp top" id="f3_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -330,18 +331,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f3_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 4:</h2>
+          <h2 class="ttl">Поле 4:</h2>
           <div class="indiv">
             <select class="inp top" id="f4_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -350,18 +351,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f4_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 5:</h2>
+          <h2 class="ttl">Поле 5:</h2>
           <div class="indiv">
             <select class="inp top" id="f5_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -370,18 +371,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f5_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 6:</h2>
+          <h2 class="ttl">Поле 6:</h2>
           <div class="indiv">
             <select class="inp top" id="f6_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -390,18 +391,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f6_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 7:</h2>
+          <h2 class="ttl">Поле 7:</h2>
           <div class="indiv">
             <select class="inp top" id="f7_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -410,18 +411,18 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f7_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Field 8:</h2>
+          <h2 class="ttl">Поле 8:</h2>
           <div class="indiv">
             <select class="inp top" id="f8_s">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
@@ -430,95 +431,95 @@
               <option value="7">BH1750</option>
             </select>
             <select class="inp top" id="f8_t">
-              <option value="0">Temperature</option>
-              <option value="1">Humidity</option>
-              <option value="2">Pressure</option>
-              <option value="3">Ambient light</option>
-              <option value="4">Battery</option>
+              <option value="0">Температура</option>
+              <option value="1">Влажность</option>
+              <option value="2">Давление</option>
+              <option value="3">Освещенность</option>
+              <option value="4">Батарейка</option>
             </select>
           </div>
         </div><hr>
 
         <h2 class="ttl">
           <input type="checkbox" id="nrdmsend">
-          Send data to narodmon.ru:
+          Отправлять данные на narodmon.ru:
         </h2>
         <div id="nrdm_send">
           <h2 class="ttl">MAC:</h2>
           <div class="indiv">
             <input id="mac_addr" class="inp mc" disabled>
           </div>
-          <h2 class="ttl">Latitude:</h2>
+          <h2 class="ttl">Широта:</h2>
           <div class="indiv">
             <input id="lat" class="inp" maxlength="10" placeholder="Latitude">
           </div>
-          <h2 class="ttl">Longitude:</h2>
+          <h2 class="ttl">Долгота:</h2>
           <div class="indiv">
             <input id="lon" class="inp" maxlength="10" placeholder="Latitude">
           </div><hr class="kurz">
-          <h2 class="ttl">Temperature 1:</h2>
+          <h2 class="ttl">Температура 1:</h2>
           <div class="indiv">
             <select class="inp" id="nrd_tout">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
               <option value="5">DHT22</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Temperature 2:</h2>
+          <h2 class="ttl">Температура 2:</h2>
           <div class="indiv">
             <select class="inp" id="nrd_tin">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
               <option value="4">SHT21</option>
               <option value="5">DHT22</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Humidity 1:</h2>
+          <h2 class="ttl">Влажность 1:</h2>
           <div class="indiv">
             <select class="inp" id="nrd_hout">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="4">SHT21</option>
               <option value="5">DHT22</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Humidity 2:</h2>
+          <h2 class="ttl">Влажность 2:</h2>
           <div class="indiv">
             <select class="inp" id="nrd_hin">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="4">SHT21</option>
               <option value="5">DHT22</option>
             </select>
           </div><hr class="kurz">
-          <h2 class="ttl">Pressure:</h2>
+          <h2 class="ttl">Давление:</h2>
           <div class="indiv">
             <select class="inp" id="nrd_pout">
-              <option value="0">Internet</option>
-              <option value="1">Wireless sensor</option>
+              <option value="0">Интернет</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="2">BME280</option>
               <option value="3">BMP180</option>
             </select>
           </div>
           <hr class="kurz">
-          <h2 class="ttl">Ambient light:</h2>
+          <h2 class="ttl">Освещенность:</h2>
           <div class="indiv">
             <select class="inp" id="nrd_lin">
-              <option value="1">Wireless sensor</option>
+              <option value="1">Беспроводной датчик</option>
               <option value="6">MAX44009</option>
               <option value="7">BH1750</option>
             </select>
           </div>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Save</button>
+          <button class="btn btn-primary" type="submit" name="button">Сохранить</button>
         </div><br>
       </form>
     </main>

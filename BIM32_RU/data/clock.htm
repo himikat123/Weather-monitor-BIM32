@@ -12,52 +12,52 @@
   </head>
   <body>
     <div id=cnv></div>
-    <div id="loading" class="active">Loading...</div>
+    <div id="loading" class="active">Загрузка...</div>
     <div id="logout">
-      <a href=# title="Logout" onclick="logout()">
-        <img src="logout.png" alt="Logout">
+      <a href=# title="Выход" onclick="logout()">
+        <img src="logout.png" alt="Выход">
       </a>
     </div>
     <input type="checkbox" id="nav-toggle" hidden>
     <nav id="navmenu" class="nav">
       <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
       <ul>
-        <li><a href="index.htm">Status</a>
-        <li><a href="network.htm">Network</a>
-        <li><a href="sensors.htm">Wired sensors</a>
-        <li><a href="wsensor.htm">Wireless sensor</a>
-        <li><a href="weather.htm">Weather</a>
-        <li><a href="disp.htm">Display</a>
-        <li><a href="clock.htm">Clock</a>
-        <li><a href="send.htm">Data send</a>
-        <li><a href="receive.htm">Data receive</a>
-        <li><a href="backup.htm">Backup</a>
-        <li><a href="default.htm">Default settings</a>
-        <li><a href="user.htm">User</a>
-        <li><a href="update.htm">Firmware update</a>
-        <li><a href="filesystem.htm">Filesystem</a>
+        <li><a href="index.htm">Статус</a>
+        <li><a href="network.htm">Сеть</a>
+        <li><a href="sensors.htm">Проводные датчики</a>
+        <li><a href="wsensor.htm">Беспроводной датчик</a>
+        <li><a href="weather.htm">Погода</a>
+        <li><a href="disp.htm">Дисплей</a>
+        <li><a href="clock.htm">Часы</a>
+        <li><a href="send.htm">Отправка данных</a>
+        <li><a href="receive.htm">Прием данных</a>
+        <li><a href="backup.htm">Резервная копия</a>
+        <li><a href="default.htm">Сброс настроек</a>
+        <li><a href="user.htm">Пользователь</a>
+        <li><a href="update.htm">Прошивка</a>
+        <li><a href="filesystem.htm">Файловая система</a>
       </ul>
     </nav>
     <main role="main">
       <form action="#" method="post">
-        <h2 class="hd1">Clock</h2><hr>
-        <h2 class="ttl">Timezone:</h2>
+        <h2 class="hd1">Часы</h2><hr>
+        <h2 class="ttl">Часовой пояс:</h2>
         <div class="indiv">
           <input id="utc" class="inp" style="text-align:center" maxlength="3" type="number" min="-12" max="12" required>
         </div><hr>
-        <h2 class="ttl">Automatic daylight saving time:</h2>
+        <h2 class="ttl">Автоматический переход на летнее время:</h2>
         <div class="indiv">
           <input type="radio" name="dlst" id="no" value="false" checked>
-          <label for="no">No</label>
+          <label for="no">Нет</label>
           <input type="radio" name="dlst" id="yes" value="true">
-          <label for="yes">Yes</label>
+          <label for="yes">Да</label>
         </div><hr>
-        <h2 class="ttl">NTP server:</h2>
+        <h2 class="ttl">NTP сервер:</h2>
         <div class="indiv">
           <input id="ntp" class="inp" maxlength="32" style="text-align:center" required>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Save</button>
+          <button class="btn btn-primary" type="submit" name="button">Сохранить</button>
         </div><br>
       </form>
     </main>

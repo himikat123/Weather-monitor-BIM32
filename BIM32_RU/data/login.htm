@@ -69,20 +69,20 @@
   <body onload="load()">
     <div id="pr">
       <div id="bl">
-        <br>BIM32 Weather monitor
-        <a href=# title="Logout" onclick="logout()">
+        <br>Монитор погоды BIM32
+        <a href=# title="Выход" onclick="logout()">
           <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoBAMAAAB+0KVeAAAAHlBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC3KG9qAAAACXRSTlMAUN9wj0CvvyBSXuGWAAAAcUlEQVQoz83RIQ6AMBBE0RIwOCyOO6BwPUIvgcD1Km2BMLclTSoqviAkJIzZ5KndWVPSq8obnPLoAEd9jHKEgVAz4T4CaiXUUKFUkghlCU9CecL4GAOhA7xoeTwT8LCAC7SUoOTYAnp88W/RbISmyXgDwcUDj/J63r8AAAAASUVORK5CYII=" alt="Выход">
         </a>
         <form method="post" action="esp/login.php">
-          <b>Username:</b><br>
+          <b>Имя пользователя:</b><br>
           <input class="inp" name="LOGIN" maxlength="32" required><br>
-          <b>Password:</b><br>
+          <b>Пароль:</b><br>
           <div class="password">
             <input id="pass" class="inp" name="PASSW" type="password" maxlength="32" autocomplete="off">
             <a id="eye" href="#" class="password-control"></a>
           </div><br><br>
-          <input class="but" type="submit" value="Login"><hr>
-          <div id="error">Wrong login or password</div>
+          <input class="but" type="submit" value="Вход"><hr>
+          <div id="error">Неверный логин или пароль</div>
         </form>
       </div>
     </div>
