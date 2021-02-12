@@ -82,9 +82,12 @@ void sensors_read(void){
     sensors_event_t pressure_event;
     bme_pressure -> getEvent(&pressure_event);
     sensors.bme280_pres = pressure_event.pressure + sensors.bme280_pres_corr;
+    sensors.bme280_pres *= 0.75;
   }
-  if(sensors.bmp180_det) sensors.bmp180_pres = bmp.readPressure() / 100 + sensors.bmp180_pres_corr;
-  sensors.bmp180_pres *= 0.75;
+  if(sensors.bmp180_det){
+    sensors.bmp180_pres = bmp.readPressure() / 100 + sensors.bmp180_pres_corr;
+    sensors.bmp180_pres *= 0.75;
+  }
 ////////// Ambient light ///////////////////////////////
   if(sensors.max44009_det) sensors.max44009_light = max_light.get_lux() + sensors.max44009_light_corr;
   if(sensors.bh1750_det) sensors.bh1750_light = lightMeter.readLightLevel() + sensors.bh1750_light_corr;

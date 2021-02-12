@@ -1,20 +1,24 @@
 /* 
- *  Weather Monitor BIM32 v1.2.1
- *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020
+ *  Weather Monitor BIM32 v2.0
+ *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2021
  */
  
-        // 1.9 MB APP with OTA / 190 kB SPIFFS
+        // 1.2 MB APP / 1.5 MB SPIFFS
         
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <ArduinoOTA.h>
 #include <TimeLib.h>
 #include <FS.h>
 #include <SPIFFS.h>
+#include <SPIFFSEditor.h>
 #include <Update.h>
-#include "FS.h"
 #include "SD.h"
 #include "SPI.h"
 #include <WiFi.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <Update.h>
 #include <OpenWeatherMap.h>
@@ -33,6 +37,8 @@
 #define FS_NO_GLOBALS
 
 WiFiClient client;
+AsyncWebServer server(80);
+AsyncEventSource events("/events");
 EasyNex myNex(Serial1);
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
 RgbColor red(colorSaturation, 0, 0);
@@ -55,20 +61,95 @@ void setup(){
     
   WiFi.mode(WIFI_STA);
   SPIFFS.begin();
-
+  
+  web_interface_init();
+  MDNS.begin("bim32");
+  MDNS.addService("http","tcp",80);
   read_config();
 
-  xTaskCreatePinnedToCore(TaskDisplay, "TaskDisplay", 32768, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
-  xTaskCreatePinnedToCore(TaskHC12rcv, "TaskHC12rcv", 16384, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
-  xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 16384, NULL, 2, NULL, ARDUINO_RUNNING_CORE);
-  xTaskCreatePinnedToCore(TaskWeather, "TaskWeather", 32768, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
-  xTaskCreatePinnedToCore(TaskWS2812B, "TaskWS2812B", 16384, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
-  if(config.mqttsend or config.mqttrcv){
-    xTaskCreatePinnedToCore(TaskHC12MQTT, "TaskHC12MQTT", 32768, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
+  if(!config.web_s){
+    xTaskCreatePinnedToCore(TaskDisplay, "TaskDisplay", 32768, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskHC12rcv, "TaskHC12rcv", 16384, NULL, 3, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 2, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskWeather, "TaskWeather", 32768, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskWS2812B, "TaskWS2812B", 16384, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
+  }
+  else{
+    wifi_connect();
+    myNex.writeStr("page page26");
+    sensors_init();
+    strip.Begin();
+    strip.Show();
   }
 }
 
-void loop(){}
+void loop(){
+  if(config.web_s){
+    ArduinoOTA.handle();
+    if(digitalRead(0) == 0){
+      web_only(false);
+      delay(100);
+      ESP.restart();
+    }
+    if((millis() - s_upd) > 1000){
+      s_upd = millis();
+      sensors_read();
+    }
+    
+    while(Serial2.available()){
+      wsensorstr = Serial2.readStringUntil('\n');
+      Serial.println(wsensorstr);
+      if(wsensorstr.lastIndexOf("{") != -1){
+        StaticJsonDocument<1024> root;
+        DeserializationError error = deserializeJson(root, wsensorstr);
+        if(!error){
+          datas.time_wsens = now();
+          datas.temp_wsens = root["t"][0].as<float>();
+          uint8_t wtemp_sens = root["t"][1].as<uint8_t>();
+          datas.hum_wsens = root["h"][0].as<float>();
+          uint8_t whum_sens = root["h"][1].as<uint8_t>();
+          uint16_t prs = root["p"][0].as<float>() * 0.75;
+          if(prs > 500 and prs < 1200) datas.pres_wsens = prs;
+          uint8_t wpres_sens = root["p"][1].as<uint8_t>();
+          datas.light_wsens = root["l"][0].as<float>();
+          uint8_t wlight_sens = root["l"][1].as<uint8_t>();
+          datas.bat_adc = root["b"].as<int>();
+          datas.wbat_voltage = (float)datas.bat_adc / (float)config.bat_k;
+          String wrs = root["s"][wtemp_sens].as<String>();
+          wrs.toCharArray(datas.wtemp_sens, wrs.length() + 1);
+          wrs = root["s"][whum_sens].as<String>();
+          wrs.toCharArray(datas.whum_sens, wrs.length() + 1);
+          wrs = root["s"][wpres_sens].as<String>();
+          wrs.toCharArray(datas.wpres_sens, wrs.length() + 1);
+          wrs = root["s"][wlight_sens].as<String>();
+          wrs.toCharArray(datas.wlight_sens, wrs.length() + 1);
+          float umin = 3.5;
+          float umax = 4.5;
+          if(config.bat_type == 1) umax = 3.9;
+          float stp = (umax - umin) / 4;
+          if(datas.wbat_voltage < (umin + stp)) datas.wbat_level = 1;
+          else if(datas.wbat_voltage < (umin + stp * 2)) datas.wbat_level = 2;
+          else if(datas.wbat_voltage < (umin + stp * 3)) datas.wbat_level = 3;
+          else datas.wbat_level = 4;
+        }
+      }
+      if(wsensorstr.lastIndexOf("OK+RC") != -1){
+        uint8_t ch = wsensorstr.substring(5).toInt();
+        if(ch != config.wsens_channel){
+          Serial2.printf("AT+C%03d\r\n", config.wsens_channel);
+          delay(100);
+          digitalWrite(SET_HC12, HIGH);
+        }
+        else digitalWrite(SET_HC12, HIGH);
+      }
+    }
+    wsensorstr = "";
+
+    RgbColor white(datas.bright_clock);
+    for(uint8_t i=0; i<30; i++) strip.SetPixelColor(i, white);
+    strip.Show();
+  }
+}
 
 void TaskDisplay(void *pvParameters){
   (void) pvParameters;
@@ -77,6 +158,7 @@ void TaskDisplay(void *pvParameters){
   vTaskDelay(1000);
   myNex.writeStr("page page1");
   datas.page = 1;
+  
   while(1){
     if(digitalRead(0) == 0){
       if(millis() - but > 1000){
@@ -122,11 +204,18 @@ void TaskDisplay(void *pvParameters){
 
     if(datas.page != 9){
       if(config.brt == 0){
-        if(datas.isDay) datas.bright = config.brday;
-        else datas.bright = config.brnight;
+        if(datas.isDay){
+          datas.bright = config.brday;
+          if(datas.page != 240) datas.bright_clock = config.ws_bright_d;
+        }
+        else{
+          datas.bright = config.brnight;
+          if(datas.page != 240) datas.bright_clock = config.ws_bright_n;
+        }
       }
       if(config.brt == 1){
         datas.bright = round(datas.light) * 3;
+        if(datas.page != 240) datas.bright_clock = config.ws_bright_d * 3;
       }
       if(config.brt == 2){
         uint16_t sunrise = config.hd * 60 + config.md;
@@ -135,19 +224,23 @@ void TaskDisplay(void *pvParameters){
         if(cur_time > sunrise and cur_time < sunset){
           datas.isDay = true;
           datas.bright = config.brday;
+          if(datas.page != 240) datas.bright_clock = config.ws_bright_d;
         }
         else{
           datas.isDay = false;
           datas.bright = config.brnight;
+          if(datas.page != 240) datas.bright_clock = config.ws_bright_n;
         }
       }
       if(config.brt == 3){
         datas.bright = config.brday;
+        if(datas.page != 240) datas.bright_clock = config.ws_bright_n;
       }
       if(datas.bright < 1) datas.bright = 1;
       if(datas.bright > 100) datas.bright = 100;
       if(millis() - old_bright > 1000){
         myNex.writeNum("dim", datas.bright);
+        if(datas.page == 2) page2_send();
         old_bright = millis();
       }
     }
@@ -169,6 +262,7 @@ void TaskSensors(void *pvParameters){
   uint32_t thngspk_update = millis() + 60000;
   uint32_t sensors_update = millis();
   uint32_t cloud_send = millis() + 300000;
+  
   while(1){
     if((millis() - sensors_update) > 1000){
       sensors_update = millis();
@@ -208,20 +302,8 @@ void TaskSensors(void *pvParameters){
       cloud_send = millis();
     }
 
+    ArduinoOTA.handle();
     vTaskDelay(200);
-  }
-}
-
-void TaskWeather(void *pvParameters){
-  (void) pvParameters;
-  while(1){
-    if(datas.net_connected){
-      getWeatherNow();
-      getWeatherDaily();
-      datas.old_ant = 0;
-      vTaskDelay(1200000);
-    }
-    else vTaskDelay(10);
   }
 }
 
@@ -337,7 +419,7 @@ void disp_receive(void){
             );
             page1_send();
           }
-          //if(datas.page == 1) datas.old_ant = datas.ant;
+          if(datas.page == 2) page2_send();
           if(datas.page == 3) page3_send();
           if(datas.page == 8) page8_send();
           if(datas.page == 9) page9_send();
@@ -363,6 +445,7 @@ void disp_receive(void){
           if(datas.page == 22) page22_send();
           if(datas.page == 23) page23_send();
           if(datas.page == 24) page24_send();
+          if(datas.page == 240) datas.bright_clock = root["br"];
         }
         if(disp.lastIndexOf("save") != -1){
           strlcpy(config.ssid, root["ssid"] | config.ssid, sizeof(config.ssid));
@@ -555,7 +638,9 @@ void disp_receive(void){
           strlcpy(config.ds[3], root["d3"][3] | config.ds[3], sizeof(config.ds[3]));
           strlcpy(config.ds[4], root["d4"][3] | config.ds[4], sizeof(config.ds[4]));
           strlcpy(config.ds[5], root["d5"][3] | config.ds[5], sizeof(config.ds[5]));
-                    
+          config.ws_bright_d = root["ws_brightd"] | config.ws_bright_d;
+          config.ws_bright_n = root["ws_brightn"] | config.ws_bright_n;
+
           save_config();
         }
       }
@@ -884,8 +969,10 @@ void save_config(void){
   conf["ds3"] = config.ds[3];
   conf["ds4"] = config.ds[4];
   conf["ds5"] = config.ds[5];
+  conf["ws_brightd"] = config.ws_bright_d;
+  conf["ws_brightn"] = config.ws_bright_n;
 
-  serializeJson(conf, json);
+  serializeJsonPretty(conf, json);
   File file = SPIFFS.open("/config.json", FILE_WRITE);
   if(file.print(json)) myNex.writeNum("ok.pic",133);
   else Serial.println("ERROR Write file");
@@ -899,7 +986,6 @@ void read_config(void){
     String json = file.readString();
     Serial.println(json);
     DynamicJsonDocument conf(8192);
-    //StaticJsonDocument<4096> conf;
     DeserializationError error = deserializeJson(conf, json);
     if(!error){
       strlcpy(config.lang, conf["lang"] | config.lang, sizeof(config.lang));
@@ -1090,6 +1176,8 @@ void read_config(void){
       strlcpy(config.ds[3], conf["ds3"] | config.ds[3], sizeof(config.ds[3]));
       strlcpy(config.ds[4], conf["ds4"] | config.ds[4], sizeof(config.ds[4]));
       strlcpy(config.ds[5], conf["ds5"] | config.ds[5], sizeof(config.ds[5]));
+      config.ws_bright_d = conf["ws_brightd"] | config.ws_bright_d;
+      config.ws_bright_n = conf["ws_brightn"] | config.ws_bright_n;
       
       digitalWrite(SET_HC12, LOW);
       delay(45);
@@ -1209,6 +1297,8 @@ void read_config(void){
       Serial.print("config.ds[3]="); Serial.println(config.ds[3]);
       Serial.print("config.ds[4]="); Serial.println(config.ds[4]);
       Serial.print("config.ds[5]="); Serial.println(config.ds[5]);
+      Serial.print("config.ws_bright_d="); Serial.println(config.ws_bright_d);
+      Serial.print("config.ws_bright_n="); Serial.println(config.ws_bright_n);
       Serial.print("config.tto="); Serial.println(config.tto);
       Serial.print("config.tho="); Serial.println(config.tho);
       Serial.print("config.tpo="); Serial.println(config.tpo);
@@ -1217,6 +1307,28 @@ void read_config(void){
       Serial.print("config.tli="); Serial.println(config.tli);
       Serial.print("config.tbt="); Serial.println(config.tbt);
       Serial.println();
+    }
+    else Serial.println("deserialisation error");
+  }
+  file = SPIFFS.open("/web.json");
+  while(file.available()){
+    String json = file.readString();
+    Serial.println(json);
+    DynamicJsonDocument conf(64);
+    DeserializationError error = deserializeJson(conf, json);
+    if(!error){
+      config.web_s = conf["web"].as<bool>() | config.web_s;
+    }
+    else Serial.println("deserialisation error");
+  }
+  file = SPIFFS.open("/user.us");
+  while(file.available()){
+    String json = file.readString();
+    DynamicJsonDocument conf(128);
+    DeserializationError error = deserializeJson(conf, json);
+    if(!error){
+      strlcpy(config.username, conf["user"] | config.username, sizeof(config.username));
+      strlcpy(config.password, conf["pass"] | config.password, sizeof(config.password));
     }
     else Serial.println("deserialisation error");
   }

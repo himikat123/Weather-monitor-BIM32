@@ -1,3 +1,28 @@
+String code2str(uint8_t code){
+  String str = " ";
+  switch(code){
+    case 0  : str = "0"; break;
+    case 1  : str = "1"; break;
+    case 2  : str = "2"; break;
+    case 3  : str = "3"; break;
+    case 4  : str = "4"; break;
+    case 5  : str = "5"; break;
+    case 6  : str = "6"; break;
+    case 7  : str = "7"; break;
+    case 8  : str = "8"; break;
+    case 9  : str = "9"; break;
+    case 10 : str = " "; break;
+    case 11 : str = "-"; break;
+    case 12 : str = "°"; break;
+    case 13 : str = "C"; break;
+    case 14 : str = "H"; break;
+    case 15 : str = "P"; break;
+    case 16 : str = "T"; break;
+    default : str = " "; break;
+  }
+  return str;
+}
+
 bool get_clock(bool dots){
   datas.clock_dig[0] = hour() / 10; 
   datas.clock_dig[1] = hour() % 10; 
@@ -73,8 +98,9 @@ void TaskWS2812B(void *pvParameters){
     clock_pixels[i] = 0; 
   }
   while(1){
-    uint16_t bright = datas.bright;
-    if(bright > 50) bright = 50;
+    int bright = datas.bright_clock;
+    if(bright < 1) bright = 1;
+    if(bright > 250) bright = 250;
     RgbColor red(bright, 0, 0);
     RgbColor yellow(bright, bright, 0);
     RgbColor green(0, bright, 0);
@@ -83,17 +109,17 @@ void TaskWS2812B(void *pvParameters){
     RgbColor purple(bright, 0, bright);
     RgbColor white(bright);
     RgbColor black(0);
-    if((millis() - prev_millis >= config.dp[snum] * 1000) or (!config.dt[snum] and config.dc[snum] == 12710)){
+    if((millis() - prev_millis >= config.dp[snum] * 1000) or (config.dp[snum] == 0)){
       snum++;
       for(uint8_t i=snum; i<6; i++){
-        if(!config.dp[snum] and !config.dt[snum] and config.dc[snum] == 12710) snum++;
+        if(config.dp[snum] == 0) snum++;
         else break;
       }
       if(snum > 5) snum = 0;
       prev_millis = millis();
     }
     
-    if(config.dp[snum] and config.dt[snum] and config.dc[snum] != 12710){
+    if(config.dp[snum] > 0){
       switch(config.dt[snum]){
         case 1: 
           if(String(config.ds[snum]) == "C") dotts = get_clock(dotts);
@@ -131,11 +157,19 @@ void TaskWS2812B(void *pvParameters){
       clock_pixels[14] = clock_pixels[15] = dotts;
     }
 
+    if(config.dt[snum] == 1 && String(config.ds[snum]) == "C"){
+      for(uint8_t i=0; i<4; i++) datas.clock_symb[i] = 16;
+    }
+    else{
+      for(uint8_t i=0; i<4; i++) datas.clock_symb[i] = datas.clock_dig[i];
+    }
+    datas.clock_colr = config.dc[snum];
+
     for(uint8_t i=0; i<7; i++){
       clock_pixels[i] = bitRead(symb[datas.clock_dig[0]], i) ? 1 : 0;
       clock_pixels[i + 7] = bitRead(symb[datas.clock_dig[1]], i) ? 1 : 0;
       clock_pixels[i + 16] = bitRead(symb[datas.clock_dig[2]], i) ? 1 : 0;
-      clock_pixels[i + 23] = bitRead(symb[datas.clock_dig[3]], i) ? 1 : 0; 
+      clock_pixels[i + 23] = bitRead(symb[datas.clock_dig[3]], i) ? 1 : 0;
     }
     
     for(uint8_t i=0; i<30; i++){
@@ -154,7 +188,6 @@ void TaskWS2812B(void *pvParameters){
       else strip.SetPixelColor(i, black);
     }
     strip.Show();
-        
     vTaskDelay(500);
   }
 }

@@ -2,7 +2,10 @@
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v1.2.1";
+char fw[7] = "v2.0";
+uint32_t s_upd = millis();
+bool clk2 = false;
+String wsensorstr = "";
 
 struct{
   char lang[5] = "ru";
@@ -94,14 +97,14 @@ struct{
   char mqttF6[40] = ""; // mqtt topic 6 name (for sending data)
   char mqttF7[40] = ""; // mqtt topic 7 name (for sending data)
   char mqttF8[40] = ""; // mqtt topic 8 name (for sending data)
-  uint8_t fd1[2] = {0,0}; // 
-  uint8_t fd2[2] = {0,0}; // 
-  uint8_t fd3[2] = {0,0}; // 
-  uint8_t fd4[2] = {0,0}; // 
-  uint8_t fd5[2] = {0,0}; // 
-  uint8_t fd6[2] = {0,0}; // 
-  uint8_t fd7[2] = {0,0}; // 
-  uint8_t fd8[2] = {0,0}; // 
+  uint8_t fd1[2] = {0,0}; // mqtt topic 1 [sensor type, data type]
+  uint8_t fd2[2] = {0,0}; // mqtt topic 2 [sensor type, data type]
+  uint8_t fd3[2] = {0,0}; // mqtt topic 3 [sensor type, data type]
+  uint8_t fd4[2] = {0,0}; // mqtt topic 4 [sensor type, data type]
+  uint8_t fd5[2] = {0,0}; // mqtt topic 5 [sensor type, data type]
+  uint8_t fd6[2] = {0,0}; // mqtt topic 6 [sensor type, data type]
+  uint8_t fd7[2] = {0,0}; // mqtt topic 7 [sensor type, data type]
+  uint8_t fd8[2] = {0,0}; // mqtt topic 8 [sensor type, data type]
 
   uint8_t f1[2] = {0,0}; // 
   uint8_t f2[2] = {0,0}; // 
@@ -130,14 +133,14 @@ struct{
   uint8_t tli = 0; // 
   uint8_t tbt = 0; //
 
-  bool tq1 = false; // 
-  bool tq2 = false; // 
-  bool tq3 = false; // 
-  bool tq4 = false; // 
-  bool tq5 = false; // 
-  bool tq6 = false; // 
-  bool tq7 = false; // 
-  bool tq8 = false; // 
+  bool tq1 = false; // whether to receive data from 1 topic mqtt
+  bool tq2 = false; // whether to receive data from 2 topic mqtt
+  bool tq3 = false; // whether to receive data from 3 topic mqtt 
+  bool tq4 = false; // whether to receive data from 4 topic mqtt
+  bool tq5 = false; // whether to receive data from 5 topic mqtt
+  bool tq6 = false; // whether to receive data from 6 topic mqtt
+  bool tq7 = false; // whether to receive data from 7 topic mqtt
+  bool tq8 = false; // whether to receive data from 8 topic mqtt
   char mqttT1[40] = ""; // 
   char mqttT2[40] = ""; // 
   char mqttT3[40] = ""; // 
@@ -151,7 +154,11 @@ struct{
   uint8_t dt[6] = {1,1,0,0,0,0}; //extra display sensor type
   uint16_t dc[6] = {65535,65504,12710,12710,12710,12710}; //extra display color
   char ds[6][2] = {"C","D","C","C","C","C"}; //extra display data type
-  
+  int ws_bright_d = 10;
+  int ws_bright_n = 10;
+  bool web_s = false;
+  char username[33] = "admin";
+  char password[33] = "1111";
 } config;
 
 struct{
@@ -173,7 +180,6 @@ struct{
   float bat_voltage = -1.0;
   uint8_t wbat_level = 0;
   float wbat_voltage = -1.0;
-  //uint32_t upd_sens = 1500;
   time_t w_updated = 0;
   char description[128] = "";
   float temp[10] = {404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0};
@@ -189,6 +195,7 @@ struct{
   float old_temp_n = 0;
   float light = 0.0;
   uint16_t bright = 20;
+  uint16_t bright_clock = 20;
   float temp_web = 404.0;
   uint8_t hum_web = 202;
   uint16_t pres_web = 4040;
@@ -226,7 +233,9 @@ struct{
   float thng_light_in = 404.0;
   float thng_bat_disp = 404.0;
   uint8_t thng_bat_levl = 0;
-  uint8_t clock_dig[4] = {10,10,10,10};
+  uint8_t clock_dig[4] = {10, 10, 10, 10};
+  uint8_t clock_symb[4] = {0, 0, 0, 0};
+  uint16_t clock_colr = 0;
 } datas;
 
 struct{
@@ -239,21 +248,21 @@ struct{
   float bme280_temp = 404.0;      // температура BME280
   float bme280_temp_corr = 0.0;   // коррекция температуры BME280
   float bme280_hum = 202.0;       // влажность BME280
-  float bme280_hum_corr = 0;      // коррекция влажности BME280
+  float bme280_hum_corr = 0.0;    // коррекция влажности BME280
   float bme280_pres = 4040.0;     // давление BME280
-  float bme280_pres_corr = 0;     // коррекция давления BME280
+  float bme280_pres_corr = 0.0;   // коррекция давления BME280
   float bmp180_temp = 404.0;      // температура BMP180
   float bmp180_temp_corr = 0.0;   // коррекция температуры BMP180
   float bmp180_pres = 4040.0;     // давление BMP180
-  float bmp180_pres_corr = 0;     // коррекция давления BMP180
+  float bmp180_pres_corr = 0.0;   // коррекция давления BMP180
   float sht21_temp = 404.0;       // температура SHT21
   float sht21_temp_corr = 0.0;    // коррекция температуры SHT21
   float sht21_hum = 202.0;        // влажность SHT21
-  float sht21_hum_corr = 0;       // коррекция влажности SHT21
+  float sht21_hum_corr = 0.0;     // коррекция влажности SHT21
   float dht22_temp = 404.0;       // температура DHT22
   float dht22_temp_corr = 0.0;    // коррекция температуры DHT22
   float dht22_hum = 202.0;        // влажность DHT22
-  float dht22_hum_corr = 0;       // коррекция влажности DHT22
+  float dht22_hum_corr = 0.0;     // коррекция влажности DHT22
   float max44009_light = -1.0;    // освещенность MAX44009
   float max44009_light_corr = 0.0;// коррекция освещенности MAX44009
   float bh1750_light = -1.0;      // освещенность BH1750

@@ -19,7 +19,7 @@ void getWeatherNow(void){
   if(config.provider == 0){    
     url = "http://api.openweathermap.org/data/2.5/weather";
     if(config.citysearch == 0) url += "?q=" + String(config.city);
-    if(config.citysearch == 1) url += "?lat=" + String(config.lat) + "&lon="+String(config.lon);
+    if(config.citysearch == 1) url += "?lat=" + String(config.lat) + "&lon=" + String(config.lon);
     if(config.citysearch == 2) url += "?id=" + String(config.cityid);
     url += "&units=metric";
     url += "&appid=" + String(config.appid);

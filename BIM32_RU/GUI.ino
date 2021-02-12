@@ -27,11 +27,7 @@ void page1_send(void){
   else myNex.writeNum("hh.font", 2);
 
   // battery
-  Serial.print("config.bat_disp="); Serial.println(config.bat_disp);
   if(config.bat_disp == 1){
-    Serial.print("now()-datas.time_wsens="); Serial.println(now() - datas.time_wsens);
-    Serial.print("datas.wbat_voltage="); Serial.println(datas.wbat_voltage);
-    Serial.print("datas.wbat_level="); Serial.println(datas.wbat_level);
     if((now() - datas.time_wsens) < (config.wexpire * 60)){
       myNex.writeNum("lbat.val", datas.wbat_voltage >= 0.0 ? datas.wbat_level : -1);
       myNex.writeStr("ubat.txt", String(round(datas.wbat_voltage * 10) / 10, 1));
@@ -212,6 +208,15 @@ void page1_send(void){
     }
   }
   myNex.writeNum("upd.val", 1);
+}
+
+void page2_send(void){
+  myNex.writeStr("d1.txt", code2str(datas.clock_symb[0]));
+  myNex.writeStr("d2.txt", code2str(datas.clock_symb[1]));
+  myNex.writeStr("d3.txt", code2str(datas.clock_symb[2]));
+  myNex.writeStr("d4.txt", code2str(datas.clock_symb[3]));
+  myNex.writeNum("color.val", datas.clock_colr);
+  myNex.writeNum("upd.val", 1); 
 }
 
 void page3_send(void){
@@ -528,5 +533,7 @@ void page24_send(void){
   for(uint8_t k = 0; k < 6; k++){
     myNex.writeStr("t" + String(k + 1) + ".txt", String(config.dp[k]));
   }
+  myNex.writeNum("h0.val", config.ws_bright_d);
+  myNex.writeNum("h1.val", config.ws_bright_n);
   myNex.writeNum("upd.val", 1);
 }
