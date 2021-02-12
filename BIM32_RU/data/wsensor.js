@@ -55,13 +55,13 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
-    config.wtempc = $('#wtempc').val();
-    config.whumc = $('#whumc').val();
-    config.wpresc = $('#wpresc').val();
-    config.wlightc = $('#wlightc').val();
-    config.chnum = $('#chnum').val();
-    config.wexpire = $('#wexpire').val();
-    config.wbatc = $('#wbatc').val();
+    config.wtempc = Number($('#wtempc').val());
+    config.whumc = Number($('#whumc').val());
+    config.wpresc = Number($('#wpresc').val());
+    config.wlightc = Number($('#wlightc').val());
+    config.chnum = Number($('#chnum').val());
+    config.wexpire = Number($('#wexpire').val());
+    config.wbatc = Number($('#wbatc').val());
     config.battype = ($('input[name=battype]:checked').val() == "battery") ? 0 : 1;
     $.ajax({
 	    url: 'esp/save.php',
