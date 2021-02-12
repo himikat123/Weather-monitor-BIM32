@@ -44,8 +44,13 @@ function bright_type(c){
 }
 
 function logout(){
+  $.ajax({
+    type:"POST",
+    url:"esp/logout.php",
+    cache:false
+  }).done();
   document.cookie='auth=0';
-  window.location='login.htm';
+  window.location='http://radiokot.ru';
 }
 
 function rgb16_to_color(c){
@@ -278,6 +283,8 @@ $(function(){
     $('#time_day').val(config.brday);
     $('#time_night').val(config.brnight);
     $('#const_day').val(config.brday);
+    $('#clock_day').val(config.ws_brightd);
+    $('#clock_night').val(config.ws_brightn);
     $('#day_time').val(((config.hd < 10) ? ('0' + config.hd) : config.hd) + ':' + config.md);
     $('#night_time').val(((config.hn < 10) ? ('0' + config.hn) : config.hn) + ':' + config.mn);
     $(`input[name="brt"]`)[config.brt].checked = true;
@@ -448,6 +455,8 @@ $(function(){
     config.brt = Number($('input[name=brt]:checked').val());
     config.brday = Number($('#auto_day').val());
     config.brnight = Number($('#auto_night').val());
+    config.ws_brightd = $('#clock_day').val();
+    config.ws_brightn = $('#clock_night').val();
     config.hd = Number($('#day_time').val().split(':')[0]);
     config.md = Number($('#day_time').val().split(':')[1]);
     config.hn = Number($('#night_time').val().split(':')[0]);
@@ -609,6 +618,15 @@ $(function(){
   $('#auto_day, #auto_night, #time_day, #time_night, #const_day').change(function(){
     $.ajax({
 	    url: 'esp/bright.php',
+	    method: 'get',
+	    data: `br=${this.value}`,
+	    success: function(data){}
+    });
+  });
+
+  $('#clock_day, #clock_night').change(function(){
+    $.ajax({
+	    url: 'esp/ws_bright.php',
 	    method: 'get',
 	    data: `br=${this.value}`,
 	    success: function(data){}
