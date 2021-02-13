@@ -14,21 +14,21 @@ function bright_type(c){
   if(c == 1){
     $('#auto_day').attr('disabled', true);
     $('#auto_night').attr('disabled', true);
-    $('#day_time').removeAttr('disabled');
-    $('#night_time').removeAttr('disabled');
-    $('#time_day').removeAttr('disabled');
-    $('#time_night').removeAttr('disabled');
-    $('#light_in').attr('disabled', true);
-    $('#const_day').attr('disabled', true);
-  }
-  if(c == 2){
-    $('#auto_day').attr('disabled', true);
-    $('#auto_night').attr('disabled', true);
     $('#day_time').attr('disabled', true);
     $('#night_time').attr('disabled', true);
     $('#time_day').attr('disabled', true);
     $('#time_night').attr('disabled', true);
     $('#light_in').removeAttr('disabled');
+    $('#const_day').attr('disabled', true);
+  }
+  if(c == 2){
+    $('#auto_day').attr('disabled', true);
+    $('#auto_night').attr('disabled', true);
+    $('#day_time').removeAttr('disabled');
+    $('#night_time').removeAttr('disabled');
+    $('#time_day').removeAttr('disabled');
+    $('#time_night').removeAttr('disabled');
+    $('#light_in').attr('disabled', true);
     $('#const_day').attr('disabled', true);
   }
   if(c == 3){
