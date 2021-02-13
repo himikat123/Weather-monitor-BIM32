@@ -2,7 +2,7 @@
 ## Weather monitor based on ESP32
 
 <p align="center">
-  <img src="/img/20200928_221642.jpg">
+  <img src="/img/screen.png">
 </p> 
 
 A short list of weather monitor features:<br><br>
