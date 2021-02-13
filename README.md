@@ -89,7 +89,7 @@ To flash the <b>ESP32</b>, download the <b>Flash Download Tools</b> and configur
 which your ESP32 actually sits.<br>
 
 <p align="center">
-  <img src="/img/downloadtool.png">
+  <img src="/img/ESP_DOWNLOAD_TOOL.png">
 </p><br><br>
 
 And of course, lastly, a couple of photos of the device in action.<br>
