@@ -204,13 +204,13 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
     }
   }
 
-  temp_out = (temp_out == undefined || temp_out > 99 || temp_out < -49) ? '--' : Math.round(temp_out) + '°';
-  temp_in = (temp_in == undefined || temp_in > 99 || temp_in < -49) ? '--' : Math.round(temp_in) + '°';
-  hum_out = (hum_out == undefined || hum_out > 100 || hum_out < 0) ? '--' : (hum_out > 99) ? Math.round(hum_out) : Math.round(hum_out) + '%';
-  hum_in = (hum_in == undefined || hum_in > 100 || hum_in < 0) ? '--' : Math.round(hum_in) + '%';
-  pres_out = (pres_out == undefined || pres_out > 800 || pres_out < 500) ? '--' : Math.round(pres_out) + 'mmHg';
-  ubat = (wubat == undefined || wubat > 20 || wubat < 0) ? '' : Math.round(wubat * 10) / 10;
-  lbat = (wlbat == undefined || wlbat > 4 || wlbat < 1) ? 0 : wlbat;
+  temp_out = (temp_out == undefined || temp_out == '--' || temp_out > 99 || temp_out < -49) ? '--' : Math.round(temp_out) + '°';
+  temp_in = (temp_in == undefined || temp_in == '--' || temp_in > 99 || temp_in < -49) ? '--' : Math.round(temp_in) + '°';
+  hum_out = (hum_out == undefined || hum_out == '--' || hum_out > 100 || hum_out < 0) ? '--' : (hum_out > 99) ? Math.round(hum_out) : Math.round(hum_out) + '%';
+  hum_in = (hum_in == undefined || hum_in == '--' || hum_in > 100 || hum_in < 0) ? '--' : Math.round(hum_in) + '%';
+  pres_out = (pres_out == undefined || pres_out == '--' || pres_out > 800 || pres_out < 500) ? '--' : Math.round(pres_out) + 'mm';
+  ubat = (wubat == undefined || wubat == '--' || wubat > 20 || wubat < 0) ? '' : Math.round(wubat * 10) / 10;
+  lbat = (wlbat == undefined || wlbat == '--' || wlbat > 4 || wlbat < 1) ? 0 : wlbat;
 
   context.fillStyle = "black";
   context.fillRect(98, 109, 381, 29);
@@ -249,15 +249,17 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   context.font = '16px Ubuntu';
   if(temp_in != '--' && hum_in != '--'){
     let cfrt = 0;
-    if(temp_in >= 22.0 && temp_in <= 27.0 && hum_in >= 30 && hum_in <= 60) cfrt = 0;
-    if(temp_in > 27.0 && hum_in >= 30 && hum_in <= 60) cfrt = 1;
-    if(temp_in < 22.0 && hum_in >= 30 && hum_in <= 60) cfrt = 2;
-    if(temp_in >= 22.0 && temp_in <= 27.0 && hum_in < 30) cfrt = 3;
-    if(temp_in >= 22.0 && temp_in <= 27.0 && hum_in > 60) cfrt = 4;
-    if(temp_in > 27.0 && hum_in > 60) cfrt = 5;
-    if(temp_in > 27.0 && hum_in < 30) cfrt = 6;
-    if(temp_in < 22.0 && hum_in > 60) cfrt = 7;
-    if(temp_in < 22.0 && hum_in < 30) cfrt = 8;
+    let t_in = parseInt(temp_in.replace(/[^\d]/g, ''));
+    let h_in = parseInt(hum_in.replace(/[^\d]/g, ''));
+    if(t_in >= 22.0 && t_in <= 27.0 && h_in >= 30 && h_in <= 60) cfrt = 0;
+    if(t_in > 27.0 && h_in >= 30 && h_in <= 60) cfrt = 1;
+    if(t_in < 22.0 && h_in >= 30 && h_in <= 60) cfrt = 2;
+    if(t_in >= 22.0 && t_in <= 27.0 && h_in < 30) cfrt = 3;
+    if(t_in >= 22.0 && t_in <= 27.0 && h_in > 60) cfrt = 4;
+    if(t_in > 27.0 && h_in > 60) cfrt = 5;
+    if(t_in > 27.0 && h_in < 30) cfrt = 6;
+    if(t_in < 22.0 && h_in > 60) cfrt = 7;
+    if(t_in < 22.0 && h_in < 30) cfrt = 8;
     context.fillText(cf[cfrt], 350 - context.measureText(cf[cfrt]).width / 2, 50);
   }
 }
