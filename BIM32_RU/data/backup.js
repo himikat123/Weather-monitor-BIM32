@@ -39,6 +39,8 @@ $(function(){
 
   $('#restore').click(function(){
     $('#loading').addClass('active');
+    $('#restore').text("Отправка...");
+    $('#restore').css("background-color", "#FA0");
     $.ajax({
 	    url: 'esp/save.php',
 	    method: 'post',
@@ -48,6 +50,12 @@ $(function(){
         $('#loading').removeClass('active');
         $('#fnm').text('');
         $('#restore').attr('disabled', true);
+        $('#restore').css("background-color", "#AF0");
+        $('#restore').text("Сохранено");
+        setTimeout(function(){
+          $('#restore').css("background-color", "#F1F1F1");
+          $('#restore').text("Восстановить");
+        }, 3000);
 	    }
     });
     return false;

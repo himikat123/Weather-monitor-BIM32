@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Wireless monitor BIM32" />
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="receive.css">
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="receive.css?v=2.1">
     <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="receive.js"></script>
+    <script type="text/javascript" src="receive.js?v=2.1"></script>
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
@@ -31,7 +31,7 @@
         <li><a href="disp.htm">Дисплей</a>
         <li><a href="clock.htm">Часы</a>
         <li><a href="send.htm">Отправка данных</a>
-        <li><a href="receive.htm">Прием данных</a>
+        <li><a href="receive.htm" class="current"><span class="currnt">Прием данных</span></a>
         <li><a href="backup.htm">Резервная копия</a>
         <li><a href="default.htm">Сброс настроек</a>
         <li><a href="user.htm">Пользователь</a>
@@ -309,7 +309,7 @@
           </div>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Сохранить</button>
+          <button id="save" class="btn btn-primary" type="submit" name="button">Сохранить</button>
         </div><br>
       </form>
     </main>

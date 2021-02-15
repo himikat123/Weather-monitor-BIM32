@@ -43,6 +43,8 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
+    $('#save').text("Отправка...");
+    $('#save').css("background-color", "#FA0");
     let name = $('#user').val();
     let oldpass = $('#oldpass').val();
     let newpass = $('#newpass').val();
@@ -53,6 +55,12 @@ $(function(){
 	    success: function(answ){
         if(answ != "OK") alert("Неверный старый пароль");
         $('#loading').removeClass('active');
+        $('#save').css("background-color", "#AF0");
+        $('#save').text("Сохранено");
+        setTimeout(function(){
+          $('#save').css("background-color", "#F1F1F1");
+          $('#save').text("Сохранить");
+        }, 3000);
 	    }
     });
     return false;

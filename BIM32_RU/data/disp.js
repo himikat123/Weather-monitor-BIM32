@@ -10,6 +10,7 @@ function bright_type(c){
     $('#time_night').attr('disabled', true);
     $('#light_in').attr('disabled', true);
     $('#const_day').attr('disabled', true);
+    $('#sdisp_sensitivity').attr('disabled', true);
   }
   if(c == 1){
     $('#auto_day').attr('disabled', true);
@@ -20,6 +21,7 @@ function bright_type(c){
     $('#time_night').attr('disabled', true);
     $('#light_in').removeAttr('disabled');
     $('#const_day').attr('disabled', true);
+    $('#sdisp_sensitivity').removeAttr('disabled');
   }
   if(c == 2){
     $('#auto_day').attr('disabled', true);
@@ -30,6 +32,7 @@ function bright_type(c){
     $('#time_night').removeAttr('disabled');
     $('#light_in').attr('disabled', true);
     $('#const_day').attr('disabled', true);
+    $('#sdisp_sensitivity').attr('disabled', true);
   }
   if(c == 3){
     $('#auto_day').attr('disabled', true);
@@ -40,6 +43,54 @@ function bright_type(c){
     $('#time_night').attr('disabled', true);
     $('#light_in').attr('disabled', true);
     $('#const_day').removeAttr('disabled');
+    $('#sdisp_sensitivity').attr('disabled', true);
+  }
+}
+
+function ws_bright_type(c){
+  if(c == 0){
+    $('#ws_auto_day').removeAttr('disabled');
+    $('#ws_auto_night').removeAttr('disabled');
+    $('#ws_day_time').attr('disabled', true);
+    $('#ws_night_time').attr('disabled', true);
+    $('#ws_time_day').attr('disabled', true);
+    $('#ws_time_night').attr('disabled', true);
+    $('#ws_light_in').attr('disabled', true);
+    $('#ws_const_day').attr('disabled', true);
+    $('#ws_sdisp_sensitivity').attr('disabled', true);
+  }
+  if(c == 1){
+    $('#ws_auto_day').attr('disabled', true);
+    $('#ws_auto_night').attr('disabled', true);
+    $('#ws_day_time').attr('disabled', true);
+    $('#ws_night_time').attr('disabled', true);
+    $('#ws_time_day').attr('disabled', true);
+    $('#ws_time_night').attr('disabled', true);
+    $('#ws_light_in').removeAttr('disabled');
+    $('#ws_const_day').attr('disabled', true);
+    $('#ws_sdisp_sensitivity').removeAttr('disabled');
+  }
+  if(c == 2){
+    $('#ws_auto_day').attr('disabled', true);
+    $('#ws_auto_night').attr('disabled', true);
+    $('#ws_day_time').removeAttr('disabled');
+    $('#ws_night_time').removeAttr('disabled');
+    $('#ws_time_day').removeAttr('disabled');
+    $('#ws_time_night').removeAttr('disabled');
+    $('#ws_light_in').attr('disabled', true);
+    $('#ws_const_day').attr('disabled', true);
+    $('#ws_sdisp_sensitivity').attr('disabled', true);
+  }
+  if(c == 3){
+    $('#ws_auto_day').attr('disabled', true);
+    $('#ws_auto_night').attr('disabled', true);
+    $('#ws_day_time').attr('disabled', true);
+    $('#ws_night_time').attr('disabled', true);
+    $('#ws_time_day').attr('disabled', true);
+    $('#ws_time_night').attr('disabled', true);
+    $('#ws_light_in').attr('disabled', true);
+    $('#ws_const_day').removeAttr('disabled');
+    $('#ws_sdisp_sensitivity').attr('disabled', true);
   }
 }
 
@@ -278,12 +329,21 @@ $(function(){
     $('#time_day').val(config.brday);
     $('#time_night').val(config.brnight);
     $('#const_day').val(config.brday);
-    $('#clock_day').val(config.ws_brightd);
-    $('#clock_night').val(config.ws_brightn);
-    $('#day_time').val(((config.hd < 10) ? ('0' + config.hd) : config.hd) + ':' + config.md);
-    $('#night_time').val(((config.hn < 10) ? ('0' + config.hn) : config.hn) + ':' + config.mn);
+    $('#day_time').val(((config.hd < 10) ? ('0' + config.hd) : config.hd) + ':' + ((config.md < 10) ? ('0' + config.md) : config.md));
+    $('#night_time').val(((config.hn < 10) ? ('0' + config.hn) : config.hn) + ':' + ((config.mn < 10) ? ('0' + config.mn) : config.mn));
     $(`input[name="brt"]`)[config.brt].checked = true;
     bright_type(config.brt);
+    $('#sdisp_sensitivity').val(config.sdisp_sensitivity);
+    $('#ws_auto_day').val(config.ws_brightd);
+    $('#ws_auto_night').val(config.ws_brightn);
+    $('#ws_time_day').val(config.ws_brightd);
+    $('#ws_time_night').val(config.ws_brightn);
+    $('#ws_const_day').val(config.ws_brightd);
+    $('#ws_day_time').val(((config.ws_hd < 10) ? ('0' + config.ws_hd) : config.ws_hd) + ':' + ((config.ws_md < 10) ? ('0' + config.ws_md) : config.ws_md));
+    $('#ws_night_time').val(((config.ws_hn < 10) ? ('0' + config.ws_hn) : config.ws_hn) + ':' + ((config.ws_mn < 10) ? ('0' + config.ws_mn) : config.ws_mn));
+    $(`input[name="ws_brt"]`)[config.ws_brt].checked = true;
+    ws_bright_type(config.ws_brt);
+    $('#ws_sdisp_sensitivity').val(config.ws_sdisp_sensitivity);
     $(`input[name="dt0"]`)[config.dt0].checked = true;
     $(`input[name="dt1"]`)[config.dt1].checked = true;
     $(`input[name="dt2"]`)[config.dt2].checked = true;
@@ -447,16 +507,26 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
+    $('#save').text("Отправка...");
+    $('#save').css("background-color", "#FA0");
     config.brt = Number($('input[name=brt]:checked').val());
     config.brday = Number($('#auto_day').val());
     config.brnight = Number($('#auto_night').val());
-    config.ws_brightd = $('#clock_day').val();
-    config.ws_brightn = $('#clock_night').val();
     config.hd = Number($('#day_time').val().split(':')[0]);
     config.md = Number($('#day_time').val().split(':')[1]);
     config.hn = Number($('#night_time').val().split(':')[0]);
     config.mn = Number($('#night_time').val().split(':')[1]);
+    config.sdisp_sensitivity = Number($('#sdisp_sensitivity').val());
+    config.ws_brt = Number($('input[name=ws_brt]:checked').val());
+    config.ws_brightd = Number($('#ws_auto_day').val());
+    config.ws_brightn = Number($('#ws_auto_night').val());
+    config.ws_hd = Number($('#ws_day_time').val().split(':')[0]);
+    config.ws_md = Number($('#ws_day_time').val().split(':')[1]);
+    config.ws_hn = Number($('#ws_night_time').val().split(':')[0]);
+    config.ws_mn = Number($('#ws_night_time').val().split(':')[1]);
+    config.ws_sdisp_sensitivity = Number($('#ws_sdisp_sensitivity').val());
     config.light_in = Number($('#light_in').val());
+    config.ws_light_in = Number($('#ws_light_in').val());
     config.temp_out = Number($('#temp_out').val());
     config.temp_in = Number($('#temp_in').val());
     config.hum_out = Number($('#hum_out').val());
@@ -494,6 +564,12 @@ $(function(){
 	    success: function(answ){
         if(answ != "OK") alert(answ);
         $('#loading').removeClass('active');
+        $('#save').css("background-color", "#AF0");
+        $('#save').text("Сохранено");
+        setTimeout(function(){
+          $('#save').css("background-color", "#F1F1F1");
+          $('#save').text("Сохранить");
+        }, 3000);
 	    }
     });
     return false;
@@ -503,9 +579,18 @@ $(function(){
     bright_type(this.value);
   });
 
+  $('input[name="ws_brt"]').click(function(){
+    ws_bright_type(this.value);
+  });
+
   $('#auto_day').click(function(){
     $('#time_day').val($('#auto_day').val());
     $('#const_day').val($('#auto_day').val());
+  });
+
+  $('#ws_auto_day').click(function(){
+    $('#ws_time_day').val($('#ws_auto_day').val());
+    $('#ws_const_day').val($('#ws_auto_day').val());
   });
 
   $('#time_day').click(function(){
@@ -513,17 +598,31 @@ $(function(){
     $('#const_day').val($('#time_day').val());
   });
 
+  $('#ws_time_day').click(function(){
+    $('#ws_auto_day').val($('#ws_time_day').val());
+    $('#ws_const_day').val($('#ws_time_day').val());
+  });
+
   $('#const_day').click(function(){
     $('#auto_day').val($('#const_day').val());
     $('#time_day').val($('#const_day').val());
+  });
+
+  $('#ws_const_day').click(function(){
+    $('#ws_auto_day').val($('#ws_const_day').val());
+    $('#ws_time_day').val($('#ws_const_day').val());
   });
 
   $('#time_night').click(function(){
     $('#auto_night').val($('#time_night').val());
   });
 
-  $('#auto_night').click(function(){
-    $('#time_night').val($('#auto_night').val());
+  $('#ws_time_night').click(function(){
+    $('#ws_auto_night').val($('#ws_time_night').val());
+  });
+
+  $('#ws_auto_night').click(function(){
+    $('#ws_time_night').val($('#ws_auto_night').val());
   });
 
   $('input[name="dt0"]').change(function(){
@@ -619,11 +718,47 @@ $(function(){
     });
   });
 
-  $('#clock_day, #clock_night').change(function(){
+  $('#ws_auto_day, #ws_auto_night, #ws_time_day, #ws_time_night, #ws_const_day').change(function(){
     $.ajax({
 	    url: 'esp/ws_bright.php',
 	    method: 'get',
 	    data: `br=${this.value}`,
+	    success: function(data){}
+    });
+  });
+
+  $('#sdisp_sensitivity').change(function(){
+    $.ajax({
+	    url: 'esp/sensitivity.php',
+	    method: 'get',
+	    data: `sen=${this.value}`,
+	    success: function(data){}
+    });
+  });
+
+  $('#ws_sdisp_sensitivity').change(function(){
+    $.ajax({
+	    url: 'esp/ws_sensitivity.php',
+	    method: 'get',
+	    data: `sen=${this.value}`,
+	    success: function(data){}
+    });
+  });
+
+  $('#light_in').change(function(){
+    $.ajax({
+	    url: 'esp/brt_sen.php',
+	    method: 'get',
+	    data: `brt=${this.value}`,
+	    success: function(data){}
+    });
+  });
+
+  $('#ws_light_in').change(function(){
+    $.ajax({
+	    url: 'esp/ws_brt_sen.php',
+	    method: 'get',
+	    data: `brt=${this.value}`,
 	    success: function(data){}
     });
   });

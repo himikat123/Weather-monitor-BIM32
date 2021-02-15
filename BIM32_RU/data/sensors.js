@@ -38,6 +38,8 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
+    $('#save').text("Отправка...");
+    $('#save').css("background-color", "#FA0");
     config.bmet = Number($('#bmet').val());
     config.bmpt = Number($('#bmpt').val());
     config.shtt = Number($('#shtt').val());
@@ -56,6 +58,12 @@ $(function(){
 	    success: function(answ){
         if(answ != "OK") alert(answ);
         $('#loading').removeClass('active');
+        $('#save').css("background-color", "#AF0");
+        $('#save').text("Сохранено");
+        setTimeout(function(){
+          $('#save').css("background-color", "#F1F1F1");
+          $('#save').text("Сохранить");
+        }, 3000);
 	    }
     });
     return false;

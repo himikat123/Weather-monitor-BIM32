@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Wireless monitor BIM32" />
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="disp.css">
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="disp.css?v=2.1">
     <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="disp.js?v=2.0"></script>
+    <script type="text/javascript" src="disp.js?v=2.1"></script>
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
@@ -27,7 +27,7 @@
         <li><a href="sensors.htm">Проводные датчики</a>
         <li><a href="wsensor.htm">Беспроводной датчик</a>
         <li><a href="weather.htm">Погода</a>
-        <li><a href="disp.htm">Дисплей</a>
+        <li><a href="disp.htm" class="current"><span class="currnt">Дисплей</span></a>
         <li><a href="clock.htm">Часы</a>
         <li><a href="send.htm">Отправка данных</a>
         <li><a href="receive.htm">Прием данных</a>
@@ -53,7 +53,26 @@
                 <label>Яркость днем</label><br>
                 <input id="auto_day" type="range" min="1" max="100"><br>
                 <label>Яркость ночью</label><br>
-                <input id="auto_night" type="range" min="1" max="100"><br>
+                <input id="auto_night" type="range" min="1" max="100">
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">По датчику освещенности</label><br>
+                <input type="radio" name="brt" id="sens" value="1">
+              </td>
+              <td>
+                <label>Тип датчика</label><br>
+                <select id="light_in" class="inp tm" disabled>
+                  <option value="1">Беспроводной датчик</option>
+                  <option value="6">MAX44009</option>
+                  <option value="7">BH1750</option>
+                  <option value="8">MQTT</option>
+                  <option value="9">Thingspeak</option>
+                </select><br>
+                <label>Чувствительность датчика</label><br>
+                <input id="sdisp_sensitivity" type="range" min="1" max="200" disabled>
               </td>
             </tr>
             <tr><td colspan="2"><hr></td></tr>
@@ -68,23 +87,7 @@
                 <input id="time_day" type="range" min="1" max="100" disabled><br>
                 <label>Ночной режим</label><br>
                 <input id="night_time" class="inp tm" type="time" required disabled><br>
-                <input id="time_night" type="range" min="1" max="100" disabled><br>
-              </td>
-            </tr>
-            <tr><td colspan="2"><hr></td></tr>
-            <tr>
-              <td>
-                <label for="time">По датчику освещенности</label><br>
-                <input type="radio" name="brt" id="sens" value="1"></td>
-              <td>
-                <label>Тип датчика</label><br>
-                <select id="light_in" class="inp tm" disabled>
-                  <option value="1">Беспроводной датчик</option>
-                  <option value="6">MAX44009</option>
-                  <option value="7">BH1750</option>
-                  <option value="8">MQTT</option>
-                  <option value="9">Thingspeak</option>
-                </select>
+                <input id="time_night" type="range" min="1" max="100" disabled>
               </td>
             </tr>
             <tr><td colspan="2"><hr></td></tr>
@@ -95,7 +98,7 @@
               </td>
               <td>
                 <label>Яркость</label><br>
-                <input id="const_day" type="range" min="1" max="100" disabled><br>
+                <input id="const_day" type="range" min="1" max="100" disabled>
               </td>
             </tr>
           </table>
@@ -670,15 +673,71 @@
               <td></td>
             </tr>
           </table>
-        </div><hr class="kurz">
-        <div class="indiv">
-          <label>Яркость часов днем</label><br>
-          <input id="clock_day" type="range" class="clock" min="1" max="250"><br>
-          <label>Яркость часов ночью</label><br>
-          <input id="clock_night" type="range" class="clock" min="1" max="250">
+        </div><br><hr class="kurz">
+        <h2 class="ttl">Яркость дисплея больших часов:</h2>
+        <div class="tab">
+          <table>
+            <tr>
+              <td>
+                <label for="auto">Автоматически</label><br>
+                <input type="radio" name="ws_brt" id="ws_auto" value="0">
+              </td>
+              <td>
+                <label>Яркость днем</label><br>
+                <input id="ws_auto_day" type="range" min="1" max="100" disabled><br>
+                <label>Яркость ночью</label><br>
+                <input id="ws_auto_night" type="range" min="1" max="100" disabled>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">По датчику освещенности</label><br>
+                <input type="radio" name="ws_brt" id="ws_sens" value="1">
+              </td>
+              <td>
+                <label>Тип датчика</label><br>
+                <select id="ws_light_in" class="inp tm" disabled>
+                  <option value="1">Беспроводной датчик</option>
+                  <option value="6">MAX44009</option>
+                  <option value="7">BH1750</option>
+                  <option value="8">MQTT</option>
+                  <option value="9">Thingspeak</option>
+                </select><br>
+                <label>Чувствительность датчика</label><br>
+                <input id="ws_sdisp_sensitivity" type="range" min="1" max="200" disabled>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">По времени</label><br>
+                <input type="radio" name="ws_brt" id="ws_time" value="2">
+              </td>
+              <td>
+                <label>Дневной режим</label><br>
+                <input id="ws_day_time" class="inp tm" type="time" required disabled><br>
+                <input id="ws_time_day" type="range" min="1" max="100" disabled><br>
+                <label>Ночной режим</label><br>
+                <input id="ws_night_time" class="inp tm" type="time" required disabled><br>
+                <input id="ws_time_night" type="range" min="1" max="100" disabled>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr></td></tr>
+            <tr>
+              <td>
+                <label for="time">Неизменная яркость</label><br>
+                <input type="radio" name="ws_brt" id="ws_const" value="3" checked>
+              </td>
+              <td>
+                <label>Яркость</label><br>
+                <input id="ws_const_day" type="range" min="1" max="100">
+              </td>
+            </tr>
+          </table>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Сохранить</button>
+          <button id="save" class="btn btn-primary" type="submit" name="button">Сохранить</button>
         </div><br>
       </form>
     </main>

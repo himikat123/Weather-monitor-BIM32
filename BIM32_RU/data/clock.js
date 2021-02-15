@@ -26,6 +26,8 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
+    $('#save').text("Отправка...");
+    $('#save').css("background-color", "#FA0");
     config.ntp = $('#ntp').val();
     config.utc = Number($('#utc').val());
     config.dlst = ($('input[name="dlst"]:checked').val() == "true") ? true : false;
@@ -36,6 +38,12 @@ $(function(){
 	    success: function(answ){
         if(answ != "OK") alert(answ);
         $('#loading').removeClass('active');
+        $('#save').css("background-color", "#AF0");
+        $('#save').text("Сохранено");
+        setTimeout(function(){
+          $('#save').css("background-color", "#F1F1F1");
+          $('#save').text("Сохранить");
+        }, 3000);
 	    }
     });
     return false;

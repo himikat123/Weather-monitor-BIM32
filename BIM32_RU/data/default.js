@@ -14,6 +14,8 @@ $(function(){
   $('#restore').click(function(){
     if(confirm('Внимание! Все настройки монитора погоды обнулятся. Вы действительно хотите всё сбросить?')){
       $('#loading').addClass('active');
+      $('#restore').text("Отправка...");
+      $('#restore').css("background-color", "#FA0");
       let config = `{
         "ssid": "",
         "pass": "",
@@ -181,6 +183,12 @@ $(function(){
 	      success: function(answ){
           if(answ != "OK") alert(answ);
           $('#loading').removeClass('active');
+          $('#restore').css("background-color", "#AF0");
+          $('#restore').text("Сохранено");
+          setTimeout(function(){
+            $('#restore').css("background-color", "#F1F1F1");
+            $('#restore').text("Сохранить");
+          }, 3000);
 	      }
       });
       return false;
