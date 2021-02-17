@@ -45,8 +45,11 @@ $(function(){
         $('#wlighttp').text(data.wlighttp);
         let dte = Date.parse(data.time);
         let w_dt = new Date(dte);
-        let ndt = w_dt.getFullYear();
-        if(ndt > 2020) $('#time').text(data.time);
+        let ndd = w_dt.getDate();
+        let ndm = w_dt.getMonth();
+        let ndy = w_dt.getFullYear();
+        let mo = ['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+        if(ndy > 2020) $('#time').text(`${data.time.split(' ')[0]} ${ndd}.${mo[ndm]}.${ndy}`);
         else $('#time').text('--');
         $('#loading').removeClass('active');
 	    }
