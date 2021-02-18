@@ -1,5 +1,5 @@
 let config, sig, dbmet, dbmeh, dbmep, dbmpt, dbmpp, dshtt, dshth, ddhtt, ddhth;
-let mnph, mnicn, wtemp, whum, wpres, wlight, wubat, wlbat;
+let updt, wtemp, whum, wpres, wlight, wubat, wlbat;
 let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
 
 function status_update(){
@@ -16,8 +16,6 @@ function status_update(){
     dshth = json['dshth'];
     ddhtt = json['ddhtt'];
     ddhth = json['ddhth'];
-    mnph = json['moon_phase'];
-    mnicn = json['moon_icon'];
     wtemp = json['temp_wsens'];
     whum = json['hum_wsens'];
     wpres = json['pres_wsens'];
@@ -111,21 +109,12 @@ function clock_upd(context){
   };
   ant.src = `${git}ant${ant_level}.png?raw=true`;
 
-  if(mnicn != undefined){
-    let moon_icon = new Image();
-    moon_icon.onload = function(){
-      context.drawImage(moon_icon, 450, 193);
-    };
-    moon_icon.src = `${git}moon${mnicn}.png?raw=true`;
-  }
-  moon = ['Новолуние', 'Молодая луна', 'Первая четверть', 'Прибывающая луна',
-          'Полнолуние', 'Убывающая луна', 'Последняя четверть', 'Старая луна'];
-  if(mnph != undefined){
+  if(updt != undefined){
     context.fillStyle = "black";
-    context.fillRect(249, 200, 200, 20);
+    context.fillRect(249, 200, 230, 20);
     context.font = '14px Ubuntu';
     context.fillStyle = "white";
-    context.fillText(moon[mnph], 448 - context.measureText(moon[mnph]).width, 214);
+    context.fillText('⭮' + updt, 475 - context.measureText('⭮' + updt).width, 214);
   }
 }
 
@@ -468,6 +457,14 @@ function weather(){
         icon_daily[3] = weatherbit_icon(json["data"][3]["weather"]["code"]);
         w_speed_daily[3] = Math.round(json["data"][3]["wind_spd"]);
       }
+      let now = new Date();
+      let hr = now.getHours();
+      let mn = now.getMinutes();
+      let sc =now.getSeconds();
+      let dt  = now.getDate();
+      let mo  = now.getMonth() + 1;
+      let yr  = now.getFullYear();
+      updt = `${hr}:${('0' + mn).slice(-2)}:${('0' + sc).slice(-2)} ${('0' + dt).slice(-2)}-${('0' + mo).slice(-2)}-${yr}`;
 
       setInterval(function(){
         forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_daily);
