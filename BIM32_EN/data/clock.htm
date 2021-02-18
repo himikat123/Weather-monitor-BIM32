@@ -5,13 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Wireless monitor BIM32" />
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css?v=2.1">
     <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="clock.js"></script>
+    <script type="text/javascript" src="clock.js?v=2.1"></script>
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
-    <div id=cnv></div>
     <div id="loading" class="active">Loading...</div>
     <div id="logout">
       <a href=# title="Logout" onclick="logout()">
@@ -22,13 +21,13 @@
     <nav id="navmenu" class="nav">
       <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
       <ul>
-        <li><a href="index.htm">Status</a>
+        <li><a href="index.htm">Status</span></a>
         <li><a href="network.htm">Network</a>
         <li><a href="sensors.htm">Wired sensors</a>
         <li><a href="wsensor.htm">Wireless sensor</a>
         <li><a href="weather.htm">Weather</a>
         <li><a href="disp.htm">Display</a>
-        <li><a href="clock.htm">Clock</a>
+        <li><a href="clock.htm" class="current"><span class="currnt">Clock</span></a>
         <li><a href="send.htm">Data send</a>
         <li><a href="receive.htm">Data receive</a>
         <li><a href="backup.htm">Backup</a>
@@ -57,7 +56,7 @@
           <input id="ntp" class="inp" maxlength="32" style="text-align:center" required>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Save</button>
+          <button id="save" class="btn btn-primary" type="submit" name="button">Save</button>
         </div><br>
       </form>
     </main>

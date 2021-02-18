@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Wireless monitor BIM32" />
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="user.css">
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="user.css?v=2.1">
     <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="user.js"></script>
+    <script type="text/javascript" src="user.js?v=2.1"></script>
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
@@ -33,7 +33,7 @@
         <li><a href="receive.htm">Data receive</a>
         <li><a href="backup.htm">Backup</a>
         <li><a href="default.htm">Default settings</a>
-        <li><a href="user.htm">User</a>
+        <li><a href="user.htm" class="current"><span class="currnt">User</span></a>
         <li><a href="update.htm">Firmware update</a>
         <li><a href="filesystem.htm">Filesystem</a>
       </ul>
@@ -48,19 +48,19 @@
         <h2 class="ttl">Old password:</h2>
         <div class="passw">
           <div class="password">
-            <input id="oldpass" class="inp" type="password" maxlength="32" autocomplete="off" required>
+            <input id="oldpass" class="inp" type="password" maxlength="32" autocomplete="off">
             <a id="eye1" href="#" class="password-control"></a>
           </div>
         </div>
         <h2 class="ttl">New password:</h2>
         <div class="passw">
           <div class="password">
-            <input id="newpass" class="inp" type="password" maxlength="32" autocomplete="off" required>
+            <input id="newpass" class="inp" type="password" maxlength="32" autocomplete="off">
             <a id="eye2" href="#" class="password-control"></a>
           </div>
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Save</button>
+          <button id="save" class="btn btn-primary" type="submit" name="button">Save</button>
         </div><br>
       </form>
     </main>

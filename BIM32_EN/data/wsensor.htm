@@ -5,10 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Wireless monitor BIM32" />
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="wsensor.css">
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="wsensor.css?v=2.1">
     <script type="text/javascript" src="jquery.js"></script>
-    <script type="text/javascript" src="wsensor.js"></script>
+    <script type="text/javascript" src="wsensor.js?v=2.1"></script>
     <title>BIM32 Weather monitor</title>
   </head>
   <body>
@@ -25,7 +25,7 @@
         <li><a href="index.htm">Status</a>
         <li><a href="network.htm">Network</a>
         <li><a href="sensors.htm">Wired sensors</a>
-        <li><a href="wsensor.htm">Wireless sensor</a>
+        <li><a href="wsensor.htm" class="current"><span class="currnt">Wireless sensor</span></a>
         <li><a href="weather.htm">Weather</a>
         <li><a href="disp.htm">Display</a>
         <li><a href="clock.htm">Clock</a>
@@ -98,7 +98,7 @@
           <input id="wexpire" class="inp" value="0" type="number" min="1" max="100" required> munites
         </div><hr>
         <div class="indiv">
-          <button class="btn btn-primary" type="submit" name="button">Save</button>
+          <button id="save" class="btn btn-primary" type="submit" name="button">Save</button>
         </div><br>
       </form>
     </main>

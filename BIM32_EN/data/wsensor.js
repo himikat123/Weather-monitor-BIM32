@@ -45,8 +45,11 @@ $(function(){
         $('#wlighttp').text(data.wlighttp);
         let dte = Date.parse(data.time);
         let w_dt = new Date(dte);
-        let ndt = w_dt.getFullYear();
-        if(ndt > 2020) $('#time').text(data.time);
+        let ndd = w_dt.getDate();
+        let ndm = w_dt.getMonth();
+        let ndy = w_dt.getFullYear();
+        let mo = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+        if(ndy > 2020) $('#time').text(`${data.time.split(' ')[0]} ${ndd}.${mo[ndm]}.${ndy}`);
         else $('#time').text('--');
         $('#loading').removeClass('active');
 	    }
@@ -55,6 +58,8 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
+    $('#save').text("Sending...");
+    $('#save').css("background-color", "#FA0");
     config.wtempc = Number($('#wtempc').val());
     config.whumc = Number($('#whumc').val());
     config.wpresc = Number($('#wpresc').val());
@@ -70,6 +75,12 @@ $(function(){
 	    success: function(answ){
         if(answ != "OK") alert(answ);
         $('#loading').removeClass('active');
+        $('#save').css("background-color", "#AF0");
+        $('#save').text("Saved");
+        setTimeout(function(){
+          $('#save').css("background-color", "#F1F1F1");
+          $('#save').text("Save");
+        }, 3000);
 	    }
     });
     return false;

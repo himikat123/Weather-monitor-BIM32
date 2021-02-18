@@ -58,6 +58,8 @@ $(function(){
 
   $('form').submit(function(){
     $('#loading').addClass('active');
+    $('#save').text("Sending...");
+    $('#save').css("background-color", "#FA0");
     config.mqttrcv = $('#mqttrcv').is(':checked');
     config.mqttServer = $('#mqttServer').val();
     config.mqttPort = Number($('#mqttPort').val());
@@ -103,6 +105,12 @@ $(function(){
 	    success: function(answ){
         if(answ != "OK") alert(answ);
         $('#loading').removeClass('active');
+        $('#save').css("background-color", "#AF0");
+        $('#save').text("Saved");
+        setTimeout(function(){
+          $('#save').css("background-color", "#F1F1F1");
+          $('#save').text("Save");
+        }, 3000);
 	    }
     });
     return false;
