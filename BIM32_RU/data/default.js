@@ -43,7 +43,7 @@ $(function(){
   "utc": 0,
   "dlst": false,
   "ntp": "time.nist.gov",
-  "city": "Moskow,RU",
+  "city": "Moscow,RU",
   "cityid": "524901",
   "lat": "55.75222",
   "lon": "37.615555",
@@ -194,10 +194,10 @@ $(function(){
           if(answ != "OK") alert(answ);
           $('#loading').removeClass('active');
           $('#restore').css("background-color", "#AF0");
-          $('#restore').text("Сохранено");
+          $('#restore').text("Сброшено");
           setTimeout(function(){
             $('#restore').css("background-color", "#F1F1F1");
-            $('#restore').text("Сохранить");
+            $('#restore').text("Сбросить");
           }, 3000);
 	      }
       });
