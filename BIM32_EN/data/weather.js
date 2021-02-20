@@ -18,15 +18,15 @@ function city_ident(c){
   }
   if(c == 1){
     $('#city').attr('disabled', true);
-    $('#cityid').attr('disabled', true);
-    $('#lat').removeAttr('disabled');
-    $('#lon').removeAttr('disabled');
-  }
-  if(c == 2){
-    $('#city').attr('disabled', true);
     $('#cityid').removeAttr('disabled');
     $('#lat').attr('disabled', true);
     $('#lon').attr('disabled', true);
+  }
+  if(c == 2){
+    $('#city').attr('disabled', true);
+    $('#cityid').attr('disabled', true);
+    $('#lat').removeAttr('disabled');
+    $('#lon').removeAttr('disabled');
   }
 }
 
