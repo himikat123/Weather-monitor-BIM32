@@ -59,7 +59,6 @@ void parseWeatherNow(String httpData){
   Serial.println(error ? "error" : "OK");
   if(error) return;
   if(config.provider == 0){
-    datas.w_updated = now();
     String descript      = root["weather"][0]["description"];
     descript.toCharArray(datas.description, (descript.length()) + 1);
     datas.icon[0]        = atoi(root["weather"][0]["icon"]);
@@ -84,7 +83,6 @@ void parseWeatherNow(String httpData){
     else datas.isDay = false;
   }
   if(config.provider == 1){
-    datas.w_updated = now();
     const char* descript = root["data"][0]["weather"]["description"];
     sprintf(datas.description, "%s", descript);
     datas.icon[0]        = weatherbit_icon(root["data"][0]["weather"]["code"].as<int>());
@@ -196,6 +194,7 @@ void getWeatherDaily(void){
     Serial.println(url);
     parseWeatherDaily(weatherRequest(url));
   }
+  datas.w_updated = now();
 }
 
 void parseWeatherDaily(String httpData){

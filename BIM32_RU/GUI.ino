@@ -101,11 +101,18 @@ void page1_send(void){
   // weather description
   myNex.writeStr("descr.txt", datas.description);
   
-  // moon phase
-  int ph;
-  uint8_t moon_icon = moon_phase(year(), month(), day(), hour(), &ph);
-  myNex.writeNum("moondscr.val", ph);
-  myNex.writeNum("moonicn.val", moon_icon);
+  // updated time
+  char recieve_time[40];
+  sprintf(recieve_time, 
+    "%u:%02u:%02u %02u-%02u-%u",
+    hour(datas.w_updated), 
+    minute(datas.w_updated),
+    second(datas.w_updated),
+    day(datas.w_updated),
+    month(datas.w_updated),
+    year(datas.w_updated)
+  );
+  if(year(datas.w_updated) > 2020) myNex.writeStr("updtime.txt", recieve_time);
 
   // weather forecast
   uint8_t wd = weekday() - 1;
@@ -253,6 +260,12 @@ void page9_send(void){
   myNex.writeStr("hn.txt", String(config.hn));
   sprintf(minut, "%02d", config.mn);
   myNex.writeStr("mn.txt", String(minut));
+  myNex.writeNum("h2.val", config.sdisp_sensitivity);
+  myNex.writeNum("c4.val", (config.light_in == 1) ? 1 : 0);
+  myNex.writeNum("c5.val", (config.light_in == 6) ? 1 : 0);
+  myNex.writeNum("c6.val", (config.light_in == 7) ? 1 : 0);
+  myNex.writeNum("c7.val", (config.light_in == 8) ? 1 : 0);
+  myNex.writeNum("c8.val", (config.light_in == 9) ? 1 : 0);
   myNex.writeNum("upd.val", 1);
 }
 
@@ -263,7 +276,6 @@ void page10_send(void){
     myNex.writeNum("ho" + String(i) + ".val", config.hum_out == i ? 1 : 0);
     myNex.writeNum("hi" + String(i) + ".val", config.hum_in == i ? 1 : 0);
     myNex.writeNum("po" + String(i) + ".val", config.pres_out == i ? 1 : 0);
-    myNex.writeNum("li" + String(i) + ".val", config.light_in == i ? 1 : 0);
     myNex.writeNum("b" + String(i) + ".val", config.bat_disp == i ? 1 : 0);
   }
   myNex.writeNum("upd.val", 1);
@@ -533,7 +545,26 @@ void page24_send(void){
   for(uint8_t k = 0; k < 6; k++){
     myNex.writeStr("t" + String(k + 1) + ".txt", String(config.dp[k]));
   }
-  myNex.writeNum("h0.val", config.ws_bright_d);
-  myNex.writeNum("h1.val", config.ws_bright_n);
+  myNex.writeNum("upd.val", 1);
+}
+
+void page30_send(void){
+  for(uint8_t i = 0; i < 4; i++) myNex.writeNum("c" + String(i) + ".val", config.ws_brt == i ? 1 : 0);
+  for(uint8_t i = 0; i < 6; i++){
+    myNex.writeNum("h" + String(i) + ".val", (i == 1 or i == 4) ? config.ws_brightd : config.ws_brightn);
+  }
+  myNex.writeStr("hd.txt", String(config.ws_hd));
+  char minut[3];
+  sprintf(minut, "%02d", config.ws_md);
+  myNex.writeStr("md.txt", String(minut));
+  myNex.writeStr("hn.txt", String(config.ws_hn));
+  sprintf(minut, "%02d", config.ws_mn);
+  myNex.writeStr("mn.txt", String(minut));
+  myNex.writeNum("h2.val", config.ws_sdisp_sensitivity);
+  myNex.writeNum("c4.val", (config.ws_light_in == 1) ? 1 : 0);
+  myNex.writeNum("c5.val", (config.ws_light_in == 6) ? 1 : 0);
+  myNex.writeNum("c6.val", (config.ws_light_in == 7) ? 1 : 0);
+  myNex.writeNum("c7.val", (config.ws_light_in == 8) ? 1 : 0);
+  myNex.writeNum("c8.val", (config.ws_light_in == 9) ? 1 : 0);
   myNex.writeNum("upd.val", 1);
 }

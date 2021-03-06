@@ -577,10 +577,10 @@ void TaskWeather(void *pvParameters){
       datas.old_ant = 0;
       first_upd = false;
       Serial.println("WEATHER UPDATE");
-      //vTaskDelay(1200000);
+      weathr = millis();
     }
-    else{
-      vTaskDelay(10);
+    else if(config.mqttsend or config.mqttrcv){
+      vTaskDelay(5000);
       MQTT_connect(mqtt);
       Adafruit_MQTT_Subscribe *subscription;
       while((subscription = mqtt.readSubscription(3000))){
