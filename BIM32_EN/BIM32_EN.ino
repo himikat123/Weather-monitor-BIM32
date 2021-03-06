@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v2.0
+ *  Weather Monitor BIM32 v2.1
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2021
  */
  
@@ -204,18 +204,14 @@ void TaskDisplay(void *pvParameters){
 
     if(datas.page != 9){
       if(config.brt == 0){
-        if(datas.isDay){
-          datas.bright = config.brday;
-          if(datas.page != 240) datas.bright_clock = config.ws_bright_d;
-        }
-        else{
-          datas.bright = config.brnight;
-          if(datas.page != 240) datas.bright_clock = config.ws_bright_n;
-        }
+        if(datas.isDay) datas.bright = config.brday;
+        else datas.bright = config.brnight;
       }
       if(config.brt == 1){
-        datas.bright = round(datas.light) * 3;
-        if(datas.page != 240) datas.bright_clock = config.ws_bright_d * 3;
+        float light = (float)datas.light * ((float)config.sdisp_sensitivity / 10.0);
+        if(light < 1.0) light = 1.0;
+        if(light > 100.0) light = 100.0;
+        datas.bright = round(light);
       }
       if(config.brt == 2){
         uint16_t sunrise = config.hd * 60 + config.md;
@@ -224,18 +220,14 @@ void TaskDisplay(void *pvParameters){
         if(cur_time > sunrise and cur_time < sunset){
           datas.isDay = true;
           datas.bright = config.brday;
-          if(datas.page != 240) datas.bright_clock = config.ws_bright_d;
         }
         else{
           datas.isDay = false;
           datas.bright = config.brnight;
-          if(datas.page != 240) datas.bright_clock = config.ws_bright_n;
         }
       }
-      if(config.brt == 3){
-        datas.bright = config.brday;
-        if(datas.page != 240) datas.bright_clock = config.ws_bright_n;
-      }
+      if(config.brt == 3) datas.bright = config.brday;
+
       if(datas.bright < 1) datas.bright = 1;
       if(datas.bright > 100) datas.bright = 100;
       if(millis() - old_bright > 1000){
@@ -243,6 +235,27 @@ void TaskDisplay(void *pvParameters){
         if(datas.page == 2) page2_send();
         old_bright = millis();
       }
+    }
+
+    if(datas.page != 30){
+      if(config.ws_brt == 0){
+        if(datas.isDay) datas.bright_clock = config.ws_brightd;
+        else datas.bright_clock = config.ws_brightn;
+      }
+      if(config.ws_brt == 1){
+        float light = (float)datas.ws_light * ((float)config.ws_sdisp_sensitivity / 10.0);
+        if(light < 1.0) light = 1.0;
+        if(light > 100.0) light = 100.0;
+        datas.bright_clock = round(light);
+      }
+      if(config.ws_brt == 2){
+        uint16_t sunrise = config.ws_hd * 60 + config.ws_md;
+        uint16_t sunset = config.ws_hn * 60 + config.ws_mn;
+        uint16_t cur_time = hour() * 60 + minute();
+        if(cur_time > sunrise and cur_time < sunset) datas.bright_clock = config.ws_brightd;
+        else datas.bright_clock = config.ws_brightn;
+      }
+      if(config.ws_brt == 3) datas.bright_clock = config.ws_brightd;
     }
         
     vTaskDelay(100);
@@ -369,6 +382,14 @@ void data_ordering(void){
     case 9: datas.light = datas.thng_light_in; break;
     default: datas.light = 1000.0; break;
   }
+  switch(config.ws_light_in){
+    case 1: datas.ws_light = ((now() - datas.time_wsens) < (config.wexpire * 60)) ? datas.light_wsens : 1000; break;
+    case 6: datas.ws_light = sensors.max44009_light; break;
+    case 7: datas.ws_light = sensors.bh1750_light; break;
+    case 8: datas.ws_light = datas.mqtt_light_in; break;
+    case 9: datas.ws_light = datas.thng_light_in; break;
+    default: datas.ws_light = 1000.0; break;
+  }
 }
 
 void wifi_connect(void){
@@ -406,6 +427,23 @@ void disp_receive(void){
       StaticJsonDocument<1024> root;
       DeserializationError error = deserializeJson(root, disp);
       if(!error){
+        if(disp.lastIndexOf("sns") != -1){
+          config.sdisp_sensitivity = root["sns"].as<int>();
+          float light = (float)datas.light * ((float)config.sdisp_sensitivity / 10.0);
+          if(light < 1.0) light = 1.0;
+          if(light > 100.0) light = 100.0;
+          myNex.writeNum("dim", round(light));
+        }
+        if(disp.lastIndexOf("ws_snt") != -1){
+          config.ws_sdisp_sensitivity = root["ws_snt"].as<int>();
+          float light = (float)datas.ws_light * ((float)config.ws_sdisp_sensitivity / 10.0);
+          if(light < 1.0) light = 1.0;
+          if(light > 100.0) light = 100.0;
+          datas.bright_clock = round(light);
+        }
+        if(disp.lastIndexOf("ws_brt") != -1){
+          datas.bright_clock = root["ws_brt"].as<int>();
+        }
         if(disp.lastIndexOf("page") != -1){
           datas.page = root["page"].as<int>();
           if(datas.page == 1){
@@ -445,7 +483,7 @@ void disp_receive(void){
           if(datas.page == 22) page22_send();
           if(datas.page == 23) page23_send();
           if(datas.page == 24) page24_send();
-          if(datas.page == 240) datas.bright_clock = root["br"];
+          if(datas.page == 30) page30_send();
         }
         if(disp.lastIndexOf("save") != -1){
           strlcpy(config.ssid, root["ssid"] | config.ssid, sizeof(config.ssid));
@@ -465,6 +503,7 @@ void disp_receive(void){
           config.md = root["md"] | config.md;
           config.hn = root["hn"] | config.hn;
           config.mn = root["mn"] | config.mn;
+          config.sdisp_sensitivity = root["sdisp_sensitivity"] | config.sdisp_sensitivity;
 
           config.temp_out = root["temp_out"] | config.temp_out;
           config.hum_out = root["hum_out"] | config.hum_out;
@@ -638,8 +677,17 @@ void disp_receive(void){
           strlcpy(config.ds[3], root["d3"][3] | config.ds[3], sizeof(config.ds[3]));
           strlcpy(config.ds[4], root["d4"][3] | config.ds[4], sizeof(config.ds[4]));
           strlcpy(config.ds[5], root["d5"][3] | config.ds[5], sizeof(config.ds[5]));
-          config.ws_bright_d = root["ws_brightd"] | config.ws_bright_d;
-          config.ws_bright_n = root["ws_brightn"] | config.ws_bright_n;
+          
+          config.sdisp_sensitivity = root["sdisp_sensitivity"] | config.sdisp_sensitivity;
+          config.ws_brt = root["ws_brt"] | config.ws_brt;
+          config.ws_brightd = root["ws_brightd"] | config.ws_brightd;
+          config.ws_brightn = root["ws_brightn"] | config.ws_brightn;
+          config.ws_hd = root["ws_hd"] | config.ws_hd;
+          config.ws_md = root["ws_md"] | config.ws_md;
+          config.ws_hn = root["ws_hn"] | config.ws_hn;
+          config.ws_mn = root["ws_mn"] | config.ws_mn;
+          config.ws_sdisp_sensitivity = root["ws_sdisp_sensitivity"] | config.ws_sdisp_sensitivity; 
+          config.ws_light_in = root["ws_light_in"] | config.ws_light_in;
 
           save_config();
         }
@@ -750,15 +798,17 @@ boolean is_summertime(){
 }
 
 time_t getTime(void){
-  uint16_t daylight = 0;
-  if(datas.clock_synchronized) if(is_summertime()) daylight = config.daylight * 3600;
-  configTime(config.utc * 3600, daylight, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
-  struct tm tmstruct;
-  vTaskDelay(2000);
-  tmstruct.tm_year = 0;
-  getLocalTime(&tmstruct, 5000);
-  setTime(tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec, tmstruct.tm_mday, tmstruct.tm_mon + 1, tmstruct.tm_year + 1900);
-  datas.clock_synchronized = true;
+  if(WiFi.status() == WL_CONNECTED){
+    uint16_t daylight = 0;
+    if(datas.clock_synchronized) if(is_summertime()) daylight = config.daylight * 3600;
+    configTime(config.utc * 3600, daylight, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
+    struct tm tmstruct;
+    vTaskDelay(2000);
+    tmstruct.tm_year = 0;
+    getLocalTime(&tmstruct, 5000);
+    setTime(tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec, tmstruct.tm_mday, tmstruct.tm_mon + 1, tmstruct.tm_year + 1900);
+    datas.clock_synchronized = true;
+  }
   return now();
 }
 
@@ -969,8 +1019,16 @@ void save_config(void){
   conf["ds3"] = config.ds[3];
   conf["ds4"] = config.ds[4];
   conf["ds5"] = config.ds[5];
-  conf["ws_brightd"] = config.ws_bright_d;
-  conf["ws_brightn"] = config.ws_bright_n;
+  conf["sdisp_sensitivity"] = config.sdisp_sensitivity;
+  conf["ws_brt"] = config.ws_brt;
+  conf["ws_brightd"] = config.ws_brightd;
+  conf["ws_brightn"] = config.ws_brightn;
+  conf["ws_hd"] = config.ws_hd;
+  conf["ws_md"] = config.ws_md;
+  conf["ws_hn"] = config.ws_hn;
+  conf["ws_mn"] = config.ws_mn;
+  conf["ws_sdisp_sensitivity"] = config.ws_sdisp_sensitivity; 
+  conf["ws_light_in"] = config.ws_light_in;
 
   serializeJsonPretty(conf, json);
   File file = SPIFFS.open("/config.json", FILE_WRITE);
@@ -1176,8 +1234,16 @@ void read_config(void){
       strlcpy(config.ds[3], conf["ds3"] | config.ds[3], sizeof(config.ds[3]));
       strlcpy(config.ds[4], conf["ds4"] | config.ds[4], sizeof(config.ds[4]));
       strlcpy(config.ds[5], conf["ds5"] | config.ds[5], sizeof(config.ds[5]));
-      config.ws_bright_d = conf["ws_brightd"] | config.ws_bright_d;
-      config.ws_bright_n = conf["ws_brightn"] | config.ws_bright_n;
+      config.sdisp_sensitivity = conf["sdisp_sensitivity"] | config.sdisp_sensitivity;
+      config.ws_brt = conf["ws_brt"] | config.ws_brt;
+      config.ws_brightd = conf["ws_brightd"] | config.ws_brightd;
+      config.ws_brightn = conf["ws_brightn"] | config.ws_brightn;
+      config.ws_hd = conf["ws_hd"] | config.ws_hd;
+      config.ws_md = conf["ws_md"] | config.ws_md;
+      config.ws_hn = conf["ws_hn"] | config.ws_hn;
+      config.ws_mn = conf["ws_mn"] | config.ws_mn;
+      config.ws_sdisp_sensitivity = conf["ws_sdisp_sensitivity"] | config.ws_sdisp_sensitivity; 
+      config.ws_light_in = conf["ws_light_in"] | config.ws_light_in;
       
       digitalWrite(SET_HC12, LOW);
       delay(45);
@@ -1297,8 +1363,16 @@ void read_config(void){
       Serial.print("config.ds[3]="); Serial.println(config.ds[3]);
       Serial.print("config.ds[4]="); Serial.println(config.ds[4]);
       Serial.print("config.ds[5]="); Serial.println(config.ds[5]);
-      Serial.print("config.ws_bright_d="); Serial.println(config.ws_bright_d);
-      Serial.print("config.ws_bright_n="); Serial.println(config.ws_bright_n);
+      Serial.print("config.sdisp_sensitivity="); Serial.println(config.sdisp_sensitivity);
+      Serial.print("config.ws_brt="); Serial.println(config.ws_brt);
+      Serial.print("config.ws_brightd="); Serial.println(config.ws_brightd);
+      Serial.print("config.ws_brightn="); Serial.println(config.ws_brightn);
+      Serial.print("config.ws_hd="); Serial.println(config.ws_hd);
+      Serial.print("config.ws_md="); Serial.println(config.ws_md);
+      Serial.print("config.ws_hn="); Serial.println(config.ws_hn);
+      Serial.print("config.ws_mn="); Serial.println(config.ws_mn);
+      Serial.print("config.ws_sdisp_sensitivity="); Serial.println(config.ws_sdisp_sensitivity); 
+      Serial.print("config.ws_light_in="); Serial.println(config.ws_light_in);
       Serial.print("config.tto="); Serial.println(config.tto);
       Serial.print("config.tho="); Serial.println(config.tho);
       Serial.print("config.tpo="); Serial.println(config.tpo);

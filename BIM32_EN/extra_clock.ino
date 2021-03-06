@@ -100,7 +100,7 @@ void TaskWS2812B(void *pvParameters){
   while(1){
     int bright = datas.bright_clock;
     if(bright < 1) bright = 1;
-    if(bright > 250) bright = 250;
+    if(bright > 100) bright = 100;
     RgbColor red(bright, 0, 0);
     RgbColor yellow(bright, bright, 0);
     RgbColor green(0, bright, 0);

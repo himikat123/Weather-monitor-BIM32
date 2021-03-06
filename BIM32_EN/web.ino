@@ -179,10 +179,6 @@ void web_interface_init(void){
     answ += "\",\"ddhth\":\""; answ += sensors.dht22_det ? String(sensors.dht22_hum) : "40400";
     answ += "\",\"dmax\":\""; answ += sensors.max44009_det ? String(sensors.max44009_light) : "40400";
     answ += "\",\"dbh\":\""; answ += sensors.bh1750_det ? String(sensors.bh1750_light) : "40400";
-    int ph;
-    uint8_t moon_icon = moon_phase(year(), month(), day(), hour(), &ph);
-    answ += "\",\"moon_phase\":\""; answ += String(ph);
-    answ += "\",\"moon_icon\":\""; answ += String(moon_icon);
     answ += "\",\"temp_wsens\":\""; answ += String(datas.temp_wsens + config.wsens_temp_corr);
     answ += "\",\"hum_wsens\":\""; answ += String(datas.hum_wsens + config.wsens_hum_corr);
     answ += "\",\"pres_wsens\":\""; answ += String(datas.pres_wsens + config.wsens_pres_corr);
@@ -219,8 +215,8 @@ void web_interface_init(void){
       hour(datas.time_wsens), 
       minute(datas.time_wsens),
       second(datas.time_wsens),
-      day(datas.time_wsens),
       month(datas.time_wsens),
+      day(datas.time_wsens),
       year(datas.time_wsens)
     );
     answ += "\",\"time\":\""; answ += String(recieve_time);
@@ -273,6 +269,50 @@ void web_interface_init(void){
   server.on("/esp/ws_bright.php", HTTP_GET, [](AsyncWebServerRequest *request){
     int bright = (request -> arg("br")).toInt();
     datas.bright_clock = bright;
+    request -> send(200, "text/plain", "OK");
+  });
+  //////////////////////////////////////////////////////////////////////////
+  server.on("/esp/sensitivity.php", HTTP_GET, [](AsyncWebServerRequest *request){
+    int sensitivity = (request -> arg("sen")).toInt();
+    float light = 100.0;
+    switch(config.light_in){
+      case 1: light = datas.light_wsens; break;
+      case 6: light = sensors.max44009_light; break;
+      case 7: light = sensors.bh1750_light; break;
+      default: light = 100.0; break;
+    }
+    light *= (float)sensitivity / 10.0;
+    if(light < 1.0) light = 1.0;
+    if(light > 100.0) light = 100.0;
+    myNex.writeNum("dim", round(light));
+    request -> send(200, "text/plain", "OK");
+  });
+  //////////////////////////////////////////////////////////////////////////
+  server.on("/esp/ws_sensitivity.php", HTTP_GET, [](AsyncWebServerRequest *request){
+    int sensitivity = (request -> arg("sen")).toInt();
+    float light = 100.0;
+    switch(config.ws_light_in){
+      case 1: light = datas.light_wsens; break;
+      case 6: light = sensors.max44009_light; break;
+      case 7: light = sensors.bh1750_light; break;
+      default: light = 100.0; break;
+    }
+    light *= (float)sensitivity / 10.0;
+    if(light < 1.0) light = 1.0;
+    if(light > 100.0) light = 100.0;
+    datas.bright_clock = round(light);
+    request -> send(200, "text/plain", "OK");
+  });
+  //////////////////////////////////////////////////////////////////////////
+  server.on("/esp/brt_sen.php", HTTP_GET, [](AsyncWebServerRequest *request){
+    int sens = (request -> arg("brt")).toInt();
+    config.light_in = sens;
+    request -> send(200, "text/plain", "OK");
+  });
+  //////////////////////////////////////////////////////////////////////////
+  server.on("/esp/ws_brt_sen.php", HTTP_GET, [](AsyncWebServerRequest *request){
+    int sens = (request -> arg("brt")).toInt();
+    datas.bright_clock = sens;
     request -> send(200, "text/plain", "OK");
   });
   //////////////////////////////////////////////////////////////////////////

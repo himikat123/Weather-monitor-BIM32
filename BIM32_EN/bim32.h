@@ -2,7 +2,7 @@
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v2.0";
+char fw[7] = "v2.1";
 uint32_t s_upd = millis();
 bool clk2 = false;
 String wsensorstr = "";
@@ -27,14 +27,29 @@ struct{
   char dns1[40] = ""; // WiFi DNS1 address
   char dns2[40] = ""; // WiFi DNS2 address
   
-  uint8_t brt = 0; // way to control backlight brightness 0 = auto, 1 = by light sensor, 2 = by time, 3 = constant 
+  uint8_t brt = 3; // way to control backlight brightness 0 = auto, 1 = by light sensor, 2 = by time, 3 = constant 
   uint32_t brday = 100; // backlight brightness during the day
   uint32_t brnight = 100; // backlight brightness during the night
   uint8_t hd = 8; // day start hours
   uint8_t md = 0; // day start minutes
   uint8_t hn = 21; // night start hours
   uint8_t mn = 0; // might start minutes
-  
+  int sdisp_sensitivity = 50; //
+
+  uint8_t dp[6] = {6,2,0,0,0,0}; //extra display period
+  uint8_t dt[6] = {1,1,0,0,0,0}; //extra display sensor type
+  uint16_t dc[6] = {65535,65504,12710,12710,12710,12710}; //extra display color
+  char ds[6][2] = {"C","D","C","C","C","C"}; //extra display data type
+  uint8_t ws_brt = 3; // way to control big clock brightness 0 = auto, 1 = by light sensor, 2 = by time, 3 = constant
+  uint32_t ws_brightd = 20; // big clock brightness during the day
+  uint32_t ws_brightn = 20; // big clock brightness during the night
+  uint8_t ws_hd = 8; // day start hours for big clock
+  uint8_t ws_md = 0; // day start minutes for big clock
+  uint8_t ws_hn = 21; // night start hours for big clock
+  uint8_t ws_mn = 30; // night start minutes for big clock
+  int ws_sdisp_sensitivity = 50;
+  uint8_t ws_light_in = 1;
+    
   uint8_t temp_out = 0; // temperature source for displaying outdoor temperature
   // 0 = internet, 1 = wireless sensor, 2 = BME280, 3 = BMP180, 4 = SHT21, 5 = DHT22, 8 = MQTT, 9 = ThingSpeak
   uint8_t hum_out = 0; // humidity source for outdoor humidity display
@@ -150,12 +165,6 @@ struct{
   char mqttT7[40] = ""; // 
   char mqttT8[40] = ""; //
 
-  uint8_t dp[6] = {6,2,0,0,0,0}; //extra display period
-  uint8_t dt[6] = {1,1,0,0,0,0}; //extra display sensor type
-  uint16_t dc[6] = {65535,65504,12710,12710,12710,12710}; //extra display color
-  char ds[6][2] = {"C","D","C","C","C","C"}; //extra display data type
-  int ws_bright_d = 10;
-  int ws_bright_n = 10;
   bool web_s = false;
   char username[33] = "admin";
   char password[33] = "1111";
@@ -194,6 +203,7 @@ struct{
   float old_temp_d = 0;
   float old_temp_n = 0;
   float light = 0.0;
+  float ws_light = 0.0;
   uint16_t bright = 20;
   uint16_t bright_clock = 20;
   float temp_web = 404.0;
