@@ -13,7 +13,6 @@ Display 5-day hourly weather forecast<br>
 Show weather history (hourly) 1 day ago<br>
 Building graphs of temperature, humidity and probability of precipitation<br>
 Home temperature and humidity display<br>
-Moon phase display<br>
 Clock (small/large/with seconds/arrow) with NTP synchronization<br>
 Calendar with the ability to scroll to plus/minus infinity<br>
 Sending and/or receiving data using the MQTT protocol<br>
