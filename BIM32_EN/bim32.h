@@ -1,14 +1,15 @@
+#define humidifier 14
 #define SET_HC12  25
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v2.1";
+char fw[7] = "v2.2";
 uint32_t s_upd = millis();
 bool clk2 = false;
 String wsensorstr = "";
 
 struct{
-  char lang[5] = "ru";
+  char lang[5] = "en";
   float wsens_temp_corr = 0.0; // wireless sensor temperature correction
   float wsens_hum_corr = 0.0; // wireless sensor humidity correction
   float wsens_pres_corr = 0.0; // wireless sensor pressure correction
@@ -68,10 +69,10 @@ struct{
   int utc = 0; // Timezone
   bool daylight = false; // auto daylight saving time
   char ntp[40] = ""; // NTP server address
-  char city[40] = "Moskva,RU"; // city name
-  char cityid[12] = "6609999"; // City ID
-  char lat[32] = "55.751"; // latitude
-  char lon[32] = "37.617"; // lоngitude
+  char city[40] = ""; // city name
+  char cityid[12] = ""; // City ID
+  char lat[32] = ""; // latitude
+  char lon[32] = ""; // lоngitude
   char appid[40] = ""; // APPID openweathermap.org
   char appkey[40] = ""; // KEY weatherbit.io
   uint8_t citysearch = 0; // the way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
@@ -168,6 +169,9 @@ struct{
   bool web_s = false;
   char username[33] = "admin";
   char password[33] = "1111";
+
+  char apssid[33] = "BIM32";
+  char appass[33] = "1234567890";
 } config;
 
 struct{
@@ -246,6 +250,8 @@ struct{
   uint8_t clock_dig[4] = {10, 10, 10, 10};
   uint8_t clock_symb[4] = {0, 0, 0, 0};
   uint16_t clock_colr = 0;
+  bool ap_mode = false;
+  bool weather_updating = false;
 } datas;
 
 struct{

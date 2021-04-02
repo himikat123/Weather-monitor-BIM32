@@ -58,18 +58,27 @@ bool handleFileRead(AsyncWebServerRequest *request){
     GetCookieValue c;
     c.Set(h -> value().c_str());
     String auth = c.Get("auth");
-    if(auth == String(code)) return FileRead(request, path);
+    if(auth == String(code)){
+      if(datas.ap_mode){
+        if(path == "/jquery.js" or path == "/favicon.ico" or path == "/config.json") return FileRead(request, path);
+        else return FileRead(request, "/apnetw.htm");
+      }
+      else return FileRead(request, path);
+    }
     else{
-      web_only(true);
-      if(!config.web_s) ESP.restart();
-      if(loged)return FileRead(request, "/");
+      if(!datas.ap_mode) web_only(true);
+      if(!datas.ap_mode) if(!config.web_s) ESP.restart();
+      if(loged){
+        if(datas.ap_mode) return FileRead(request, "/apnetw.htm");
+        else return FileRead(request, "/");
+      }
       else return FileRead(request, "/login.htm");
     }
   }
   else{
-    web_only(true);
-    if(!config.web_s) ESP.restart();
-    if(loged)return FileRead(request, "/");
+    if(!datas.ap_mode) web_only(true);
+    if(!datas.ap_mode) if(!config.web_s) ESP.restart();
+    if(loged) return FileRead(request, "/");
     else return FileRead(request, "/login.htm");
   }
 }

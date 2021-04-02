@@ -572,11 +572,14 @@ void TaskWeather(void *pvParameters){
   
   while(1){
     if(datas.net_connected and (millis() - weathr > 1200000 or first_upd)){
+      Serial.println("WEATHER UPDATING");
+      datas.weather_updating = true;
       getWeatherNow();
       getWeatherDaily();
+      datas.weather_updating = false;
       datas.old_ant = 0;
       first_upd = false;
-      Serial.println("WEATHER UPDATE");
+      Serial.println("WEATHER UPDATED");
       weathr = millis();
     }
     else if(config.mqttsend or config.mqttrcv){

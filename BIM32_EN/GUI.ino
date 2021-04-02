@@ -51,7 +51,7 @@ void page1_send(void){
   }
     
   // antenna
-  myNex.writeNum("page0.rssi.val", datas.ant);
+  myNex.writeNum("page0.rssi.val", datas.net_connected ? datas.ant : 1);
   myNex.writeStr("page0.ip.txt", WiFi.localIP().toString());
   myNex.writeStr("page0.mac.txt", WiFi.macAddress());
   myNex.writeStr("page0.ssid.txt", WiFi.SSID());
@@ -151,6 +151,8 @@ void page1_send(void){
       myNex.writeNum("cfrt.val", 7);
     if(datas.temp[1] < 22.0 and datas.hum[1] < 30)
       myNex.writeNum("cfrt.val", 8);
+    if(datas.hum[1] > 35) digitalWrite(humidifier, LOW);
+    if(datas.hum[1] < 30) digitalWrite(humidifier, HIGH);
   }
   else myNex.writeNum("cfrt.val", -1);
 
