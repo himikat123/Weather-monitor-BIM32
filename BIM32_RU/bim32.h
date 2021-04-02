@@ -1,8 +1,9 @@
+#define humidifier 14
 #define SET_HC12  25
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v2.1";
+char fw[7] = "v2.2";
 uint32_t s_upd = millis();
 bool clk2 = false;
 String wsensorstr = "";
@@ -168,6 +169,9 @@ struct{
   bool web_s = false;
   char username[33] = "admin";
   char password[33] = "1111";
+
+  char apssid[33] = "BIM32";
+  char appass[33] = "1234567890";
 } config;
 
 struct{
@@ -246,6 +250,8 @@ struct{
   uint8_t clock_dig[4] = {10, 10, 10, 10};
   uint8_t clock_symb[4] = {0, 0, 0, 0};
   uint16_t clock_colr = 0;
+  bool ap_mode = false;
+  bool weather_updating = false;
 } datas;
 
 struct{

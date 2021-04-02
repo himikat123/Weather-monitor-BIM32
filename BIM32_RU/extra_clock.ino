@@ -43,18 +43,25 @@ bool get_date(){
 
 bool get_temp(float t){
   int buf = round(t);
-  if(buf >= 0){
-    datas.clock_dig[0] = buf < 10 ? 10 : buf / 10; 
-    datas.clock_dig[1] = buf < 10 ? buf : buf % 10; 
+  if(buf > 99){
+    datas.clock_dig[0] = datas.clock_dig[1] = 11; 
     datas.clock_dig[2] = 12; 
     datas.clock_dig[3] = 13;
   }
   else{
-    buf = abs(buf);
-    datas.clock_dig[0] = 11; 
-    datas.clock_dig[1] = buf < 10 ? buf : buf / 10; 
-    datas.clock_dig[2] = buf < 10 ? 12 : buf % 10; 
-    datas.clock_dig[3] = buf < 10 ? 13 : 12;
+    if(buf >= 0){
+      datas.clock_dig[0] = buf < 10 ? 10 : buf / 10; 
+      datas.clock_dig[1] = buf < 10 ? buf : buf % 10; 
+      datas.clock_dig[2] = 12; 
+      datas.clock_dig[3] = 13;
+    }
+    else{
+      buf = abs(buf);
+      datas.clock_dig[0] = 11; 
+      datas.clock_dig[1] = buf < 10 ? buf : buf / 10; 
+      datas.clock_dig[2] = buf < 10 ? 12 : buf % 10; 
+      datas.clock_dig[3] = buf < 10 ? 13 : 12;
+    }
   }
   return 0;
 }
@@ -62,26 +69,37 @@ bool get_temp(float t){
 bool get_hum(float h){
   uint8_t buf = round(h);
   datas.clock_dig[3] = 14;
-  if(buf < 10) datas.clock_dig[1] = buf;
-  else if(buf < 100){
-    datas.clock_dig[0] = buf / 10; 
-    datas.clock_dig[1] = buf % 10;
+  if(buf > 100){
+    datas.clock_dig[0] = datas.clock_dig[1] = 11;
     datas.clock_dig[2] = 10;
   }
   else{
-    datas.clock_dig[0] = 1; 
-    datas.clock_dig[1] = 0; 
-    datas.clock_dig[2] = 0;
+    if(buf < 10) datas.clock_dig[1] = buf;
+    else if(buf < 100){
+      datas.clock_dig[0] = buf / 10; 
+      datas.clock_dig[1] = buf % 10;
+      datas.clock_dig[2] = 10;
+    }
+    else{
+      datas.clock_dig[0] = 1; 
+      datas.clock_dig[1] = 0; 
+      datas.clock_dig[2] = 0;
+    }
   }
   return 0;
 }
 
 bool get_pres(float p){
   uint16_t buf = round(p);
-  datas.clock_dig[0] = buf / 100; 
-  datas.clock_dig[1] = buf % 100 / 10; 
-  datas.clock_dig[2] = buf % 10;
   datas.clock_dig[3] = 15;
+  if(buf > 1200){
+    datas.clock_dig[0] = datas.clock_dig[1] = datas.clock_dig[2] = 11;
+  }
+  else{
+    datas.clock_dig[0] = buf / 100; 
+    datas.clock_dig[1] = buf % 100 / 10; 
+    datas.clock_dig[2] = buf % 10;
+  }
   return 0;
 }
 
