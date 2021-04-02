@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v2.1
+ *  Weather Monitor BIM32 v2.2
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2021
  */
  
@@ -18,6 +18,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <ESP32Ping.h>
 #include <ESPmDNS.h>
 #include <HTTPClient.h>
 #include <Update.h>
@@ -53,6 +54,8 @@ RgbColor black(0);
 
 void setup(){
   pinMode(SET_HC12, OUTPUT);
+  pinMode(humidifier, OUTPUT);
+  digitalWrite(humidifier, LOW);
   uint8_t cardType;
   Serial.begin(115200);
   Serial1.begin(9600);
@@ -265,13 +268,16 @@ void TaskDisplay(void *pvParameters){
 
 void TaskSensors(void *pvParameters){
   (void) pvParameters;
-  if(config.ssid != "") wifi_connect();
-  setSyncProvider(getTime);
-  setSyncInterval(300);
-  ThingSpeak.begin(client);
   sensors_init();
   sensors_read();
   data_ordering();
+  if(String(config.ssid) != "") wifi_connect();
+  else access_point();
+  if(!datas.ap_mode){
+    setSyncProvider(get_time);
+    setSyncInterval(350);
+    ThingSpeak.begin(client);
+  }
   uint32_t thngspk_update = millis() + 60000;
   uint32_t sensors_update = millis();
   uint32_t cloud_send = millis() + 300000;
@@ -282,13 +288,14 @@ void TaskSensors(void *pvParameters){
       sensors_read();
     }
 
-    if(config.ssid != ""){
+    if(String(config.ssid) != ""){
       if(WiFi.status() != WL_CONNECTED){
         datas.net_connected = false;
         wifi_connect();
       }
       else{
-        datas.net_connected = true;
+        if(Ping.ping("www.google.com")) datas.net_connected = true;
+        else datas.net_connected = false;
         if(String(WiFi.SSID()) != String(config.ssid)){
           WiFi.disconnect();
           datas.net_connected = false;
@@ -300,7 +307,7 @@ void TaskSensors(void *pvParameters){
 
     if(config.thngrcv){
       if((millis() - thngspk_update + 30000) > 60000){
-        thingspk_recv();
+        if(datas.net_connected) thingspk_recv();
         thngspk_update = millis();
       }
     }
@@ -308,11 +315,14 @@ void TaskSensors(void *pvParameters){
     data_ordering();
 
     if((millis() - cloud_send) > (config.tupd * 60000)){
-      if(config.thngsend) thingspk_send();
-      if(config.nrdmsend) narodmon_send();
+      if(datas.net_connected){
+        if(config.thngsend and !datas.weather_updating) thingspk_send();
+        if(config.nrdmsend and !datas.weather_updating) narodmon_send();
+        if(datas.weather_updating) cloud_send = millis() - (config.tupd * 60000);
+      }
       vTaskDelay(200);
-      if(config.mqttsend) datas.mqtt_sending = true;
-      cloud_send = millis();
+      if(config.mqttsend) if(datas.net_connected) datas.mqtt_sending = true;
+      if(!datas.weather_updating) cloud_send = millis();
     }
 
     ArduinoOTA.handle();
@@ -393,29 +403,44 @@ void data_ordering(void){
 }
 
 void wifi_connect(void){
-  if(config.ssid != ""){
+  Serial.println("Connetcting to WiFi");
+  if(String(config.ssid) != ""){
     int i = 0;
     WiFi.begin(config.ssid, config.pass);
     while(WiFi.status() != WL_CONNECTED){
       i++;
       vTaskDelay(500);
-      if(i > 100) break;
+      if(i > 20) break;
     }
-    WiFi.setAutoConnect(true);
-    WiFi.setAutoReconnect(true);
-    if(config.type){
-      IPAddress ip;
-      IPAddress subnet;
-      IPAddress gateway;
-      IPAddress dns1;
-      IPAddress dns2;
-      if(ip.fromString(config.ip) and
-         gateway.fromString(config.gw) and
-         subnet.fromString(config.mask) and
-         dns1.fromString(config.dns1) and
-         dns2.fromString(config.dns2)
-      ) WiFi.config(ip, gateway, subnet, dns1, dns2);
+    if(WiFi.status() == WL_CONNECTED){
+      Serial.println("Connected");
+      WiFi.setAutoConnect(true);
+      WiFi.setAutoReconnect(true);
+      if(config.type){
+        IPAddress ip;
+        IPAddress subnet;
+        IPAddress gateway;
+        IPAddress dns1;
+        IPAddress dns2;
+        if(ip.fromString(config.ip) and
+           gateway.fromString(config.gw) and
+           subnet.fromString(config.mask) and
+           dns1.fromString(config.dns1) and
+           dns2.fromString(config.dns2)
+        ) WiFi.config(ip, gateway, subnet, dns1, dns2);
+      }
     }
+  }
+}
+
+void access_point(){
+  if(!datas.ap_mode){
+    Serial.println("Access Point Mode");
+    datas.ap_mode = true;
+    WiFi.mode(WIFI_AP);
+    WiFi.disconnect();
+    WiFi.softAP(config.apssid, config.appass);
+    datas.ap_mode = true;
   }
 }
 
@@ -797,11 +822,9 @@ boolean is_summertime(){
   else return false;
 }
 
-time_t getTime(void){
+time_t get_time(void){
   if(WiFi.status() == WL_CONNECTED){
-    uint16_t daylight = 0;
-    if(datas.clock_synchronized) if(is_summertime()) daylight = config.daylight * 3600;
-    configTime(config.utc * 3600, daylight, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
+    configTime(config.utc * 3600, config.daylight ? 3600 : 0, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
     struct tm tmstruct;
     vTaskDelay(2000);
     tmstruct.tm_year = 0;
@@ -1042,7 +1065,7 @@ void read_config(void){
   File file = SPIFFS.open("/config.json");
   while(file.available()){
     String json = file.readString();
-    Serial.println(json);
+    //Serial.println(json);
     DynamicJsonDocument conf(8192);
     DeserializationError error = deserializeJson(conf, json);
     if(!error){
