@@ -1,5 +1,5 @@
 let config, sig, dbmet, dbmeh, dbmep, dbmpt, dbmpp, dshtt, dshth, ddhtt, ddhth;
-let updt, wtemp, whum, wpres, wlight, wubat, wlbat;
+let updt, wtemp, whum, wpres, wlight, wubat, wlbat, thing;
 let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
 
 function status_update(){
@@ -157,6 +157,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
       case 3: temp_out = dbmpt; break;
       case 4: temp_out = dshtt; break;
       case 5: temp_out = ddhtt; break;
+      case 9: temp_out = thing['field' + config.tto]; break;
       default: temp_out = '--'; break;
     }
     switch(Number(config['temp_in'])){
@@ -166,6 +167,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
       case 3: temp_in = dbmpt; break;
       case 4: temp_in = dshtt; break;
       case 5: temp_in = ddhtt; break;
+      case 9: temp_in = thing['field' + config.tti]; break;
       default: temp_in = '--'; break;
     }
     switch(Number(config['hum_out'])){
@@ -174,6 +176,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
       case 2: hum_out = dbmeh; break;
       case 4: hum_out = dshth; break;
       case 5: hum_out = ddhth; break;
+      case 9: hum_out = thing['field' + config.tho]; break;
       default: hum_out = '--'; break;
     }
     switch(Number(config['hum_in'])){
@@ -182,6 +185,7 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
       case 2: hum_in = dbmeh; break;
       case 4: hum_in = dshth; break;
       case 5: hum_in = ddhth; break;
+      case 9: hum_in = thing['field' + config.thi]; break;
       default: hum_in = '--'; break;
     }
     switch(Number(config['pres_out'])){
@@ -189,7 +193,25 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
       case 1: pres_out = wpres; break;
       case 2: pres_out = dbmep; break;
       case 3: pres_out = dbmpp; break;
+      case 9: pres_out = thing['field' + config.tpo]; break;
       default: pres_out = '--'; break;
+    }
+    switch(Number(config['bat_disp'])){
+      case 1: {
+        ubat = wubat;
+        lbat = wlbat;
+      } break;
+      case 9: {
+        ubat = thing['field' + config.tbt];
+        if(ubat < (3.6)) lbat = 1;
+        else if(ubat < 3.7) lbat = 2;
+        else if(ubat < 3.8) lbat = 3;
+        else lbat = 4;
+      } break;
+      default: {
+        ubat = undefined;
+        lbat = undefined;
+      } break;
     }
   }
 
@@ -198,8 +220,8 @@ function curr_weather(context, icon, w_dir, descript, w_speed, temp_weather, hum
   hum_out = (hum_out == undefined || hum_out == '--' || hum_out > 100 || hum_out < 0) ? '--' : (hum_out > 99) ? Math.round(hum_out) : Math.round(hum_out) + '%';
   hum_in = (hum_in == undefined || hum_in == '--' || hum_in > 100 || hum_in < 0) ? '--' : Math.round(hum_in) + '%';
   pres_out = (pres_out == undefined || pres_out == '--' || pres_out > 800 || pres_out < 500) ? '--' : Math.round(pres_out) + 'мм';
-  ubat = (wubat == undefined || wubat == '--' || wubat > 20 || wubat < 0) ? '' : Math.round(wubat * 10) / 10;
-  lbat = (wlbat == undefined || wlbat == '--' || wlbat > 4 || wlbat < 1) ? 0 : wlbat;
+  ubat = (ubat == undefined || ubat == '--' || ubat > 20 || ubat < 0) ? '' : Math.round(ubat * 10) / 10;
+  lbat = (lbat == undefined || lbat == '--' || lbat > 4 || lbat < 1) ? 0 : lbat;
 
   context.fillStyle = "black";
   context.fillRect(98, 109, 381, 29);
@@ -470,6 +492,12 @@ function weather(){
         forecast(context, icon_daily, temp_max_daily, temp_min_daily, w_speed_daily);
       }, 1000);
     });
+
+    if(config.thngrcv){
+      $.getJSON(`https://api.thingspeak.com/channels/${config.chid}/feeds.json?api_key=${config.rdkey}&results=1`, function(json){
+        thing = json["feeds"][0];
+      });
+    }
   });
   return context;
 }
