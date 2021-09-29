@@ -2,7 +2,7 @@
 ## Weather monitor based on ESP32
 
 <p align="center">
-  <img src="/img/screen.png">
+  <img src="/img/screen.png" alt="Weather monitor based on ESP32">
 </p> 
 
 A short list of weather monitor features:<br><br>
@@ -24,7 +24,7 @@ Auto adjustment of screen backlight brightness (by light sensor, by time or by s
 
 ## Schematic diagram of a weather monitor<br>
 <p align="center">
-  <img src="/img/BIM32schematic.png">
+  <img src="/img/BIM32schematic.png" alt="weather monitor BIM32 shematic
 </p><br><br>
 
 I used ready-made modules, so the device schematic is very simple. WiFi module <b>Nodemcu 32S</b> 30pin is applied.
@@ -94,14 +94,14 @@ which your ESP32 actually sits.<br>
 And of course, lastly, a couple of photos of the device in action.<br>
 
 <p align="center">
-  <img src="/img/20200918_165534.jpg">
+  <img src="/img/20200918_165534.jpg" alt="Weather monitor">
 </p><br>
 <p align="center">
-  <img src="/img/20200918_165717.jpg">
+  <img src="/img/20200918_165717.jpg" alt="Weather monitor">
 </p><br>
 <p align="center">
-  <img src="/img/20200918_165741.jpg">
+  <img src="/img/20200918_165741.jpg" alt="Weather monitor">
 </p><br>
 <p align="center">
-  <img src="/img/20200918_170005.jpg">
+  <img src="/img/20200918_170005.jpg" alt="Weather monitor">
 </p><br>
