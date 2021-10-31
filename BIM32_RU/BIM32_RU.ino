@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v2.2
+ *  Weather Monitor BIM32 v2.3
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2021
  */
  
@@ -9,11 +9,10 @@
 #include <ArduinoJson.h>
 #include <ArduinoOTA.h>
 #include <TimeLib.h>
-#include <FS.h>
+#include "FS.h"
 #include <SPIFFS.h>
 #include <SPIFFSEditor.h>
 #include <Update.h>
-#include "SD.h"
 #include "SPI.h"
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -24,7 +23,6 @@
 #include <Update.h>
 #include <OpenWeatherMap.h>
 #include "EasyNextionLibrary.h"
-#include "ThingSpeak.h"
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
 #include "bim32.h"
@@ -58,14 +56,17 @@ void setup(){
   digitalWrite(humidifier, LOW);
   uint8_t cardType;
   Serial.begin(115200);
-  Serial1.begin(9600);
+  Serial1.begin(115200);
   Serial2.begin(9600);
+  myNex.writeNum("sleep", 0);
+  delay(100);
   myNex.writeStr("rest");
     
   WiFi.mode(WIFI_STA);
   SPIFFS.begin();
   
   web_interface_init();
+
   MDNS.begin("bim32");
   MDNS.addService("http","tcp",80);
   read_config();
@@ -126,7 +127,7 @@ void loop(){
           wrs.toCharArray(datas.wpres_sens, wrs.length() + 1);
           wrs = root["s"][wlight_sens].as<String>();
           wrs.toCharArray(datas.wlight_sens, wrs.length() + 1);
-          float umin = 3.5;
+          float umin = 3.75;
           float umax = 4.5;
           if(config.bat_type == 1) umax = 3.9;
           float stp = (umax - umin) / 4;
@@ -234,7 +235,10 @@ void TaskDisplay(void *pvParameters){
       if(datas.bright < 1) datas.bright = 1;
       if(datas.bright > 100) datas.bright = 100;
       if(millis() - old_bright > 1000){
-        myNex.writeNum("dim", datas.bright);
+        if(!datas.disp_asleep){
+          if(datas.br_reduc) myNex.writeNum("dim", round(datas.bright / 2));
+          else myNex.writeNum("dim", datas.bright);
+        }
         if(datas.page == 2) page2_send();
         old_bright = millis();
       }
@@ -260,6 +264,18 @@ void TaskDisplay(void *pvParameters){
       }
       if(config.ws_brt == 3) datas.bright_clock = config.ws_brightd;
     }
+
+    if(config.disp_autooff > 0){
+      if((now() - datas.touched) > (config.disp_autooff * 60 - 5)){
+        datas.br_reduc = true;
+        if((now() - datas.touched) > (config.disp_autooff * 60)){
+          datas.disp_asleep = true;
+          myNex.writeNum("thup", 1);
+          myNex.writeNum("sleep", 1);
+        }
+      }
+      else datas.br_reduc = false;
+    }
         
     vTaskDelay(100);
   }
@@ -276,7 +292,6 @@ void TaskSensors(void *pvParameters){
   if(!datas.ap_mode){
     setSyncProvider(get_time);
     setSyncInterval(350);
-    ThingSpeak.begin(client);
   }
   uint32_t thngspk_update = millis() + 60000;
   uint32_t sensors_update = millis();
@@ -448,10 +463,14 @@ void disp_receive(void){
   while(Serial1.available()){
     String disp = Serial1.readString();
     Serial.print(disp);
-    if(disp.lastIndexOf("{") != -1){
+    datas.touched = now();
+    datas.disp_asleep = false;
+    if(disp.lastIndexOf(":") != -1){
+      Serial.println("was {");
       StaticJsonDocument<1024> root;
       DeserializationError error = deserializeJson(root, disp);
       if(!error){
+        Serial.println("!error");
         if(disp.lastIndexOf("sns") != -1){
           config.sdisp_sensitivity = root["sns"].as<int>();
           float light = (float)datas.light * ((float)config.sdisp_sensitivity / 10.0);
@@ -509,6 +528,7 @@ void disp_receive(void){
           if(datas.page == 23) page23_send();
           if(datas.page == 24) page24_send();
           if(datas.page == 30) page30_send();
+          if(datas.page == 31) page31_send();
         }
         if(disp.lastIndexOf("save") != -1){
           strlcpy(config.ssid, root["ssid"] | config.ssid, sizeof(config.ssid));
@@ -522,6 +542,7 @@ void disp_receive(void){
 
           strlcpy(config.lang, root["lang"] | config.lang, sizeof(config.lang));
           config.brt = root["brt"] | config.brt;
+          config.disp_autooff = root["disp_autooff"] | config.disp_autooff;
           config.brday = int(root["brday"] | config.brday);
           config.brnight = int(root["brnight"] | config.brnight);
           config.hd = root["hd"] | config.hd;
@@ -768,16 +789,9 @@ void TaskHC12rcv(void *pvParameters){
           Serial.print("datas.wpres_sens="); Serial.println(datas.wpres_sens);
           Serial.print("datas.wlight_sens="); Serial.println(datas.wlight_sens);
 
-          float umin = 3.3;
-          float umax = 5.0;
-          if(config.bat_type == 0){
-            umin = 3.5;
-            umax = 4.5;
-          }
-          if(config.bat_type == 1){
-            umin = 3.5;
-            umax = 3.9;
-          }
+          float umin = 3.75;
+          float umax = 3.9;
+          if(config.bat_type == 0) umax = 4.5;
           float stp = (umax - umin) / 4;
           if(datas.wbat_voltage < (umin + stp)) datas.wbat_level = 1;
           else if(datas.wbat_voltage < (umin + stp * 2)) datas.wbat_level = 2;
@@ -824,7 +838,7 @@ boolean is_summertime(){
 
 time_t get_time(void){
   if(WiFi.status() == WL_CONNECTED){
-    configTime(config.utc * 3600, config.daylight ? 3600 : 0, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
+    configTime(config.utc * 3600, 0, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
     struct tm tmstruct;
     vTaskDelay(2000);
     tmstruct.tm_year = 0;
@@ -832,7 +846,7 @@ time_t get_time(void){
     setTime(tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec, tmstruct.tm_mday, tmstruct.tm_mon + 1, tmstruct.tm_year + 1900);
     datas.clock_synchronized = true;
   }
-  return now();
+  return now() + config.daylight ? is_summertime() ? 3600 : 0 : 0;
 }
 
 void save_config(void){
@@ -848,6 +862,7 @@ void save_config(void){
   conf["type"] = config.type;
 
   conf["lang"] = config.lang;
+  conf["disp_autooff"] = config.disp_autooff;
   conf["brt"] = config.brt;
   conf["brday"] = config.brday;
   conf["brnight"] = config.brnight;
@@ -1080,6 +1095,7 @@ void read_config(void){
       config.type = conf["type"].as<bool>() | config.type;
 
       config.brt = conf["brt"] | config.brt;
+      config.disp_autooff = conf["disp_autooff"] | config.disp_autooff;
       config.brday = conf["brday"] | config.brday;
       config.brnight = conf["brnight"] | config.brnight;
       config.hd = conf["hd"] | config.hd;
@@ -1283,6 +1299,7 @@ void read_config(void){
       Serial.print("config.type="); Serial.println(config.type);
       Serial.println();
       Serial.print("config.brt="); Serial.println(config.brt);
+      Serial.print("config.disp_autooff="); Serial.println(config.disp_autooff);
       Serial.print("config.brday="); Serial.println(config.brday);
       Serial.print("config.brnight="); Serial.println(config.brnight);
       Serial.print("config.hd="); Serial.println(config.hd);

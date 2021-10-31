@@ -1,9 +1,10 @@
 #define humidifier 14
 #define SET_HC12  25
+#define nexSerial 1
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v2.2";
+char fw[7] = "v2.3";
 uint32_t s_upd = millis();
 bool clk2 = false;
 String wsensorstr = "";
@@ -29,6 +30,7 @@ struct{
   char dns2[40] = ""; // WiFi DNS2 address
   
   uint8_t brt = 3; // way to control backlight brightness 0 = auto, 1 = by light sensor, 2 = by time, 3 = constant 
+  uint16_t disp_autooff = 0; // set display to sleep mode after "disp_autooff" minutes
   uint32_t brday = 100; // backlight brightness during the day
   uint32_t brnight = 100; // backlight brightness during the night
   uint8_t hd = 8; // day start hours
@@ -69,10 +71,10 @@ struct{
   int utc = 0; // Timezone
   bool daylight = false; // auto daylight saving time
   char ntp[40] = ""; // NTP server address
-  char city[40] = "Moskva,RU"; // city name
-  char cityid[12] = "6609999"; // City ID
-  char lat[32] = "55.751"; // latitude
-  char lon[32] = "37.617"; // lоngitude
+  char city[40] = ""; // city name
+  char cityid[12] = ""; // City ID
+  char lat[32] = ""; // latitude
+  char lon[32] = ""; // lоngitude
   char appid[40] = ""; // APPID openweathermap.org
   char appkey[40] = ""; // KEY weatherbit.io
   uint8_t citysearch = 0; // the way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
@@ -252,6 +254,10 @@ struct{
   uint16_t clock_colr = 0;
   bool ap_mode = false;
   bool weather_updating = false;
+  time_t touched = 0;
+  bool disp_asleep = false;
+  bool br_reduc = false;
+  bool d_updated = false;
 } datas;
 
 struct{

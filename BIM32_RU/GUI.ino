@@ -39,7 +39,7 @@ void page1_send(void){
   }
   if(config.bat_disp == 9 and datas.thng_bat_disp < 20.0){
     datas.bat_voltage = datas.thng_bat_disp;
-    float umin = 3.5;
+    float umin = 3.75;
     float umax = 3.9;
     float stp = (umax - umin) / 4;
     if(datas.bat_voltage < (umin + stp)) datas.bat_level = 1;
@@ -568,5 +568,10 @@ void page30_send(void){
   myNex.writeNum("c6.val", (config.ws_light_in == 7) ? 1 : 0);
   myNex.writeNum("c7.val", (config.ws_light_in == 8) ? 1 : 0);
   myNex.writeNum("c8.val", (config.ws_light_in == 9) ? 1 : 0);
+  myNex.writeNum("upd.val", 1);
+}
+
+void page31_send(void){
+  myNex.writeNum("n0.val", config.disp_autooff);
   myNex.writeNum("upd.val", 1);
 }

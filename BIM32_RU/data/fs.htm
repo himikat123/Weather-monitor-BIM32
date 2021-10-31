@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="filesystem.css?v=2.1">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="filesystem.js?v=2.1"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body onload="loaded()">
+    <div id="loading" class="active">Загрузка...</div>
+    <div id="logout">
+      <a href=# title="Выход" onclick="logout()">
+        <img src="logout.png" alt="Выход">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Статус</a>
+        <li><a href="network.htm">Сеть</a>
+        <li><a href="sensors.htm">Проводные датчики</a>
+        <li><a href="wsensor.htm">Беспроводной датчик</a>
+        <li><a href="weather.htm">Погода</a>
+        <li><a href="disp.htm">Дисплей</a>
+        <li><a href="clock.htm">Часы</a>
+        <li><a href="send.htm">Отправка данных</a>
+        <li><a href="receive.htm">Прием данных</a>
+        <li><a href="backup.htm">Резервная копия</a>
+        <li><a href="default.htm">Сброс настроек</a>
+        <li><a href="user.htm">Пользователь</a>
+        <li><a href="update.htm">Прошивка</a>
+        <li><a href="filesystem.htm" class="current"><span class="currnt">Файловая система</span></a>
+      </ul>
+    </nav>
+    <main role="main">
+      <div id=menu>
+        <div id="uploader"></div>
+        <div id=bts>
+          <a href=# id=op class="but dis" onclick=opn()><span id=opn>&#9658;</span><span id=i2>Открыть</span></a>
+          <a href=# id=dn class="but dis" onclick=down()><span id=dnl>&#128190;</span><span id=i3>Скачать</span></a>
+          <a href=# id=dl class="but dis" onclick=del()><span id=dlt>&#215;</span><span id=i4>Удалить</span></a>
+          <a href=# id=rn class="but dis" onclick=rename()><span id=rnm>&#9998;</span><span id=i5>Переименовать</span></a>
+        </div>
+      </div>
+      <table id=fs>
+        <tr>
+          <td id=i6>Всего:</td>
+          <td><span id=total></span> <span id=kb>кБ</span></td>
+        </tr>
+        <tr>
+          <td id=i7>Занято:</td>
+          <td><span id=used></span> <span id=kb2>кБ</span></td>
+        </tr>
+      </table>
+      <div id=main>
+        <table id=tb></table>
+      </div>
+      <div id=view><b onclick=cls()>&times;</b></div>
+
+      <table id="submenu" class="menu">
+        <tr id=op_mn class="menu-item disabled" onclick="opn();hideMenu();">
+          <td class="menu-btn opn">&#9658;</td>
+          <td class="menu-btn" id=i8>Открыть</td>
+        </tr>
+        <tr id=dn_mn class="menu-item disabled" onclick="down();hideMenu();">
+          <td class="menu-btn dnl">&#128190;</td>
+          <td class="menu-btn" id=i9>Скачать</td>
+        </tr>
+        <tr id=dl_mn class="menu-item disabled" onclick="del();hideMenu();">
+          <td class="menu-btn dlt">&#215;</td>
+          <td class="menu-btn" id=i10>Удалить</td>
+        </tr>
+        <tr id=rn_mn class="menu-item disabled" onclick="rename();hideMenu();">
+          <td class="menu-btn rnm">&#9998;</td>
+          <td class="menu-btn menu-text" id=i11>Переименовать</td>
+        </tr>
+      </table>
+      <script>
+        var menu=document.querySelector('.menu');
+
+        function showMenu(x,y){
+          menu.style.left=x+'px';
+          menu.style.top=y+'px';
+          menu.classList.add('show-menu');
+        }
+
+        function hideMenu(){
+          menu.classList.remove('show-menu');
+        }
+
+        function onContextMenu(e){
+          e.preventDefault();
+          var b=document.getElementById("main");
+          var w=b.clientWidth || b.offsetWidth;
+          var h=window.innerHeight;
+          var x=e.pageX;
+          var y=e.pageY;
+          if(w-e.pageX<140) x=w-140;
+          if(h-e.pageY<130) y=h-130;
+          showMenu(x,y);
+        }
+
+        document.addEventListener('contextmenu',onContextMenu,false);
+      </script>
+    </main>
+  </body>
+</html>

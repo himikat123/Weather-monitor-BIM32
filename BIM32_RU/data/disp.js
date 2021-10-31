@@ -510,6 +510,7 @@ $(function(){
     $('#save').text("Отправка...");
     $('#save').css("background-color", "#FA0");
     config.brt = Number($('input[name=brt]:checked').val());
+    config.disp_autooff = Number($('#disp_autooff').val());
     config.brday = Number($('#auto_day').val());
     config.brnight = Number($('#auto_night').val());
     config.hd = Number($('#day_time').val().split(':')[0]);

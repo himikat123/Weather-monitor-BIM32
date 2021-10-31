@@ -42,12 +42,12 @@
     <main role="main">
       <h2 class="hh">Обновление прошивки</h2><hr>
       <form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
-        <h4 class="hds">Прошивка файлом</h4>
+        <h4 class="hds">Прошивка ESP32</h4>
         <div class="dd">
           <label for="fl" class="flup">
             <span class="btn btn-primary">Выберите файл</span>
           </label>
-          <input id="fl" type="file" name="update" />
+          <input id="fl" type="file" accept=".bin" name="update" />
         </div>
         <div class="dd">
           <input id="sm" type="submit" value="Обновить" class="btn btn-primary" />
@@ -61,6 +61,19 @@
           <div class="value-bar"></div>
         </div>
       </div><hr>
+      <h4 class="hds">Прошивка дисплея</h4>
+      <form id="disp_up" method="post" enctype="multipart/form-data">
+        <div class="dd">
+          <label for="fld" class="flup">
+            <span class="btn btn-primary">Выберите файл</span>
+          </label>
+          <input id="fld" type="file" accept=".tft" name="name">
+        </div>
+        <div class="dd">
+          <input id="updd" type="submit" value="Обновить" class="btn btn-primary">
+        </div>
+      </form>
+      <p>Updating might take a while if you have complex .tft file. Check Nextion display for progress.</p>
     </main>
   </body>
 </html>

@@ -1,0 +1,280 @@
+@charset "UTF-8";
+
+#tb{
+  width:100%
+}
+
+#tb tr:first-child{
+  background-color:teal;
+  color:#FFF
+}
+
+#tb td{
+  padding-left:15px;
+  cursor:default;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none
+}
+
+.td1{
+  text-align:center
+}
+
+.td2{
+  text-align:right;
+  padding-right:15px
+}
+
+#tb img{
+  padding-right:10px
+}
+
+#menu{
+  background-color:#777;
+  width:100%;
+  padding:10px;
+  top:0
+}
+
+#view{
+  display:none;
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:4000;
+  width:100%;
+  height:100%;
+  background-color:white;
+  border:20px solid gray;
+  overflow:scroll
+}
+
+#view img{
+  position:absolute;
+  margin:auto;
+  left:0;
+  top:0;
+  bottom:0;
+  right:0
+}
+
+#view b{
+  background-color:white;
+  position:fixed;
+  top:0;
+  right:0;
+  margin:20px 42px;
+  padding:2px 10px;
+  font-size:25pt;
+  cursor:default;
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none
+}
+
+#view b:hover{
+  background-color:#BBB
+}
+
+#view pre{
+  margin-top:50px
+}
+
+#main input{
+  width:121px;
+  height:18px
+}
+
+#upf{
+  color:#2F2;
+  font-size:18px
+}
+
+#opn{
+  color:#25F;
+  font-size:18px
+}
+
+#dnl{
+  font-size:14px
+}
+
+#dlt{
+  color:red;
+  font-size:20px;
+  font-weight:bold
+}
+
+#rnm{
+  color:orange;
+  font-size:14px;
+  font-weight:bold
+}
+
+#fld{
+  color:#FF0;
+  font-size:18px;
+  font-weight:bold
+}
+
+#upf,
+#opn,
+#dnl,
+#dlt,
+#rnm,
+#fld{
+  margin-right:5px
+}
+
+#fs{
+  float:right;
+  margin-right:20px
+}
+
+#fs td:last-child{
+  text-align:right
+}
+
+#i6,
+#i7{
+  font-weight:bold
+}
+
+#i6{
+  text-align:right
+}
+
+.upl{
+  width:300px
+}
+
+.but{
+  height:20px;
+  cursor:default;
+  margin-top:15px;
+  color:#FFF;
+  text-shadow:0 -1px rgb(46,53,58);
+  text-decoration:none;
+  user-select:none;
+  padding:1px 0.8em;
+  outline:none;
+  border:1px solid rgba(33,43,52,1);
+  border-radius:3px;
+  background:rgb(81,92,102) linear-gradient(rgb(81,92,102),rgb(69,78,87));
+  box-shadow:inset 0 1px rgba(101,114,126,1),inset 0 0 1px rgba(140,150,170,.8),0 1px rgb(83,94,104),0 0 1px rgb(86,96,106)
+}
+
+.but:hover{
+  box-shadow:inset 0 1px 3px rgba(0,10,20,.5),0 1px rgb(83,94,104),0 0 1px rgb(86,96,106)
+}
+
+.sl{
+  background-color:#999;
+  color:#FFF
+}
+
+.dis{
+  pointer-events:none;
+  color:#999
+}
+
+.menu{
+  position:absolute;
+  padding:2px;
+  margin:0;
+  border:1px solid #bbb;
+  background:#eee;
+  z-index:100;
+  border-radius:3px;
+  box-shadow:1px 1px 4px rgba(0,0,0,.2);
+  opacity:0;
+  -webkit-transform:translate(0, 15px) scale(.95);
+  transform:translate(0, 15px) scale(.95);
+  transition:transform 0.1s ease-out, opacity 0.1s ease-out;
+  pointer-events:none
+}
+
+.menu-btn{
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  color:#444;
+  font-family:'Roboto',sans-serif;
+  font-size:13px;
+  text-align:left;
+  cursor:default;
+  border:1px solid transparent;
+  border-radius:3px
+}
+
+.menu-btn::-moz-focus-inner,
+.menu-btn::-moz-focus-inner{
+  border:0;
+  padding:0
+}
+
+.menu-btn .fa{
+  position:absolute;
+  -webkit-transform:translateY(-50%);
+  transform:translateY(-50%)
+}
+
+.menu-item:hover > .menu-btn{
+  color:#fff;
+  outline:none;
+  background-color:#2E3940;
+  background:-webkit-linear-gradient(to bottom, #5D6D79, #2E3940);
+  background:linear-gradient(to bottom, #5D6D79, #2E3940);
+  border:1px solid #2E3940
+}
+
+.menu-item.disabled{
+  opacity:.5;
+  pointer-events:none
+}
+
+.menu-item.disabled .menu-btn{
+  cursor:default
+}
+
+.show-menu,.menu-item:hover > .menu{
+  opacity:1;
+  -webkit-transform:translate(0, 0) scale(1);
+  transform:translate(0, 0) scale(1);
+  pointer-events:auto
+}
+
+.opn{
+  color:blue;
+  font-size:18px
+}
+
+.dnl{
+  font-size:14px
+}
+
+.dlt{
+  color:red;
+  font-size:24px;
+  font-weight:bold
+}
+
+.rnm{
+  color:orange;
+  font-size:14px;
+  font-weight:bold
+}
+
+.un{
+  color:blue;
+  text-align:center;
+  margin-top:20px;
+  font-size:25pt
+}

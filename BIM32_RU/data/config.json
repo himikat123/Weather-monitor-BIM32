@@ -25,10 +25,10 @@
   "utc": 0,
   "dlst": false,
   "ntp": "time.nist.gov",
-  "city": "Moscow,RU",
-  "cityid": "524901",
-  "lat": "55.75222",
-  "lon": "37.615555",
+  "city": "",
+  "cityid": "",
+  "lat": "",
+  "lon": "",
   "appid": "",
   "appkey": "",
   "citysearch": 0,
@@ -165,5 +165,6 @@
   "ws_hn": 21,
   "ws_mn": 9,
   "ws_sdisp_sensitivity": 26,
-  "ws_light_in": 7
+  "ws_light_in": 7,
+  "disp_autooff": 0
 }

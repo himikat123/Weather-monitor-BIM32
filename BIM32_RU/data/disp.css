@@ -110,3 +110,12 @@ td{
   width: 70%;
   margin: auto;
 }
+
+#disp_autooff{
+  margin: -5px 5px 0 5px;
+  width: 65px;
+}
+
+.indiv div{
+  margin-top: 5px;
+}

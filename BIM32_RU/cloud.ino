@@ -77,31 +77,67 @@ void narodmon_send(void){
 }
 
 void thingspk_recv(void){
-  float field = ThingSpeak.readFloatField(config.chid, config.tto, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_temp_out = field;
-  field = ThingSpeak.readFloatField(config.chid, config.tti, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_temp_in = field;
-  field = ThingSpeak.readFloatField(config.chid, config.tho, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_hum_out = field;
-  field = ThingSpeak.readFloatField(config.chid, config.thi, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_hum_in = field;
-  field = ThingSpeak.readFloatField(config.chid, config.tpo, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_pres_out = field;
-  field = ThingSpeak.readFloatField(config.chid, config.tli, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_light_in = field;
-  field = ThingSpeak.readFloatField(config.chid, config.tbt, config.rdkey);
-  if(ThingSpeak.getLastReadStatus() == 200) datas.thng_bat_disp = field;
+  String url;
+  url = "http://api.thingspeak.com/channels/";
+  url += String(config.chid); 
+  url += "/feeds.json?api_key=";
+  url += String(config.rdkey);
+  url += "&results=1";
+  parseThing(thingRequest(url));
+}
+
+String thingRequest(String url){
+  String httpData = "";
+  HTTPClient client;
+  client.begin(url);
+  int httpCode = client.GET();
+  if(httpCode > 0){
+    if(httpCode == HTTP_CODE_OK){
+      httpData = client.getString();
+    }
+  }
+  client.end();
+  return httpData;
+}
+
+void parseThing(String httpData){
+  float thinh_fields[9] = {404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0, 404.0};
+  StaticJsonDocument<2048> root;
+  DeserializationError error = deserializeJson(root, httpData);
+  if(error) return;
+  thinh_fields[1] = root["feeds"][0]["field1"];
+  thinh_fields[2] = root["feeds"][0]["field2"];
+  thinh_fields[3] = root["feeds"][0]["field3"];
+  thinh_fields[4] = root["feeds"][0]["field4"];
+  thinh_fields[5] = root["feeds"][0]["field5"];
+  thinh_fields[6] = root["feeds"][0]["field6"];
+  thinh_fields[7] = root["feeds"][0]["field7"];
+  thinh_fields[8] = root["feeds"][0]["field8"];
+  httpData = "";
+  datas.thng_temp_out = thinh_fields[config.tto];
+  datas.thng_temp_in = thinh_fields[config.tti];
+  datas.thng_hum_out = thinh_fields[config.tho];
+  datas.thng_hum_in = thinh_fields[config.thi];
+  datas.thng_pres_out = thinh_fields[config.tpo];
+  datas.thng_light_in = thinh_fields[config.tli];
+  datas.thng_bat_disp = thinh_fields[config.tbt];
 }
 
 void thingspk_send(void){
   Serial.println("thingspeak send");
+  String url;
+  url = "http://api.thingspeak.com/update?api_key=";
+  url += String(config.wrkey);
   float val = 404.0;
   if(config.f1[0] == 0){
     val = 404.0;
     if(config.f1[1] == 0) val = datas.temp_web;
     else if(config.f1[1] == 1) val = datas.hum_web;
     else if(config.f1[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 1){
     val = 404.0;
@@ -110,49 +146,73 @@ void thingspk_send(void){
     else if(config.f1[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f1[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f1[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 2){
     val = 404.0;
     if(config.f1[1] == 0) val = (sensors.bme280_temp > -55.0 and sensors.bme280_temp < 100.0) ? sensors.bme280_temp : 404.0;
     else if(config.f1[1] == 1) val = (sensors.bme280_hum >= 0.0 and sensors.bme280_hum <= 100.0) ? sensors.bme280_hum : 404.0;
     else if(config.f1[1] == 2) val = (sensors.bme280_pres > 450.0 and sensors.bme280_pres < 1200.0) ? sensors.bme280_pres : 4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 3){
     val = 404.0;
     if(config.f1[1] == 0) val = (sensors.bmp180_temp > -55.0 and sensors.bmp180_temp < 100.0) ? sensors.bmp180_temp : 404.0;
     else if(config.f1[1] == 2) val = (sensors.bmp180_pres > 450.0 and sensors.bmp180_pres < 1200.0) ? sensors.bme280_pres : 4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 4){
     val = 404.0;
     if(config.f1[1] == 0) (sensors.sht21_temp > -55.0 and sensors.sht21_temp < 100.0) ? sensors.sht21_temp : 404.0;
     else if(config.f1[1] == 1) val = (sensors.sht21_hum >= 0.0 and sensors.sht21_hum <= 100.0) ? sensors.sht21_hum : 404.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 5){
     val = 404.0;
     if(config.f1[1] == 0) (sensors.dht22_temp > -55.0 and sensors.dht22_temp < 100.0) ? sensors.dht22_temp : 404.0;
     else if(config.f1[1] == 1) val = (sensors.dht22_hum >= 0.0 and sensors.dht22_hum <= 100.0) ? sensors.dht22_hum : 404.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 6){
     val = 404.0;
     if(config.f1[1] == 3) val = (sensors.max44009_light >= 0.0 and sensors.max44009_light <= 10000.0) ? sensors.max44009_light : 4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f1[0] == 7){
     val = 404.0;
     if(config.f1[1] == 3) val = (sensors.bh1750_light >= 0.0 and sensors.bh1750_light <= 10000.0) ? sensors.bh1750_light : 4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(1, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field1="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 0){
     val = 404.0;
     if(config.f2[1] == 0) val = datas.temp_web;
     else if(config.f2[1] == 1) val = datas.hum_web;
     else if(config.f2[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 1){
     val = 404.0;
@@ -161,49 +221,74 @@ void thingspk_send(void){
     else if(config.f2[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f2[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f2[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 2){
     val = 404.0;
     if(config.f2[1] == 0) val = sensors.bme280_temp;
     else if(config.f2[1] == 1) val = sensors.bme280_hum;
     else if(config.f2[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0)
+    {
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 3){
     val = 404.0;
     if(config.f2[1] == 0) val = sensors.bmp180_temp;
     else if(config.f2[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 4){
     val = 404.0;
     if(config.f2[1] == 0) val = sensors.sht21_temp;
     else if(config.f2[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 5){
     val = 404.0;
     if(config.f2[1] == 0) val = sensors.dht22_temp;
     else if(config.f2[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 6){
     val = 404.0;
     if(config.f2[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f2[0] == 7){
     val = 404.0;
     if(config.f2[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(2, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field2="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 0){
     val = 404.0;
     if(config.f3[1] == 0) val = datas.temp_web;
     else if(config.f3[1] == 1) val = datas.hum_web;
     else if(config.f3[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 1){
     val = 404.0;
@@ -212,49 +297,73 @@ void thingspk_send(void){
     else if(config.f3[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f3[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f3[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 2){
     val = 404.0;
     if(config.f3[1] == 0) val = sensors.bme280_temp;
     else if(config.f3[1] == 1) val = sensors.bme280_hum;
     else if(config.f3[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 3){
     val = 404.0;
     if(config.f3[1] == 0) val = sensors.bmp180_temp;
     else if(config.f3[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 4){
     val = 404.0;
     if(config.f3[1] == 0) val = sensors.sht21_temp;
     else if(config.f3[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 5){
     val = 404.0;
     if(config.f3[1] == 0) val = sensors.dht22_temp;
     else if(config.f3[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 6){
     val = 404.0;
     if(config.f3[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f3[0] == 7){
     val = 404.0;
     if(config.f3[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(3, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field3="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 0){
     val = 404.0;
     if(config.f4[1] == 0) val = datas.temp_web;
     else if(config.f4[1] == 1) val = datas.hum_web;
     else if(config.f4[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 1){
     val = 404.0;
@@ -263,49 +372,73 @@ void thingspk_send(void){
     else if(config.f4[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f4[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f4[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 2){
     val = 404.0;
     if(config.f4[1] == 0) val = sensors.bme280_temp;
     else if(config.f4[1] == 1) val = sensors.bme280_hum;
     else if(config.f4[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 3){
     val = 404.0;
     if(config.f4[1] == 0) val = sensors.bmp180_temp;
     else if(config.f4[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 4){
     val = 404.0;
     if(config.f4[1] == 0) val = sensors.sht21_temp;
     else if(config.f4[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 5){
     val = 404.0;
     if(config.f4[1] == 0) val = sensors.dht22_temp;
     else if(config.f4[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 6){
     val = 404.0;
     if(config.f4[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f4[0] == 7){
     val = 404.0;
     if(config.f4[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(4, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field4="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 0){
     val = 404.0;
     if(config.f5[1] == 0) val = datas.temp_web;
     else if(config.f5[1] == 1) val = datas.hum_web;
     else if(config.f5[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 1){
     val = 404.0;
@@ -314,49 +447,73 @@ void thingspk_send(void){
     else if(config.f5[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f5[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f5[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 2){
     val = 404.0;
     if(config.f5[1] == 0) val = sensors.bme280_temp;
     else if(config.f5[1] == 1) val = sensors.bme280_hum;
     else if(config.f5[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 3){
     val = 404.0;
     if(config.f5[1] == 0) val = sensors.bmp180_temp;
     else if(config.f5[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 4){
     val = 404.0;
     if(config.f5[1] == 0) val = sensors.sht21_temp;
     else if(config.f5[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 5){
     val = 404.0;
     if(config.f5[1] == 0) val = sensors.dht22_temp;
     else if(config.f5[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 6){
     val = 404.0;
     if(config.f5[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f5[0] == 7){
     val = 404.0;
     if(config.f5[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(5, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field5="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 0){
     val = 404.0;
     if(config.f6[1] == 0) val = datas.temp_web;
     else if(config.f6[1] == 1) val = datas.hum_web;
     else if(config.f6[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 1){
     val = 404.0;
@@ -365,49 +522,73 @@ void thingspk_send(void){
     else if(config.f6[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f6[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f6[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 2){
     val = 404.0;
     if(config.f6[1] == 0) val = sensors.bme280_temp;
     else if(config.f6[1] == 1) val = sensors.bme280_hum;
     else if(config.f6[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 3){
     val = 404.0;
     if(config.f6[1] == 0) val = sensors.bmp180_temp;
     else if(config.f6[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 4){
     val = 404.0;
     if(config.f6[1] == 0) val = sensors.sht21_temp;
     else if(config.f6[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 5){
     val = 404.0;
     if(config.f6[1] == 0) val = sensors.dht22_temp;
     else if(config.f6[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 6){
     val = 404.0;
     if(config.f6[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f6[0] == 7){
     val = 404.0;
     if(config.f6[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(6, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field6="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 0){
     val = 404.0;
     if(config.f7[1] == 0) val = datas.temp_web;
     else if(config.f7[1] == 1) val = datas.hum_web;
     else if(config.f7[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 1){
     val = 404.0;
@@ -416,49 +597,73 @@ void thingspk_send(void){
     else if(config.f7[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f7[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f7[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 2){
     val = 404.0;
     if(config.f7[1] == 0) val = sensors.bme280_temp;
     else if(config.f7[1] == 1) val = sensors.bme280_hum;
     else if(config.f7[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 3){
     val = 404.0;
     if(config.f7[1] == 0) val = sensors.bmp180_temp;
     else if(config.f7[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 4){
     val = 404.0;
     if(config.f7[1] == 0) val = sensors.sht21_temp;
     else if(config.f7[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 5){
     val = 404.0;
     if(config.f7[1] == 0) val = sensors.dht22_temp;
     else if(config.f7[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 6){
     val = 404.0;
     if(config.f7[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f7[0] == 7){
     val = 404.0;
     if(config.f7[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(7, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field7="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 0){
     val = 404.0;
     if(config.f8[1] == 0) val = datas.temp_web;
     else if(config.f8[1] == 1) val = datas.hum_web;
     else if(config.f8[1] == 2) val = datas.pres_web;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 1){
     val = 404.0;
@@ -467,47 +672,78 @@ void thingspk_send(void){
     else if(config.f8[1] == 2) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.pres_wsens:4040.0;
     else if(config.f8[1] == 3) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.light_wsens:4040.0;
     else if(config.f8[1] == 4) val = ((now()-datas.time_wsens)<(config.wexpire*60))?datas.wbat_voltage:4040.0;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 2){
     val = 404.0;
     if(config.f8[1] == 0) val = sensors.bme280_temp;
     else if(config.f8[1] == 1) val = sensors.bme280_hum;
     else if(config.f8[1] == 2) val = sensors.bme280_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 3){
     val = 404.0;
     if(config.f8[1] == 0) val = sensors.bmp180_temp;
     else if(config.f8[1] == 2) val = sensors.bmp180_pres;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 4){
     val = 404.0;
     if(config.f8[1] == 0) val = sensors.sht21_temp;
     else if(config.f8[1] == 1) val = sensors.sht21_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 5){
     val = 404.0;
     if(config.f8[1] == 0) val = sensors.dht22_temp;
     else if(config.f8[1] == 1) val = sensors.dht22_hum;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 6){
     val = 404.0;
     if(config.f8[1] == 3) val = sensors.max44009_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
   if(config.f8[0] == 7){
     val = 404.0;
     if(config.f8[1] == 3) val = sensors.bh1750_light;
-    if(val != 202 and val != 404.0 and val != 4040.0) ThingSpeak.setField(8, val);
+    if(val != 202 and val != 404.0 and val != 4040.0){
+      url += "&field8="; 
+      url += String(val);
+    }
   }
-  ThingSpeak.setStatus("BIM");
-  int x = ThingSpeak.writeFields(config.chid, config.wrkey);
-  if(x == 200) Serial.println("Channel update successful.");
-  else Serial.println("Problem updating channel. HTTP error code " + String(x));
+  String httpData = "";
+  HTTPClient th_client;
+  th_client.begin(url);
+  int httpCode = th_client.GET();
+  if(httpCode > 0){
+    if(httpCode == HTTP_CODE_OK){
+      httpData = th_client.getString();
+      Serial.print("Channel update successful: ");
+      Serial.println(httpData);
+    }
+    else Serial.println("Problem updating channel. HTTP error code " + String(httpCode));
+  }
+  th_client.end();
+  httpData = "";
 }
 
 void MQTT_connect(Adafruit_MQTT_Client &mqtt){

@@ -5,8 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Wireless monitor BIM32" />
-    <link rel="stylesheet" href="index.css?v=2.1">
-    <link rel="stylesheet" href="disp.css?v=2.1">
+    <link rel="stylesheet" href="index.css?v=2.3">
+    <link rel="stylesheet" href="disp.css?v=2.3">
     <script type="text/javascript" src="jquery.js"></script>
     <script type="text/javascript" src="disp.js?v=2.1"></script>
     <title>BIM32 Weather monitor</title>
@@ -41,6 +41,12 @@
     <main role="main">
       <form action="#" method="post">
         <h2 class="hd1">Дисплей</h2><hr>
+        <h2 class="ttl">Автоотключение дисплея:</h2>
+        <div class="indiv">
+          <label>Отключать дисплей при простое</label>
+          <input id="disp_autooff" class="inp tm" type="number" value="0" min="0" max="300" required>минут(у)(ы)
+          <div>(0 - никогда не отключать)</div>
+        </div><br><hr class="kurz">
         <h2 class="ttl">Яркость дисплея:</h2>
         <div class="tab">
           <table>

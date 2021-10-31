@@ -406,27 +406,11 @@ void web_interface_init(void){
     neu = String();
   });
   //////////////////////////////////////////////////////////////////////////////
-  server.on(
-    "/doUpdate",
-    HTTP_POST,
-    [](AsyncWebServerRequest *request){},
-    [](AsyncWebServerRequest *request,
-      const String& filename,
-      size_t index,
-      uint8_t *data,
-      size_t len,
-      bool final
-    ){
-      handleDoUpdate(
-        request,
-        filename,
-        index,
-        data,
-        len,
-        final
-      );
-    }
-  );
+  server.on("/doUpdate", HTTP_POST, [](AsyncWebServerRequest *request){},
+    [](AsyncWebServerRequest *request, const String& filename,
+    size_t index, uint8_t *data, size_t len, bool final){
+      handleDoUpdate(request, filename, index, data, len, final);
+  });
   //////////////////////////////////////////////////////////////////////////////
   server.onNotFound([](AsyncWebServerRequest *request){
     if(!handleFileRead(request)) request -> send(404);
