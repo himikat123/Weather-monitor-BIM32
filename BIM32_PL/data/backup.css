@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+#restore:disabled{
+  color: #AAA!important;
+  border: 2px solid #AAA;
+  cursor: not-allowed;
+}
+
+.hds{
+  text-align: center;
+  margin-bottom: 0
+}
+
+.dd{
+  position: relative;
+  display: table;
+  margin: 0 auto
+}
+
+.flup{
+  display: inline-block;
+  padding: 6px 0;
+  cursor: pointer;
+  min-width: 200px;
+  margin-left: 30px
+}
+
+input[type="file"]{
+  display: none
+}

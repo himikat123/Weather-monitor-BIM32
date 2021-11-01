@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="update.css?v=2.1">
+    <style media="screen" id="stl"></style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="update.js?v=2.1"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body onload="loaded()">
+    <div id="loading" class="active">Ładowanie...</div>
+    <div id="logout">
+      <a href=# title="Wyloguj" onclick="logout()">
+        <img src="logout.png" alt="Wyloguj">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Sieć</a>
+        <li><a href="sensors.htm">Czujniki przewodowe</a>
+        <li><a href="wsensor.htm">Czujnik bezprzewodowy</a>
+        <li><a href="weather.htm">Pogoda</a>
+        <li><a href="disp.htm">Wyświetlacz</a>
+        <li><a href="clock.htm">Zegar</a>
+        <li><a href="send.htm">Wysyłanie danych</a>
+        <li><a href="receive.htm">Odbieranie danych</a>
+        <li><a href="backup.htm">Utworzyć kopię zapasową</a>
+        <li><a href="default.htm">Ustawienia domyślne</a>
+        <li><a href="user.htm">Użytkownik</a>
+        <li><a href="update.htm" class="current"><span class="currnt">Aktualizacja firmware</span></a>
+        <li><a href="filesystem.htm">System plików</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <h2 class="hh">Aktualizacja oprogramowania</h2><hr>
+      <form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
+        <h4 class="hds">Z pliku</h4>
+        <div class="dd">
+          <label for="fl" class="flup">
+            <span class="btn btn-primary">Wybierz plik</span>
+          </label>
+          <input id="fl" type="file" accept=".bin" name="update" />
+        </div>
+        <div class="dd">
+          <input id="sm" type="submit" value="Aktualizacja" class="btn btn-primary" />
+        </div>
+        <div id="fnm" class="hds"></div>
+      </form>
+      <div id="kr" class="progress-circle p0">
+        <span id="prg">0%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div><hr>
+    </main>
+  </body>
+</html>

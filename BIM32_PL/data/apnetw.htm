@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <style rel="stylesheet">
+      #loading{margin:auto;width:150px;height:27px;background:#DDA;position:absolute;left:50%;z-index:5000;border-radius:5px;text-align:center;padding-top:6px;display:none;box-shadow:4px 4px 7px rgba(0,0,0,0.5)}
+      #loading{top:50px}
+      #loading.active{display:block}
+      body{-webkit-animation:bugfix infinite 1s}
+      img{width:25px}
+      .btn:focus{outline:none !important}
+      .btn:active{background-color:#aaa}
+      @-webkit-keyframes bugfix{to{padding:0}}
+      @media screen and (min-width: 320px){html,body{margin:0;overflow-x:hidden}}
+      * {box-sizing:border-box}
+      html{font-size:100%}
+      html,body{margin:0;padding:0;width:100%;height:100%}
+      body{color:#333;font:0.85em 'Open Sans', sans-serif;background-color:#f1f1f1}
+      ::-webkit-scrollbar{width:.65em}
+      ::-webkit-scrollbar-track{background-color:rgba(217, 217, 217, 0.75)}
+      ::-webkit-scrollbar-thumb{background:rgba(170, 170, 170, 0.6);border-radius:5px;box-shadow:inset 0.05em 0.05em 0 rgba(0, 0, 0, 0.1), inset 0 -0.05em 0 rgba(0, 0, 0, 0.07)}
+      main{padding:30px 50px 30px 50px;margin:0 auto}
+      article{margin:0 1em;padding:0 22px;-o-transition:-o-transform .3s;-webkit-transition:-webkit-transform .3s;-moz-transition:-moz-transform .3s;transition:transform .3s}
+      header{margin:0;padding:0;text-align:center}
+      footer{font-size:14px;text-align:center}
+      p{margin-bottom:16px}
+      hr{margin:22px 0;height:1px;border:0;background-image:-webkit-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));background-image:-moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));background-image:-ms-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));background-image:linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0))}
+      h1,h2{margin-bottom:22px;color:#191919;font-weight:300}
+      h1{font-size:32px;line-height:32px}
+      h2{color:#565d66;font-size:26px;line-height:26px}
+      a{color:#006b05;text-decoration:none}
+      .btn{-webkit-border-radius:10em;-moz-border-radius:10em;-ms-border-radius:10em;-o-border-radius:10em;border-radius:10em;border:0;color:#fff!important;margin:6px;white-space:normal!important;word-wrap:break-word;display:inline-block;line-height:1.25;text-align:center;vertical-align:middle;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;padding:.5rem 1rem;font-size:1rem;font-weight:400;-webkit-box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);-moz-box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12)}
+      .btn{-o-transition:box-shadow .2s ease-out;-webkit-transition:box-shadow .2s ease-out;-moz-transition:box-shadow .2s ease-out;-ms-transition:box-shadow .2s ease-out;transition:box-shadow .2s ease-out}
+      .btn:hover{-webkit-box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15);-moz-box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15);box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15)}
+      .btn-primary{border:2px solid #2BBBAD;color:#00695c!important;background-color:transparent}
+      .btn-secondary{border:2px solid #00C851;color:#007E33!important;background-color:transparent}
+      .ttl{font-size: 1.3em}
+      .hd1,.ttl,.indiv{text-align:center;margin-bottom:5px}
+      .inp{color:blue;width:300px;height:25px;padding-left:10px;-webkit-border-radius:0.5em;-moz-border-radius:0.5em;-ms-border-radius:0.5em;-o-border-radius:0.5em;border-radius:0.5em;border:0;outline:0;-webkit-box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);-moz-box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12);box-shadow:0 2px 5px 0 rgba(0,0,0,.16),0 2px 10px 0 rgba(0,0,0,.12)}
+      .inp:focus{-webkit-box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15);-moz-box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15);box-shadow:0 5px 11px 0 rgba(0,0,0,.18),0 4px 15px 0 rgba(0,0,0,.15)}
+      .password-control{position:absolute;top:3px;right:10px;display:inline-block;width:20px;height:20px;background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAABEUlEQVQ4jd3UMUpDQRSF4c+giJ2JYOIDRXtX4RoCljbiHiy0MKBbSUrtXUAaRSUowWihYGeTzkIt3hVkGE2UFOKBW8ybOz9nzrwZ/rvqOEBlUrAe3tAa1VzFDk5wj9eoO2wlsF6Ms5rDPobRnFYHxbiwNZwngFs0w3E1AytwiEYKW8FjBlb71JNus0A7xv1ggFlcZrbXHAHrJP1dTIvMcnnNB2wRV/HtGkvhPLdmt4KXfKSmAnaKddxgA08xl9OMsNn1s9PczLi7iPhQBtqPifYIWA2DBPaA5dRuA0cZWBGQhXCWws6w+kUEY53mRw2xp7wMY8Hqyms2wHPUAMfYVv7o36oln9mvVVE+RROB/V29A/fQeynOGpetAAAAAElFTkSuQmCC') 0 0 no-repeat}
+      .password-control.view{background:url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABmJLR0QA/wD/AP+gvaeTAAAA90lEQVQ4je3TTU4CQRAF4E83yAIislf0NBI3JASPoNFLoOFA6kWIPxuWOuMJ0MSlLqaMpNOD48IdL6lN16vX9aq62eC/0Mcl7lDiI6KMswvsNRHawQzv+Pwl3nCNVp3YIZ6SogJjdCJGWCScBxykYkd4zYjlbPUit8otMfgmtPGYsTSO/ElcVmIYZ5MM/z5G5qpmRp0oLpOuoVtTM93OWGqCrXXJdrSb3jaK/DC6LHAcZ6cZ/lxYptpwmRAWqgWk6Ge4hcymB6onkBInqpl1o7NUbI79Ovst1ZKWGUtpLDG15mGvoodz3OLFz9d7xg3OsNtEaIO/4wtlK3KNaQfEYAAAAABJRU5ErkJggg==') 0 0 no-repeat}
+      .current{background-color: #599}
+      .currnt{margin-left: 30px}
+      #ssids{width:300px;max-height:400px;background-color:#FFF;border:1px solid #000;border-radius:0.5em;margin-left:calc(50% - 200px);display:none;position:absolute;z-index:100;padding:0 5px}
+      #ssids div{padding:5px 0 5px 25px;text-align:left;word-wrap:break-word;background-repeat:no-repeat}
+      #ssids div:hover{background-color:#DDD}
+      .ss{color:blue;font-size:1em;padding:5px 0}
+      #cnv{display:none}
+      .passw{width:100%;display:flex;justify-content:center}
+      .password{position:relative;width:300px;text-align:center}
+      .tab{width:100%;display:flex;justify-content:center}
+      .hid{display:none}
+      #restore:disabled{color:#AAA!important;border:2px solid #AAA;cursor:not-allowed}
+      .hds{text-align:center;margin-bottom:0}
+      .dd{position:relative;display:table;margin:0 auto}
+      .flup{display:inline-block;padding:6px 0;cursor:pointer;min-width:200px;margin-left:30px}
+      input[type="file"]{display:none}
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+      let ant = {}, config = {}, error = false;
+
+      function antena(){
+        let an = {}, a = {}, c;
+        for(c=1; c<8; c++){
+          let i = document.getElementById("cnv");
+          var cv = document.createElement("canvas");
+          if(c < 6) cv.setAttribute("id", "ant" + c);
+          if(c == 6) cv.setAttribute("id", "arr");
+          if(c == 7) cv.setAttribute("id", "sav");
+          i.appendChild(cv);
+        }
+        for(c=1; c<6; c++){
+          an[c] = document.getElementById("ant" + c);
+          a[c] = an[c].getContext("2d");
+          a[c].fillStyle = "#095";
+          for(var x0=0, x1=0, y0=16, y1=2; x0<17; x0+=4, x1++, y0-=2, y1+=2){
+            if(c == x1) a[c].fillStyle = "#ccc";
+            a[c].fillRect(x0, y0, 3, y1);
+          }
+          ant[c] = an[c].toDataURL();
+        }
+      }
+
+      function ssid_sel(name){
+        $('#ssid').val(name);
+        $('#ssids').hide();
+      }
+
+      function ip_type(t){
+        if(t == "static"){
+          $('#ip_s').addClass('hid');
+          $('#mask_s').addClass('hid');
+          $('#gw_s').addClass('hid');
+          $('#dns1_s').addClass('hid');
+          $('#dns2_s').addClass('hid');
+          $('#ip').removeClass('hid');
+          $('#mask').removeClass('hid');
+          $('#gw').removeClass('hid');
+          $('#dns1').removeClass('hid');
+          $('#dns2').removeClass('hid');
+        }
+        else{
+          $('#ip_s').removeClass('hid');
+          $('#mask_s').removeClass('hid');
+          $('#gw_s').removeClass('hid');
+          $('#dns1_s').removeClass('hid');
+          $('#dns2_s').removeClass('hid');
+          $('#ip').addClass('hid');
+          $('#mask').addClass('hid');
+          $('#gw').addClass('hid');
+          $('#dns1').addClass('hid');
+          $('#dns2').addClass('hid');
+        }
+      }
+
+      $(function(){
+        antena();
+
+        $('#sm').click(function(){
+          $('#ssids').toggle();
+        });
+
+        $(document).click(function(e){
+          let div = $("#ssids");
+          if(!$("#sm").is(e.target) && !div.is(e.target) && div.has(e.target).length === 0){
+            div.hide();
+          }
+        });
+
+        $.getJSON(`config.json?R=${Math.random()}`,function(json){
+          config = json;
+          for(var b in config){
+            try{
+              $(`#${b}`).val(config[b]);
+            }
+            catch(b){}
+          }
+          $(`input:radio[value=${config.type}]`)[0].checked = true;
+          ip_type(config.type ? 'static' : 'dynamic');
+        });
+
+        setInterval(function(){
+          $.ajax({
+            url: 'esp/ssids.php',
+            method: 'get',
+            dataType: 'json',
+            success: function(data){
+              $("#ssids").empty();
+              let an = 0;
+              let entries = Object.entries(data);
+              data = entries.sort((a, b) => a[1] - b[1]);
+              for(let b in data){
+                if(data[b][1] > 102) an = ant[0];
+                if(data[b][1] > 87 && data[b][1] < 103) an = ant[1];
+                if(data[b][1] > 72 && data[b][1] < 88) an = ant[2];
+                if(data[b][1] > 57 && data[b][1] < 73) an = ant[3];
+                if(data[b][1] <= 57) an = ant[4];
+                $('#ssids').append(`
+                  <div style="background-image:url('${an}')" onclick="ssid_sel('${data[b][0]}')">
+                    ${data[b][0]}
+                  </div>
+                `);
+              }
+              $('#loading').removeClass('active');
+            }
+          });
+        },5000);
+
+        $('#eye').click(function(){
+          if($('#pass').attr('type') == 'password'){
+            $(this).addClass('view');
+            $('#pass').attr('type', 'text');
+          }
+          else{
+            $(this).removeClass('view');
+            $('#pass').attr('type', 'password');
+          }
+          return false;
+        });
+
+        $('input[name="ip"]').click(function(){
+          ip_type(this.id);
+        });
+
+        $('form').submit(function(){
+          $('#loading').addClass('active');
+          $('#save').text("Wysyłanie...");
+          $('#save').css("background-color", "#FA0");
+          config.ssid = $('#ssid').val();
+          config.pass = $('#pass').val();
+          config.ip   = $('#ip').val();
+          config.mask = $('#mask').val();
+          config.gw   = $('#gw').val();
+          config.dns1 = $('#dns1').val();
+          config.dns2 = $('#dns2').val();
+          config.type = ($('input[name=ip]:checked').val() == "true") ? true : false;
+          $.ajax({
+            url: 'esp/save.php',
+            method: 'post',
+            data: `CONFIG=${JSON.stringify(config, null, 2)}`,
+            success: function(answ){
+              if(answ != "OK") alert(answ);
+              $('#loading').removeClass('active');
+              $('#save').css("background-color", "#AF0");
+              $('#save').text("Zapisane");
+              $.ajax({
+                url: 'esp/logout.php',
+                method: 'post',
+                success: function(r){}
+              });
+              document.cookie = 'auth=0';
+              setTimeout(function(){
+                $('#save').css("background-color", "#F1F1F1");
+                $('#save').text("Zapisz i uruchom ponownie");
+              }, 3000);
+            }
+          });
+          return false;
+        });
+
+        $.getJSON("esp/ip_gw.php", function(json){
+          for(var b in json){
+            try{
+              $(`#${b}`).val(json[b]);
+            }
+            catch(b){}
+          }
+        });
+
+        $('#getfile').click(function(){
+          var link = document.createElement('a');
+          link.setAttribute('href', 'config.json');
+          link.setAttribute('download', 'config.json');
+          onload = link.click();
+        });
+
+        $('#configfile').on('change', function(e){
+          $('#fnm').text(e.target.files[0].name);
+          var reader = new FileReader();
+          reader.onload = function(){
+            var data = reader.result;
+            try{
+              config = JSON.parse(data);
+              $('#ssid').val(config.ssid);
+              $('#pass').val(config.pass);
+              $('#ip').val(config.ip);
+              $('#mask').val(config.mask);
+              $('#gw').val(config.gw);
+              $('#dns1').val(config.dns1);
+              $('#dns2').val(config.dns2);
+              $(`input:radio[value=${config.type}]`)[0].checked = true;
+              ip_type(config.type ? 'static' : 'dynamic');
+            }
+            catch(e){
+              error = true;
+              $('#restore').attr('disabled', true);
+              alert("Wybrano nieprawidłowy plik");
+            }
+          };
+          reader.readAsText($("#configfile")[0].files[0], "UTF-8");
+          $('#restore').attr('disabled', false);
+        });
+
+        $('#restore').click(function(){
+          $('#loading').addClass('active');
+          $('#restore').text("Wysyłanie...");
+          $('#restore').css("background-color", "#FA0");
+          $.ajax({
+      	    url: 'esp/save.php',
+      	    method: 'post',
+            data: `CONFIG=${JSON.stringify(config, null, 2)}`,
+      	    success: function(answ){
+              if(answ != "OK") alert(answ);
+              $('#loading').removeClass('active');
+              $('#fnm').text('');
+              $('#restore').attr('disabled', true);
+              $('#restore').css("background-color", "#AF0");
+              $('#restore').text("Zapisane");
+              $.ajax({
+                url: 'esp/logout.php',
+                method: 'post',
+                success: function(r){}
+              });
+              document.cookie = 'auth=0';
+              setTimeout(function(){
+                $('#restore').css("background-color", "#F1F1F1");
+                $('#restore').text("Przywróć i uruchom ponownie");
+              }, 3000);
+      	    }
+          });
+          return false;
+        });
+      });
+    </script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id=cnv></div>
+    <div id="loading" class="active">Ładowanie...</div>
+    <main role="main">
+      <form method="POST" action="#" enctype="multipart/form-data" id="upload_form">
+        <h2 class="ttl">Przywróć ustawienia z pliku</h2>
+        <div class="dd">
+          <label for="configfile" class="flup">
+            <span class="btn btn-primary">Wybierz plik</span>
+          </label>
+          <input id="configfile" type="file" name="update">
+        </div>
+        <div class="dd">
+          <input id="restore" type="submit" value="Przywróć i uruchom ponownie" class="btn btn-primary" disabled>
+        </div>
+        <div id="fnm" class="hds"></div>
+      </form><hr>
+      <form action="#" method="post" id="netwrk">
+        <h2 class="hd1">Sieć</h2>
+        <h2 class="ttl">Nazwa sieci:</h2>
+        <div class="indiv">
+          <input id="ssid" class="inp" maxlength="32" autocomplete="off" required><br>
+          <input id="sm" type="button" value="lista dostępnych sieci" class="btn btn-primary" /><br>
+          <div id="ssids">
+            <div id="empty" class="ss">Jedna chwila...</div>
+          </div>
+        </div>
+        <h2 class="ttl">Hasło:</h2>
+        <div class="passw">
+          <div class="password">
+            <input id="pass" class="inp" type="password" maxlength="32" autocomplete="off">
+            <a id="eye" href="#" class="password-control"></a>
+          </div>
+        </div><hr>
+        <h2 class="ttl">Rodzaj połączenia:</h2>
+        <div class="tab">
+          <table>
+            <tr>
+              <td><input type="radio" name="ip" id="dynamic" value="false" checked></td>
+              <td><label for="dynamic">Dynamiczny adres IP</label></td>
+            </tr>
+            <tr>
+              <td><input type="radio" name="ip" id="static" value="true"></td>
+              <td><label for="static">Stałe IP</label></td>
+            </tr>
+          </table>
+        </div>
+        <h2 class="ttl">Adres IP:</h2>
+        <div class="indiv">
+          <input id="ip_s" class="inp" name="IP_S" disabled>
+          <input id="ip" class="inp hid" maxlength="15" title="192.168.0.99"
+            pattern="(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*){3}"><br>
+        </div>
+        <h2 class="ttl">Maska podsieci:</h2>
+        <div class="indiv">
+          <input id="mask_s" class="inp" disabled>
+          <input id="mask" class="inp hid" maxlength="15" title="255.255.255.0"
+            pattern="(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*){3}"><br>
+        </div>
+        <h2 class="ttl">Brama domyślna:</h2>
+        <div class="indiv">
+          <input id="gw_s" class="inp" disabled>
+          <input id="gw" class="inp hid" maxlength="15" title="192.168.0.1"
+            pattern="(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*){3}"><br>
+        </div>
+        <h2 class="ttl">Preferowany serwer DNS:</h2>
+        <div class="indiv">
+          <input id="dns1_s" class="inp" disabled>
+          <input id="dns1" class="inp hid" maxlength="15" title="192.168.0.1"
+            pattern="(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*){3}"><br>
+        </div>
+        <h2 class="ttl">Alternatywny serwer DNS:</h2>
+        <div class="indiv">
+          <input id="dns2_s" class="inp" disabled>
+          <input id="dns2" class="inp hid" maxlength="15" title="192.168.0.2"
+            pattern="(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)_*){3}"><br>
+        </div><hr>
+        <div class="indiv">
+          <button id="save" class="btn btn-primary" type="submit" name="button">Zapisz i uruchom ponownie</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>

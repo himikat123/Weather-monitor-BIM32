@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <style media="screen">
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu);
+      * {font-family:'Ubuntu', Arial, serif}
+      body{-webkit-animation:bugfix infinite 1s}
+      @-webkit-keyframes bugfix{to{padding:0}}
+      @media screen and (min-width: 320px){html,body{margin:0;overflow-x:hidden}}
+      * {box-sizing:border-box}
+      html{font-size:100%}
+      html,body{margin:0;padding:0;width:100%;height:100%}
+      body{color:#333;font:0.85em 'Open Sans', sans-serif;background-color:#f1f1f1}
+      main{padding:30px 50px 30px 50px;margin:0 auto}
+      .canv{width:100%;display:flex;justify-content:center}
+      #display_canvas{width:60%;height:60%}
+    </style>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript">
+      let first = true, page = 'main', anim, dots, shift = 0, days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+      let months =  ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+      let datas = {'ant' : 0, 'icon' : 404, 'w_dir' : -1, 'temp_out' : 404, 'temp_in' : 404,
+                  'hum_out' : 404, 'hum_in' : 404, 'pres' : 4040, 'descript' : '', 'w_speed' : -1,
+                  'cfrt' : -1, 'icon_daily' : [1, 1, 1, 1], 'temp_max_daily' : [404, 404, 404, 404],
+                  'temp_min_daily' : [404, 404, 404, 404], 'w_speed_daily' : [-1, -1, -1, -1], 'isday' : 'd'};
+      let cf = ['Комфортно', 'Жарко', 'Холодно', 'Слишком сухо', 'Слишком влажно', 'Жарко и влажно', 'Жарко и сухо', 'Холодно и влажно', 'Холодно и сухо'];
+      let git = 'https://github.com/himikat123/Weather-monitor-BIM32/blob/master/BIM32_RU/data/';
+
+      function clock_upd(context){
+        let now = new Date();
+        let hr0 = Math.floor(now.getHours() / 10);
+        let hr1 = now.getHours() % 10;
+        let mn0 = Math.floor(now.getMinutes() / 10);
+        let mn1 = now.getMinutes() % 10;
+        let wd  = now.getDay();
+        if(hr0 == 0) hr0 = 'dig';
+        let clock_hr0 = new Image();
+        clock_hr0.onload = function(){
+          context.drawImage(clock_hr0, 2, 2);
+        };
+        clock_hr0.src = `${git}${hr0}.png?raw=true`;
+        let clock_hr1 = new Image();
+        clock_hr1.onload = function(){
+          context.drawImage(clock_hr1, 48, 2);
+        };
+        clock_hr1.src = `${git}${hr1}.png?raw=true`;
+        let clock_mn0 = new Image();
+        clock_mn0.onload = function(){
+          context.drawImage(clock_mn0, 116, 2);
+        };
+        clock_mn0.src = `${git}${mn0}.png?raw=true`;
+        let clock_mn1 = new Image();
+        clock_mn1.onload = function(){
+          context.drawImage(clock_mn1, 162, 2);
+        };
+        clock_mn1.src = `${git}${mn1}.png?raw=true`;
+
+        context.fillStyle = "black";
+        context.fillRect(211, 0, 60, 57);
+        context.fillRect(12, 225, 40, 24);
+        context.fillRect(132, 225, 40, 24);
+        context.fillRect(252, 225, 40, 24);
+        context.fillRect(372, 225, 40, 24);
+        context.font = '48px Ubuntu';
+        context.fillStyle = "rgb(0, 255, 0)";
+        context.fillText(days[wd], 212, 38);
+        context.font = '22px Ubuntu';
+        context.fillStyle = "white";
+        context.fillText(days[wd], 15, 242);
+        wd++;
+        if(wd > 6) wd = 0;
+        context.fillText(days[wd], 135, 242);
+        wd++;
+        if(wd > 6) wd = 0;
+        context.fillText(days[wd], 255, 242);
+        wd++;
+        if(wd > 6) wd = 0;
+        context.fillText(days[wd], 375, 242);
+
+        let ant = new Image();
+        ant.onload = function(){
+          context.drawImage(ant, 431, 1);
+        };
+        ant.src = `${git}ant${datas.ant}.png?raw=true`;
+
+        let icon_img = new Image();
+        icon_img.onload = function(){
+          context.drawImage(icon_img, 0, 116);
+        };
+        icon_img.src = `${git}${datas.icon>9?datas.icon:'0'+datas.icon}${datas.isday}.png?raw=true`;
+
+        let wind_icon = new Image();
+        wind_icon.onload = function(){
+          context.drawImage(wind_icon, 97, 194);
+        };
+        wind_icon.src = `${git}wind.png?raw=true`;
+
+        let temp_icon = new Image();
+        temp_icon.onload = function(){
+          context.drawImage(temp_icon, 99, 140);
+        };
+        temp_icon.src = `${git}temp.png?raw=true`;
+
+        let wind_dir = new Image();
+        wind_dir.onload = function(){
+          context.drawImage(wind_dir, 222, 195);
+        };
+        wind_dir.src = `${git}w${datas.w_dir}.png?raw=true`;
+
+        context.font = '40px Ubuntu';
+        context.fillStyle = "rgb(255, 255, 0)";
+        context.fillText(datas.temp_out + '°', 160 - context.measureText(datas.temp_out + '°').width / 2, 185);
+        context.fillText(datas.temp_in + '°', 310 - context.measureText(datas.temp_in + '°').width / 2, 100);
+        context.font = '28px Ubuntu';
+        context.fillStyle = "rgb(0, 255, 255)";
+        context.fillText(datas.hum_out + '%', 292 - context.measureText(datas.hum_out + '%').width / 2, 188);
+        context.fillText(datas.hum_in + '%', 435 - context.measureText(datas.hum_in + '%').width / 2, 100);
+        context.fillStyle = "rgb(255, 0, 255)";
+        context.fillText(datas.pres + 'мм', 420 - context.measureText(datas.pres + 'мм').width / 2, 188);
+        context.fillStyle = "white";
+        context.fillText(datas.descript, 288 - context.measureText(datas.descript).width / 2, 131);
+        context.font = '20px Ubuntu';
+        context.fillText(`${datas.w_speed}м/с`, 167, 215);
+
+        context.fillStyle = "white";
+        context.font = '16px Ubuntu';
+        context.fillText(cf[datas.cfrt], 350 - context.measureText(cf[datas.cfrt]).width / 2, 50);
+
+        let icon1_img = new Image();
+        icon1_img.onload = function(){
+          context.drawImage(icon1_img, 3, 247);
+        };
+        icon1_img.src = `${git}i${datas.icon_daily[0]}.png?raw=true`;
+        let icon2_img = new Image();
+        icon2_img.onload = function(){
+          context.drawImage(icon2_img, 123, 247);
+        };
+        icon2_img.src = `${git}i${datas.icon_daily[1]}.png?raw=true`;
+        let icon3_img = new Image();
+        icon3_img.onload = function(){
+          context.drawImage(icon3_img, 243, 247);
+        };
+        icon3_img.src = `${git}i${datas.icon_daily[2]}.png?raw=true`;
+        let icon4_img = new Image();
+        icon4_img.onload = function(){
+          context.drawImage(icon4_img, 363, 247);
+        };
+        icon4_img.src = `${git}i${datas.icon_daily[3]}.png?raw=true`;
+
+        context.font = '26px Ubuntu';
+        context.fillStyle = "rgb(255, 255, 0)";
+        context.fillText(`${datas.temp_max_daily[0]}°`, 86 - context.measureText(`${datas.temp_max_daily[0]}°`).width / 2, 262);
+        context.fillText(`${datas.temp_max_daily[1]}°`, 206 - context.measureText(`${datas.temp_max_daily[1]}°`).width / 2, 262);
+        context.fillText(`${datas.temp_max_daily[2]}°`, 326 - context.measureText(`${datas.temp_max_daily[2]}°`).width / 2, 262);
+        context.fillText(`${datas.temp_max_daily[3]}°`, 446 - context.measureText(`${datas.temp_max_daily[3]}°`).width / 2, 262);
+        context.fillStyle = "rgb(255, 127, 0)";
+        context.fillText(`${datas.temp_min_daily[0]}°`, 86 - context.measureText(`${datas.temp_min_daily[0]}°`).width / 2, 289);
+        context.fillText(`${datas.temp_min_daily[1]}°`, 206 - context.measureText(`${datas.temp_min_daily[1]}°`).width / 2, 289);
+        context.fillText(`${datas.temp_min_daily[2]}°`, 326 - context.measureText(`${datas.temp_min_daily[2]}°`).width / 2, 289);
+        context.fillText(`${datas.temp_min_daily[3]}°`, 446 - context.measureText(`${datas.temp_min_daily[3]}°`).width / 2, 289);
+        context.font = '22px Ubuntu';
+        context.fillStyle = "white";
+        context.fillText(`${datas.w_speed_daily[0]}м/с`, 63 - context.measureText(`${datas.w_speed_daily[0]}м/с`).width / 2, 314);
+        context.fillText(`${datas.w_speed_daily[1]}м/с`, 183 - context.measureText(`${datas.w_speed_daily[1]}м/с`).width / 2, 314);
+        context.fillText(`${datas.w_speed_daily[2]}м/с`, 303 - context.measureText(`${datas.w_speed_daily[2]}м/с`).width / 2, 314);
+        context.fillText(`${datas.w_speed_daily[3]}м/с`, 423 - context.measureText(`${datas.w_speed_daily[3]}м/с`).width / 2, 314);
+      }
+
+      function weather(){
+        let canvas = document.getElementById("display_canvas");
+        let context = canvas.getContext("2d");
+        context.rect(0, 0, 480, 320);
+        context.fillStyle = 'black';
+        context.fill();
+
+        let ground = new Image();
+        ground.onload = function(){
+          context.drawImage(ground, 0, 0);
+        };
+        ground.src = `${git}disp.png?raw=true`;
+
+        anim = setInterval(function(){
+          clock_upd(context);
+        }, 1000);
+
+        return context;
+      }
+
+      function findPos(obj){
+        var curleft = 0, curtop = 0;
+        if(obj.offsetParent){
+          do{
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+          }
+          while(obj = obj.offsetParent);
+          return { x: curleft, y: curtop };
+        }
+        return undefined;
+      }
+
+      function page_hourly(day, context){
+        page = 'hourly';
+        clearInterval(anim);
+        clearInterval(dots);
+        context.rect(0, 0, 480, 320);
+        context.fillStyle = 'black';
+        context.fill();
+
+        let wdy = 0;
+        if(day > 0 && day < 4){
+          shift = 0;
+          for(var i=0; i<40; i++){
+            let dat = new Date(date_hourly[i] * 1000);
+            let hr = dat.getHours();
+            if(hr == 0) wdy++;
+            if(wdy == day) shift = i;
+            if(wdy == day) break;
+          }
+        }
+
+        if(day == 0) shift = 0;
+
+        let close = new Image();
+        close.onload = function(){
+          context.drawImage(close, 430, 1);
+        };
+        close.src = `${git}close.bmp?raw=true`;
+
+        let back = new Image();
+        back.onload = function(){
+          context.drawImage(back, 5, 144);
+        };
+        back.src = `${git}back.bmp?raw=true`;
+
+        let forward = new Image();
+        forward.onload = function(){
+          context.drawImage(forward, 440, 144);
+        };
+        forward.src = `${git}forward.bmp?raw=true`;
+
+        for(var i=shift, s=0; i<(shift+8); i++, s++){
+          context.font = '16px Ubuntu';
+          context.fillStyle = "rgb(255, 255, 0)";
+          context.fillText(`${temp_hourly[i].toFixed(1)}°`, 63 - context.measureText(`${temp_hourly[i].toFixed(1)}°`).width / 72 + 47 * s, 140);
+
+          let dat = new Date(date_hourly[i] * 1000);
+          let wd = dat.getDay();
+          let dt = dat.getDate();
+          let mo = dat.getMonth();
+          let hr = dat.getHours();
+          context.font = '22px Ubuntu';
+          context.fillStyle = "white";
+          context.fillText(days[wd], 72 - context.measureText(days[wd]).width / 2 + 47 * s, 223);
+
+          context.font = '12px Ubuntu';
+          context.fillText(dt + months[mo], 72 - context.measureText(dt + months[mo]).width / 2 + 47 * s, 241);
+
+          context.fillText(`${hr}:00`, 72 - context.measureText(`${hr}:00`).width / 2 + 47 * s, 259);
+
+          context.font = '14px Ubuntu';
+          context.fillText(wind_hourly[i] + 'м/с', 72 - context.measureText(wind_hourly[i] + 'м/с').width / 2 + 47 * s, 277);
+
+          context.font = '12px Ubuntu';
+          context.fillStyle = "rgb(0, 255, 255)";
+          context.fillText((prec_hourly[i] == 0) ? '0мм' : prec_hourly[i], 65 + 47 * s, 309);
+        }
+
+        if(icon_hourly[shift] == 3) icon_hourly[shift] = 2;
+        let icon0 = new Image();
+        icon0.onload = function(){
+          context.drawImage(icon0, 48, 152);
+        };
+        icon0.src = `${git}i${icon_hourly[shift]}.png?raw=true`;
+        if(icon_hourly[shift + 1] == 3) icon_hourly[shift + 1] = 2;
+        let icon1 = new Image();
+        icon1.onload = function(){
+          context.drawImage(icon1, 96, 152);
+        };
+        icon1.src = `${git}i${icon_hourly[shift + 1]}.png?raw=true`;
+        if(icon_hourly[shift + 2] == 3) icon_hourly[shift + 2] = 2;
+        let icon2 = new Image();
+        icon2.onload = function(){
+          context.drawImage(icon2, 142, 152);
+        };
+        icon2.src = `${git}i${icon_hourly[shift + 2]}.png?raw=true`;
+        if(icon_hourly[shift + 3] == 3) icon_hourly[shift + 3] = 2;
+        let icon3 = new Image();
+        icon3.onload = function(){
+          context.drawImage(icon3, 189, 152);
+        };
+        icon3.src = `${git}i${icon_hourly[shift + 3]}.png?raw=true`;
+        if(icon_hourly[shift + 4] == 3) icon_hourly[shift + 4] = 2;
+        let icon4 = new Image();
+        icon4.onload = function(){
+          context.drawImage(icon4, 236, 152);
+        };
+        icon4.src = `${git}i${icon_hourly[shift + 4]}.png?raw=true`;
+        if(icon_hourly[shift + 5] == 3) icon_hourly[shift + 5] = 2;
+        let icon5 = new Image();
+        icon5.onload = function(){
+          context.drawImage(icon5, 283, 152);
+        };
+        icon5.src = `${git}i${icon_hourly[shift + 5]}.png?raw=true`;
+        if(icon_hourly[shift + 6] == 3) icon_hourly[shift + 6] = 2;
+        let icon6 = new Image();
+        icon6.onload = function(){
+          context.drawImage(icon6, 330, 152);
+        };
+        icon6.src = `${git}i${icon_hourly[shift + 6]}.png?raw=true`;
+        if(icon_hourly[shift + 7] == 3) icon_hourly[shift + 7] = 2;
+        let icon7 = new Image();
+        icon7.onload = function(){
+          context.drawImage(icon7, 377, 152);
+        };
+        icon7.src = `${git}i${icon_hourly[shift + 7]}.png?raw=true`;
+
+        let wnd0 = new Image();
+        wnd0.onload = function(){
+          context.drawImage(wnd0, 64, 281);
+        };
+        wnd0.src = `${git}w${Math.floor(wdeg_hourly[shift] / 45) + 1}m.bmp?raw=true`;
+        let wnd1 = new Image();
+        wnd1.onload = function(){
+          context.drawImage(wnd1, 111, 281);
+        };
+        wnd1.src = `${git}w${Math.floor(wdeg_hourly[shift + 1] / 45) + 1}m.bmp?raw=true`;
+        let wnd2 = new Image();
+        wnd2.onload = function(){
+          context.drawImage(wnd2, 158, 281);
+        };
+        wnd2.src = `${git}w${Math.floor(wdeg_hourly[shift + 2] / 45) + 1}m.bmp?raw=true`;
+        let wnd3 = new Image();
+        wnd3.onload = function(){
+          context.drawImage(wnd3, 205, 281);
+        };
+        wnd3.src = `${git}w${Math.floor(wdeg_hourly[shift + 3] / 45) + 1}m.bmp?raw=true`;
+        let wnd4 = new Image();
+        wnd4.onload = function(){
+          context.drawImage(wnd4, 252, 281);
+        };
+        wnd4.src = `${git}w${Math.floor(wdeg_hourly[shift + 4] / 45) + 1}m.bmp?raw=true`;
+        let wnd5 = new Image();
+        wnd5.onload = function(){
+          context.drawImage(wnd5, 299, 281);
+        };
+        wnd5.src = `${git}w${Math.floor(wdeg_hourly[shift + 5] / 45) + 1}m.bmp?raw=true`;
+        let wnd6 = new Image();
+        wnd6.onload = function(){
+          context.drawImage(wnd6, 346, 281);
+        };
+        wnd6.src = `${git}w${Math.floor(wdeg_hourly[shift + 6] / 45) + 1}m.bmp?raw=true`;
+        let wnd7 = new Image();
+        wnd7.onload = function(){
+          context.drawImage(wnd7, 393, 281);
+        };
+        wnd7.src = `${git}w${Math.floor(wdeg_hourly[shift + 7] / 45) + 1}m.bmp?raw=true`;
+
+        let prc0 = new Image();
+        prc0.onload = function(){
+          context.drawImage(prc0, 49, 295);
+        };
+        prc0.src = `${git}prec.bmp?raw=true`;
+        let prc1 = new Image();
+        prc1.onload = function(){
+          context.drawImage(prc1, 96, 295);
+        };
+        prc1.src = `${git}prec.bmp?raw=true`;
+        let prc2 = new Image();
+        prc2.onload = function(){
+          context.drawImage(prc2, 143, 295);
+        };
+        prc2.src = `${git}prec.bmp?raw=true`;
+        let prc3 = new Image();
+        prc3.onload = function(){
+          context.drawImage(prc3, 190, 295);
+        };
+        prc3.src = `${git}prec.bmp?raw=true`;
+        let prc4 = new Image();
+        prc4.onload = function(){
+          context.drawImage(prc4, 237, 295);
+        };
+        prc4.src = `${git}prec.bmp?raw=true`;
+        let prc5 = new Image();
+        prc5.onload = function(){
+          context.drawImage(prc5, 284, 295);
+        };
+        prc5.src = `${git}prec.bmp?raw=true`;
+        let prc6 = new Image();
+        prc6.onload = function(){
+          context.drawImage(prc6, 331, 295);
+        };
+        prc6.src = `${git}prec.bmp?raw=true`;
+        let prc7 = new Image();
+        prc7.onload = function(){
+          context.drawImage(prc7, 378, 295);
+        };
+        prc7.src = `${git}prec.bmp?raw=true`;
+
+        context.strokeStyle = "rgb(50, 50, 50)";
+        context.beginPath();
+        for(var i=1; i<12; i++){
+          context.moveTo(50, i * 10);
+          context.lineTo(420, i * 10);
+        }
+        context.stroke();
+        context.closePath();
+        context.beginPath();
+        for(var i=0; i<38; i++){
+          context.moveTo(50 + i * 10, 10);
+          context.lineTo(50 + i * 10, 110);
+        }
+        context.stroke();
+        context.closePath();
+        for(var k=0; k<2; k++){
+          let chrt0 = 1000;
+          let chrt1 = -1000;
+          let ch = [];
+          for(var i=shift, n=0; i<(shift+8); i++, n++){
+            if(k == 0) ch[n] = temp_hourly[i];
+            if(k == 1) ch[n] = prec_hourly[i];
+          }
+          for(var i=0; i<8; i++){
+            if(ch[i] < chrt0) chrt0 = ch[i];
+            if(ch[i] > chrt1) chrt1 = ch[i];
+          }
+          let ampl = 80 / (chrt1 - chrt0);
+          for(var i=0; i<8; i++){
+            ch[i] -= chrt0;
+            if(ampl > 0) ch[i] *= ampl;
+            else ch[i] /= 2;
+          }
+          context.beginPath();
+          for(var i=0; i<7; i++){
+            if(k == 0){
+              context.strokeStyle = "rgb(255, 255, 0)";
+              context.moveTo(i * 47 + 68, 90 - ch[i]);
+              context.lineTo(i * 47 + 115, 90 - ch[i + 1]);
+            }
+            if(k == 1){
+              context.strokeStyle = "rgb(0, 255, 255)";
+              context.moveTo(i * 47 + 68, 98 - ch[i]);
+              context.lineTo(i * 47 + 115, 98 - ch[i + 1]);
+            }
+          }
+          context.stroke();
+          context.closePath();
+        }
+      }
+
+      $(function(){
+        let context = weather();
+
+        setInterval(function(){
+          location.reload();
+        }, 600000);
+
+        let half_sec = false;
+        dots = setInterval(function(){
+          context.beginPath();
+          if(half_sec) context.fillStyle = "rgb(0, 255, 255)";
+          else context.fillStyle = "rgb(0, 0, 0)";
+          context.arc(103, 36, 5, 0, 2 * Math.PI, true);
+          context.arc(103, 70, 5, 0, 2 * Math.PI, true);
+          context.fill();
+          half_sec = !half_sec;
+        }, 500);
+
+        $('#display_canvas').click(function(e){
+          var pos = findPos(this);
+          let x_c = 480 / $('#display_canvas').outerWidth();
+          let y_c = 320 / $('#display_canvas').outerHeight();
+          var x = x_c * (e.pageX - pos.x);
+          var y = y_c * (e.pageY - pos.y);
+          if(page == 'main'){
+            if(x > 0 && x < 120 && y > 224){
+              page_hourly(0, context);
+              page_hourly(0, context);
+            }
+            if(x > 120 && x < 240 && y > 224){
+              page_hourly(1, context);
+              page_hourly(1, context);
+            }
+            if(x > 240 && x < 360 && y > 224){
+              page_hourly(2, context);
+              page_hourly(2, context);
+            }
+            if(x > 360 && y > 224){
+              page_hourly(3, context);
+              page_hourly(3, context);
+            }
+          }
+          if(page == 'hourly'){
+            if(x > 430 && y < 50){
+              first = true;
+              page = 'main';
+              weather();
+
+              let half_sec = false;
+              dots = setInterval(function(){
+                context.beginPath();
+                if(half_sec) context.fillStyle = "rgb(0, 255, 255)";
+                else context.fillStyle = "rgb(0, 0, 0)";
+                context.arc(103, 36, 5, 0, 2 * Math.PI, true);
+                context.arc(103, 70, 5, 0, 2 * Math.PI, true);
+                context.fill();
+                half_sec = !half_sec;
+              }, 500);
+            }
+            if(x > 5 && x < 37 && y > 144 && y < 176){
+              if(shift > 0) shift -= 4;
+              if(shift < 0) shift = 0;
+              page_hourly(10, context);
+            }
+            if(x > 440 && x < 472 && y > 144 && y < 176){
+              if(shift < 32) shift += 4;
+              if(shift > 32) shift = 32;
+              page_hourly(10, context);
+            }
+          }
+        });
+      });
+    </script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <main role="main">
+      <div class="canv">
+        <canvas id="display_canvas" width="480" height="320"></canvas>
+      </div>
+    </main>
+  </body>
+</html>

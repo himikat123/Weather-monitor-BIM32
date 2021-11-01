@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="user.css?v=2.1">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="user.js?v=2.1"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id=cnv></div>
+    <div id="loading" class="active">Ładowanie...</div>
+    <div id="logout">
+      <a href=# title="Wyloguj" onclick="logout()">
+        <img src="logout.png" alt="Wyloguj">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Sieć</a>
+        <li><a href="sensors.htm">Czujniki przewodowe</a>
+        <li><a href="wsensor.htm">Czujnik bezprzewodowy</a>
+        <li><a href="weather.htm">Pogoda</a>
+        <li><a href="disp.htm">Wyświetlacz</a>
+        <li><a href="clock.htm">Zegar</a>
+        <li><a href="send.htm">Wysyłanie danych</a>
+        <li><a href="receive.htm">Odbieranie danych</a>
+        <li><a href="backup.htm">Utworzyć kopię zapasową</a>
+        <li><a href="default.htm">Ustawienia domyślne</a>
+        <li><a href="user.htm" class="current"><span class="currnt">Użytkownik</span></a>
+        <li><a href="update.htm">Aktualizacja firmware</a>
+        <li><a href="filesystem.htm">System plików</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <form action="#" method="post">
+        <h2 class="hd1">Użytkownik</h2><hr>
+        <h2 class="ttl">Nazwa użytkownika:</h2>
+        <div class="indiv">
+          <input id="user" class="inp" maxlength="32" required><br>
+        </div>
+        <h2 class="ttl">Stare hasło:</h2>
+        <div class="passw">
+          <div class="password">
+            <input id="oldpass" class="inp" type="password" maxlength="32" autocomplete="off">
+            <a id="eye1" href="#" class="password-control"></a>
+          </div>
+        </div>
+        <h2 class="ttl">Nowe hasło:</h2>
+        <div class="passw">
+          <div class="password">
+            <input id="newpass" class="inp" type="password" maxlength="32" autocomplete="off">
+            <a id="eye2" href="#" class="password-control"></a>
+          </div>
+        </div><hr>
+        <div class="indiv">
+          <button id="save" class="btn btn-primary" type="submit" name="button">Zapisz</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>

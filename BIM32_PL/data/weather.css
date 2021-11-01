@@ -1,0 +1,23 @@
+@charset "UTF-8";
+
+table a{
+  color: #050;
+}
+
+table td:first-child{
+  vertical-align: top;
+}
+
+td{
+  text-align: center;
+}
+
+.tab{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.inp{
+  margin: 5px 0;
+}

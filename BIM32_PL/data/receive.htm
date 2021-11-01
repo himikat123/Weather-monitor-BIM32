@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Wireless monitor BIM32" />
+    <link rel="stylesheet" href="index.css?v=2.1">
+    <link rel="stylesheet" href="receive.css?v=2.1">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="receive.js?v=2.1"></script>
+    <title>BIM32 Weather monitor</title>
+  </head>
+  <body>
+    <div id=cnv></div>
+    <div id="loading" class="active">Ładowanie...</div>
+    <div id="logout">
+      <a href=# title="Wyloguj" onclick="logout()">
+        <img src="logout.png" alt="Wyloguj">
+      </a>
+    </div>
+    <input type="checkbox" id="nav-toggle" hidden>
+    <nav id="navmenu" class="nav">
+      <label id="mn" for="nav-toggle" class="nav-toggle" onclick></label>
+      <ul>
+        <li><a href="index.htm">Status</a>
+        <li><a href="network.htm">Sieć</a>
+        <li><a href="sensors.htm">Czujniki przewodowe</a>
+        <li><a href="wsensor.htm">Czujnik bezprzewodowy</a>
+        <li><a href="weather.htm">Pogoda</a>
+        <li><a href="disp.htm">Wyświetlacz</a>
+        <li><a href="clock.htm">Zegar</a>
+        <li><a href="send.htm">Wysyłanie danych</a>
+        <li><a href="receive.htm" class="current"><span class="currnt">Odbieranie danych</span></a>
+        <li><a href="backup.htm">Utworzyć kopię zapasową</a>
+        <li><a href="default.htm">Ustawienia domyślne</a>
+        <li><a href="user.htm">Użytkownik</a>
+        <li><a href="update.htm">Aktualizacja firmware</a>
+        <li><a href="filesystem.htm">System plików</a>
+      </ul>
+    </nav>
+    <main role="main">
+      <form action="#" method="post">
+        <h2 class="hd1">Odbieranie danych</h2><hr>
+        <h2 class="ttl">
+          <input type="checkbox" id="mqttrcv">
+          Receive data from MQTT server:
+        </h2>
+        <div id="mqtt_recv">
+          <h2 class="ttl">Pośrednik:</h2>
+          <div class="indiv">
+            <input id="mqttServer" class="inp" maxlength="32">
+          </div>
+          <h2 class="ttl">Numer portu:</h2>
+          <div class="indiv">
+            <input id="mqttPort" class="inp" type="number" min="0" maxlength="10">
+          </div>
+          <h2 class="ttl">Login:</h2>
+          <div class="indiv">
+            <input id="mqttLogin" class="inp" maxlength="32">
+          </div>
+          <h2 class="ttl">Hasło:</h2>
+          <div class="indiv">
+            <input id="mqttPass" class="inp" maxlength="32">
+          </div><hr class="kurz">
+          <h2 class="ttl">
+            <input type="checkbox" id="tq1">
+            Temat 1:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT1" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq2">
+            Temat 2:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT2" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq3">
+            Temat 3:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT3" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq4">
+            Temat 4:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT4" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq5">
+            Temat 5:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT5" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq6">
+            Temat 6:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT6" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq7">
+            Temat 7:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT7" class="inp" maxlength="32" disabled><br><br>
+          </div>
+          <h2 class="ttl">
+            <input type="checkbox" id="tq8">
+            Temat 8:
+          </h2>
+          <div class="indiv">
+            <input id="mqttT8" class="inp" maxlength="32" disabled><br><br>
+          </div><hr class="kurz">
+          <h2 class="ttl">Temat temperatury zewnętrznej:</h2>
+          <div class="indiv">
+            <select class="inp" id="mto">
+              <option value="1">Temat 1</option>
+              <option value="2">Temat 2</option>
+              <option value="3">Temat 3</option>
+              <option value="4">Temat 4</option>
+              <option value="5">Temat 5</option>
+              <option value="6">Temat 6</option>
+              <option value="7">Temat 7</option>
+              <option value="8">Temat 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Temat wilgotności na zewnątrz:</h2>
+          <div class="indiv">
+            <select class="inp" id="mho">
+              <option value="1">Temat 1</option>
+              <option value="2">Temat 2</option>
+              <option value="3">Temat 3</option>
+              <option value="4">Temat 4</option>
+              <option value="5">Temat 5</option>
+              <option value="6">Temat 6</option>
+              <option value="7">Temat 7</option>
+              <option value="8">Temat 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Temat ciśnienia:</h2>
+          <div class="indiv">
+            <select class="inp" id="mpo">
+              <option value="1">Temat 1</option>
+              <option value="2">Temat 2</option>
+              <option value="3">Temat 3</option>
+              <option value="4">Temat 4</option>
+              <option value="5">Temat 5</option>
+              <option value="6">Temat 6</option>
+              <option value="7">Temat 7</option>
+              <option value="8">Temat 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Temat temperatury wewnętrznej:</h2>
+          <div class="indiv">
+            <select class="inp" id="mti">
+              <option value="1">Temat 1</option>
+              <option value="2">Temat 2</option>
+              <option value="3">Temat 3</option>
+              <option value="4">Temat 4</option>
+              <option value="5">Temat 5</option>
+              <option value="6">Temat 6</option>
+              <option value="7">Temat 7</option>
+              <option value="8">Temat 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Temat wilgotności w pomieszczeniu:</h2>
+          <div class="indiv">
+            <select class="inp" id="mhi">
+              <option value="1">Temat 1</option>
+              <option value="2">Temat 2</option>
+              <option value="3">Temat 3</option>
+              <option value="4">Temat 4</option>
+              <option value="5">Temat 5</option>
+              <option value="6">Temat 6</option>
+              <option value="7">Temat 7</option>
+              <option value="8">Temat 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Temat oświetlenia otoczenia:</h2>
+          <div class="indiv">
+            <select class="inp" id="mli">
+              <option value="1">Temat 1</option>
+              <option value="2">Temat 2</option>
+              <option value="3">Temat 3</option>
+              <option value="4">Temat 4</option>
+              <option value="5">Temat 5</option>
+              <option value="6">Temat 6</option>
+              <option value="7">Temat 7</option>
+              <option value="8">Temat 8</option>
+            </select>
+          </div><hr class="kurz">
+        </div><hr>
+
+        <h2 class="ttl">
+          <input type="checkbox" id="thngrcv">
+          Otrzymuj dane z thingspeak.com:
+        </h2>
+        <div id="thng_recv">
+          <h2 class="ttl">Channel ID:</h2>
+          <div class="indiv">
+            <input id="chid" class="inp" type="number" min="0" maxlength="10">
+          </div>
+          <h2 class="ttl">Write API Key:</h2>
+          <div class="indiv">
+            <input id="wrkey" class="inp" maxlength="32">
+          </div>
+          <h2 class="ttl">Read API Key:</h2>
+          <div class="indiv">
+            <input id="rdkey" class="inp" maxlength="32">
+          </div><hr class="kurz">
+          <h2 class="ttl">Pole temperatury zewnętrznej:</h2>
+          <div class="indiv">
+            <select class="inp" id="tto">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</option>
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Pole wilgotności na zewnątrz:</h2>
+          <div class="indiv">
+            <select class="inp" id="tho">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</option>
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Pole ciśnienia:</h2>
+          <div class="indiv">
+            <select class="inp" id="tpo">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</option>
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Поле temperatury wewnętrznej:</h2>
+          <div class="indiv">
+            <select class="inp" id="tti">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</option>
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Pole wilgotności w pomieszczeniu:</h2>
+          <div class="indiv">
+            <select class="inp" id="thi">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</option>
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Pole oświetlenia otoczenia:</h2>
+          <div class="indiv">
+            <select class="inp" id="tli">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</optPole
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div><hr class="kurz">
+          <h2 class="ttl">Pole poziomu baterii:</h2>
+          <div class="indiv">
+            <select class="inp" id="tbt">
+              <option value="1">Pole 1</option>
+              <option value="2">Pole 2</option>
+              <option value="3">Pole 3</option>
+              <option value="4">Pole 4</option>
+              <option value="5">Pole 5</option>
+              <option value="6">Pole 6</option>
+              <option value="7">Pole 7</option>
+              <option value="8">Pole 8</option>
+            </select>
+          </div>
+        </div><hr>
+        <div class="indiv">
+          <button id="save" class="btn btn-primary" type="submit" name="button">Zapisz</button>
+        </div><br>
+      </form>
+    </main>
+  </body>
+</html>
