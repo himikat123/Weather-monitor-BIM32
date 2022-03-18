@@ -71,6 +71,9 @@ To flash the **ESP32**, download the **Flash Download Tools** and configure ever
 And of course, lastly, a couple of photos of the device in action.
 
 ![Weather monitor](/img/20200918_165534.jpg)
+
 ![Weather monitor](/img/20200918_165717.jpg)
+
 ![Weather monitor](/img/20200918_165741.jpg)
+
 ![Weather monitor](/img/20200918_170005.jpg)
