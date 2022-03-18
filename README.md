@@ -1,26 +1,24 @@
 # Weather monitor BIM32
 ## Weather monitor based on ESP32
 
-<p align="center">
-  <img src="/img/screen.png" alt="Weather monitor based on ESP32">
-</p> 
+![Weather monitor based on ESP32](/img/screen.png) 
 
-A short list of weather monitor features:<br><br>
+### A short list of weather monitor features:
 
-Connecting to your home network WiFi 2.4 GHz<br>
-Display of the current weather and 3-day forecast<br>
-Display 5-day hourly weather forecast<br>
-Show weather history (hourly) 1 day ago<br>
-Building graphs of temperature, humidity and probability of precipitation<br>
-Home temperature and humidity display<br>
-Clock (small/large/with seconds/arrow) with NTP synchronization<br>
-Calendar with the ability to scroll to plus/minus infinity<br>
-Sending and/or receiving data using the MQTT protocol<br>
-Sending and/or receiving data from/to thingspeak.com<br>
-Sending data to narodmon.ru<br>
-Wireless temperature/pressure/humidity/ambient light sensor<br>
-Support for wired temperature/pressure/humidity/ambient light sensors<br>
-Auto adjustment of screen backlight brightness (by light sensor, by time or by sunrise and sunset)<br>
+* Connecting to your home network WiFi 2.4 GHz
+* Display of the current weather and 3-day forecast
+* Display 5-day hourly weather forecast
+* Show weather history (hourly) 1 day ago
+* Building graphs of temperature, humidity and probability of precipitation
+* Home temperature and humidity display
+* Clock (small/large/with seconds/arrow) with NTP synchronization
+* Calendar with the ability to scroll to plus/minus infinity
+* Sending and/or receiving data using the MQTT protocol
+* Sending and/or receiving data from/to thingspeak.com
+* Sending data to narodmon.ru
+* Wireless temperature/pressure/humidity/ambient light sensor
+* Support for wired temperature/pressure/humidity/ambient light sensors
+* Auto adjustment of screen backlight brightness (by light sensor, by time or by sunrise and sunset)
 
 ## Schematic diagram of a weather monitor<br>
 <p align="center">
