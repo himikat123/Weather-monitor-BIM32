@@ -1,5 +1,5 @@
 /* 
- *  Weather Monitor BIM32 v2.3
+ *  Weather Monitor BIM32 v2.4
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2021
  */
  
@@ -265,7 +265,7 @@ void TaskDisplay(void *pvParameters){
       if(config.ws_brt == 3) datas.bright_clock = config.ws_brightd;
     }
 
-    if(config.disp_autooff > 0){
+    if(config.disp_autooff > 0 and millis() > config.disp_autooff * 60000){
       if((now() - datas.touched) > (config.disp_autooff * 60 - 5)){
         datas.br_reduc = true;
         if((now() - datas.touched) > (config.disp_autooff * 60)){
@@ -530,10 +530,7 @@ void disp_receive(void){
           if(datas.page == 30) page30_send();
           if(datas.page == 31) page31_send();
         }
-        Serial.println("tut");
-        Serial.println(disp.lastIndexOf("save"));
         if(disp.lastIndexOf("save") != -1){
-          Serial.println("saving");
           strlcpy(config.ssid, root["ssid"] | config.ssid, sizeof(config.ssid));
           strlcpy(config.pass, root["pass"] | config.pass, sizeof(config.pass));
           strlcpy(config.mask, root["mask"] | config.mask, sizeof(config.mask));
@@ -843,7 +840,7 @@ time_t get_time(void){
   if(WiFi.status() == WL_CONNECTED){
     configTime(config.utc * 3600, config.daylight ? 3600 : 0, config.ntp, "0.pool.ntp.org", "1.pool.ntp.org");
     struct tm tmstruct;
-    vTaskDelay(2000);
+    //vTaskDelay(2000);
     tmstruct.tm_year = 0;
     getLocalTime(&tmstruct, 5000);
     setTime(tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec, tmstruct.tm_mday, tmstruct.tm_mon + 1, tmstruct.tm_year + 1900);

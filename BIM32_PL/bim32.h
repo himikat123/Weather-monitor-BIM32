@@ -4,7 +4,7 @@
 const uint16_t PixelCount = 30;
 const uint8_t PixelPin = 12;
 #define colorSaturation 25
-char fw[7] = "v2.3";
+char fw[7] = "v2.4";
 uint32_t s_upd = millis();
 bool clk2 = false;
 String wsensorstr = "";
