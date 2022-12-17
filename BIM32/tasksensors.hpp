@@ -149,6 +149,7 @@ void TaskSensors(void *pvParameters) {
     if(now() - historyUpdate > config.history_period() * 60) {
       historyUpdate = now();
       thingspeak.sendHistory();
+      vTaskDelay(500);
       thingspeak.receiveHistory();
     }
     

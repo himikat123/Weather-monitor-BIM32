@@ -66,6 +66,7 @@ void TaskDisplay(void *pvParameters) {
     
     vTaskDelay(500);
 
+    /* Stop all OS tasks while updating the firmware */
     if(global.stopOS) {
       vTaskDelete(task_sensors_handle);
       vTaskDelete(task_display_handle);
