@@ -88,7 +88,7 @@ class Send extends SendFn {
                                 </div>
                                 
                                 {/* Read API Key */}
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                                {/* <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
                                     <TextInput label="Read API Key"
                                         maxLength="32" 
                                         placeholder="Read API Key" 
@@ -96,7 +96,7 @@ class Send extends SendFn {
                                         config={this.props.config} 
                                         changedConfig={this.changedConfig} 
                                     />
-                                </div>
+                                </div> */}
                             </div><hr />
                             <div className="row">    
                                 {/* Field 1...8 */}

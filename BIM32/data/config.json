@@ -37,7 +37,6 @@
 	   "parsingServer":""
 	},
 	"lang":"en",
-	"ver": "v3.0a",
 	"clock":{
 	   "format":0,
 	   "ntp":"time.nist.gov",

@@ -34,12 +34,14 @@ class HistoryBlock extends React.Component {
                             config={this.props.config} 
                             changedConfig={this.props.changedConfig}
                         />
-                        <SelectInput value={`history.wTypes.${this.props.num}`}
-                            label={text.get('sensorType', lang)}
-                            options={this.props.wTemperatures} 
-                            config={this.props.config} 
-                            changedConfig={this.props.changedConfig}
-                        />
+                        {(this.props.num==0 || this.props.num==3) &&
+                            <SelectInput value={`history.wTypes.${this.props.num}`}
+                                label={text.get('sensorType', lang)}
+                                options={this.props.wTemperatures} 
+                                config={this.props.config} 
+                                changedConfig={this.props.changedConfig}
+                            />
+                        }
                     </>}
                     {this.props.config.history.fields[this.props.num] == 3 && <>
                         <SelectInput value={`history.tFields.${this.props.num}`}
