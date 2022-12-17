@@ -14,7 +14,15 @@
 
 Если ваш датчик собран на **Arduino модуле** то просто прошейте его как обычно. 
 
-А если на ***рассыпухе*** - выберите в меню **Скетч** -> **Экспорт бинарного файла**. 
+А если на ***рассыпухе*** - выберите в Arduino IDE **Инструменты** -> **Программатор** -> **Ваш тип программатора**
+
+<p align="center"><img src="../img/wirelessProgrammer.jpg" alt="weather monitor BIM32 wireless sensor programmer select"></p>
+
+Затем кликните в меню **Скетч** -> **Загрузить через программатор**
+
+<p align="center"><img src="../img/wirelessProgrammerUpload.jpg" alt="weather monitor BIM32 wireless sensor programmer upload"></p>
+
+В случае, если в Ардино нет вашего программатора - выберите в меню **Скетч** -> **Экспорт бинарного файла**. 
 
 <p align="center"><img src="../img/wirelessExport.jpg" alt="weather monitor BIM32 wireless sensor export compiled binary"></p>
 
