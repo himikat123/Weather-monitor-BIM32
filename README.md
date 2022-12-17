@@ -1,79 +1,117 @@
-# Weather monitor BIM32
-## Weather monitor based on ESP32
+# Монитор погоды BIM32
+## Монитор погоды на ESP32
 
-![Weather monitor based on ESP32](/img/screen.png) 
+<p align="center"><img src="img/main.gif" alt="Weather monitor based on ESP32"></p> 
 
-### A short list of weather monitor features:
+<p align="center"><img src="img/clocks.gif" alt="Weather monitor based on ESP32"></p> 
 
-* Connecting to your home network WiFi 2.4 GHz
-* Display of the current weather and 3-day forecast
-* Display 5-day hourly weather forecast
-* Show weather history (hourly) 1 day ago
-* Building graphs of temperature, humidity and probability of precipitation
-* Home temperature and humidity display
-* Clock (small/large/with seconds/arrow) with NTP synchronization
-* Calendar with the ability to scroll to plus/minus infinity
-* Sending and/or receiving data using the MQTT protocol
-* Sending and/or receiving data from/to thingspeak.com
-* Sending data to narodmon.ru
-* Wireless temperature/pressure/humidity/ambient light sensor
-* Support for wired temperature/pressure/humidity/ambient light sensors
-* Auto adjustment of screen backlight brightness (by light sensor, by time or by sunrise and sunset)
+### Краткий список возможностей монитора погоды:
 
-## Schematic diagram of a weather monitor
-![weather monitor BIM32 shematic](/img/BIM32schematic.png)
+* Подключение к домашней WiFi сети 2.4 гГц
+* Отображение текущей погоды и прогноза погоды на 3 дня
+* Отображение почасового прогноза погоды на 5 дней
+* Отображение истории погоды (почасово) на 1 день назад
+* Построение графиков температуры, влажности, давления и вероятности осадков
+* Отображение температуры и влажности в доме
+* Управление погодой в доме (увлажнителем, осушителем, обогревателем и охладителем)
+* Часы (маленькие/большие/с секундами/стрелочные) с синхронизацией NTP
+* Календарь с возможностью перелистывания до плюс/минус бесконечности
+* Отправка и/или прием данных с/на сервис thingspeak
+* Отправка данных на народный мониторинг
+* До 2х беспроводных датчиков температуры/давления/влажности/освещенности/напряжения/тока/мощности/потребленной энергии
+* Поддержка проводных датчиков температуры/давления/влажности/освещенности
+* Авторегулировка яркости подсветки экрана (по датчику освещенности, по времени или по факту рассвета и заката)
+* Цветной сенсорный дисплей 3,5 дюйма
+* Поддержка 5 языков: Английский, Немецкий, Русский, Польский, Украинский
+* Дополнительный 7-сегментный цветной дисплей больших и даже огромных часов
+* Говорящие часы
+* Будильник воспроизводящий mp3 файлы
+* Очень гибкие настройки через веб интерфейс
 
+## Схема подключения базовых модулей монитора погоды
+Для запуска и работы монитора погоды достаточно соединить **дисплей** с **ESP32**. Подключение всех остальных модулей является необязательным. 
 
-I used ready-made modules, so the device schematic is very simple. WiFi module **Nodemcu 32S** 30pin is applied. This is the heart and soul of the device, all the basic logic of the weather monitor is performed by this module. This module is an ESP32 SoC chip with all the necessary wiring, flash memory, USB-> UART converter and a power supply voltage regulator.
+Выкладываю вместо схем полурисунки-полуфотографии, чтоб было понятно и начинающим и даже непрофессионалам. Профессионалов прошу не расстраиваться, нормальные схемы тоже будут.
 
-![ESP32](/img/NodeMCU-32S-Lua-WiFi-IoT-Entwicklung-Board-Serielle-WiFi-Modul-ESP32-38PIN-30PIN-ESP32-ESP32S-Entwicklung.jpg_960x960.jpg)
+<p align="center"><img src="img/base.png" alt="weather monitor BIM32 base wiring diagramm"></p>
 
+Можно применить расширенную версию **Nextion** дисплея **NX4832K035**, или базовую **NX4832T035**. В случае с базовой моделью вам не будут доступны часы с секундами, а также при включении на часах дисплея не будет отображаться правильное время, пока **монитор погоды** не синхронизирует часы с **NTP-сервером**.
 
-As a display, I used the **NX4832K035** Nextion enhanced 3.5 inch module. It is an HMI TFT display, with an integrated graphics processor, with 16 MB flash memory, 1024 bytes EEPROM and 3584 bytes RAM. The display takes over the tasks of drawing graphics, and processing taps on the touchscreen, as well as independently provides the clock, calendar, animation and text scrolling, which allows significantly unload the main (**ESP32**) processor. The display communicates with the main processor via the **UART interface.**
+Если вдруг, кому нужно иметь под рукой кнопку включения/выключения дисплея, ее можно подключить по следующей схеме.
 
-![Nextion Display](/img/NX4832K035-1.jpg)
+<p align="center"><img src="img/disp1Button.png" alt="weather monitor BIM32 display 1 button"></p>
 
+## Схема подключения проводных датчиков к монитору погоды
+К **монитору погоды** можно подключить проводные датчики температуры, влажности, давления и уровня освещенности. **Монитор** поддерживает следующие датчики: 
+* BME280
+* BMP180
+* SHT21
+* DHT22
+* DS18B20
+* MAX44009
+* BH1750
+* фоторезистор
 
-The **HC-12** radio channel module is designed here for communication with a wireless sensor. Working frequency - 433.4 - 473.0 MHz. Data transmission range - up to 1 km in open space. The number of data transmission channels is 100. This module has a built-in microcontroller that independently solves all issues of receiving or transmitting data. This module communicates with the main processor via the **UART interface.** If the use of a wireless sensor is not planned, then this module can not be installed.
+Можно подключить любой один, несколько, либо сразу все датчики из этого списка. Схема подключения следующая.
 
-![HC-12](/img/review26-3.jpg)
+<p align="center"><img src="img/sensors.png" alt="weather monitor BIM32 wired sensors"></p>
 
+## Схема подключения модуля радиоканала для связи с беспроводными датчиками
+Также, к **монитору погоды** можно подключить **[беспроводные датчики](/Wireless_sensor/README.md)**, для этого нужно добавить модуль радиоканала **HC-12** по схеме приведенной ниже.
 
-The weather monitor can read temperature, pressure, humidity and ambient light sensors.
-The following sensors are supported:
-* **BME280**
-* **BMP180**
-* **DHT22**
-* **SHT21**
-* **BH1750**
-* **MAX44009**
-You can connect one, none, several or all at once from this list.
+<p align="center"><img src="img/radio.png" alt="weather monitor BIM32 radio channel"></p>
 
+## Схема подключения приборов управления погодой в доме
+Для управления погодой в доме можно подключить увлажнитель и осушитель воздуха, а также обогреватель и охладитель. Схему подключения этих приборов привести не могу, так как все зависит от того как реализовано управление в каждом конкретном приборе (пультом, кнопками, напряжением). Поэтому просто обозначу на каких выводах **ESP32** появятся логические единицы когда нужно включить тот или иной прибор.
 
-I ordered a PCB in China, because there was no desire to torment with a homemade one.
+<p align="center"><img src="img/humidifier.png" alt="weather monitor BIM32 humidifier dehumidifier heater cooler"></p>
 
-![PCB](/img/BIM32_t.png)
+## Схема подключения модуля звука
+Чтоб будильник и говорящие часы могли издавать звуки, применен модуль mp3-плеера **DF-Player mini**, схема подключения которого представлена ниже. Необходимо будет скопировать папку **02** на **micro-sd карту** из папки **SDcard** и папку **01** из папки соответствующей вашему языку, из той же папки. На итог, на **micro-sd карте** должны быть 2 папки: **01** - с файлами озвучки часов и **02** - со звуками и мелодиями будильников.
 
+<p align="center"><img src="img/df-player.png" alt="weather monitor BIM32 df-player"></p>
 
-Watch a video overview of the weather monitor. The review is made in Russian, but you can turn on subtitles.
+## Дополнительный 7-сегментный дисплей
+В качестве дополнения, к **монитору погоды** можно подключить **[дополнительный 7-сегментный цветной дисплей](/7segment_display/README.md).**
 
-[![Video overview](/img/yt.png)](https://www.youtube.com/watch?v=fijWaK1R-Vs)
+<p align="center"><img src="img/clockBig.jpg" alt="weather monitor BIM32 big clock"></p>
 
+## Схема монитора погоды
 
-To flash the weather monitor you need a micro-sd card, micro-USB cable and a computer.
-To flash the **display**, you need to copy the display firmware file (file with the **.tft** extension) to the micro-sd card (the card must be formatted with the **FAT32** file system). Then insert the micro-sd card into the micro-sd slot of the display and turn him on. The display itself will be flashed from the micro-sd card, the flashing process can be watched on the screen.
+Ну и, как и обещал, нормальная общая схема для общего развития. **Обратите внимание**, если вы решите не устанавливать кнопки (включения/отключения дисплеев и отключения будильника), подтягивающие резисторы R1, R2 и R3 все равно нужны.
 
-To flash the **ESP32**, download the **Flash Download Tools** and configure everything as in the screenshot. **COM port** specify the one on which your ESP32 actually sits.
+<p align="center"><img src="schematic%20diagramm/bim32.png" alt="weather monitor bim32 schematic diagramm"></p>
 
-![ESP DOWNLOAD TOOL](/img/ESP_DOWNLOAD_TOOL.png)
+## Прошивка монитора погоды
 
+Для прошивки монитора погоды вам понадобится **micro-sd** карта, **micro-USB** кабель и компьютер.
 
-And of course, lastly, a couple of photos of the device in action.
+Чтоб прошить **дисплей**, нужно скопировать файл прошивки дисплея (файл с названием модели вашего дисплея .tft) из папки **bin** на **micro-sd** карту (карта должна быть отформатирована в файловой системе **FAT32**). Затем вставить флешку в слот **micro-sd** дисплея и подать ему питание. Дисплей сам прошьется с флешки, прогресс прошивки будет отображен на экране.
 
-![Weather monitor](/img/20200918_165534.jpg)
+Для прошивки **ESP32**:
+1. Добавляем в **Arduino IDE** поддержку **ESP32**, находим [инструкцию](https://www.google.ru/search?newwindow=1&sxsrf=ALeKk01SY0YVvecPGZL1p6_dmI2_zcbuzQ%3A1604686083566&ei=A5GlX-mXIoeckwX0lbiYCw&q=esp32+arduino+ide+%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0&oq=arduino+%D1%83%D1%81%D1%82esp32&gs_lcp=CgZwc3ktYWIQAxgAMggIABAIEAcQHjoECAAQRzoHCCMQsAIQJzoECAAQDToECCMQJzoFCAAQywE6BggAEAcQHlDcpgFY89oBYPzmAWgAcAJ4AIABb4gBzwaSAQM2LjOYAQCgAQGqAQdnd3Mtd2l6yAEIwAEB&sclient=psy-ab)
+2. Добавляем в **Ардуино** плагин для заливки **SPIFFS** находим [инструкцию](https://www.google.ru/search?newwindow=1&sxsrf=ALeKk01Btxvm4RWeH8qgpglopKEEPCEwiw%3A1604686179645&ei=Y5GlX_bkJsHUkwXEqpSICg&q=esp32+arduino+%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0+sketch+upload&oq=esp32+arduino+%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0+sketch+upload&gs_lcp=CgZwc3ktYWIQAzoECAAQRzoHCCMQsAIQJzoICAAQCBANEB46BAgjECc6BggAEAgQHlC7Slj5dGDdeWgGcAJ4AIABiAGIAa0LkgEDNy43mAEAoAEBqgEHZ3dzLXdpesgBCMABAQ&sclient=psy-ab&ved=0ahUKEwi2otrtwe7sAhVB6qQKHUQVBaEQ4dUDCA0&uact=5)
+3. Распаковываем библиотеки из файла **libraries.zip** в папку C:/Users/**Username**/Documents/Arduino/libraries
+4. Прошиваем плату скетчем
+5. Прошиваем файлы файловой системы **SPIFFS**, в Ардуино нужно выбрать **Инструмены --> ESP32 Sketch Data Upload**
 
-![Weather monitor](/img/20200918_165717.jpg)
+После прошивки **монитор погоды** нужно настроить. Ненастроенный прибор сам включает точку доступа (создает WiFi сеть) **BIM32** с паролем сети по умолчанию **1234567890**. А в дальнейшем, чтоб ее снова включить, нужно нажать и удерживать нажатой кнопку **Settings**, пока на экране вместо символа антенны не появится символ точки доступа. Подключив ноутбук или телефон к сети **BIM32** нужно открыть браузер и перейти по адресу **http://192.168.4.1**. Введите логин **admin** и пароль **1111** чтоб открыть страницу настроек. В дальнейшем, в целях безопасности, рекомендуется сменить пароль по умолчанию.
 
-![Weather monitor](/img/20200918_165741.jpg)
+<p align="center"><img src="img/login.jpg" alt="weather monitor bim32 ws2812b display"></p>
 
-![Weather monitor](/img/20200918_170005.jpg)
+Также, когда прибор уже настроен и подключен к сети, в настройки можно попасть и без нажатия кнопки **Settings**, достаточно ввести в браузере IP-адрес **монитора погоды**. Узнать этот адрес можно тапнув по символу антенны на экране **монитора погоды**.
+
+<p align="center"><img src="img/about.jpg" alt="weather monitor bim32 about"></p>
+
+## Фотки монитора погоды
+Ну и в конце, традиционно несколько фоток получившегося устройства. Корпус напечатан на 3д принтере и состоит из девяти частей: сам корпус, задняя стенка, крышка micro-sd карт, кнопки и пять держателей платы. 
+
+<p align="center"><img src="img/device4.jpg" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/device3.jpg" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/device2.jpg" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/device1.jpg" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/bigClock.gif" alt="weather monitor BIM32 big clock"></p>

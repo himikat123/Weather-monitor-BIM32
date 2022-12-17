@@ -1,0 +1,129 @@
+.menu-svg-bg {
+    fill: $BACKGROUND-COLOR;
+}
+
+.menu-svg-col1 {
+    fill: $MENU-COLOR;
+
+    @media(prefers-color-scheme: dark) {
+        fill: $MENU-COLOR-DARK;
+    } 
+}
+
+.menu-svg-col2 {
+    fill: #00CC99;
+}
+
+.menu-svg-col3 {
+    fill: #00BBDD;
+}
+
+.menu {
+    background-color: $MENU-COLOR;
+    height: 5rem;
+
+    @media(prefers-color-scheme: dark) {
+        background-color: $MENU-COLOR-DARK;
+    } 
+
+    &>div{
+        position: relative;
+        z-index: 10;
+        background-color: $MENU-COLOR;
+
+        @media(prefers-color-scheme: dark) {
+            background-color: $MENU-COLOR-DARK;
+        } 
+    }
+}
+
+.menu-icon {
+    width: $MENU-ICON-WIDTH;
+
+    @media(max-width: $MOBILE) {
+        width: $MENU-ICON-WIDTH-MOBILE;
+    }
+}
+
+.dropdown-toggle::after {
+    content: none;
+}
+
+#account-submenu {
+    margin-left: -7rem;
+
+    @media(max-width: $MOBILE) {
+        margin-left: 0;
+    }
+}
+
+.dropdown-divider {
+    @media(prefers-color-scheme: dark) {
+        color: white;
+    }
+}
+
+.nav-item > a {
+    transition: 250ms;
+    
+    &:hover {
+        transform: scale(1.2);
+
+        @media(max-width: $MOBILE) {
+            transform: scale(1);
+        }
+    }
+}
+
+.dropdown-menu {
+    @media(prefers-color-scheme: dark) {
+        background-color: $BACKGROUND-COLOR-DARK;
+    }
+}
+
+.dropdown-item {
+    @media(prefers-color-scheme: dark) {
+        color: white;
+    }
+}
+
+.active-menu-item {
+    transform: scale(1.2);
+
+    .menu-svg-bg {
+        fill: #EEF;
+    }
+
+    .menu-svg-col1 {
+        fill: black;
+    }
+}
+
+.button-up {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    background-color: transparent;
+    border: 1px solid $TEXT-COLOR;
+    border-radius: 50%;
+    opacity: .5;
+    z-index: 3;
+
+    @media(prefers-color-scheme: dark) {
+        border: 1px solid $TEXT-COLOR-DARK;
+    }
+
+    svg {
+        fill: $TEXT-COLOR;
+
+        @media(prefers-color-scheme: dark) {
+            fill: $TEXT-COLOR-DARK;
+        }
+    }
+}
+
+.hide {
+    display: none;
+}

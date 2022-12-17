@@ -1,0 +1,12 @@
+<svg version="1.1" x="0px" y="0px" viewBox="0 0 500 500" style="enable-background:new 0 0 500 500;" xml:space="preserve">
+	<g>
+		<circle className="menu-svg-bg" cx="250" cy="250" r="250"/>
+	</g>
+	<rect x="100.5" y="237" className="menu-svg-col1" width="80" height="183"/>
+	<rect x="207.5" y="281" className="menu-svg-col1" width="80" height="139"/>
+	<rect x="315" y="175" className="menu-svg-col1" width="80" height="245"/>
+	<rect x="66.79" y="161.22" transform="matrix(0.866 -0.5 0.5 0.866 -68.8684 97.4188)" className="menu-svg-col1" width="161.12" height="32"/>
+	<rect x="201.61" y="133.87" transform="matrix(-0.5 -0.866 0.866 -0.5 232.8558 436.1714)" className="menu-svg-col1" width="81.46" height="34"/>
+	<rect x="259.28" y="128.77" transform="matrix(0.866 -0.5 0.5 0.866 -30.2028 173.5688)" className="menu-svg-col1" width="99" height="28.75"/>
+	<polygon className="menu-svg-col1" points="406.47,86.7 373.53,158.86 327.5,79.14 "/>
+</svg>
