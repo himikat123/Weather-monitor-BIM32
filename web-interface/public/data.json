@@ -132,6 +132,10 @@
             {
                 "name": "alarm.json",
                 "size": "823"
+            },
+            {
+                "name": "icon48.png",
+                "size": "20000"
             }
         ]
     }

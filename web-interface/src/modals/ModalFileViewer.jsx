@@ -17,7 +17,10 @@ class ModalFileViewer extends React.Component{
                             <button type="button" className="btn-close" data-bs-dismiss="modal" title={text.get('close', lang)}></button>
                         </div>
                         <div className="modal-body">
-                            <pre>{this.props.data}</pre>
+                            {this.props.fileName && this.props.fileName.endsWith('.png') ?
+                                <p className="text-center"><img src={this.props.fileName}/></p> : 
+                                <pre>{this.props.data}</pre>
+                            }
                         </div>
                         <div className="modal-footer">
                             <button type="button" id="closeFileViewer" className="btn btn-secondary" data-bs-dismiss="modal">
