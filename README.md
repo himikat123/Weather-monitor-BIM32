@@ -74,7 +74,7 @@
 ## Дополнительный 7-сегментный дисплей
 В качестве дополнения, к **монитору погоды** можно подключить **[дополнительный 7-сегментный цветной дисплей](/7segment_display/README.md).**
 
-<p align="center"><img src="img/clockBig.jpg" alt="weather monitor BIM32 big clock"></p>
+<p align="center"><img src="7segment_display/img/clockBig.jpg" alt="weather monitor BIM32 big clock"></p>
 
 ## Схема монитора погоды
 
