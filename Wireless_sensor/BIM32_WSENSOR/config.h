@@ -5,14 +5,13 @@
  */
 // #define USE_BME280
 // #define USE_SHT21
-#define USE_DHT22
 
 /**
  * Temperature sensor(s)
  * 
  * Uncomment as many sensors as you need them
  */
-#define USE_DS18B20_1
+// #define USE_DS18B20_1
 // #define USE_DS18B20_2
 // #define USE_DS18B20_3
 // #define USE_DS18B20_4
@@ -34,7 +33,7 @@
  * 
  * Uncomment if you need it
  */
-#define USE_MAX44009
+// #define USE_MAX44009
 
 
 /**
