@@ -546,15 +546,20 @@ void webInterface_init(void) {
   
   server.begin();
 
+  uint32_t chipId = 0;
+  for(int i=0; i<17; i=i+8) {
+    chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  }
   SSDP.setSchemaURL("description.xml");
   SSDP.setHTTPPort(80);
   SSDP.setName("Weather monitor");
-  SSDP.setSerialNumber(WiFi.macAddress());
+  SSDP.setSerialNumber(chipId);
   SSDP.setURL("/");
   SSDP.setModelName("BIM32");
   SSDP.setModelNumber(String(global.fw));
+  SSDP.setModelURL("https://github.com/himikat123/Weather-monitor-BIM32");
   SSDP.setManufacturer("himikat123@gmail.com");
-  SSDP.setManufacturerURL("https://github.com/himikat123/Weather-monitor-BIM32");
+  SSDP.setManufacturerURL("https://radiokot.ru/artfiles/6571/");
   SSDP.setDeviceType("rootdevice");
   SSDP.setServerName("SSDPServer/1.0");
   SSDP.setIcons("<icon>"
