@@ -159,11 +159,13 @@ void Weather::update() {
     Serial.println("Wrong weather provider");
     return;
   }
+  Serial.println(url);
   HTTPClient clientWeather;
   clientWeather.begin(url);
   int httpCode = clientWeather.GET();
   if(httpCode == HTTP_CODE_OK) {
     String httpData = clientWeather.getString();
+    Serial.println(httpData);
     DynamicJsonDocument weather(8192);
     DeserializationError errorWeather = deserializeJson(weather, httpData);
     if(errorWeather) {
@@ -239,10 +241,12 @@ void Weather::_updateWeatherbitDaily(void) {
   if(config.weather_citysearch() == 2) url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
   url += "&key=" + config.weather_appid(WEATHERBIT);
   HTTPClient clientDaily;
+  Serial.println(url);
   clientDaily.begin(url);
   int httpCode = clientDaily.GET();
   if(httpCode == HTTP_CODE_OK) {
     String httpData = clientDaily.getString();
+    Serial.println(httpData);
     DynamicJsonDocument forecast(8192);
     DeserializationError errorForecast = deserializeJson(forecast, httpData);
     if(errorForecast) {
@@ -284,17 +288,31 @@ void Weather::_updateOpenweathermapHourly(void) {
  */
 void Weather::_openweathermapHourlyViaParsingServer(void) {
   Serial.println("Update via parsing server... ");
+  String location = "";
+  if(config.weather_citysearch() == 0) {
+    if(config.weather_city() == "") return;
+    location = "?q=" + config.weather_city();
+  }
+  if(config.weather_citysearch() == 1) {
+    if(config.weather_cityid() == "") return;
+    location = "?id=" + config.weather_cityid();
+  }
+  if(config.weather_citysearch() == 2) {
+    if(config.weather_lat() == "" || config.weather_lon() == "") return;
+    location = "?lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
+  }
   String url = config.weather_parsingServer();
-  url += "?country=" + _country;
-  url += "&city=" + _city;
+  url += location;
   url += "&provider=" + String(config.weather_provider());
   url += "&appid=" + config.weather_appid(config.weather_provider());
   url += "&mac=" + WiFi.macAddress();
   HTTPClient clientHourly;
+  Serial.println(url);
   clientHourly.begin(url);
   int httpCode = clientHourly.GET();
   if(httpCode == HTTP_CODE_OK) {
     String httpData = clientHourly.getString();
+    Serial.println(httpData);
     DynamicJsonDocument hourly(8192);
     DeserializationError errorHourly = deserializeJson(hourly, httpData);
     if(errorHourly) {
@@ -331,7 +349,20 @@ void Weather::_openweathermapHourly(void) {
   Serial.println("Update from openweathermap server... ");
   OWMfiveForecast owF5;
   OWM_fiveForecast *ow_fcast5 = new OWM_fiveForecast[40];
-  unsigned int entries = owF5.updateForecast(ow_fcast5, 40, config.weather_appid(config.weather_provider()), _country, _city, "metric");
+  String location = "";
+  if(config.weather_citysearch() == 0) {
+    if(config.weather_city() == "") return;
+    location = "q=" + config.weather_city();
+  }
+  if(config.weather_citysearch() == 1) {
+    if(config.weather_cityid() == "") return;
+    location = "id=" + config.weather_cityid();
+  }
+  if(config.weather_citysearch() == 2) {
+    if(config.weather_lat() == "" || config.weather_lon() == "") return;
+    location = "lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
+  }
+  unsigned int entries = owF5.updateForecast(ow_fcast5, 40, config.weather_appid(config.weather_provider()), location, "metric");
   for(unsigned int i=0; i<=entries; i++) { 
     _hourlyDate[i] = ow_fcast5[i].dt.toInt();
     _hourlyIcon[i] = ow_fcast5[i].icon.toInt();

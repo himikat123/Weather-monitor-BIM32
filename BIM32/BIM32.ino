@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v3.0
+ *  Weather Monitor BIM32 v3.1
  *  https://github.com/himikat123/Weather-monitor-BIM32
 
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2022
@@ -29,7 +29,6 @@ WiFiClient client;
 #include <AsyncTCP.h> // v1.1.1 https://github.com/me-no-dev/AsyncTCP
 #include <ESPAsyncWebServer.h> // v1.2.3 https://github.com/me-no-dev/ESPAsyncWebServer
 AsyncWebServer server(80);
-#include <OpenWeatherMap.h> // https://github.com/sfrwmaker/openweathermap.org-ESP8266
 #include <SoftwareSerial.h> // v6.16.1 https://github.com/plerup/espsoftwareserial/
 SoftwareSerial Serial3;
 #include "EasyNextionLibrary.h" // v1.0.3 https://github.com/Seithan/EasyNextionLibrary
@@ -39,6 +38,7 @@ DFRobotDFPlayerMini mp3player;
 #include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
+#include "openweathermap.hpp"
 #include "globals.hpp"
 Config config;
 #include "sensors.hpp"
@@ -102,7 +102,7 @@ void setup() {
   myNex.writeStr("page Logo");
   Serial.println(SEPARATOR);
   Serial.println(SEPARATOR);
-  Serial.println("*  Weather Monitor BIM32 v3.0    © himikat123@gmail.com   2020-2022  *");
+  Serial.println("*  Weather Monitor BIM32 " + String(global.fw) + "    © himikat123@gmail.com   2020-2022  *");
   Serial.println(SEPARATOR);
   Serial.println();
 
