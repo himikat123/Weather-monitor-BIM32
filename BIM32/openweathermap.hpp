@@ -107,8 +107,10 @@ void OWMrequest::doUpdate(String url, byte maxForecasts) {
   bool isBody = false;
   char c;
   int httpCode = http.GET();
+  Serial.println("code:" + String(httpCode));
   if(httpCode > 0) {
     WiFiClient * client = http.getStreamPtr();
+    uint32_t break_millis = millis(); 
     while(client->connected()) {
       while(true) {
         if (client->available() > 0) {
@@ -129,7 +131,9 @@ void OWMrequest::doUpdate(String url, byte maxForecasts) {
           if (client->available() <= 0)
             break;
         }
+        if(millis() - break_millis > 120000) break;
       }
+      if(millis() - break_millis > 120000) break;
     }
   }
 }
