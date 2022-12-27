@@ -166,7 +166,7 @@ void Weather::update() {
   if(httpCode == HTTP_CODE_OK) {
     String httpData = clientWeather.getString();
     Serial.println(httpData);
-    DynamicJsonDocument weather(8192);
+    StaticJsonDocument<8192> weather;
     DeserializationError errorWeather = deserializeJson(weather, httpData);
     if(errorWeather) {
       Serial.println("Current weather deserialization error");
