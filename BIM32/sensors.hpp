@@ -5,8 +5,8 @@
 #include "DHTesp.h" // v1.17.0 http://desire.giesecke.tk/index.php/2018/01/30/esp32-dht11/
 #include <MAX44009.h> // v1.2.3 https://github.com/dantudose/MAX44009
 #include <BH1750.h> // v1.1.4 https://github.com/claws/BH1750
-#include <OneWire.h> // v2.3.5 https://www.pjrc.com/teensy/td_libs_OneWire.html
-#include <DallasTemperature.h> // v3.9.0 https://github.com/milesburton/Arduino-Temperature-Control-Library
+#include <OneWire.h> // v2.3.7 https://github.com/PaulStoffregen/OneWire
+#include <DallasTemperature.h> // v3.9.1 https://github.com/milesburton/Arduino-Temperature-Control-Library
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature   term(&oneWire);
