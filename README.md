@@ -115,3 +115,17 @@
 <p align="center"><img src="img/device1.jpg" alt="weather monitor BIM32"></p>
 
 <p align="center"><img src="img/bigClock.gif" alt="weather monitor BIM32 big clock"></p>
+
+<hr>
+
+
+## Нравится проект? Купи мне кофе, или пиво.
+
+<a href="https://www.paypal.com/donate/?hosted_button_id=R4QDCRKTC9QA6">
+    <img src="https://img.shields.io/badge/Donate-PayPal-green.svg" alt="Donate">
+</a>
+
+
+<a href="https://www.buymeacoffee.com/himikat123Q">
+    <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Donate" width="150">
+</a>
