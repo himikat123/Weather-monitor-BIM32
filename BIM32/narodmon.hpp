@@ -25,7 +25,7 @@ void Narodmon::send() {
     buf += _fieldsPrepare(i, config.narodmonSend_metrics(i), mac); 
   }
   buf += "\n##\r\n";
-  if(!client.connect("narodmon.ru", 8283)) Serial.println("failed");
+  if(!client.connect("narodmon.ru", 8283, 3000)) Serial.println("failed");
   else {
     Serial.println(buf);
     client.print(buf);
