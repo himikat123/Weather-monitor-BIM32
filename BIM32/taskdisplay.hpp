@@ -55,14 +55,15 @@ void TaskDisplay(void *pvParameters) {
     /* Receive data from Nextion */
     nextion.dataReceive();
 
-    /* Alarm */
-    
-
     /* Hourly signal */
     sound.hourlySignal();
 
     /* Alarm */
     sound.alarm();
+
+    /* Automatic daily restart of the device at the specified time.
+     * Uncomment this line and specify the time if you need autorestart. */
+    // if(hour() == 12 and minute() == 0 and second() == 0) ESP.restart();
     
     vTaskDelay(500);
 
