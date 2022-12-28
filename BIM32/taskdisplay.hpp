@@ -15,13 +15,16 @@ void TaskDisplay(void *pvParameters) {
   
   nextion.init(); // Initialize Nextion display
     
-  while(1) {  
+  while(1) {
+      
     /* Nextion display update once in 5 seconds */
     if(millis() - disp_millis[NEXTION] > 5000) {
       disp_millis[NEXTION] = millis();
       nextion.tick();
     }
-    /* WS2812b display update once in 0.5 second */
+    
+    /* WS2812b brightness change and display update (once in 0.5 second) */
+    ws2812b.setIntensity(get_brightness(WS2812B), global.reduc[WS2812B]);
     if(config.display_type(WS2812B)) ws2812b.tick();
 
     /* Brightness change once in 1 second */
@@ -31,15 +34,8 @@ void TaskDisplay(void *pvParameters) {
       /* Nextion display brightness change */
       nextion.setIntensity(get_brightness(NEXTION), global.reduc[NEXTION]);
 
-      /* WS2812b display */
-      if(config.display_type(WS2812B)) {
-
-        /* Slow down points blinking frequency if the device isn't connected to the network */
-        ws2812b.setDotFreq(global.net_connected ? 500 : 1000);
-
-        /* WS2812b display brightness change */
-        ws2812b.setIntensity(get_brightness(WS2812B), global.reduc[WS2812B]);
-      }
+      /* WS2812b display slow down points blinking frequency if the device isn't connected to the network */
+      if(config.display_type(WS2812B)) ws2812b.setDotFreq(global.net_connected ? 500 : 1000);
 
       /* Check if need and it's time to turn off the display Nextion */
       if(isOffTime(NEXTION)) { 
