@@ -295,9 +295,9 @@ class Config {
         DynamicJsonDocument conf(12192);
         DeserializationError error = deserializeJson(conf, json);
         if(!error) {
-          #define COPYSTR(from, to) strlcpy(to, from, sizeof(to))
-          #define COPYNUM(from, to) to = from
-          #define COPYBOOL(from, to) to = from.as<bool>() 
+          #define COPYSTR(from, to) strlcpy(to, from | to, sizeof(to))
+          #define COPYNUM(from, to) to = from | to
+          #define COPYBOOL(from, to) to = from.as<bool>() | to
           
           //WiFi network
           for(unsigned int i=0; i<NETWORKS; i++) {
