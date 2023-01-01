@@ -201,8 +201,8 @@ class Config {
   float _wsensor_pow_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t power correction
   float _wsensor_enrg_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t energy correction
   float _wsensor_freq_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t frequency correction
-  unsigned int _wsensor_bat_k[WSENSORS] = {125, 125}; // Wireless sensor battery voltage ADC division factor
-  unsigned int _wsensor_bat_type[WSENSORS] = {0, 0}; // Wireless sensor battery type: 0-3xBatteries (4.5V), 1-LiIon battery (3.7V) 
+  float _wsensor_bat_k[WSENSORS] = {125, 125}; // Wireless sensor battery voltage ADC division factor
+  unsigned int _wsensor_bat_type[WSENSORS] = {0, 0}; // Wireless sensor battery type: 0 - 3x Batteries (4.5V), 1 - LiIon battery (3.7V) 
   unsigned int _wsensor_expire[WSENSORS] = {10, 10}; // Wireless sensor data expire (minutes) 1...100
   unsigned int _wsensor_channel = 1; // Wireless sensors channel number 1...100
 
@@ -298,7 +298,7 @@ class Config {
           #define COPYSTR(from, to) strlcpy(to, from | to, sizeof(to))
           #define COPYNUM(from, to) to = from | to
           #define COPYBOOL(from, to) to = from.as<bool>() | to
-          
+
           //WiFi network
           for(unsigned int i=0; i<NETWORKS; i++) {
             COPYSTR(conf["network"]["ssid"][i], _network_ssid[i]);
@@ -1117,9 +1117,9 @@ class Config {
     return _wsensor_freq_corr[num];
   }
 
-  unsigned int wsensor_bat_k(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    if(_wsensor_bat_k[num] < 10 or _wsensor_bat_k[num] > 250) return 120;
+  float wsensor_bat_k(unsigned int num) {
+    if(num >= WSENSORS) return 0.0;
+    if(_wsensor_bat_k[num] < 10.0 or _wsensor_bat_k[num] > 250.0) return 120.0;
     return _wsensor_bat_k[num];
   };
 

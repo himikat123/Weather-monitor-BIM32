@@ -88,7 +88,7 @@ void WirelessSensor::receive() {
         _frequency[number] = root["pzem"][4] | -1.0;
            
         _adc[number] = root["b"] | -1;
-        _batteryVoltage[number] = (float)_adc[number] / (300.0 - (float)config.wsensor_bat_k(number));
+        _batteryVoltage[number] = (float)_adc[number] / (300.0 - config.wsensor_bat_k(number));
         if(_batteryVoltage[number] > 0.0) {
           float umin = 3.75;
           float umax = 3.9;
