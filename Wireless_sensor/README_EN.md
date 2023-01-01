@@ -1,5 +1,5 @@
-<a href="README_EN.md"><img src="img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
-<a href="README.md"><img src="img/ru.png" alt="Читать на русском" width="50px"></a>
+<a href="README_EN.md"><img src="../img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
+<a href="README.md"><img src="../img/ru.png" alt="Читать на русском" width="50px"></a>
 
 # Wireless sensor
 
