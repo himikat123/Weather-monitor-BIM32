@@ -275,12 +275,10 @@ void Weather::_updateOpenweathermapHourly(void) {
   Serial.println(SEPARATOR);
   Serial.println("Hourly forecast update... ");
 
-  if(_country != "" && _city != "") {
-    if(config.weather_parsingServer() == "") {
-      _openweathermapHourly();
-    }
-    else _openweathermapHourlyViaParsingServer();
+  if(config.weather_parsingServer() == "") {
+    _openweathermapHourly();
   }
+  else _openweathermapHourlyViaParsingServer();
 }
 
 /**
@@ -362,7 +360,7 @@ void Weather::_openweathermapHourly(void) {
     if(config.weather_lat() == "" || config.weather_lon() == "") return;
     location = "lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
   }
-  unsigned int entries = owF5.updateForecast(ow_fcast5, 40, config.weather_appid(config.weather_provider()), location, "metric");
+  unsigned int entries = owF5.updateForecast(ow_fcast5, config.weather_appid(config.weather_provider()), location);
   for(unsigned int i=0; i<=entries; i++) { 
     _hourlyDate[i] = ow_fcast5[i].dt.toInt();
     _hourlyIcon[i] = ow_fcast5[i].icon.toInt();
