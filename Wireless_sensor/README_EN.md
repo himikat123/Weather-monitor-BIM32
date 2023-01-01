@@ -21,15 +21,15 @@ If your sensor is built on **Arduino module** then just flash it as usual.
 
 And if on ***SMD-components*** - select in the Arduino IDE **Tools** -> **Programmer** -> **Your type of programmer**
 
-<p align="center"><img src="../img/wirelessProgrammer_RU.jpg" alt="weather monitor BIM32 wireless sensor programmer select"></p>
+<p align="center"><img src="../img/wirelessProgrammer_EN.jpg" alt="weather monitor BIM32 wireless sensor programmer select"></p>
 
 Then click on the menu **Sketch** -> **Download via programmer**
 
-<p align="center"><img src="../img/wirelessProgrammerUpload_RU.jpg" alt="weather monitor BIM32 wireless sensor programmer upload"></p>
+<p align="center"><img src="../img/wirelessProgrammerUpload_EN.jpg" alt="weather monitor BIM32 wireless sensor programmer upload"></p>
 
 If Ardino does not have your programmer, select **Sketch** -> **Export binary file** from the menu.
 
-<p align="center"><img src="../img/wirelessExport_RU.jpg" alt="weather monitor BIM32 wireless sensor export compiled binary"></p>
+<p align="center"><img src="../img/wirelessExport_EN.jpg" alt="weather monitor BIM32 wireless sensor export compiled binary"></p>
 
 After compilation, two **.hex** files will appear in the project folder, you need **BIM32_wsensor.ino.eightanaloginputs.hex**, and you need to flash it into **atmega328p** using a programmer. Set the fuses as in the screenshot below.
 
