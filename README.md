@@ -1,9 +1,12 @@
+<a href="README_EN.md"><img src="img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
+<a href="README.md"><img src="img/ru.png" alt="Читать на русском" width="50px"></a> 
+
 # Монитор погоды BIM32
 ## Монитор погоды на ESP32
 
-<p align="center"><img src="img/main.gif" alt="Weather monitor based on ESP32"></p> 
+<p align="center"><img src="img/main_RU.gif" alt="Weather monitor based on ESP32"></p> 
 
-<p align="center"><img src="img/clocks.gif" alt="Weather monitor based on ESP32"></p> 
+<p align="center"><img src="img/clocks_RU.gif" alt="Weather monitor based on ESP32"></p> 
 
 ### Краткий список возможностей монитора погоды:
 
@@ -95,13 +98,13 @@
 4. Прошиваем плату скетчем
 5. Прошиваем файлы файловой системы **SPIFFS**, в Ардуино нужно выбрать **Инструмены --> ESP32 Sketch Data Upload**
 
-После прошивки **монитор погоды** нужно настроить. Ненастроенный прибор сам включает точку доступа (создает WiFi сеть) **BIM32** с паролем сети по умолчанию **1234567890**. А в дальнейшем, чтоб ее снова включить, нужно нажать и удерживать нажатой кнопку **Settings**, пока на экране вместо символа антенны не появится символ точки доступа. Подключив ноутбук или телефон к сети **BIM32** нужно открыть браузер и перейти по адресу **http://192.168.4.1**. Введите логин **admin** и пароль **1111** чтоб открыть страницу настроек. В дальнейшем, в целях безопасности, рекомендуется сменить пароль по умолчанию.
+После прошивки **монитор погоды** нужно настроить. Ненастроенный прибор сам включает точку доступа (создает WiFi сеть) **Weather monitor BIM32** с паролем сети по умолчанию **1234567890**. А в дальнейшем, чтоб ее снова включить, нужно нажать и удерживать нажатой кнопку **Settings**, пока на экране вместо символа антенны не появится символ точки доступа. Подключив ноутбук или телефон к сети **Weather monitor BIM32** нужно открыть браузер и перейти по адресу **http://192.168.4.1**. Введите логин **admin** и пароль **1111** чтоб открыть страницу настроек. В дальнейшем, в целях безопасности, рекомендуется сменить пароль по умолчанию.
 
-<p align="center"><img src="img/login.jpg" alt="weather monitor bim32 ws2812b display"></p>
+<p align="center"><img src="img/login_RU.jpg" alt="weather monitor bim32 ws2812b display"></p>
 
 Также, когда прибор уже настроен и подключен к сети, в настройки можно попасть и без нажатия кнопки **Settings**, достаточно ввести в браузере IP-адрес **монитора погоды**. Узнать этот адрес можно тапнув по символу антенны на экране **монитора погоды**.
 
-<p align="center"><img src="img/about.jpg" alt="weather monitor bim32 about"></p>
+<p align="center"><img src="img/about_RU.jpg" alt="weather monitor bim32 about"></p>
 
 ## Фотки монитора погоды
 Ну и в конце, традиционно несколько фоток получившегося устройства. Корпус напечатан на 3д принтере и состоит из девяти частей: сам корпус, задняя стенка, крышка micro-sd карт, кнопки и пять держателей платы. 
@@ -112,7 +115,7 @@
 
 <p align="center"><img src="img/device2.jpg" alt="weather monitor BIM32"></p>
 
-<p align="center"><img src="img/device1.jpg" alt="weather monitor BIM32"></p>
+<p align="center"><img src="img/device1_RU.jpg" alt="weather monitor BIM32"></p>
 
 <p align="center"><img src="img/bigClock.gif" alt="weather monitor BIM32 big clock"></p>
 
