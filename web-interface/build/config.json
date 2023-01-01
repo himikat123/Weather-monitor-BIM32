@@ -27,7 +27,7 @@
 		"type":0
 	},
 	"accessPoint":{
-		"ssid":"BIM32",
+		"ssid":"Weather monitor BIM32",
 		"pass":"1234567890",
 		"chnl":1,
 		"ip":"192.168.1.4",
