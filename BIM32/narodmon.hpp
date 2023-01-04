@@ -45,7 +45,7 @@ void Narodmon::send() {
  */
 String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String mac) {
   String fields = "";
-  String field = "\n#" + metrics + mac + "#";
+  String field = "\n#" + metrics + "_" + mac + "#";
   switch(config.narodmonSend_sensors(fieldNum)) {
     case 0: ; break; // --
     
@@ -169,6 +169,12 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         if(wsensType == 13 and wsensor.checkBatVolt(vbat)) fields = field + String(vbat);
         if(wsensType == 14 and wsensor.checkBatPercent(batprc)) fields = field + String(batprc);
         if(wsensType == 15 and wsensor.checkBatLvl(batlvl)) fields = field + String(batlvl);
+      }
+    }; break;
+
+    case 12:{ // thingspeak
+      if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+        fields = field + String(thingspeak.get_field(config.narodmonSend_thing(fieldNum)));
       }
     }; break;
     

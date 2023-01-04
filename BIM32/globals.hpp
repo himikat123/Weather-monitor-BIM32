@@ -248,6 +248,7 @@ class Config {
   unsigned int _narodmonSend_types[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send to Narodmon
   unsigned int _narodmonSend_wsensors[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send to Narodmon
   unsigned int _narodmonSend_wtypes[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Narodmon
+  unsigned int _narodmonSend_thing[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Thingspeak field number to send to Narodmon
 
   // Account
   char _account_name[33] = "admin"; // Web interface username
@@ -494,6 +495,7 @@ class Config {
             COPYNUM(conf["narodmonSend"]["types"][i], _narodmonSend_types[i]);
             COPYNUM(conf["narodmonSend"]["wsensors"][i], _narodmonSend_wsensors[i]);
             COPYNUM(conf["narodmonSend"]["wtypes"][i], _narodmonSend_wtypes[i]);
+            COPYNUM(conf["narodmonSend"]["thing"][i], _narodmonSend_thing[i]);
           }
 
           // Comfort
@@ -1288,7 +1290,7 @@ class Config {
 
   unsigned int narodmonSend_sensors(unsigned int num) {
     if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_sensors[num] > 11) return 0;
+    if(_narodmonSend_sensors[num] > 12) return 0;
     return _narodmonSend_sensors[num];
   }
 
@@ -1313,6 +1315,12 @@ class Config {
     if(num >= NAROD_FIELDS) return 0;
     if(_narodmonSend_wtypes[num] > 15) return 0;
     return _narodmonSend_wtypes[num];
+  }
+
+  unsigned int narodmonSend_thing(unsigned int num) {
+    if(num >= NAROD_FIELDS) return 0;
+    if(_narodmonSend_thing[num] > 7) return 0;
+    return _narodmonSend_thing[num];
   }
 
   unsigned int comfort_temp_source() {

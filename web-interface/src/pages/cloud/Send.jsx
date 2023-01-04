@@ -16,6 +16,8 @@ class Send extends SendFn {
             '--', text.get('forecast', lang), 'BME280', 'BMP180', 'SHT21', 'DHT22', 'DS18B20', 
             'MAX44009', 'BH1750', text.get('analogInput', lang), 'ESP32', text.get('wirelessSensor', lang)
         ];
+        let narodSensors = sensors.slice(0);
+        narodSensors.push('thingspeak');
         let thp = [text.get('temperature', lang), text.get('humidity', lang), text.get('pressure', lang)];
         let th = [text.get('temperature', lang), text.get('humidity', lang)];
         let tp = [text.get('temperature', lang), text.get('pressure', lang)];
@@ -31,6 +33,8 @@ class Send extends SendFn {
         for(let i=0; i<2; i++) wSensors.push(text.get('wirelessSensor', lang) + ' ' + i);
         let tf = this.props.config.hasOwnProperty('thingspeakSend') ? this.props.config.thingspeakSend.fields : 0;
         let nf = this.props.config.hasOwnProperty('narodmonSend') ? this.props.config.narodmonSend.sensors : 0;
+        let fields = [];
+        for(let i=1; i<=8; i++) fields.push(text.get('field', lang) + ' ' + i);
 
         return (<>
             <Menu language={lang} />
@@ -54,7 +58,7 @@ class Send extends SendFn {
                             <div className="row">
 
                                 {/* Period */}
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                                <div className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <NumberInput label={text.get('periodMinutes', lang)}
                                         value={'thingspeakSend.period'}
                                         min="1"
@@ -66,7 +70,7 @@ class Send extends SendFn {
                                 </div>
 
                                 {/* Channel ID */}
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                                <div className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <TextInput label="Channel ID"
                                         maxLength="20" 
                                         placeholder="Channel ID" 
@@ -77,7 +81,7 @@ class Send extends SendFn {
                                 </div>
                                 
                                 {/* Write API Key */}
-                                <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
+                                <div className="col-12 col-sm-6 col-md-4 col-lg-3">
                                     <TextInput label="Write API Key"
                                         maxLength="32" 
                                         placeholder="Write API Key" 
@@ -90,7 +94,7 @@ class Send extends SendFn {
                             <div className="row">    
                                 {/* Field 1...8 */}
                                 {[...Array(8)].map((x, i) =>
-                                    <div className="pb-4 col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={i}>
+                                    <div className="pb-4 col-12 col-sm-6 col-md-4 col-lg-3" key={i}>
                                         <SelectInput value={`thingspeakSend.fields.${i}`}
                                             label={text.get('field', lang) + ' ' + (i + 1)}
                                             options={sensors} 
@@ -199,7 +203,7 @@ class Send extends SendFn {
                                     <div className="pb-4 col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2" key={i}>
                                         <SelectInput value={`narodmonSend.sensors.${i}`}
                                             label={text.get('sensor', lang) + ' ' + (i + 1)}
-                                            options={sensors} 
+                                            options={narodSensors} 
                                             config={this.props.config} 
                                             changedConfig={this.changedConfig}
                                         />
@@ -221,6 +225,14 @@ class Send extends SendFn {
                                             <SelectInput value={`narodmonSend.wtypes.${i}`}
                                                 label={text.get('sensorType', lang)}
                                                 options={wTypes} 
+                                                config={this.props.config} 
+                                                changedConfig={this.changedConfig}
+                                            />
+                                        </>}
+                                        {nf[i] == 12 && <>
+                                            <SelectInput value={`narodmonSend.thing.${i}`}
+                                                label={text.get('field', lang)}
+                                                options={fields} 
                                                 config={this.props.config} 
                                                 changedConfig={this.changedConfig}
                                             />
