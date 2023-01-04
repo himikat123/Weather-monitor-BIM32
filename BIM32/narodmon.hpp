@@ -155,7 +155,8 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         float enrg = wsensor.get_energy(wsensNum, config.wsensor_enrg_corr(wsensNum));
         float freq = wsensor.get_frequency(wsensNum, config.wsensor_freq_corr(wsensNum));
         float vbat = wsensor.get_batteryVoltage(wsensNum);
-        unsigned int batlvl = wsensor.get_batteryLevel(wsensNum);
+        int batlvl = wsensor.get_batteryLevel(wsensNum);
+        int batprc = wsensor.get_batteryPercentage(wsensNum);
         if(wsensType >= 0 and wsensType <= 4 and sensors.checkTemp(temp)) fields = field + String(temp);
         if(wsensType == 5 and sensors.checkHum(hum)) fields = field + String(hum);
         if(wsensType == 6 and sensors.checkPres(pres)) fields = field + String(pres);
@@ -166,7 +167,8 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         if(wsensType == 11 and wsensor.checkEnrg(enrg)) fields = field + String(enrg);
         if(wsensType == 12 and wsensor.checkFrq(freq)) fields = field + String(freq);
         if(wsensType == 13 and wsensor.checkBatVolt(vbat)) fields = field + String(vbat);
-        if(wsensType == 14 and wsensor.checkBatLvl(batlvl)) fields = field + String(batlvl);
+        if(wsensType == 14 and wsensor.checkBatPercent(batprc)) fields = field + String(batprc);
+        if(wsensType == 15 and wsensor.checkBatLvl(batlvl)) fields = field + String(batlvl);
       }
     }; break;
     

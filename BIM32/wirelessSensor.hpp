@@ -10,6 +10,7 @@ class WirelessSensor {
     bool checkFrq(float frq);
     bool checkBatVolt(float volt);
     bool checkBatLvl(int lvl);
+    bool checkBatPercent(int percent);
     unsigned int get_updated(unsigned int num);
     float get_temperature(unsigned int num, unsigned int sensor, float corr);
     String get_sensorType(unsigned int num, unsigned int sensor);
@@ -26,6 +27,7 @@ class WirelessSensor {
     int get_batteryAdc(unsigned int num);
     float get_batteryVoltage(unsigned int num);
     int get_batteryLevel(unsigned int num);
+    int get_batteryPercentage(unsigned int num);
 
   private:
     unsigned int _updated[WSENSORS] = {0, 0};        // Last update timestamp
@@ -46,6 +48,7 @@ class WirelessSensor {
     int _adc[WSENSORS] = {-1, -1};                   // Battery ADC raw data
     float _batteryVoltage[WSENSORS] = {-1.0, -1.0};  // Battery voltage
     int _batteryLevel[WSENSORS] = {-1, -1};          // Battery level
+    int _batteryPercentage[WSENSORS] = {-1, -1};     // Battery percentage
 };
 
 void WirelessSensor::receive() {
@@ -98,6 +101,8 @@ void WirelessSensor::receive() {
           else if(_batteryVoltage[number] < (umin + stp * 2)) _batteryLevel[number] = 2;
           else if(_batteryVoltage[number] < (umin + stp * 3)) _batteryLevel[number] = 3;
           else _batteryLevel[number] = 4;
+          _batteryPercentage[number] = (_batteryVoltage[number] - umin) * 100 / (umax - umin); 
+          if(_batteryPercentage[number] > 100) _batteryPercentage[number] = 100;
         }
             
         Serial.printf("Sensor %d updated at: ", number);
@@ -168,6 +173,13 @@ bool WirelessSensor::checkBatVolt(float volt) {
  */
 bool WirelessSensor::checkBatLvl(int lvl) {
   return (lvl >= 1 and lvl <= 4);
+}
+
+/**
+ * Check if battery percentage is within the normal range
+ */
+bool WirelessSensor::checkBatPercent(int percent) {
+  return (percent >= 0 and percent <= 100);
 }
         
 /*
@@ -253,4 +265,9 @@ float WirelessSensor::get_batteryVoltage(unsigned int num) {
 int WirelessSensor::get_batteryLevel(unsigned int num) {
   if(num >= WSENSORS) return -1;
   return _batteryLevel[num];
+}
+
+int WirelessSensor::get_batteryPercentage(unsigned int num) {
+  if(num >= WSENSORS) return -1;
+  return _batteryPercentage[num];
 }

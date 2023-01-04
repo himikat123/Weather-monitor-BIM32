@@ -322,7 +322,13 @@ void Nextion::_voltage(void) {
           myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
         else myNex.writeStr("Main.uBat.txt", "");
       }
-      else if(config.display_source_volt_volt() == 1) { // PZEM-004t voltage
+      else if(config.display_source_volt_volt() == 1) { // battery percentage
+        float percentage = wsensor.get_batteryPercentage(config.display_source_volt_wsensNum());
+        if(wsensor.checkBatPercent(percentage)) 
+          myNex.writeStr("Main.uBat.txt", String(percentage, 0) + "%");
+        else myNex.writeStr("Main.uBat.txt", "");
+      }
+      else if(config.display_source_volt_volt() == 2) { // PZEM-004t voltage
         float voltage = wsensor.get_voltage(config.display_source_volt_wsensNum(), config.wsensor_volt_corr(config.display_source_volt_wsensNum()));
         if(wsensor.checkVolt(voltage))
           myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());

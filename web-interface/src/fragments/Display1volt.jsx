@@ -28,7 +28,11 @@ class Display1volt extends Save {
 
                 {/* Wireless sensor */}
                 {this.props.config.display.source.volt.sens == 1 &&
-                    <Display1wSens optsVolt={[text.get('batteryVoltage', lang), text.get('voltage', lang) + ' PZEM-004t']}
+                    <Display1wSens optsVolt={[
+                            text.get('batteryVoltage', lang), 
+                            text.get('batteryPercentage', lang),  
+                            text.get('voltage', lang) + ' PZEM-004t'
+                        ]}
                         wSensNum={'display.source.volt.wsensNum'} 
                         volt={'display.source.volt.volt'}
                         config={this.props.config} 

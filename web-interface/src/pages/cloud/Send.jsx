@@ -25,7 +25,7 @@ class Send extends SendFn {
             text.get('temperature', lang) + ' 3', text.get('temperature', lang) + ' 4', text.get('humidity', lang),
             text.get('pressure', lang), text.get('ambientLight', lang), text.get('voltage', lang), text.get('current', lang),
             text.get('power', lang), text.get('energy', lang), text.get('frequency', lang), 
-            text.get('batteryVoltage', lang), text.get('batteryLevel', lang)
+            text.get('batteryVoltage', lang), text.get('batteryPercentage', lang), text.get('batteryLevel', lang)
         ];
         let wSensors = [];
         for(let i=0; i<2; i++) wSensors.push(text.get('wirelessSensor', lang) + ' ' + i);
@@ -86,17 +86,6 @@ class Send extends SendFn {
                                         changedConfig={this.changedConfig} 
                                     />
                                 </div>
-                                
-                                {/* Read API Key */}
-                                {/* <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2">
-                                    <TextInput label="Read API Key"
-                                        maxLength="32" 
-                                        placeholder="Read API Key" 
-                                        value="thingspeakSend.rdkey" 
-                                        config={this.props.config} 
-                                        changedConfig={this.changedConfig} 
-                                    />
-                                </div> */}
                             </div><hr />
                             <div className="row">    
                                 {/* Field 1...8 */}
