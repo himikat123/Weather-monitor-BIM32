@@ -25,7 +25,8 @@ in file /public/data.json set
         $ cd .\web-interface
         $ npm run build
 
-in file /built/index.html <script>...</script> move in between </body> and </html>
+then in file **/built/index.html** move the ***&lt;script&gt;...&lt;/script&gt;*** tag along with its contents between tags ***&lt;/body&gt;*** and ***&lt;/html&gt;***
+
 and then run
 
         $ gulp
