@@ -20,7 +20,8 @@ String web_sensorsPrepare(bool logged) {
   json["state"] = logged ? "OK" : "LOGIN";
   json["fw"] = global.fw;
   unsigned long mil = millis() / 1000;
-  sprintf(buf, "%d:%02d:%02d", mil / 3600 % 24, mil / 60 % 60, mil % 60);
+  if(mil <= 86400) sprintf(buf, "%d:%02d:%02d", hour(mil), minute(mil), second(mil));
+  else sprintf(buf, "%d:%02d:%02d:%02d", round(mil / 86400), hour(mil), minute(mil), second(mil));
   json["runtime"] = buf;
   json["time"] = web_timeString(now());
   json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
@@ -242,14 +243,8 @@ void web_dispToggle(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
     if(request->hasArg("num")) {
       unsigned int disp = (request->arg("num")).toInt();
-      if(disp == NEXTION) {
-        global.disp_autoOff[NEXTION] = millis();
-        nextion.displayToggle();
-      }
-      if(disp == WS2812B) {
-        global.disp_autoOff[WS2812B] = millis();
-        ws2812b.displayToggle();
-      }
+      if(disp == NEXTION) global.display1_but_pressed = true;
+      if(disp == WS2812B) global.display2_but_pressed = true;
       request->send(200, "text/plain", "OK");
     }
     else request->send(200, "text/plain", "ERROR");

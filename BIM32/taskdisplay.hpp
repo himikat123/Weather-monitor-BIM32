@@ -1,11 +1,12 @@
 unsigned int get_brightness(unsigned int display_num);
-bool isOffTime(unsigned int dispNum);
+bool isOffTime(unsigned int dispNum, bool buttonWasPressed);
 
 void TaskDisplay(void *pvParameters) {
   (void) pvParameters;
 
   unsigned int bright_update = 0;
   unsigned int disp_millis[2] = {0, 0};
+  bool buttonWasPressed[2] = {false, false};
 
   #define HOUR 0
   #define MINUTE 1
@@ -16,6 +17,21 @@ void TaskDisplay(void *pvParameters) {
   nextion.init(); // Initialize Nextion display
     
   while(1) {
+    /* Display 1 toogle if display 1 button was pressed */
+    if(global.display1_but_pressed) {
+      global.display1_but_pressed = false;
+      global.disp_autoOff[NEXTION] = millis();
+      nextion.displayToggle();
+      buttonWasPressed[0] = !buttonWasPressed[0];
+    }
+
+    /* Display 2 toogle if display 2 button was pressed */
+    if(global.display2_but_pressed) {
+      global.display2_but_pressed = false;
+      global.disp_autoOff[WS2812B] = millis();
+      ws2812b.displayToggle();
+      buttonWasPressed[1] = !buttonWasPressed[1];
+    }
       
     /* Nextion display update once in 5 seconds */
     if(millis() - disp_millis[NEXTION] > 5000) {
@@ -38,14 +54,16 @@ void TaskDisplay(void *pvParameters) {
       if(config.display_type(WS2812B)) ws2812b.setDotFreq(global.net_connected ? 500 : 1000);
 
       /* Check if need and it's time to turn off the display Nextion */
-      if(isOffTime(NEXTION)) { 
+      if(isOffTime(NEXTION, buttonWasPressed[NEXTION])) { 
         if(nextion.isDisplayOn()) nextion.displayOff(); 
       }
+      else if(!buttonWasPressed[NEXTION] && config.display_nightOff(NEXTION)) nextion.displayOn();
 
       /* Check if need and it's time to turn off the display WS2812b */
-      if(isOffTime(WS2812B)) { 
+      if(isOffTime(WS2812B, buttonWasPressed[WS2812B])) { 
         if(ws2812b.isDisplayOn()) ws2812b.displayOff(); 
       }
+      else if(!buttonWasPressed[WS2812B] && config.display_nightOff(WS2812B)) ws2812b.displayOn();
     }
 
     /* Receive data from Nextion */
@@ -121,11 +139,14 @@ unsigned int get_brightness(unsigned int display_num) {
 /**
  * Check if need and it's time to turn off display
  */
-bool isOffTime(unsigned int dispNum) {
+bool isOffTime(unsigned int dispNum, bool buttonWasPressed) {
   if(config.display_autoOff(dispNum) > 0 and ((millis() - global.disp_autoOff[dispNum]) > (config.display_autoOff(dispNum) * 60000))) {
     global.reduc[dispNum] = true;
     if((millis() - global.disp_autoOff[dispNum]) > ((config.display_autoOff(dispNum) * 60000) + 5000)) return true;
   }
   else global.reduc[dispNum] = false;
+  if(config.display_nightOff(dispNum) && !buttonWasPressed) {
+    if((hour() >= config.display_nightOff_from(dispNum)) && hour() < config.display_nightOff_to(dispNum)) return true;
+  }
   return false;
 }

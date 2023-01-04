@@ -25,7 +25,7 @@
 #define SEPARATOR "**********************************************************************"
 
 struct {
-  char fw[7] = "v3.2"; // Firmware version
+  char fw[7] = "v3.3"; // Firmware version
   const char* remote_host = "www.google.com"; // Remote host to ping
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
@@ -119,6 +119,9 @@ class Config {
   char _display_nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
   unsigned int _display_brightMethod[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
   unsigned int _display_autoOff[DISPLAYS] = {0, 0}; // Display auto-off time 0...1440
+  bool _display_nightOff[DISPLAYS] = {false, false}; // Turn off display at night
+  unsigned int _display_nightOff_from[DISPLAYS] = {22, 22}; // The hour from which the display is turned off
+  unsigned int _display_nightOff_to[DISPLAYS] = {7, 7}; // The hour from which the display is turned on
   unsigned int _display_brightness_day[DISPLAYS] = {50, 50}; // Day mode brightness 1...100
   unsigned int _display_brightness_night[DISPLAYS] = {50, 50}; // Night mode brightness 1...100
   unsigned int _display_brightness_min[DISPLAYS] = {1, 1}; // Minimum brightness limit 0...255
@@ -144,7 +147,7 @@ class Config {
   unsigned int _display_source_humIn_thing = 0; // Thingspeak field number for the outdoor humidity
   unsigned int _display_source_volt_sens = 0; // Voltage data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak
   unsigned int _display_source_volt_wsensNum = 0; // Wireless sensor number for the voltage
-  unsigned int _display_source_volt_volt = 0; // Sensor type for the voltage: 0-Wireless sensor battery, 1-PZEM-004t voltage
+  unsigned int _display_source_volt_volt = 0; // Sensor type for the voltage: 0-Wireless sensor battery voltage, 1-Wireless sensor battery percentage, 2-PZEM-004t voltage
   unsigned int _display_source_volt_thing = 0; // Thingspeak field number for the voltage
   unsigned int _display_source_bat_sens = 0; // Battery level data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak
   unsigned int _display_source_bat_wsensNum = 0; // Wireless sensor number for the battery level:
@@ -349,6 +352,9 @@ class Config {
             COPYSTR(conf["display"]["nightTime"][i], _display_nightTime[i]);
             COPYNUM(conf["display"]["brightMethod"][i], _display_brightMethod[i]);
             COPYNUM(conf["display"]["autoOff"][i], _display_autoOff[i]);
+            COPYBOOL(conf["display"]["nightOff"]["need"][i], _display_nightOff[i]);
+            COPYNUM(conf["display"]["nightOff"]["from"][i], _display_nightOff_from[i]);
+            COPYNUM(conf["display"]["nightOff"]["to"][i], _display_nightOff_to[i]);
             COPYNUM(conf["display"]["brightness"]["day"][i], _display_brightness_day[i]);
             COPYNUM(conf["display"]["brightness"]["night"][i], _display_brightness_night[i]);
             COPYNUM(conf["display"]["brightness"]["min"][i], _display_brightness_min[i]);
@@ -749,6 +755,23 @@ class Config {
     if(_display_autoOff[num] > 1440) return 0; 
     return _display_autoOff[num];
   }
+  
+  bool display_nightOff(unsigned int num) {
+    if(num >= DISPLAYS) return false;
+    return _display_nightOff[num];
+  }
+
+  unsigned int display_nightOff_from(unsigned int num) {
+    if(num >= DISPLAYS) return 0;
+    if(_display_nightOff_from[num] > 23) return 0; 
+    return _display_nightOff_from[num];
+  }
+
+  unsigned int display_nightOff_to(unsigned int num) {
+    if(num >= DISPLAYS) return 0;
+    if(_display_nightOff_to[num] > 23) return 0; 
+    return _display_nightOff_to[num];
+  }
 
   unsigned int display_brightness_day(unsigned int num) {
     if(num >= DISPLAYS) return 100;
@@ -880,7 +903,7 @@ class Config {
   }
 
   unsigned int display_source_volt_volt() {
-    if(_display_source_volt_volt > 1) return 0;
+    if(_display_source_volt_volt > 2) return 0;
     return _display_source_volt_volt; 
   }
 
@@ -1217,7 +1240,7 @@ class Config {
 
   unsigned int thingspeakSend_wtypes(unsigned int num) {
     if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_wtypes[num] > 14) return 0;
+    if(_thingspeakSend_wtypes[num] > 15) return 0;
     return _thingspeakSend_wtypes[num];
   }
 
@@ -1288,7 +1311,7 @@ class Config {
 
   unsigned int narodmonSend_wtypes(unsigned int num) {
     if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_wtypes[num] > 14) return 0;
+    if(_narodmonSend_wtypes[num] > 15) return 0;
     return _narodmonSend_wtypes[num];
   }
 

@@ -58,6 +58,11 @@
 		"nightTime":["21:00","21:00"],
 		"brightMethod":[3,3],
 		"autoOff":[0,0],
+		"nightOff": {
+			"need": [0,0],
+			"from": [22,22],
+			"to": [7,7]
+		},
 		"brightness":{
 			"day":[100,100],
 			"night":[50,50],

@@ -1239,6 +1239,14 @@
         "ua": "Вимикати дисплей через (хвилин)"
     },
 
+    "turnOffDisplayAtNight": {
+        "en": "Turn off display at night",
+        "de": "Bildschirm ausschalten nachts",
+        "ru": "Отключать дисплей ночью",
+        "pl": "Wyłącz wyświetlacz na noc",
+        "ua": "Вимикати дисплей вночі"
+    },
+
     "animation": {
         "en": "Animation",
         "de": "Animation",
@@ -1773,6 +1781,14 @@
         "ru": "Напряжение батареи",
         "pl": "Napięcie baterii",
         "ua": "Напруга батареї"
+    },
+
+    "batteryPercentage": {
+        "en": "Battery percentage",
+        "de": "Batterieprozentsatz",
+        "ru": "Процент батареи",
+        "pl": "Procent baterii",
+        "ua": "Відсоток батареї"
     },
 
     "batteryLevel": {
