@@ -4,13 +4,13 @@
 
 
 ## To swith to login page
-in file /public/data.json set 
+in file **/public/data.json** set 
 
     "state": "LOGIN"
 
 
 ## To switch to other pages
-in file /public/data.json set
+in file **/public/data.json** set
 
     "state": "OK"
 
