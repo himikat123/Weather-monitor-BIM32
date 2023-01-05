@@ -106,7 +106,7 @@ Also, when the device is already configured and connected to the network, you ca
 
 <p align="center"><img src="img/about_RU.jpg" alt="weather monitor bim32 about"></p><hr />
 
-## A demo of the settings page can be viewed [here](https://bim32demo.000webhostapp.com/){:target="_blank" rel="noopener"}<hr />
+## A demo of the settings page can be viewed <a href="https://bim32demo.000webhostapp.com/" target="_blank">here</a><hr />
 
 ## Photos of the weather monitor
 Well, in the end, traditionally a few pictures of the resulting device. The case is printed on a 3D printer and consists of nine parts: the case itself, the back wall, the micro-sd card cover, buttons and five board holders.
