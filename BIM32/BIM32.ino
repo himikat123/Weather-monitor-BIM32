@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v3.3
+ *  Weather Monitor BIM32 v3.3.1
  *  https://github.com/himikat123/Weather-monitor-BIM32
 
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2023
@@ -82,7 +82,7 @@ Network network;
 */
 void setup() {
   pinMode(SET_HC12_PIN, OUTPUT);
-  digitalWrite(SET_HC12_PIN, LOW);
+  digitalWrite(SET_HC12_PIN, HIGH);
   pinMode(DISPLAY1_BUTTON_PIN, INPUT);
   pinMode(DISPLAY2_BUTTON_PIN, INPUT);
   pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);

@@ -22,8 +22,12 @@ void TaskSensors(void *pvParameters) {
   attachInterrupt(DISPLAY2_BUTTON_PIN, display2_toggle, FALLING);
   attachInterrupt(ALARM_BUTTON_PIN, alarm_button, FALLING);
 
-  // HC12 wireless module channel nummer request
+  // HC12 wireless module channel number request
+  digitalWrite(SET_HC12_PIN, LOW);
+  delay(50);
   Serial2.println("AT+RC");
+  delay(100);
+  digitalWrite(SET_HC12_PIN, HIGH);
     
   while(1) {
     /**

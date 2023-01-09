@@ -109,16 +109,17 @@ void WirelessSensor::receive() {
         Serial.printf("%d:%02d:%02d\r\n", hour(_updated[number]), minute(_updated[number]), second(_updated[number]));
       }
     }
-      
+
     if(wsensorStr.lastIndexOf("OK+RC") != -1) {
       unsigned int ch = wsensorStr.substring(5).toInt();
       if(ch != config.wsensor_channel()) {
         Serial.println("Change channel number");
+        digitalWrite(SET_HC12_PIN, LOW);
+        delay(50);
         Serial2.printf("AT+C%03d\r\n", config.wsensor_channel());
         delay(100);
         digitalWrite(SET_HC12_PIN, HIGH);
       }
-      else digitalWrite(SET_HC12_PIN, HIGH);
     }
   }
   
