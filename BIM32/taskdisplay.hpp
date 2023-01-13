@@ -57,7 +57,7 @@ void TaskDisplay(void *pvParameters) {
       if(isOffTime(NEXTION, buttonWasPressed[NEXTION])) { 
         if(nextion.isDisplayOn()) nextion.displayOff(); 
       }
-      else if(!buttonWasPressed[NEXTION] && config.display_nightOff(NEXTION)) nextion.displayOn();
+      else if(!buttonWasPressed[NEXTION] && config.display_nightOff(NEXTION)) nextion.displayOn(false);
 
       /* Check if need and it's time to turn off the display WS2812b */
       if(isOffTime(WS2812B, buttonWasPressed[WS2812B])) { 

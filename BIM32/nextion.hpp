@@ -6,7 +6,7 @@ class Nextion {
     void init(void);
     void tick(void);
     void displayToggle(void);
-    void displayOn(void);
+    void displayOn(bool doinit = true);
     void displayOff(void);
     bool isDisplayOn(void);
     void setIntensity(unsigned int brightness, bool reduc);
@@ -225,9 +225,9 @@ void Nextion::displayToggle() {
 /**
  * Turns on the display
  */
-void Nextion::displayOn() {
+void Nextion::displayOn(bool doinit) {
   _power = true;
-  init();
+  if(doinit) init();
 }
 
 /*
