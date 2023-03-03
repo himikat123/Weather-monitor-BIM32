@@ -575,8 +575,7 @@ class Lang {
       }
       else if(mil < 86400) {
         buf = String(hour(mil)) + " "; 
-        buf += (plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5() + " "; 
-        buf += _and() + " "; 
+        buf += (plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5() + " ";  
         buf += String(minute(mil)) + " ";
         buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
       }
