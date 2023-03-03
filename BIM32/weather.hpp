@@ -370,6 +370,8 @@ void Weather::_openweathermapHourly(void) {
     _hourlyWindDir[i] = ow_fcast5[i].w_deg.toInt();
     _hourlyPrec[i] = (ow_fcast5[i].cond == "rain" or ow_fcast5[i].cond == "snow") ? ow_fcast5[i].cond_value.toInt() : 0;
   }
+  delete [] ow_fcast5;
+  
   if(entries) {
     _hourlyUpdated = now();
     Serial.print("Hourly forecast updated successfully at: ");
