@@ -81,7 +81,11 @@ As an option, **[additional 7-segment color display](/7segment_display/README_EN
 
 ## Weather monitor circuit
 
-Well, as promised, a normal general schematic diagramm for general development. **Please note** if you choose not to install buttons (turn on/off displays and turn off alarms), pull-up resistors R1, R2 and R3 are still needed.
+Well, as promised, a normal general schematic diagramm for general development. 
+
+```diff 
+- **Please note** if you choose not to install buttons (turn on/off displays and turn off alarms), pull-up resistors R1, R2 and R3 are still needed.
+```
 
 <p align="center"><img src="schematic%20diagramm/bim32.png" alt="weather monitor bim32 schematic diagramm"></p>
 
