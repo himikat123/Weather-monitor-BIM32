@@ -1,4 +1,92 @@
 class Lang {
+  private:
+    String _day() {
+      if(config.lang() == "en") return "day";
+      if(config.lang() == "de") return "Tag";
+      if(config.lang() == "pl") return "dzień";
+      return "день";
+    }
+    
+    String _days2() {
+      if(config.lang() == "de") return "Tage";
+      if(config.lang() == "ru") return "дня";
+      if(config.lang() == "pl") return "dni";
+      if(config.lang() == "ua") return "дні";
+      return "days";  
+    }
+    
+    String _days5() {
+      if(config.lang() == "de") return "Tage";
+      if(config.lang() == "ru") return "дней";
+      if(config.lang() == "pl") return "dni";
+      if(config.lang() == "ua") return "днів";
+      return "days";  
+    }
+
+    String _hour() {
+      if(config.lang() == "de") return "Stunde";
+      if(config.lang() == "ru") return "час";
+      if(config.lang() == "pl") return "godzina";
+      if(config.lang() == "ua") return "година";
+      return "hour";  
+    }
+    
+    String _hours2() {
+      if(config.lang() == "de") return "Stunden";
+      if(config.lang() == "ru") return "часа";
+      if(config.lang() == "pl") return "godziny";
+      if(config.lang() == "ua") return "години";
+      return "hours";  
+    }
+    
+    String _hours5() {
+      if(config.lang() == "de") return "Stunden";
+      if(config.lang() == "ru") return "часов";
+      if(config.lang() == "pl") return "godzin";
+      if(config.lang() == "ua") return "годин";
+      return "hours";  
+    }
+
+    String _minute() {
+      if(config.lang() == "de") return "Minute";
+      if(config.lang() == "ru") return "минута";
+      if(config.lang() == "pl") return "minuta";
+      if(config.lang() == "ua") return "хвилина";
+      return "minute";
+    }
+
+    String _minutes2() {
+      if(config.lang() == "de") return "Minuten";
+      if(config.lang() == "ru") return "минуты";
+      if(config.lang() == "pl") return "minuty";
+      if(config.lang() == "ua") return "хвилини";
+      return "minutes";  
+    }
+
+    String _minutes5() {
+      if(config.lang() == "de") return "Minuten";
+      if(config.lang() == "ru") return "минут";
+      if(config.lang() == "pl") return "minut";
+      if(config.lang() == "ua") return "хвилин";
+      return "minutes";  
+    }
+
+    String _lessThanAMinute() {
+      if(config.lang() == "de") return "Weniger als einer Minute";
+      if(config.lang() == "ru") return "Меньше минуты";
+      if(config.lang() == "pl") return "Mniej niż minutę";
+      if(config.lang() == "ua") return "Менше хвилини";
+      return "Less than a minute";  
+    }
+
+    String _and() {
+      if(config.lang() == "de") return "und";
+      if(config.lang() == "ru") return "и";
+      if(config.lang() == "pl") return "i";
+      if(config.lang() == "ua") return "та";
+      return "and";  
+    }
+
   public:
     String january() {
       if(config.lang() == "de") return "Januar";
@@ -468,6 +556,42 @@ class Lang {
       if(config.lang() == "pl") return "Historia pogody na zewnątrz";
       if(config.lang() == "ua") return "Історія погоди на вулиці";
       return "Weather outdoor history";  
+    }
+
+    unsigned int plural(int num) {
+      if(num > 10 && num < 20) return 0;
+      if(num % 10 == 1) return 1;
+      if(num % 10 > 1 && num % 10 < 5) return 2;
+      return 0;
+    }
+
+    String runtime(unsigned long mil) {
+      String buf = "";
+
+      if(mil < 60) buf = _lessThanAMinute();
+      else if(mil < 3600) {
+        buf = String(minute(mil)) + " ";
+        buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
+      }
+      else if(mil < 86400) {
+        buf = String(hour(mil)) + " "; 
+        buf += (plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5() + " "; 
+        buf += _and() + " "; 
+        buf += String(minute(mil)) + " ";
+        buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
+      }
+      else {
+        int days = lround(mil / 86400);
+        buf = String(days) + " ";
+        buf += (plural(days) == 1) ? _day() : (plural(days) == 2) ? _days2() : _days5() + ", ";
+        buf += String(hour(mil)) + " ";
+        buf += (plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5() + " ";
+        buf += _and() + " ";
+        buf += String(minute(mil)) + " ";
+        buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
+      }
+      
+      return buf;
     }
 
     String comfort(unsigned int level) {

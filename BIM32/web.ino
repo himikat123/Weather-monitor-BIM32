@@ -14,15 +14,12 @@ String web_timeString(unsigned int tm) {
  * Prepare sensors data
  */
 String web_sensorsPrepare(bool logged) {
-  char buf[20];
   StaticJsonDocument<4096> json;
 
   json["state"] = logged ? "OK" : "LOGIN";
   json["fw"] = global.fw;
-  unsigned long mil = millis() / 1000;
-  if(mil <= 86400) sprintf(buf, "%d:%02d:%02d", hour(mil), minute(mil), second(mil));
-  else sprintf(buf, "%d:%02d:%02d:%02d", round(mil / 86400), hour(mil), minute(mil), second(mil));
-  json["runtime"] = buf;
+  json["runtime"] = lang.runtime(millis() / 1000);
+  json["heap"] = String(ESP.getFreeHeap());
   json["time"] = web_timeString(now());
   json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
   json["network"]["ch"] = WiFi.channel();
@@ -557,13 +554,14 @@ void webInterface_init(void) {
   SSDP.setManufacturerURL("https://radiokot.ru/artfiles/6571/");
   SSDP.setDeviceType("rootdevice");
   SSDP.setServerName("SSDPServer/1.0");
-  SSDP.setIcons("<icon>"
-                  "<mimetype>image/png</mimetype>"
-                  "<height>48</height>"
-                  "<width>48</width>"
-                  "<depth>24</depth>"
-                  "<url>icon48.png</url>"
-                "</icon>"
+  SSDP.setIcons(
+    "<icon>"
+      "<mimetype>image/png</mimetype>"
+      "<height>48</height>"
+      "<width>48</width>"
+      "<depth>24</depth>"
+      "<url>icon48.png</url>"
+    "</icon>"
   );
   SSDP.begin();
 
