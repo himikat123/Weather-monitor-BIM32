@@ -145,24 +145,24 @@ bool isOffTime(unsigned int dispNum, bool buttonWasPressed) {
     if((millis() - global.disp_autoOff[dispNum]) > ((config.display_autoOff(dispNum) * 60000) + 5000)) return true;
   }
   else global.reduc[dispNum] = false;
+
   if(config.display_nightOff(dispNum) && !buttonWasPressed) {
-    TimeElements timeFrom, timeTo;
-    timeFrom.Year = year() - 1970; 
-    timeFrom.Month = month(); 
-    timeFrom.Day = day(); 
-    timeFrom.Hour = config.display_nightOff_from(dispNum); 
-    timeFrom.Minute = 0; 
-    timeFrom.Second = 0;
-    timeTo.Year = year() - 1970; 
-    timeTo.Month = month(); 
-    timeTo.Day = day(); 
-    timeTo.Hour = config.display_nightOff_to(dispNum); 
-    timeTo.Minute = 0; 
-    timeTo.Second = 0;
-    unsigned int timestampFrom = makeTime(timeFrom);
-    unsigned int timestampTo = makeTime(timeTo);
+    TimeElements timeElm;
+    timeElm.Year = year() - 1970; 
+    timeElm.Month = month(); 
+    timeElm.Day = day(); 
+    timeElm.Hour = config.display_nightOff_from(dispNum); 
+    timeElm.Minute = 0; 
+    timeElm.Second = 0;
+    unsigned int timestampFrom = makeTime(timeElm);
+    if(hour() < config.display_nightOff_from(dispNum)) timestampFrom -= 86400;
+
+    timeElm.Hour = config.display_nightOff_to(dispNum);
+    unsigned int timestampTo = makeTime(timeElm);
+
     if(timestampFrom > timestampTo) timestampTo += 86400;
     if(timestampFrom <= now() && now() < timestampTo) return true;
   }
+
   return false;
 }
