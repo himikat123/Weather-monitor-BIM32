@@ -598,12 +598,12 @@ class Config {
    */
 
   char* network_ssid(unsigned int num) {
-    if(num >= NETWORKS) return "";
+    if(num >= NETWORKS) return (char*) "";
     return _network_ssid[num];
   }
 
   char* network_pass(unsigned int num) {
-    if(num >= NETWORKS) return "";
+    if(num >= NETWORKS) return (char*) "";
     return _network_pass[num];
   }
 
@@ -697,7 +697,7 @@ class Config {
   }
 
   char* clock_ntp() {
-    if(String(_clock_ntp) == "") return "time.nist.gov";
+    if(String(_clock_ntp) == "") return (char*) "time.nist.gov";
     return _clock_ntp;
   }
 

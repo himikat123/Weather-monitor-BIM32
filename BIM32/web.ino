@@ -524,7 +524,7 @@ void webInterface_init(void) {
   server.on("/esp/mp3play",      HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundPlay(request); });
   server.on("/esp/mp3stop",      HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundStop(request); });
   server.on("/esp/fileUpload",   HTTP_POST, [](AsyncWebServerRequest *request){ request->send(200); }, web_fileUpload);
-  server.on("/description.xml",  HTTP_GET, [&](AsyncWebServerRequest *request){ request->send(200, "text/xml", SSDP.schema(false)); });
+  server.on("/description.xml",  HTTP_GET, [&](AsyncWebServerRequest *request){ request->send(200, "text/xml", SSDP.getSchema()); });
   server.on("/esp/delete",       HTTP_POST, [](AsyncWebServerRequest *request){ web_fileDelete(request); });
   server.on("/esp/rename",       HTTP_POST, [](AsyncWebServerRequest *request){ web_fileRename(request); });
   server.on("/esp/fwUpdate",     HTTP_POST, [](AsyncWebServerRequest *request){},
