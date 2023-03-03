@@ -575,16 +575,16 @@ class Lang {
       }
       else if(mil < 86400) {
         buf = String(hour(mil)) + " "; 
-        buf += (plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5() + " ";  
+        buf += ((plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5()) + " ";  
         buf += String(minute(mil)) + " ";
         buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
       }
       else {
         int days = lround(mil / 86400);
         buf = String(days) + " ";
-        buf += (plural(days) == 1) ? _day() : (plural(days) == 2) ? _days2() : _days5() + ", ";
+        buf += ((plural(days) == 1) ? _day() : (plural(days) == 2) ? _days2() : _days5()) + ", ";
         buf += String(hour(mil)) + " ";
-        buf += (plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5() + " ";
+        buf += ((plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5()) + " ";
         buf += _and() + " ";
         buf += String(minute(mil)) + " ";
         buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
