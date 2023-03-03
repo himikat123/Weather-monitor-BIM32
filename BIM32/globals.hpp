@@ -25,7 +25,7 @@
 #define SEPARATOR "**********************************************************************"
 
 struct {
-  char fw[7] = "v3.3.1"; // Firmware version
+  char fw[7] = "v3.4"; // Firmware version
   const char* remote_host = "www.google.com"; // Remote host to ping
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
