@@ -27,7 +27,9 @@ class AppFn extends React.Component {
                 old: "",
                 new: ""
             },
-            path: ""
+            path: "",
+            gitVersion: null,
+            newVersion: false
         };
 
         this.getConfig = this.getConfig.bind(this);
@@ -64,6 +66,12 @@ class AppFn extends React.Component {
                 }, 5000);
             }
         })
+        fetch("https://raw.githubusercontent.com/himikat123/Weather-monitor-BIM32/master/BIM32/globals.hpp")
+        .then((response) => response.text())
+        .then((text) => {
+            let regex = /] = "(v.+)"/gm;
+            this.setState({ gitVersion: regex.exec(text)[1] });
+        });
     }
 
     /**
@@ -104,6 +112,9 @@ class AppFn extends React.Component {
                         dataState: { isLoaded: true }, 
                         data: result
                     });
+                    if(this.state.gitVersion) {
+                        if(result.fw != this.state.gitVersion) this.setState({ newVersion: true });
+                    }
                 },
                 (error) => {
                     this.setState({ dataState: { isLoaded: true, error } });

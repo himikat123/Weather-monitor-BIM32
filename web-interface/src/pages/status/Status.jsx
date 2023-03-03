@@ -8,6 +8,7 @@ class Status extends StatusFn {
     render() {
         let text = new Languages();
         let lang = this.props.config.lang;
+        let url = "https://github.com/himikat123/Weather-monitor-BIM32";
 
         return (<>
             <Menu language={lang} />
@@ -15,6 +16,13 @@ class Status extends StatusFn {
             <div className="d-flex justify-content-center">
                 <div className="content m-2 m-lg-5">
                     <PageHeader h="2" text={text.get('status', lang)} />
+
+                    {this.props.newVersion && 
+                        <div className="text-center border border-secondary rounded m-3 p-3">
+                            {text.get('firmwareUpdateAppeared', lang).replace(new RegExp("XXX", "g"), this.props.gitVersion)}<br />
+                            <a href={url}>{url}</a>
+                        </div>
+                    }
 
                     {this.props.data.hasOwnProperty('network') &&
                     <div className="row">

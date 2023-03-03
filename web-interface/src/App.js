@@ -43,7 +43,9 @@ class App extends AppFn {
                 <Routes>
                     <Route exact path="/" element={
                         <Status config={this.state.config} 
-                            data={this.state.data} 
+                            data={this.state.data}
+                            newVersion={this.state.newVersion}
+                            gitVersion={this.state.gitVersion}
                         />
                     } />
                     <Route exact path="/connect" element={

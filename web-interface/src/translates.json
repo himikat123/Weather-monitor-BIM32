@@ -1949,5 +1949,12 @@
         "ru": "Хранилище истории",
         "pl": "Repozytorium historii",
         "ua": "Сховище історії"
+    },
+    "firmwareUpdateAppeared": {
+        "en": "A firmware update has appeared, version XXX is available:",
+        "de": "Ein Firmware-Update ist erschienen, Version XXX ist verfügbar:",
+        "ru": "Обнаружено обновление прошивки, версия XXX доступна:",
+        "pl": "Wykryto aktualizację oprogramowania układowego, dostępna wersja XXX:",
+        "ua": "Виявлено оновлення прошивки, версія XXX доступна:"
     }
 }
