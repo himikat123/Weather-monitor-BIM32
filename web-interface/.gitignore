@@ -5,12 +5,11 @@
 /.pnp
 .pnp.js
 
+# testing
+/coverage
+
 # production
-/build/asset-manifest.json
-/build/static
- 
-# server
-/server/node_modules
+/build
 
 # misc
 .DS_Store
