@@ -8,7 +8,7 @@
  *  1.2 MB APP / 1.5 MB SPIFFS
 
  *  Arduino IDE v1.8.19
- *  ESP32 board v1.0.6
+ *  ESP32 board v1.0.5
  */
 
 /* Arduino libraries */
@@ -117,7 +117,7 @@ void setup() {
 
   delay(45);
 
-  xTaskCreatePinnedToCore(TaskDisplay, "TaskDisplay", 32768, NULL, 2, &task_display_handle, ARDUINO_RUNNING_CORE);
+  xTaskCreatePinnedToCore(TaskDisplay, "TaskDisplay", 32768, NULL, 1, &task_display_handle, ARDUINO_RUNNING_CORE);
   xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, ARDUINO_RUNNING_CORE);
 }
 
