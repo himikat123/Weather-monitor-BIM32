@@ -41,7 +41,7 @@ class Userpass extends UserpassFn {
                 </div>
             </div>
 
-            <SaveRestart config={this.props.config} save="1" restart="1" pass="1" />
+            <SaveRestart config={this.props.config} save="1" restart="1" pass="1" pass_old={this.state.oldPass} pass_new={this.state.newPass} />
         </>);
     };
 };

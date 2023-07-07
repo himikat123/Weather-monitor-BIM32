@@ -41,7 +41,7 @@ class SaveRestart extends React.Component {
                     `${href}/esp/saveAlarm` : 
                     `${href}/esp/saveConfig`,
             data: this.props.pass ?
-                `oldPass=${this.props.pass.old}&newPass=${this.props.pass.new}` :
+                `oldPass=${this.props.pass_old}&newPass=${this.props.pass_new}` :
                 this.props.alarm ?
                 `alarm=${JSON.stringify(this.props.alarm, null, '\t')}` :
                 `config=${JSON.stringify(this.props.config, null, '\t')}`
