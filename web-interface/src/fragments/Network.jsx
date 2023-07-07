@@ -71,6 +71,7 @@ class Network extends Save{
                         placeholder={text.get('networkName', lang)}  
                         defaultValue={this.state.ssid} 
                         onChange={this.SsidChanged}
+                        onClick={this.SsidChanged}
                         maxLength="32" 
                     />
 
