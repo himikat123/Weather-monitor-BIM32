@@ -260,6 +260,6 @@
 	},
 	"account":{
 		"name":"admin",
-		"required":1
+		"required":0
 	}
 }
