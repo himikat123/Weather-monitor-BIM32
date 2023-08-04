@@ -1,15 +1,15 @@
-<a href="README_EN.md"><img src="../img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
-<a href="README.md"><img src="../img/ru.png" alt="Читать на русском" width="50px"></a>
+<a href="README.md"><img src="../img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
+<a href="README_RU.md"><img src="../img/ru.png" alt="Читать на русском" width="50px"></a>
 
-## Схема дополнительного 7-сегментного дисплея
-Дополнительный 7-сегментный цветной дисплей на пиксельных светодиодах WS2812b. Изначально я купил небольшие часы на Алиэкспресс, вынул из них все внутренности и смонтировал вместо них пиксельные светодиоды. 
+## Schematic of optional 7-segment display
+Optional WS2812b pixel LED 7-segment color display. Initially, I bought a small clock from Aliexpress, took out all the insides and mounted pixel LEDs instead.
 
 <p align="center"><img src="img/litleClock.jpg" alt="weather monitor BIM32 clock"></p>
 
-В дальнейшем захотелось дисплей побольше и я напечатал его на 3d принтере. Получились довольно немаленькие часики размерами 30 х 80 см.
+In the future, I wanted a larger display and I printed it on a 3d printer. It turned out to be a rather rather big watch measuring 30 x 80 cm.
 
 <p align="center"><img src="img/clockBig.jpg" alt="weather monitor BIM32 big clock"></p>
 
-Схема соединения светодиодов показана на рисунке ниже. Нужно соединить все светодиоды последовательно, от 1 до 3 шт. на сегмент, в разделительных точках по одному светодиоду. В настройках можно выбрать количество светодиодов в сегменте. Некоторые партии светодиодов WS2812b отлично работают при входных уровнях управляющих импульсов в 3.3в, но в большинстве случаев работать они так не будут, поэтому может понадобиться преобразователь уровней сигналов. Самый простой способ - пожертвовать один такой светодиод на преобразователь. На схеме "жертвенный светодиод" обведен штрих-линией. Также стоит отметить что большое количество светодиодов WS2812b может потреблять значительный ток, для простоты расчета мощности блока питания, на странице настроек будет показан максимальный ток потребления дисплея для текущих настроек.
+The LED connection diagram is shown in the figure below. It is necessary to connect all the LEDs in series, from 1 to 3 pcs. per segment, at the dividing points, one LED each. In the settings, you can select the number of LEDs in the segment. Some batches of WS2812b LEDs work fine with 3.3V input levels, but in most cases they won't work that way, so a signal level converter may be needed. The easiest way is to donate one such LED to the converter. In the diagram, the "sacrificial LED" is circled with a dashed line. It is also worth noting that a large number of WS2812b LEDs can consume significant current, for ease of calculating the power supply capacity, the settings page will show the maximum current consumption of the display for the current settings.
 
 <p align="center"><img src="img/display2.png" alt="weather monitor bim32 ws2812b display"></p>
