@@ -1,36 +1,36 @@
-<a href="README_EN.md"><img src="../img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
-<a href="README.md"><img src="../img/ru.png" alt="Читать на русском" width="50px"></a>
+<a href="README.md"><img src="../img/en.png" alt="Read this in english" width="50px" style="margin-right:20px"></a>
+<a href="README_RU.md"><img src="../img/ru.png" alt="Читать на русском" width="50px"></a>
 
-# Беспроводной датчик
+# Wireless sensor
 
-## Схема беспроводного датчика
-Сам **беспроводной датчик** можно собрать на модуле **Arduino Nano**, или любом другом модуле построенном на **atmega328p**. В этом случае схема, сборка и прошивка **беспроводного датчика** будут максимально простыми, но в таком виде об автомном питании датчика можно забыть.
+## Wireless sensor schematic diagramm
+The **wireless sensor** itself can be assembled on the **Arduino Nano** module, or any other module built on the **atmega328p**. In this case, the circuit, assembly and flashing of the **wireless sensor** will be as simple as possible, but in this form you can forget about the autonomous power supply of the sensor.
 
 <p align="center"><img src="../img/arduino.jpg" alt="weather monitor BIM32 wireless sensor arduino based"></p>
 
-Или можно пойти более сложным путем, собрать **беспроводной датчик** из *рассыпухи* и прошить его программатором. В этом случае **беспроводной датчик** сможет прожить от трех пальчиковых батареек почти год.
+Or you can go a more complicated way, assemble the **wireless sensor** from *SMD-components* and flash it with a programmer. In this case, the **wireless sensor** will be able to live from three AA batteries for almost a year.
 
 <p align="center"><img src="../img/wireless_sensor_schematic_v2.0.png" alt="weather monitor BIM32 wireless sensor schematic"></p>
 
-## Прошивка беспроводного датчика
-Чтоб прошить **беспроводной датчик** нужно открыть проект в Arduino IDE, перейти во вкладку **config.h** и раскомментировать (убрать символы **//** в начале строки) нужные датчики. Если у вас 2 беспроводных датчика - в конце этого файла в строчке **const int SENSOR_NUMBER = 0;** для первого датчика оставьте значение **0**, а для второго измените **0** на **1**.
+## Wireless sensor firmware
+To flash the **wireless sensor** you need to open the project in the Arduino IDE, go to the **config.h** tab and uncomment (remove the characters **//** at the beginning of the line) the necessary sensors. If you have 2 wireless sensors - at the end of this file in the line **const int SENSOR_NUMBER = 0;** for the first sensor leave the value **0**, and for the second change **0** to **1**.
 
 <p align="center"><img src="../img/wirelessConfig_RU.jpg" alt="weather monitor BIM32 wireless sensor config"></p>
 
-Если ваш датчик собран на **Arduino модуле** то просто прошейте его как обычно. 
+If your sensor is built on **Arduino module** then just flash it as usual.
 
-А если на ***рассыпухе*** - выберите в Arduino IDE **Инструменты** -> **Программатор** -> **Ваш тип программатора**
+And if on ***SMD-components*** - select in the Arduino IDE **Tools** -> **Programmer** -> **Your type of programmer**
 
-<p align="center"><img src="../img/wirelessProgrammer_RU.jpg" alt="weather monitor BIM32 wireless sensor programmer select"></p>
+<p align="center"><img src="../img/wirelessProgrammer_EN.jpg" alt="weather monitor BIM32 wireless sensor programmer select"></p>
 
-Затем кликните в меню **Скетч** -> **Загрузить через программатор**
+Then click on the menu **Sketch** -> **Download via programmer**
 
-<p align="center"><img src="../img/wirelessProgrammerUpload_RU.jpg" alt="weather monitor BIM32 wireless sensor programmer upload"></p>
+<p align="center"><img src="../img/wirelessProgrammerUpload_EN.jpg" alt="weather monitor BIM32 wireless sensor programmer upload"></p>
 
-В случае, если в Ардино нет вашего программатора - выберите в меню **Скетч** -> **Экспорт бинарного файла**. 
+If Ardino does not have your programmer, select **Sketch** -> **Export binary file** from the menu.
 
-<p align="center"><img src="../img/wirelessExport_RU.jpg" alt="weather monitor BIM32 wireless sensor export compiled binary"></p>
+<p align="center"><img src="../img/wirelessExport_EN.jpg" alt="weather monitor BIM32 wireless sensor export compiled binary"></p>
 
-После компиляции в папке проекта появятся два **.hex** файла, вам нужен **BIM32_wsensor.ino.eightanaloginputs.hex**, его и нужно зашить в **atmega328p** при помощи программатора. Фьюзы выставьте как на скрине ниже.
+After compilation, two **.hex** files will appear in the project folder, you need **BIM32_wsensor.ino.eightanaloginputs.hex**, and you need to flash it into **atmega328p** using a programmer. Set the fuses as in the screenshot below.
 
 <p align="center"><img src="../img/wirelessFuses_RU.jpg" alt="weather monitor BIM32 wireless sensor fuses"></p>
