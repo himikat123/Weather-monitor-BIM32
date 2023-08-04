@@ -24,7 +24,8 @@
         ["veryLongWirelessNetworkNameHere", 21],
         ["Tp-Link_6732", 94],
         ["Vadafone-987", 27],
-        ["Megafon5", 77]
+        ["Megafon5", 77],
+        ["Emgafno6", 82]
     ],
     "bme280": {
         "temp": -45,
