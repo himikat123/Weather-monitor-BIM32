@@ -152,7 +152,7 @@ bool Sensors::checkHum(float hum) {
  * Check if pressure is within the normal range
  */
 bool Sensors::checkPres(float pres) {
-  return (pres >= 500.0 and pres <= 1200.0);
+  return (pres >= 800.0 and pres <= 1200.0);
 }
 
 /**
