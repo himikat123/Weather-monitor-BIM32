@@ -106,6 +106,10 @@
             "data": [50.1, 49.9],
             "name": ["PZEM-004t", "PZEM-004t"]
         },
+        "co2": {
+            "data": [450.1, 1999.9],
+            "name": ["Senseair S8", "Senseair S8"]
+        },
         "bat": [547, 258]
     },
     "weather": {

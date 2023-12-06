@@ -1,12 +1,12 @@
 /**
  *  Weather Monitor BIM32 v3.4
  *  https://github.com/himikat123/Weather-monitor-BIM32
-
+ *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2023
-
+ *
  *  ESP32 Dev Module
  *  1.2 MB APP / 1.5 MB SPIFFS
-
+ *
  *  Arduino IDE v1.8.19
  *  ESP32 board v1.0.5
  */

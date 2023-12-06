@@ -77,6 +77,8 @@ String web_sensorsPrepare(bool logged) {
     json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType(i);
     json["wsensor"]["freq"]["data"][i] = round(wsensor.get_frequency(i, 0) * 10) / 10;
     json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType(i);
+    json["wsensor"]["s8"]["data"][i] = round(wsensor.get_co2(i, 0) * 10) / 10;
+    json["wsensor"]["s8"]["name"][i] = wsensor.get_co2Type(i);
     json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
   }
   File root = SPIFFS.open("/");
