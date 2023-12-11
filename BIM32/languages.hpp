@@ -428,7 +428,7 @@ class Lang {
       if(config.lang() == "ru") return "Вт";
       if(config.lang() == "pl") return "Wt";
       if(config.lang() == "ua") return "Вт";
-      else return "Tu";  
+      return "Tu";  
     }
 
     String we() {
