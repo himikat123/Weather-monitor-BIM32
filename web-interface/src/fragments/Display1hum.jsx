@@ -33,10 +33,14 @@ class Display1hum extends Save {
         let lang = this.props.config.lang;
         let fields = [];
         for(let i=1; i<=8; i++) fields.push(text.get('field', lang) + ' ' + i);
-        let sensorsHumIn = [text.get('forecast', lang), text.get('wirelessSensor', lang),
-          "Thingspeak", "BME280", "SHT21", "DHT22", text.get('sequence', lang)];
-        let sensorsHumOut = [text.get('forecast', lang), text.get('wirelessSensor', lang),
-          "Thingspeak", "BME280", "SHT21", "DHT22"];
+        let sensorsHumIn = [
+            text.get('forecast', lang), text.get('wirelessSensor', lang), "Thingspeak", 
+            "BME280", "SHT21", "DHT22", text.get('sequence', lang), "BME680"
+        ];
+        let sensorsHumOut = [
+            text.get('forecast', lang), text.get('wirelessSensor', lang), "Thingspeak", 
+            "BME280", "SHT21", "DHT22", "BME680"
+        ];
         let sensType = this.props.place == 'In' ? 
             this.props.config.display.source.humIn.sens : 
             this.props.config.display.source.humOut.sens;
@@ -73,14 +77,14 @@ class Display1hum extends Save {
                     </>}
 
                     {/* Sequence */}
-                    {sensType == 6 &&
+                    {sensType == 6 && this.props.place === 'In' &&
                         <Display1sequence type="hum"
                             config={this.props.config} 
                             changedConfig={this.props.changedConfig} 
                         />
                     }
                 </div>
-                {sensType == 6 &&
+                {sensType == 6 && this.props.place === 'In' &&
                     <div className="mt-3">* {text.get('leaveTheNameBlankToNotDisplayThisTimeslot', lang)}</div>
                 }
             </div>

@@ -535,6 +535,62 @@
         "ua": "Частота"
     },
 
+    "co2Level": {
+        "en": "CO2 level",
+        "de": "CO2-Gehalt",
+        "ru": "Уровень СО2",
+        "pl": "Poziom CO2",
+        "ua": "Рівень СО2"
+    },
+
+    "indexForAirQuality": {
+        "en": "Index for Air Quality",
+        "de": "Index für Luftqualität",
+        "ru": "Индекс качества воздуха",
+        "pl": "Indeks jakości powietrza",
+        "ua": "Індекс якості повітря"
+    },
+
+    "airQuality": {
+        "en": "AirQuality",
+        "de": "Luftqualität",
+        "ru": "Качество воздуха",
+        "pl": "Jakość powietrza",
+        "ua": "Якість повітря"
+    },
+
+    "sensorAccuracy": {
+        "en": "Sensor accuracy",
+        "de": "Sensorgenauigkeit",
+        "ru": "Точность датчика",
+        "pl": "Dokładność czujnika",
+        "ua": "Точність датчика"
+    },
+
+    "good": {
+        "en": "Clean",
+        "de": "Saubere",
+        "ru": "Чистый",
+        "pl": "Czyste",
+        "ua": "Чисте"
+    },
+
+    "polluted": {
+        "en": "Polluted",
+        "de": "Verschmutzt",
+        "ru": "Загрязнен",
+        "pl": "Zanieczyszczone",
+        "ua": "Забруднене"
+    },
+
+    "heavilyPolluted": {
+        "en": "Heavily polluted",
+        "de": "Stark verschmutzt",
+        "ru": "Сильно загрязнен",
+        "pl": "Silnie zanieczyszczone",
+        "ua": "Сильно забруднене"
+    },
+
     "weatherCheckError": {
         "en": "Failed to load weather, please check settings and internet connection",
         "de": "Wetter konnte nicht geladen werden, bitte überprüfen Sie die Einstellungen und die Internetverbindung",

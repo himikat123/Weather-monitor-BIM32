@@ -54,7 +54,15 @@ class Display extends DisplayFn {
             "ESP32", 
             "Thingspeak", 
             text.get('forecast', lang),
-            text.get('wirelessSensor', lang)
+            text.get('wirelessSensor', lang),
+            "BME680"
+        ];
+
+        let displaySensorTypesTHPI = [
+            text.get('temperature', lang), 
+            text.get('humidity', lang), 
+            text.get('pressure', lang),
+            text.get('indexForAirQuality', lang)
         ];
 
         let displaySensorTypesTHP = [
@@ -80,7 +88,7 @@ class Display extends DisplayFn {
             text.get('temperature', lang) + ' 0', text.get('temperature', lang) + ' 1', 
             text.get('temperature', lang) + ' 2', text.get('temperature', lang) + ' 3', 
             text.get('temperature', lang) + ' 4', text.get('humidity', lang),
-            text.get('pressure', lang)
+            text.get('pressure', lang), "CO2"
         ];
         let wSensors = [];
         for(let i=0; i<2; i++) wSensors.push(text.get('wirelessSensor', lang) + ' ' + i);
@@ -225,7 +233,17 @@ class Display extends DisplayFn {
                                 <div className="d-none">
                                     {sensor = this.props.config.display.timeSlot.sensor[i]}
                                 </div>
-                                {((sensor >= 2 && sensor <= 5) || sensor == 8 || sensor == 9) && <>
+                                {((sensor >= 2 && sensor <= 5) || sensor == 8 || sensor == 9 || sensor == 11) && <>
+
+                                    {/* Data types: temperature, humidity, pressure, IAQ */}
+                                    {(sensor == 11) &&
+                                        <SelectInput value={`display.timeSlot.data.${i}`}
+                                            label={text.get('sensorType', lang)}
+                                            options={displaySensorTypesTHPI} 
+                                            config={this.props.config} 
+                                            changedConfig={this.changedConfig}
+                                        />
+                                    }
 
                                     {/* Data types: temperature, humidity, pressure */}
                                     {(sensor == 2 || sensor == 8 || sensor == 9) &&

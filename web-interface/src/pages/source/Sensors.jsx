@@ -19,47 +19,52 @@ class Sensors extends SensorsFn{
                     <PageHeader h="2" text={text.get('sensors', lang)} />
 
                     <div className="row">
-                        <Sensor name="bme280" t="1" h="1" p="1" l="0" a="0" 
+                        <Sensor name="bme680" t="1" h="1" p="1" l="0" a="0" i="1" 
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="bmp180" t="1" h="0" p="1" l="0" a="0" 
+                        <Sensor name="bme280" t="1" h="1" p="1" l="0" a="0" i="0"
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="sht21" t="1" h="1" p="0" l="0" a="0" 
+                        <Sensor name="bmp180" t="1" h="0" p="1" l="0" a="0" i="0"
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="dht22" t="1" h="1" p="0" l="0" a="0" 
+                        <Sensor name="sht21" t="1" h="1" p="0" l="0" a="0" i="0"
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="ds18b20" t="1" h="0" p="0" l="0" a="0" 
+                        <Sensor name="dht22" t="1" h="1" p="0" l="0" a="0" i="0"
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="esp32" t="1" h="0" p="0" l="0" a="0" 
+                        <Sensor name="ds18b20" t="1" h="0" p="0" l="0" a="0" i="0" 
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="max44009" t="0" h="0" p="0" l="1" a="0" 
+                        <Sensor name="esp32" t="1" h="0" p="0" l="0" a="0" i="0"
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="bh1750" t="0" h="0" p="0" l="1" a="0" 
+                        <Sensor name="max44009" t="0" h="0" p="0" l="1" a="0" i="0"
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 
                         />
-                        <Sensor name="analog" t="0" h="0" p="0" l="0" a="1" 
+                        <Sensor name="bh1750" t="0" h="0" p="0" l="1" a="0" i="0" 
+                            data={this.state.data} 
+                            config={this.props.config} 
+                            changedConfig={this.changedConfig} 
+                        />
+                        <Sensor name="analog" t="0" h="0" p="0" l="0" a="1" i="0" 
                             data={this.state.data} 
                             config={this.props.config} 
                             changedConfig={this.changedConfig} 

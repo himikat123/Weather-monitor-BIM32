@@ -193,6 +193,7 @@ void comfortCalculate() {
     case 5: temp = round(sensors.get_sht21_temp(config.sht21_temp_corr())); break; // temperature from SHT21
     case 6: temp = round(sensors.get_dht22_temp(config.dht22_temp_corr())); break; // temperature from DHT22
     case 7: temp = round(sensors.get_ds18b20_temp(config.ds18b20_temp_corr())); break; // temperature from DS18B20
+    case 8: temp = round(sensors.get_bme680_temp(config.bme680_temp_corr())); break; // temperature from BME680
     default: temp = 40400; break;
   }
   switch(config.comfort_hum_source()) {
@@ -208,6 +209,7 @@ void comfortCalculate() {
     case 3: hum = round(sensors.get_bme280_hum(config.bme280_hum_corr())); break; // humidity from BME280
     case 4: hum = round(sensors.get_sht21_hum(config.sht21_hum_corr())); break; // humidity from SHT21
     case 5: hum = round(sensors.get_dht22_hum(config.dht22_hum_corr())); break; // humidity from DHT22
+    case 6: hum = round(sensors.get_bme680_hum(config.bme680_hum_corr())); break; // humidity from BME680
     default: temp = 40400; break;
   }
   

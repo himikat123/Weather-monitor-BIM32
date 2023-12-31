@@ -10,6 +10,8 @@ class Sensor extends Save {
         this.getSensorHum = this.getSensorHum.bind(this);
         this.getSensorPres = this.getSensorPres.bind(this);
         this.getSensorLight = this.getSensorLight.bind(this);
+        this.getSensorIaq = this.getSensorIaq.bind(this);
+        this.getSensorIaqAccuracy = this.getSensorIaqAccuracy.bind(this);
     };
 
     /**
@@ -73,6 +75,28 @@ class Sensor extends Save {
             let sensor = this.props.data.analog.volt;
             if(sensor === undefined || isNaN(sensor) || sensor < 0 || sensor > 5) return '--';
             return Math.round((sensor + this.props.config.sensors[this.props.name].v) * 10) / 10;
+        }
+        catch(e) { return '--' }
+    }
+
+    /**
+     * checks if the sensor IAQ exists and
+     * @returns IAQ or "--"
+     */
+    getSensorIaq() {
+        try { 
+            let sensor = this.props.data[this.props.name].iaq;
+            if(sensor === undefined || isNaN(sensor) || sensor < 0 || sensor > 500) return '--';
+            else return Math.round((sensor + this.props.config.sensors[this.props.name].i) * 10) / 10;
+        }
+        catch(e) { return '--' }
+    }
+
+    getSensorIaqAccuracy() {
+        try { 
+            let sensor = this.props.data[this.props.name].iaqAccr;
+            if(sensor === undefined || isNaN(sensor) || sensor < 0 || sensor > 10) return '--';
+            else return sensor + this.props.config.sensors[this.props.name].i;
         }
         catch(e) { return '--' }
     }
@@ -152,6 +176,20 @@ class Sensor extends Save {
                                 units={text.get('v', lang)} 
                             />
                         }
+
+                        {this.props.i == 1 && <>
+                            <SensorIndication name={text.get('indexForAirQuality', lang)} 
+                                data={this.getSensorIaq()}
+                                config={this.props.config}
+                                changedConfig={this.props.changedConfig}
+                                corr={`sensors.${this.props.name}.i`}
+                                sensor={this.props.name}
+                                units="" 
+                            />
+                            <div>{text.get('sensorAccuracy', lang)}:
+                                <span className="text-primary indication ms-1">{this.getSensorIaqAccuracy()}</span>
+                            </div>
+                        </>}
                     </div>
                 </div>          
             </div>

@@ -663,6 +663,33 @@ class Lang {
       }
     }
 
+    String airQuality(unsigned int level) {
+      switch(level) {
+        case 0: {
+          if(config.lang() == "de") return "Saubere Luft";
+          if(config.lang() == "ru") return "Воздух чистый";
+          if(config.lang() == "pl") return "Powietrze czyste";
+          if(config.lang() == "ua") return "Повітря чисте";
+          return "Clean Air";
+        }; break;
+        case 1: {
+          if(config.lang() == "de") return "Luft ist verschmutzt";
+          if(config.lang() == "ru") return "Воздух загрязнен";
+          if(config.lang() == "pl") return "Powietrze zanieczyszczone";
+          if(config.lang() == "ua") return "Повітря забруднене";
+          return "Air is polluted";
+        }; break;
+        case 2: {
+          if(config.lang() == "de") return "Luft ist stark verschmutzt";
+          if(config.lang() == "ru") return "Воздух сильно загрязнен";
+          if(config.lang() == "pl") return "Powietrze silnie zanieczyszczone";
+          if(config.lang() == "ua") return "Повітря сильно забруднене";
+          return "Air is heavily polluted";
+        }; break;
+        default: return "???"; break;
+      }
+    }
+
     String weekdayShortName(unsigned int day) {
       switch(day) {
         case 1: return su();

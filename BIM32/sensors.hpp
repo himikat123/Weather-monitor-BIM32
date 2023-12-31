@@ -7,6 +7,7 @@
 #include <BH1750.h> // v1.1.4 https://github.com/claws/BH1750
 #include <OneWire.h> // v2.3.7 https://github.com/PaulStoffregen/OneWire
 #include <DallasTemperature.h> // v3.9.1 https://github.com/milesburton/Arduino-Temperature-Control-Library
+#include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature   term(&oneWire);
@@ -20,6 +21,8 @@ Adafruit_BME280     bme;
 Adafruit_Sensor     *bme_temp = bme.getTemperatureSensor();
 Adafruit_Sensor     *bme_pressure = bme.getPressureSensor();
 Adafruit_Sensor     *bme_humidity = bme.getHumiditySensor();
+Bsec                iaqSensor;
+
 
 #ifdef __cplusplus
   extern "C"{
@@ -34,11 +37,13 @@ class Sensors {
   public:
     void init(void);
     void read(void);
+    void BME680Read(void);
     bool checkTemp(float temp);
     bool checkHum(float hum);
     bool checkPres(float pres);
     bool checkLight(float light);
     bool checkVolt(float volt);
+    bool checkIaq(float iaq);
     float get_esp32_temp(float corr);
     float get_bme280_temp(float corr);
     float get_bme280_hum(float corr);
@@ -53,6 +58,11 @@ class Sensors {
     float get_max44009_light(float corr);
     float get_bh1750_light(float corr);
     float get_analog_voltage(float corr);
+    float get_bme680_temp(float corr);
+    float get_bme680_hum(float corr);
+    float get_bme680_pres(float corr);
+    float get_bme680_iaq(float corr);
+    uint8_t get_bme680_iaq_accuracy();
     
   private:
     bool _bme280_det = false;
@@ -62,6 +72,11 @@ class Sensors {
     bool _ds18b20_det = false;
     bool _max44009_det = false;
     bool _bh1750_det = false;
+    bool _bme680_det = false;
+    uint8_t _bme680_bsecState[BSEC_MAX_STATE_BLOB_SIZE] = {0};
+    uint16_t _bme680_stateUpdateCounter = 0;
+    unsigned int _bme680_stateCounter = 0;
+    unsigned int _bme680_stateTimestamp = 0;
     
     float _esp32_temp = 40400.0;
     float _bme280_temp = 40400.0;
@@ -77,6 +92,11 @@ class Sensors {
     float _max44009_light = -1000.0;
     float _bh1750_light = -10000.0;
     float _analog_voltage = -10000.0;
+    float _bme680_temp = 40400.0;
+    float _bme680_hum = 40400.0;
+    float _bme680_pres = 40400.0;
+    float _bme680_iaq = 40400.0;
+    uint8_t _bme680_iaq_accuracy = 0;
 
     void _BME280Init(void);
     void _BMP180Init(void);
@@ -85,6 +105,10 @@ class Sensors {
     void _DS18B20Init(void);
     void _MAX44009Init(void);
     void _BH1750Init(void);
+    void _BME680Init(void);
+    bool _bme680_checkIaqSensorStatus(void);
+    void _bme680_loadState(void);
+    void _bme680_updateState(void);
     
     void _BME280Read(void);
     void _BMP180Read(void);
@@ -101,8 +125,6 @@ class Sensors {
  * Initialize all sensors
  */
 void Sensors::init(void) {
-  Serial.println(SEPARATOR);
-  Serial.println("Sensor initialization");
   _BME280Init();
   _BMP180Init();
   _SHT21Init();
@@ -110,6 +132,9 @@ void Sensors::init(void) {
   _DS18B20Init();
   _MAX44009Init();
   _BH1750Init();
+  _BME680Init();
+  Serial.println(SEPARATOR);
+  Serial.println("Sensor initialization");
   Serial.printf("%s %s%s\r\n", "DS18B20:  ", _ds18b20_det ? "" : "NOT ", "Detected");
   Serial.printf("%s %s%s\r\n", "BME280:   ", _bme280_det ? "" : "NOT ", "Detected");
   Serial.printf("%s %s%s\r\n", "BMP180:   ", _bmp180_det ? "" : "NOT ", "Detected");
@@ -117,6 +142,7 @@ void Sensors::init(void) {
   Serial.printf("%s %s%s\r\n", "DHT22:    ", _dht22_det ? "" : "NOT ", "Detected");
   Serial.printf("%s %s%s\r\n", "MAX44009: ", _max44009_det ? "" : "NOT ", "Detected");
   Serial.printf("%s %s%s\r\n", "BH1750:   ", _bh1750_det ? "" : "NOT ", "Detected");
+  Serial.printf("%s %s%s\r\n", "BME680:   ", _bme680_det ? "" : "NOT ", "Detected");
 }
 
 /**
@@ -167,6 +193,13 @@ bool Sensors::checkLight(float light) {
  */
 bool Sensors::checkVolt(float volt) {
   return (volt >= 0.0 and volt <= 3.3);
+}
+
+/**
+ * Check if IAQ is within the normal range
+ */
+bool Sensors::checkIaq(float iaq) {
+  return (iaq >= 0.0 and iaq <= 500.0);
 }
 
 /**
@@ -226,6 +259,26 @@ float Sensors::get_bh1750_light(float corr) {
 
 float Sensors::get_analog_voltage(float corr) {
   return _analog_voltage + corr;
+}
+
+float Sensors::get_bme680_temp(float corr) {
+  return _bme680_temp + corr;
+}
+
+float Sensors::get_bme680_hum(float corr) {
+  return _bme680_hum + corr;
+}
+
+float Sensors::get_bme680_pres(float corr) {
+  return _bme680_pres + corr;
+}
+
+float Sensors::get_bme680_iaq(float corr) {
+  return _bme680_iaq + corr;
+}
+
+uint8_t Sensors::get_bme680_iaq_accuracy() {
+  return _bme680_iaq_accuracy;
 }
 
 /**
@@ -297,6 +350,117 @@ void Sensors::_MAX44009Init(void) {
 void Sensors::_BH1750Init(void) {
   if(lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2)) {
     _bh1750_det = true;
+  }
+}
+
+/**
+ * Initialize BME680 sensor
+ */
+void Sensors::_BME680Init(void) {
+  const uint8_t bsec_config_iaq[] = {
+    #include "config/generic_33v_3s_4d/bsec_iaq.txt"
+  };
+  
+  iaqSensor.begin(BME68X_I2C_ADDR_HIGH, Wire);
+  _bme680_det = _bme680_checkIaqSensorStatus();
+  if(_bme680_det) {
+    iaqSensor.setConfig(bsec_config_iaq);
+    _bme680_checkIaqSensorStatus();
+    _bme680_loadState();
+  
+    bsec_virtual_sensor_t sensorList[4] = {
+      BSEC_OUTPUT_IAQ,
+      BSEC_OUTPUT_RAW_PRESSURE,
+      BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
+      BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY
+    };
+    iaqSensor.updateSubscription(sensorList, 4, BSEC_SAMPLE_RATE_LP);
+    _bme680_checkIaqSensorStatus();
+  }
+}
+
+/*
+ * Check BME680 Status
+ * @return true if there are no problems
+ */
+bool Sensors::_bme680_checkIaqSensorStatus(void) {
+  if(iaqSensor.bsecStatus != BSEC_OK) return false;
+  if(iaqSensor.bme68xStatus != BME68X_OK) return false;
+  return true;
+}
+
+/**
+ * Load BME680 state from EEPROM
+ */
+void Sensors::_bme680_loadState(void) {
+  Serial.println(SEPARATOR);
+  Serial.print("Read BME680 state file... ");
+  
+  File file = SPIFFS.open("/bme680.json");
+  if(file) {
+    while(file.available()) {
+      String json = file.readString();
+      
+      StaticJsonDocument<4096> state;
+      DeserializationError errorState = deserializeJson(state, json);
+      
+      if(!errorState) {
+        _bme680_stateTimestamp = state["timestamp"];
+        _bme680_stateCounter = state["counter"];
+        for(uint8_t i=0; i<BSEC_MAX_STATE_BLOB_SIZE; i++) {
+          _bme680_bsecState[i] = state["data"][i];
+        }
+        
+        iaqSensor.setState(_bme680_bsecState);
+        _bme680_checkIaqSensorStatus();
+        
+        Serial.println("done");
+      }
+      else Serial.println(" BME680 state file corrupted");
+    }
+  }
+  else Serial.println(" No BME680 file found");
+}
+
+/**
+ * Update BME680 status file
+ */
+void Sensors::_bme680_updateState(void) {
+  #define STATE_SAVE_PERIOD  UINT32_C(6 * 60 * 60)           /* 6 hours - 4 times a day */
+  
+  if((now() - _bme680_stateTimestamp >= STATE_SAVE_PERIOD) and (iaqSensor.iaqAccuracy >= 3)) {
+    Serial.println(SEPARATOR);
+    Serial.print("Update BME680 state file... ");
+    
+    iaqSensor.getState(_bme680_bsecState);
+    _bme680_checkIaqSensorStatus();
+    
+    _bme680_stateTimestamp = now();
+    _bme680_stateCounter++;
+    
+    char datetime[20];
+    sprintf(datetime, "%02d.%02d.%d %02d:%02d:%02d", day(), month(), year(), hour(), minute(), second());
+    
+    StaticJsonDocument<4096> json;
+    json["timestamp"] = _bme680_stateTimestamp;
+    json["datetime"] = datetime;
+    json["counter"] = _bme680_stateCounter;
+    for(uint8_t i=0; i<BSEC_MAX_STATE_BLOB_SIZE; i++) {
+      json["data"][i] = _bme680_bsecState[i];
+    }
+    
+    String data = "";
+    serializeJsonPretty(json, data);
+    Serial.println(data);
+    
+    File file = SPIFFS.open("/bme680.json", "w");
+    if(file) {
+      file.print(data);
+      file.close();
+      data = String();
+      Serial.println("done");
+    }
+    else Serial.println("Failed to save BME680 state file");
   }
 }
 
@@ -404,4 +568,27 @@ void Sensors::_AnalogRead(void) {
  */
 void Sensors::_ESP32Read(void) {
   _esp32_temp = (temprature_sens_read() - 32) / 1.8;
+}
+
+/**
+ * Read data from BME680 sensor
+ */
+void Sensors::BME680Read(void) {
+  if(_bme680_det) {
+    if(iaqSensor.run()) {
+      _bme680_temp = iaqSensor.temperature;
+      _bme680_hum = iaqSensor.humidity;
+      _bme680_pres = iaqSensor.pressure / 100.0F;
+      _bme680_iaq = iaqSensor.iaq;
+      _bme680_iaq_accuracy = iaqSensor.iaqAccuracy;
+      _bme680_updateState();
+    }
+    else _bme680_checkIaqSensorStatus();
+  }
+  else {
+    _bme680_temp = 40400.0;
+    _bme680_hum = 40400.0;
+    _bme680_pres = 40400.0;
+    _bme680_iaq = 40400.0;
+  }
 }

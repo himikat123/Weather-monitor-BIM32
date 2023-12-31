@@ -75,6 +75,12 @@ void TaskDisplay(void *pvParameters) {
     /* Alarm */
     sound.alarm();
 
+    /**
+     * BME680 sensor update
+     * try as often as possible, the sensor will update when it decides
+     */
+    sensors.BME680Read();
+
     /* Automatic daily restart of the device at the specified time.
      * Uncomment this line and specify the time if you need autorestart. */
     // if(hour() == 12 and minute() == 0 and second() == 0) ESP.restart();
