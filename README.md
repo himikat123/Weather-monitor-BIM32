@@ -100,9 +100,18 @@ To flash a **display**, you need to copy the display firmware file (the file wit
 To flash **ESP32**:
 1. Add **ESP32** support to **Arduino IDE**, find [instruction](https://www.google.ru/search?q=arduino+ide+installing+esp32&newwindow=1&sxsrf=ALiCzsbDLg54nE9Dbm382-Jn26gRGqRdDA%3A1672595667576&ei=08ixY5rgIsCFxc8P2eSyuAE&ved=0ahUKEwjalfm0-Kb8AhXAQvEDHVmyDBcQ4dUDCBA&uact=5&oq=arduino+ide+installing+esp32&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAzIGCAAQCBAeMgYIABAIEB4yBggAEAgQHjIGCAAQCBAeMgkIABAIEB4Q8QQ6CggAEEcQ1gQQsAM6BwgAELADEEM6BwgjELACECc6BggAEAcQHjoHCAAQgAQQDToICAAQCBAHEB46CwgAEAgQBxAeEPEEOggIABAHEB4QEzoKCAAQCBAHEB4QEzoNCAAQCBAHEB4Q8QQQEzoICAAQCBAeEA1KBAhBGABKBAhGGABQ-AdYiBhg9BpoAXABeACAAbABiAGTCJIBBDEwLjGYAQCgAQHIAQrAAQE&sclient=gws-wiz-serp)
 2. Add to **Arduino** plug-in for filling **SPIFFS** find [instruction](https://www.google.ru/search?q=esp32+sketch+data+upload+tool&newwindow=1&sxsrf=ALiCzsZ5JftMwAL465WEznVc7qxgQslq3g%3A1672595724155&ei=DMmxY8_9CLWGxc8PiLOIsAw&oq=esp32+sketch+data+upload+&gs_lcp=Cgxnd3Mtd2l6LXNlcnAQAxgCMggIABCABBDLATIICAAQgAQQywEyCAgAEIAEEMsBMggIABCABBDLATIICAAQgAQQywEyCAgAEIAEEMsBMggIABCABBDLATIGCAAQFhAeMgYIABAWEB4yBggAEBYQHjoKCAAQRxDWBBCwAzoGCAAQBxAeOgUIABCABDoGCAAQCBAeOggIABAIEAcQHjoICCEQwwQQoAE6CgghEMMEEAoQoAE6BQgAEKIESgQIQRgASgQIRhgAUMQGWMFBYPJTaAFwAXgAgAF8iAHyB5IBAzYuNJgBAKABAcgBCMABAQ&sclient=gws-wiz-serp)
-3. Unpack the libraries from the file **libraries.zip** to the folder C:/Users/**Username**/Documents/Arduino/libraries
-4. Flash the board with a sketch
-5. Flash the files of the **SPIFFS** file system, in Arduino you need to select **Tools --> ESP32 Sketch Data Upload**
+3. Unpack the libraries from the file **libraries.zip** to the folder `C:/Users/Username/Documents/Arduino/libraries`
+4. Open the `C:/Users/Username/AppData/Local/Arduino15/packages/esp32/hardware/esp32/1.0.5/platform.txt` and find the line
+`compiler.elf2hex.extra_flags=`, add new line: `compiler.libraries.ldflags=`
+
+<img src="img/bsec1.png" alt="BSEC flags">
+
+Then in the same file find `{compiler.c.elf.libs}` and add after it, to the same line: `{compiler.libraries.ldflags}`
+
+<img src="img/bsec2.png" alt="BSEC ldflags">
+
+5. Flash the board with a sketch
+6. Flash the files of the **SPIFFS** file system, in Arduino you need to select **Tools --> ESP32 Sketch Data Upload**
 
 After the flashing **the weather monitor** needs to be configured. An unconfigured device turns on the access point (creates a WiFi network) **Weather monitor BIM32** with the default network password **1234567890**. And in the future, to turn it on again, you need to press and hold the **Settings** button until the access point symbol appears on the screen instead of the antenna symbol. After connecting a laptop or phone to the **Weather monitor BIM32** network, open a browser and navigate to **http://192.168.4.1**. Enter login **admin** and password **1111** to open the settings page. In the future, for security reasons, it is recommended to change the default password.
 
