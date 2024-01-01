@@ -62,6 +62,13 @@ void sensorsInit(void){
   #ifdef USE_MAX44009
     if(!max44009.begin()) detected.max44009 = true;
   #endif
+
+   //S8 initialization
+  #ifdef USE_S8
+    sensor_S8->get_firmware_version(sensor.firm_version);
+    int len = strlen(sensor.firm_version);
+    if(len) detected.s8 = true;
+  #endif
 }
 
 /**
@@ -135,5 +142,10 @@ void getData(void){
     float pf = pzem.pf();
     if(!isnan(pf)) datas.pf = pf;
     else datas.pf = -1.0;
+  #endif
+
+  //S8 read
+  #ifdef USE_S8
+    if(detected.s8) datas.co2 = sensor_S8->get_co2();
   #endif
 }

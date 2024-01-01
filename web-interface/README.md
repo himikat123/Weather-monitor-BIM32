@@ -25,7 +25,7 @@ in file **/public/data.json** set
         $ cd .\web-interface
         $ npm run build
 
-then in file **/built/index.html** move the ***&lt;script&gt;...&lt;/script&gt;*** tag along with its contents between tags ***&lt;/body&gt;*** and ***&lt;/html&gt;***
+then in file **/build/index.html** move the ***&lt;script&gt;...&lt;/script&gt;*** tag along with its contents between tags ***&lt;/body&gt;*** and ***&lt;/html&gt;***
 
 and then run
 

@@ -14,10 +14,14 @@ class Send extends SendFn {
         let lang = this.props.config.lang;
         let sensors = [
             '--', text.get('forecast', lang), 'BME280', 'BMP180', 'SHT21', 'DHT22', 'DS18B20', 
-            'MAX44009', 'BH1750', text.get('analogInput', lang), 'ESP32', text.get('wirelessSensor', lang)
+            'MAX44009', 'BH1750', text.get('analogInput', lang), 'ESP32', 
+            text.get('wirelessSensor', lang)
         ];
         let narodSensors = sensors.slice(0);
         narodSensors.push('thingspeak');
+        narodSensors.push('BME680');
+        sensors.push('BME680');
+        let thpi = [text.get('temperature', lang), text.get('humidity', lang), text.get('pressure', lang), text.get('indexForAirQuality', lang)];
         let thp = [text.get('temperature', lang), text.get('humidity', lang), text.get('pressure', lang)];
         let th = [text.get('temperature', lang), text.get('humidity', lang)];
         let tp = [text.get('temperature', lang), text.get('pressure', lang)];
@@ -27,7 +31,7 @@ class Send extends SendFn {
             text.get('temperature', lang) + ' 3', text.get('temperature', lang) + ' 4', text.get('humidity', lang),
             text.get('pressure', lang), text.get('ambientLight', lang), text.get('voltage', lang), text.get('current', lang),
             text.get('power', lang), text.get('energy', lang), text.get('frequency', lang), 
-            text.get('batteryVoltage', lang), text.get('batteryPercentage', lang), text.get('batteryLevel', lang)
+            text.get('batteryVoltage', lang), text.get('batteryPercentage', lang), text.get('batteryLevel', lang), 'CO2'
         ];
         let wSensors = [];
         for(let i=0; i<2; i++) wSensors.push(text.get('wirelessSensor', lang) + ' ' + i);
@@ -123,6 +127,14 @@ class Send extends SendFn {
                                                 changedConfig={this.changedConfig}
                                             />
                                         </>}
+                                        {tf[i] == 12 &&
+                                            <SelectInput value={`thingspeakSend.types.${i}`}
+                                                label={text.get('sensorType', lang)}
+                                                options={thpi} 
+                                                config={this.props.config} 
+                                                changedConfig={this.changedConfig}
+                                            />
+                                        }
                                     </div> 
                                 )}
                             </div>
@@ -237,6 +249,14 @@ class Send extends SendFn {
                                                 changedConfig={this.changedConfig}
                                             />
                                         </>}
+                                        {nf[i] == 13 &&
+                                            <SelectInput value={`narodmonSend.types.${i}`}
+                                                label={text.get('sensorType', lang)}
+                                                options={thpi} 
+                                                config={this.props.config} 
+                                                changedConfig={this.changedConfig}
+                                            />
+                                        }
                                         <TextInput label={text.get('sensorMetric', lang)}
                                             maxLength="16" 
                                             placeholder={text.get('sensorMetric', lang)} 

@@ -13,12 +13,12 @@ class Comfort extends ComfortFn {
 
         let temperatures = [
             text.get('forecast', lang), text.get('wirelessSensor', lang),
-            "Thingspeak", "BME280", "BMP180", "SHT21", "DHT22", "DS18B20"
+            "Thingspeak", "BME280", "BMP180", "SHT21", "DHT22", "DS18B20", "BME680"
         ];
 
         let humidities  = [
             text.get('forecast', lang), text.get('wirelessSensor', lang),
-            "Thingspeak", "BME280", "SHT21", "DHT22"
+            "Thingspeak", "BME280", "SHT21", "DHT22", "BME680"
         ];
 
         let wSensors = [];
@@ -92,6 +92,7 @@ class Comfort extends ComfortFn {
                                 />
                             </div>
                         </div>
+
                         <div className="col col-12 col-md-6 p-4">
                             <div className="border border-secondary rounded p-3 sensor">
                                 <SelectInput value={'comfort.hum.source'}
@@ -136,6 +137,79 @@ class Comfort extends ComfortFn {
                                     changedConfig={this.changedConfig}
                                     units={"%"}
                                 />
+                            </div>
+                        </div>
+
+                        <div className="col col-12 col-md-6 p-4">
+                            <div className="border border-secondary rounded p-3 sensor">
+                                <SelectInput value={'comfort.iaq.source'}
+                                    label={text.get('indexForAirQuality', lang)}
+                                    options={['--', 'BME680']}
+                                    config={this.props.config} 
+                                    changedConfig={(this.props.changedConfig)}
+                                />
+                                <table className="table mt-4 text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>{text.get('indexForAirQuality', lang)}</th>
+                                            <th>{text.get('airQuality', lang)}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="table-success">
+                                            <td>&lt; 100</td>
+                                            <td>{text.get('good', lang)}</td>
+                                        </tr>
+                                        <tr className="table-warning">
+                                            <td>100 - 200</td>
+                                            <td>{text.get('polluted', lang)}</td>
+                                        </tr>
+                                        <tr className="table-danger">
+                                            <td>&gt; 200</td>
+                                            <td>{text.get('heavilyPolluted', lang)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div className="col col-12 col-md-6 p-4">
+                            <div className="border border-secondary rounded p-3 sensor">
+                                <SelectInput value={'comfort.co2.source'}
+                                    label={'CO2'}
+                                    options={['--', text.get('wirelessSensor', lang)]}
+                                    config={this.props.config} 
+                                    changedConfig={(this.props.changedConfig)}
+                                />
+                                {this.props.config.comfort.co2.source == 1 &&
+                                <SelectInput value={'comfort.co2.wsensNum'}
+                                    label={text.get('wirelessSensorNumber', lang)}
+                                    options={wSensors}
+                                    config={this.props.config} 
+                                    changedConfig={(this.props.changedConfig)}
+                                />}
+                                <table className="table mt-4 text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>{text.get('co2Level', lang)}</th>
+                                            <th>{text.get('airQuality', lang)}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr className="table-success">
+                                            <td>&lt; 800</td>
+                                            <td>{text.get('good', lang)}</td>
+                                        </tr>
+                                        <tr className="table-warning">
+                                            <td>800 - 1400</td>
+                                            <td>{text.get('polluted', lang)}</td>
+                                        </tr>
+                                        <tr className="table-danger">
+                                            <td>&gt; 1400</td>
+                                            <td>{text.get('heavilyPolluted', lang)}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>}

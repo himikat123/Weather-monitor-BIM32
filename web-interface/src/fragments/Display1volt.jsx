@@ -14,11 +14,11 @@ class Display1volt extends Save {
         let lang = this.props.config.lang;
         let fields = [];
         for(let i=1; i<=8; i++) fields.push(text.get('field', lang) + ' ' + i);
-        let sensorsVolt = ['--', text.get('wirelessSensor', lang), "Thingspeak"];
+        let sensorsVolt = ['--', text.get('wirelessSensor', lang), "Thingspeak", text.get('indexForAirQuality', lang) + ' BME680'];
 
         return (
             <div className="col border border-secondary rounded m-4 p-3 disp-card">
-                <h5>{text.get('voltage', lang)}</h5>
+                <h5>{text.get('voltage', lang)} / {text.get('indexForAirQuality', lang)} / CO2</h5>
                 <SelectInput value={`display.source.volt.sens`}
                     label={text.get('dataSource', lang)}
                     options={sensorsVolt}
@@ -31,7 +31,8 @@ class Display1volt extends Save {
                     <Display1wSens optsVolt={[
                             text.get('batteryVoltage', lang), 
                             text.get('batteryPercentage', lang),  
-                            text.get('voltage', lang) + ' PZEM-004t'
+                            text.get('voltage', lang) + ' PZEM-004t',
+                            text.get('co2Level', lang)
                         ]}
                         wSensNum={'display.source.volt.wsensNum'} 
                         volt={'display.source.volt.volt'}

@@ -33,10 +33,14 @@ class Display1temp extends Save {
         let lang = this.props.config.lang;
         let fields = [];
         for(let i=1; i<=8; i++) fields.push(text.get('field', lang) + ' ' + i);
-        let sensorsTempIn = [text.get('forecast', lang), text.get('wirelessSensor', lang),
-          "Thingspeak", "BME280", "BMP180", "SHT21", "DHT22", "DS18B20", text.get('sequence', lang)];
-        let sensorsTempOut = [text.get('forecast', lang), text.get('wirelessSensor', lang),
-          "Thingspeak", "BME280", "BMP180", "SHT21", "DHT22", "DS18B20"];
+        let sensorsTempIn = [
+            text.get('forecast', lang), text.get('wirelessSensor', lang), "Thingspeak", 
+            "BME280", "BMP180", "SHT21", "DHT22", "DS18B20", text.get('sequence', lang), "BME680"
+        ];
+        let sensorsTempOut = [
+            text.get('forecast', lang), text.get('wirelessSensor', lang), "Thingspeak", 
+            "BME280", "BMP180", "SHT21", "DHT22", "DS18B20", "BME680"
+        ];
         let wsensorTemp = [];
         for(let i=0; i<5; i++) wsensorTemp.push(text.get('temperature', lang) + ' ' + i);
         let sensType = this.props.place == 'In' ? 
@@ -75,14 +79,14 @@ class Display1temp extends Save {
                     </>}
 
                     {/* Sequence */}
-                    {sensType == 8 &&
+                    {sensType == 8 && this.props.place === 'In' &&
                         <Display1sequence type="temp"
                             config={this.props.config} 
                             changedConfig={this.props.changedConfig} 
                         />
                     }
                 </div>
-                {sensType == 8 &&
+                {sensType == 8 && this.props.place === 'In' &&
                     <div className="mt-3">* {text.get('leaveTheNameBlankToNotDisplayThisTimeslot', lang)}</div>
                 }
             </div>

@@ -1,6 +1,8 @@
 class Nextion {
   #define NX4832K035 0
   #define NX4832T035 1
+  #define OUTDOOR    0
+  #define INDOOR     1
 
   public:
     void init(void);
@@ -17,6 +19,9 @@ class Nextion {
     bool _power = true; // display on/off flag
     int _customData = -1; // flag of key symbols of receive from the display
     String _receivedData = "";
+    uint8_t _iaq_level = 0;
+    uint8_t _co2_level = 0;
+    uint16_t _air_color[3] = { 65520, 64512, 63488 };
 
     void _NX4832K035_setRTC(void);
     void _NX4832T035_timeDate(void);
@@ -24,9 +29,9 @@ class Nextion {
     void _voltage(void);
     void _battery(void);
     void _antenna(void);
-    float _temp(unsigned int sens, unsigned int wsensNum, unsigned int tempSensor, unsigned int thing, String field);
-    float _hum(unsigned int sens, unsigned int wsensNum, unsigned int thing, String field);
-    void _comfortLevel(float temp, float hum);
+    float _temp(unsigned int sens, unsigned int wsensNum, unsigned int tempSensor, unsigned int thing, String field, uint8_t location);
+    void _hum(unsigned int sens, unsigned int wsensNum, unsigned int thing, String field, uint8_t location);
+    void _comfortLevel(void);
     void _weatherDescription(void);
     void _currentIcon(void);
     void _thermometer(float temp);
@@ -153,6 +158,7 @@ void Nextion::tick(void) {
     }
   
     _networkPage();
+    _comfortLevel();
     _voltage();
     _battery();
     _antenna();
@@ -162,17 +168,18 @@ void Nextion::tick(void) {
       config.display_source_tempIn_wsensNum(),
       config.display_source_tempIn_temp(),
       config.display_source_tempIn_thing(),
-      "Main.tempInside.txt"
+      "Main.tempInside.txt",
+      INDOOR
     );
   
-    float hum =_hum(
+    _hum(
       config.display_source_humIn_sens(),
       config.display_source_humIn_wsensNum(),
       config.display_source_humIn_thing(),
-      "Main.humInside.txt"
+      "Main.humInside.txt",
+      INDOOR
     );
   
-    _comfortLevel(temp, hum);
     _weatherDescription();
     _currentIcon();
   
@@ -181,16 +188,18 @@ void Nextion::tick(void) {
       config.display_source_tempOut_wsensNum(),
       config.display_source_tempOut_temp(),
       config.display_source_tempOut_thing(),
-      "Main.tempOutside.txt"
+      "Main.tempOutside.txt",
+      OUTDOOR
     );
   
     _thermometer(temp);
   
-    hum =_hum(
+    _hum(
       config.display_source_humOut_sens(),
       config.display_source_humOut_wsensNum(),
       config.display_source_humOut_thing(),
-      "Main.humOutside.txt"
+      "Main.humOutside.txt",
+      OUTDOOR
     );
   
     _pres();
@@ -313,25 +322,43 @@ void Nextion::_networkPage(void) {
  * Display voltage
  */
 void Nextion::_voltage(void) {
-  if(config.display_source_volt_sens() == 1) { // voltage from wireless sensor
+  if(config.display_source_volt_sens() == 1) { /* from wireless sensor */
     if(now() - wsensor.get_updated(config.display_source_volt_wsensNum()) < 
     config.wsensor_expire(config.display_source_volt_wsensNum()) * 60) {
-      if(config.display_source_volt_volt() == 0) { // battery voltage
+      if(config.display_source_volt_volt() == 0) { /* battery voltage */
         float voltage = wsensor.get_batteryVoltage(config.display_source_volt_wsensNum());
-        if(wsensor.checkBatVolt(voltage)) 
+        if(wsensor.checkBatVolt(voltage)) {
           myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
+          myNex.writeNum("Main.uBat.xcen", 2);
+          myNex.writeNum("Main.uBat.pco", 2016);
+        }
         else myNex.writeStr("Main.uBat.txt", "");
       }
-      else if(config.display_source_volt_volt() == 1) { // battery percentage
+      else if(config.display_source_volt_volt() == 1) { /* battery percentage */
         float percentage = wsensor.get_batteryPercentage(config.display_source_volt_wsensNum());
-        if(wsensor.checkBatPercent(percentage)) 
+        if(wsensor.checkBatPercent(percentage)) {
           myNex.writeStr("Main.uBat.txt", String(percentage, 0) + "%");
+          myNex.writeNum("Main.uBat.xcen", 2);
+          myNex.writeNum("Main.uBat.pco", 2016);
+        }
         else myNex.writeStr("Main.uBat.txt", "");
       }
-      else if(config.display_source_volt_volt() == 2) { // PZEM-004t voltage
+      else if(config.display_source_volt_volt() == 2) { /* PZEM-004t voltage */
         float voltage = wsensor.get_voltage(config.display_source_volt_wsensNum(), config.wsensor_volt_corr(config.display_source_volt_wsensNum()));
-        if(wsensor.checkVolt(voltage))
+        if(wsensor.checkVolt(voltage)) {
           myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
+          myNex.writeNum("Main.uBat.xcen", 1);
+          myNex.writeNum("Main.uBat.pco", 2016);
+        }
+        else myNex.writeStr("Main.uBat.txt", "");
+      }
+      else if(config.display_source_volt_volt() == 3) { /* SenseAir S8 CO2 level */
+        float co2 = wsensor.get_co2(config.display_source_volt_wsensNum(), config.wsensor_co2_corr(config.display_source_volt_wsensNum()));
+        if(wsensor.checkCo2(co2)) {
+          myNex.writeStr("Main.uBat.txt", String((int)round(co2)) + "ppm");
+          myNex.writeNum("Main.uBat.xcen", 1);
+          myNex.writeNum("Main.uBat.pco", _air_color[_co2_level]);
+        }
         else myNex.writeStr("Main.uBat.txt", "");
       }
       else myNex.writeStr("Main.uBat.txt", "");
@@ -340,8 +367,20 @@ void Nextion::_voltage(void) {
   }
   else if(config.display_source_volt_sens() == 2) { // voltage from thingspeak
     float voltage = thingspeak.get_field(config.display_source_volt_thing());
-    if((wsensor.checkVolt(voltage) or wsensor.checkBatVolt(voltage)) and ((now() - thingspeak.get_updated()) < (config.thingspeakReceive_expire() * 60)))
+    if((wsensor.checkVolt(voltage) or wsensor.checkBatVolt(voltage)) and ((now() - thingspeak.get_updated()) < (config.thingspeakReceive_expire() * 60))) {
       myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
+      myNex.writeNum("Main.uBat.xcen", 2);
+      myNex.writeNum("Main.uBat.pco", 2016);
+    }
+    else myNex.writeStr("Main.uBat.txt", "");
+  }
+  else if(config.display_source_volt_sens() == 3) { // Index for Air Quality
+    float iaq = sensors.get_bme680_iaq(config.bme680_iaq_corr());
+    if(sensors.checkIaq(iaq)) {
+      myNex.writeStr("Main.uBat.txt", "IAQ " + String((int)round(iaq)));
+      myNex.writeNum("Main.uBat.xcen", 1);
+      myNex.writeNum("Main.uBat.pco", _air_color[_iaq_level]);
+    }
     else myNex.writeStr("Main.uBat.txt", "");
   }
   else myNex.writeStr("Main.uBat.txt", "");
@@ -393,43 +432,46 @@ void Nextion::_antenna(void) {
  * @param field name of the temperature field in the display
  * @return displayed temperature
  */
-float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int tempSensor, unsigned int thing, String field) {
+float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int tempSensor, unsigned int thing, String field, uint8_t location) {
   float temp = 40400.0;
-  if(sens == 0) temp = weather.get_currentTemp(); // temperature from weather forecast
-  if(sens == 1) { // temperature from wireless sensor
+  if(sens == 0) temp = weather.get_currentTemp();                                 /* temperature from weather forecast */
+  if(sens == 1) {                                                                 /* temperature from wireless sensor */
     if(now() - wsensor.get_updated(wsensNum) < config.wsensor_expire(wsensNum) * 60) {
       temp = wsensor.get_temperature(wsensNum, tempSensor, config.wsensor_temp_corr(wsensNum, tempSensor));
     }
   }
-  if(sens == 2) { // temperature from thingspeak
+  if(sens == 2) {                                                                 /* temperature from thingspeak */
     if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
       temp = thingspeak.get_field(thing);
     }
   }
-  if(sens == 3) { // temperature from BME280
+  if(sens == 3) {                                                                 /* temperature from BME280 */
     temp = sensors.get_bme280_temp(config.bme280_temp_corr());
   }
-  if(sens == 4) { // temperature from BMP180
+  if(sens == 4) {                                                                 /* temperature from BMP180 */
     temp = sensors.get_bmp180_temp(config.bmp180_temp_corr());
   }
-  if(sens == 5) { // temperature from SHT21
+  if(sens == 5) {                                                                 /* temperature from SHT21 */
     temp = sensors.get_sht21_temp(config.sht21_temp_corr());
   }
-  if(sens == 6) { // temperature from DHT22
+  if(sens == 6) {                                                                 /* temperature from DHT22 */
     temp = sensors.get_dht22_temp(config.dht22_temp_corr());
   }
-  if(sens == 7) { // temperature from DS18B20
+  if(sens == 7) {                                                                 /* temperature from DS18B20 */
     temp = sensors.get_ds18b20_temp(config.ds18b20_temp_corr());
   }
-  if(sens == 8) { // temperature from sequence
+  if((sens == 8 and location == OUTDOOR) or (sens == 9 and location == INDOOR)) { /* temperature from BME680 */
+    temp = sensors.get_bme680_temp(config.bme680_temp_corr());
+  }
+  if(sens == 8 and location == INDOOR) {                                          /* temperature from sequence */
     float tempSequence[4] = { 40400.0, 40400.0, 40400.0, 40400.0 }; 
     for(unsigned int i=0; i<4; i++) {
-      if(config.display_source_sequence_temp(i) == 1) { // thingspeak
+      if(config.display_source_sequence_temp(i) == 1) {                           /* thingspeak */
         if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
           tempSequence[i] = thingspeak.get_field(config.display_source_sequence_thngtemp(i));
         }
       }
-      if(config.display_source_sequence_temp(i) == 2) { // wireless sensor
+      if(config.display_source_sequence_temp(i) == 2) {                           /* wireless sensor */
         if(now() - wsensor.get_updated(config.display_source_sequence_wsenstemp(i, 0)) < 
         config.wsensor_expire(config.display_source_sequence_wsenstemp(i, 0)) * 60) {
           tempSequence[i] = wsensor.get_temperature(
@@ -442,26 +484,29 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
           );
         }
       }
-      if(config.display_source_sequence_temp(i) == 3) { // BME280
+      if(config.display_source_sequence_temp(i) == 3) {                           /* BME280 */
         tempSequence[i] = sensors.get_bme280_temp(config.bme280_temp_corr());
       }
-      if(config.display_source_sequence_temp(i) == 4) { // BMP180
+      if(config.display_source_sequence_temp(i) == 4) {                           /* BMP180 */
         tempSequence[i] = sensors.get_bmp180_temp(config.bmp180_temp_corr());
       }
-      if(config.display_source_sequence_temp(i) == 5) { // SHT21
+      if(config.display_source_sequence_temp(i) == 5) {                           /* SHT21 */
         tempSequence[i] = sensors.get_sht21_temp(config.sht21_temp_corr());
       }
-      if(config.display_source_sequence_temp(i) == 6) { // DHT22
+      if(config.display_source_sequence_temp(i) == 6) {                           /* DHT22 */
         tempSequence[i] = sensors.get_dht22_temp(config.dht22_temp_corr());
       }
-      if(config.display_source_sequence_temp(i) == 7) { // DS18B20
+      if(config.display_source_sequence_temp(i) == 7) {                           /* DS18B20 */
         tempSequence[i] = sensors.get_ds18b20_temp(config.ds18b20_temp_corr());
       }
-      if(config.display_source_sequence_temp(i) == 8) { // ESP32
+      if(config.display_source_sequence_temp(i) == 8) {                           /* ESP32 */
         tempSequence[i] = sensors.get_esp32_temp(config.esp32_temp_corr());
       }
-      if(config.display_source_sequence_temp(i) == 9) { // Forecast
+      if(config.display_source_sequence_temp(i) == 9) {                           /* Forecast */
         tempSequence[i] = weather.get_currentTemp();
+      }
+      if(config.display_source_sequence_temp(i) == 10) {                          /* BME680 */
+        tempSequence[i] = sensors.get_bme680_temp(config.bme680_temp_corr());
       }
       
       if(sensors.checkTemp(tempSequence[i])) myNex.writeStr("Main.tempSeq" + String(i) + ".txt", String(int(round(tempSequence[i]))) + "°C");
@@ -470,6 +515,7 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
       myNex.writeStr("Main.txtSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
     }
   }
+  
   else {
     if(sensors.checkTemp(temp)) myNex.writeStr(field, String(int(round(temp))) + "°C");
     else myNex.writeStr(field, "--");
@@ -479,6 +525,7 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
       }
     }
   }
+  
   return temp;
 }
 
@@ -488,39 +535,41 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
  * @param wsensNum wireless sensor number
  * @param thing thinspeak field number
  * @param field name of the humidity field in the display
- * @return displayed humidity
  */
-float Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing, String field) {
+void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing, String field, uint8_t location) {
   float hum = 40400.0;
-  if(sens == 0) hum = weather.get_currentHum(); // humudity from weather forecast
-  if(sens == 1) { // humidity from wireless sensor
+  if(sens == 0) hum = weather.get_currentHum();                                   /* humudity from weather forecast */
+  if(sens == 1) {                                                                 /* humidity from wireless sensor */
     if(now() - wsensor.get_updated(wsensNum) < config.wsensor_expire(wsensNum) * 60) {
       hum = wsensor.get_humidity(wsensNum, config.wsensor_hum_corr(wsensNum));
     }
   }
-  if(sens == 2) { // humidity from thingspeak
+  if(sens == 2) {                                                                 /* humidity from thingspeak */
     if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
       hum = thingspeak.get_field(thing);
     }
   }
-  if(sens == 3) { // humidity from BME280
+  if(sens == 3) {                                                                 /* humidity from BME280 */
     hum = sensors.get_bme280_hum(config.bme280_hum_corr());
   }
-  if(sens == 4) { // humidity from SHT21
+  if(sens == 4) {                                                                 /* humidity from SHT21 */
     hum = sensors.get_sht21_hum(config.sht21_hum_corr());
   }
-  if(sens == 5) { // humidity from DHT22
+  if(sens == 5) {                                                                 /* humidity from DHT22 */
     hum = sensors.get_dht22_hum(config.dht22_hum_corr());
   }
-  if(sens == 6) { // humidity from sequence
+  if((sens == 6 and location == OUTDOOR) or (sens == 7 and location == INDOOR)) { /* humidity from BME680 */
+    hum = sensors.get_bme680_hum(config.bme680_hum_corr());
+  }
+  if(sens == 6 and location == INDOOR) {                                          /* humidity from sequence */
     float humSequence[4] = { 40400.0, 40400.0, 40400.0, 40400.0 }; 
     for(unsigned int i=0; i<4; i++) {
-      if(config.display_source_sequence_hum(i) == 1) { // thingspeak
+      if(config.display_source_sequence_hum(i) == 1) {                            /* thingspeak */
         if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
           humSequence[i] = thingspeak.get_field(config.display_source_sequence_thnghum(i));
         }
       }
-      if(config.display_source_sequence_hum(i) == 2) { // wireless sensor
+      if(config.display_source_sequence_hum(i) == 2) {                            /* wireless sensor */
         if(now() - wsensor.get_updated(config.display_source_sequence_wsenshum(i)) < 
         config.wsensor_expire(config.display_source_sequence_wsenshum(i)) * 60) {
           humSequence[i] = wsensor.get_humidity(
@@ -529,17 +578,20 @@ float Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing
           );
         }
       }
-      if(config.display_source_sequence_hum(i) == 3) { // BME280
+      if(config.display_source_sequence_hum(i) == 3) {                            /* BME280 */
         humSequence[i] = sensors.get_bme280_hum(config.bme280_hum_corr());
       }
-      if(config.display_source_sequence_hum(i) == 4) { // SHT21
+      if(config.display_source_sequence_hum(i) == 4) {                            /* SHT21 */
         humSequence[i] = sensors.get_sht21_hum(config.sht21_hum_corr());
       }
-      if(config.display_source_sequence_hum(i) == 5) { // DHT22
+      if(config.display_source_sequence_hum(i) == 5) {                            /* DHT22 */
         humSequence[i] = sensors.get_dht22_hum(config.dht22_hum_corr());
       }
-      if(config.display_source_sequence_hum(i) == 6) { // Forecast
+      if(config.display_source_sequence_hum(i) == 6) {                            /* Forecast */
         humSequence[i] = weather.get_currentHum();
+      }
+      if(config.display_source_sequence_hum(i) == 7) {                            /* BME680 */
+        humSequence[i] = sensors.get_bme680_hum(config.bme680_hum_corr());
       }
       
       if(sensors.checkHum(humSequence[i])) { 
@@ -548,28 +600,29 @@ float Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing
       else myNex.writeStr("Main.humSeq" + String(i) + ".txt", "--");
     }
   }
+
   else {
     if(sensors.checkHum(hum)) myNex.writeStr(field, String(int(round(hum))) + "%");
     else myNex.writeStr(field, "--");
   }
-  return hum;
 }
 
 /**
  * Display comfort level
- * @param temp temperature
- * @param hum humidity
  */
-void Nextion::_comfortLevel(float temp, float hum) {
-  #define COMFORTABLE 0
-  #define HOT         1
-  #define COLD        2
-  #define DRY         3
-  #define HUMID       4
-  #define HOT_HUMID   5
-  #define HOT_DRY     6
-  #define COLD_HUMID  7
-  #define COLD_DRY    8
+void Nextion::_comfortLevel() {
+  #define COMFORTABLE          0
+  #define HOT                  1
+  #define COLD                 2
+  #define DRY                  3
+  #define HUMID                4
+  #define HOT_HUMID            5
+  #define HOT_DRY              6
+  #define COLD_HUMID           7
+  #define COLD_DRY             8
+  #define AIR_CLEAN            0
+  #define AIR_POLLUTED         1
+  #define AIR_HEAVILY_POLLUTED 2
   
   if(config.display_source_descr() == 0) { // --
     myNex.writeNum("Main.seq.val", 0);
@@ -578,19 +631,42 @@ void Nextion::_comfortLevel(float temp, float hum) {
   
   if(config.display_source_descr() == 1) { // comfort level
     myNex.writeNum("Main.seq.val", 0);
+    String comfort = "";
     switch(global.comfort) {
-      case 0: myNex.writeStr("Main.comfort.txt", "--"); break;
-      case 1: myNex.writeStr("Main.comfort.txt", lang.comfort(COMFORTABLE)); break;
-      case 2: myNex.writeStr("Main.comfort.txt", lang.comfort(HOT)); break;
-      case 3: myNex.writeStr("Main.comfort.txt", lang.comfort(COLD)); break;
-      case 4: myNex.writeStr("Main.comfort.txt", lang.comfort(DRY)); break;
-      case 5: myNex.writeStr("Main.comfort.txt", lang.comfort(HUMID)); break;
-      case 6: myNex.writeStr("Main.comfort.txt", lang.comfort(HOT_HUMID)); break;
-      case 7: myNex.writeStr("Main.comfort.txt", lang.comfort(HOT_DRY)); break;
-      case 8: myNex.writeStr("Main.comfort.txt", lang.comfort(COLD_HUMID)); break;
-      case 9: myNex.writeStr("Main.comfort.txt", lang.comfort(COLD_DRY)); break;
-      default: myNex.writeStr("Main.comfort.txt", "--"); break;
+      case 1: comfort = lang.comfort(COMFORTABLE); break;
+      case 2: comfort = lang.comfort(HOT); break;
+      case 3: comfort = lang.comfort(COLD); break;
+      case 4: comfort = lang.comfort(DRY); break;
+      case 5: comfort = lang.comfort(HUMID); break;
+      case 6: comfort = lang.comfort(HOT_HUMID); break;
+      case 7: comfort = lang.comfort(HOT_DRY); break;
+      case 8: comfort = lang.comfort(COLD_HUMID); break;
+      case 9: comfort = lang.comfort(COLD_DRY); break;
+      default: comfort = ""; break;
     }
+    if(config.comfort_iaq_source() == 1) {
+      float iaq = sensors.get_bme680_iaq(config.bme680_iaq_corr());
+      if(sensors.checkIaq(iaq)) {
+        _iaq_level = AIR_CLEAN;
+        if(iaq > 100.0) _iaq_level = AIR_POLLUTED;
+        if(iaq > 200.0) _iaq_level = AIR_HEAVILY_POLLUTED;
+        if(comfort.length()) comfort += ". ";
+        comfort += lang.airQuality(_iaq_level);
+      } 
+    }
+    if(config.comfort_co2_source() == 1) {
+      if(now() - wsensor.get_updated(config.comfort_co2_wsensNum()) < config.wsensor_expire(config.comfort_co2_wsensNum()) * 60) {
+        float co2 = wsensor.get_co2(config.comfort_co2_wsensNum(), config.wsensor_co2_corr(config.comfort_co2_wsensNum()));
+        if(wsensor.checkCo2(co2)) {
+          _co2_level = AIR_CLEAN;
+          if(co2 > 800.0) _co2_level = AIR_POLLUTED;
+          if(co2 > 1400.0) _co2_level = AIR_HEAVILY_POLLUTED;
+          if(comfort.length()) comfort += ". ";
+          comfort += lang.airQuality(_co2_level);
+        }
+      } 
+    }
+    myNex.writeStr("Main.comfort.txt", comfort);
   }
   if(config.display_source_descr() == 2) { // sequence
     myNex.writeNum("Main.seq.val", 1);
@@ -659,6 +735,8 @@ void Nextion::_pres(void) {
     pres = sensors.get_bme280_pres(config.bme280_pres_corr());
   if(config.display_source_presOut_sens() == 4) // pressure outside from BMP180
     pres = sensors.get_bmp180_pres(config.bmp180_pres_corr());
+  if(config.display_source_presOut_sens() == 5) // pressure outside from BME680
+    pres = sensors.get_bme680_pres(config.bme680_pres_corr());
   if(sensors.checkPres(pres)) 
   myNex.writeStr("Main.presOutside.txt", String(int(round(pres * 0.75))) + lang.mm());
   else myNex.writeStr("Main.presOutside.txt", "--");

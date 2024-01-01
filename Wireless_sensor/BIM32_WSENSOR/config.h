@@ -25,7 +25,7 @@
  */
 // #define DS18B20_RESOLUTION 9
 // #define DS18B20_RESOLUTION 10
-#define DS18B20_RESOLUTION 11
+ #define DS18B20_RESOLUTION 11
 // #define DS18B20_RESOLUTION 12
 
 /**
@@ -42,6 +42,14 @@
  * Uncomment if you need it
  */
 // #define USE_PZEM_004T
+
+
+/**
+ * CO2 sensor SENSEAIR S8
+ * 
+ * Uncomment if you need it
+ */
+// #define USE_S8
 
 
 /**

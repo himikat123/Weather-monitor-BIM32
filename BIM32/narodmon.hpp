@@ -154,6 +154,7 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         float pwr = wsensor.get_power(wsensNum, config.wsensor_pow_corr(wsensNum));
         float enrg = wsensor.get_energy(wsensNum, config.wsensor_enrg_corr(wsensNum));
         float freq = wsensor.get_frequency(wsensNum, config.wsensor_freq_corr(wsensNum));
+        float co2 = wsensor.get_co2(wsensNum, config.wsensor_co2_corr(wsensNum));
         float vbat = wsensor.get_batteryVoltage(wsensNum);
         int batlvl = wsensor.get_batteryLevel(wsensNum);
         int batprc = wsensor.get_batteryPercentage(wsensNum);
@@ -169,6 +170,7 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         if(wsensType == 13 and wsensor.checkBatVolt(vbat)) fields = field + String(vbat);
         if(wsensType == 14 and wsensor.checkBatPercent(batprc)) fields = field + String(batprc);
         if(wsensType == 15 and wsensor.checkBatLvl(batlvl)) fields = field + String(batlvl);
+        if(wsensType == 16 and wsensor.checkCo2(co2)) fields = field + String(co2);
       }
     }; break;
 
@@ -176,6 +178,25 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
       if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
         fields = field + String(thingspeak.get_field(config.narodmonSend_thing(fieldNum)));
       }
+    }; break;
+
+    case 13: { // BME680
+      // Temperature
+      if(config.narodmonSend_types(fieldNum) == 0 and 
+        sensors.checkTemp(sensors.get_bme680_temp(config.bme680_temp_corr()))) 
+          fields = field + String(sensors.get_bme680_temp(config.bme680_temp_corr()));
+      // Humidity
+      if(config.narodmonSend_types(fieldNum) == 1 and 
+        sensors.checkHum(sensors.get_bme680_hum(config.bme680_hum_corr())))
+          fields = field + String(sensors.get_bme680_hum(config.bme680_hum_corr()));
+      // Pressure
+      if(config.narodmonSend_types(fieldNum) == 2 and
+        sensors.checkPres(sensors.get_bme680_pres(config.bme680_pres_corr())))
+          fields = field + String(sensors.get_bme680_pres(config.bme680_pres_corr()));
+      // IAQ
+      if(config.narodmonSend_types(fieldNum) == 3 and
+        sensors.checkIaq(sensors.get_bme680_iaq(config.bme680_iaq_corr())))
+          fields = field + String(sensors.get_bme680_iaq(config.bme680_iaq_corr()));
     }; break;
     
     default: ; break; 
