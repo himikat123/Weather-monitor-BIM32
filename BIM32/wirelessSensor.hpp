@@ -8,6 +8,7 @@ class WirelessSensor {
     bool checkPwr(float pwr);
     bool checkEnrg(float enrg);
     bool checkFrq(float frq);
+    bool checkCo2(float co2);
     bool checkBatVolt(float volt);
     bool checkBatLvl(int lvl);
     bool checkBatPercent(int percent);
@@ -24,6 +25,8 @@ class WirelessSensor {
     float get_energy(unsigned int num, float corr);
     float get_frequency(unsigned int num, float corr);
     String get_energyType(unsigned int num);
+    float get_co2(unsigned int num, float corr);
+    String get_co2Type(unsigned int num);
     int get_batteryAdc(unsigned int num);
     float get_batteryVoltage(unsigned int num);
     int get_batteryLevel(unsigned int num);
@@ -45,6 +48,7 @@ class WirelessSensor {
     float _power[WSENSORS] = {-1.0, -1.0};           // Power
     float _energy[WSENSORS] = {-1.0, -1.0};          // Energy
     float _frequency[WSENSORS] = {-1.0, -1.0};       // Frequency
+    float _co2[WSENSORS] = {-1.0, -1.0};             // CO2
     int _adc[WSENSORS] = {-1, -1};                   // Battery ADC raw data
     float _batteryVoltage[WSENSORS] = {-1.0, -1.0};  // Battery voltage
     int _batteryLevel[WSENSORS] = {-1, -1};          // Battery level
@@ -89,6 +93,8 @@ void WirelessSensor::receive() {
         _power[number] = root["pzem"][2] | -1.0;
         _energy[number] = root["pzem"][3] | -1.0;
         _frequency[number] = root["pzem"][4] | -1.0;
+
+        _co2[number] = root["s8"] | -1.0;
            
         _adc[number] = root["b"] | -1;
         _batteryVoltage[number] = (float)_adc[number] / (300.0 - config.wsensor_bat_k(number));
@@ -160,6 +166,13 @@ bool WirelessSensor::checkEnrg(float enrg) {
  */
 bool WirelessSensor::checkFrq(float frq) {
   return (frq >= 45.0 and frq <= 65.0);
+}
+
+/**
+ * Check if Senseair S8 CO2 is within the normal range
+ */
+bool WirelessSensor::checkCo2(float co2) {
+  return (co2 >= 400.0 and co2 <= 2000.0);
 }
 
 /**
@@ -251,6 +264,16 @@ float WirelessSensor::get_frequency(unsigned int num, float corr) {
 String WirelessSensor::get_energyType(unsigned int num) {
   if(num >= WSENSORS) return "";
   return "PZEM-004t";
+}
+
+float WirelessSensor::get_co2(unsigned int num, float corr) {
+  if(num >= WSENSORS) return -1.0;
+  return _co2[num] + corr;
+}
+
+String WirelessSensor::get_co2Type(unsigned int num) {
+  if(num >= WSENSORS) return "";
+  return "Senseair S8";
 }
 
 int WirelessSensor::get_batteryAdc(unsigned int num) {

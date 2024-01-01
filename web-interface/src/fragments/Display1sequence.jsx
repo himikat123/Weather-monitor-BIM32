@@ -32,7 +32,8 @@ class Display1sequence extends Save {
             'DHT22', 
             'DS18B20', 
             'ESP32',
-            text.get('forecast', lang)
+            text.get('forecast', lang),
+            'BME680'
         ];
 
         let humSensors = [
@@ -42,7 +43,8 @@ class Display1sequence extends Save {
             'BME280',
             'SHT21', 
             'DHT22',
-            text.get('forecast', lang)
+            text.get('forecast', lang),
+            'BME680'
         ];
 
         return (<><hr />

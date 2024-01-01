@@ -119,6 +119,15 @@ class Wsensors extends WsensorsFn{
                                     min="-10" max="10" step="0.1"
                                     config={this.props.config} changedConfig={this.changedConfig}
                                     units={text.get('hz', lang)}
+                                />
+                                
+                                {/* CO2 Senseair S8 */}
+                                <Wsensor name='CO2'
+                                    value={this.getVal(num, this.props.config.wsensor.co2.corr[num], 'ppm', 'co2', 400, 2000, 10)}
+                                    corr={`wsensor.co2.corr.${num}`}
+                                    min="-10" max="10" step="0.1"
+                                    config={this.props.config} changedConfig={this.changedConfig}
+                                    units='ppm'
                                 /><hr />
 
                                 {/* Battery */}

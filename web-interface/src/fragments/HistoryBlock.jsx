@@ -41,12 +41,14 @@ class HistoryBlock extends React.Component {
                             src={`https://thingspeak.com/channels/${this.props.config.history.channelID}/charts/${Number(this.props.num)+1}?bgcolor=%23${this.props.bgcolor}&color=%23${this.props.color}&dynamic=true&results=24&round=2&title=${this.props.fields}&type=line&api_key=${this.props.config.history.rdkey}&width=${this.state.width}`}>
                         </iframe>
                     </div>
+
                     <SelectInput value={`history.fields.${this.props.num}`}
                         label={this.props.fields}
                         options={this.props.sensors} 
                         config={this.props.config} 
                         changedConfig={this.props.changedConfig}
                     />
+
                     {this.props.config.history.fields[this.props.num] == 2 && <>
                         <SelectInput value={`history.wSensors.${this.props.num}`}
                             label={text.get('wirelessSensorNumber', lang)}
@@ -63,10 +65,20 @@ class HistoryBlock extends React.Component {
                             />
                         }
                     </>}
+
                     {this.props.config.history.fields[this.props.num] == 3 && <>
                         <SelectInput value={`history.tFields.${this.props.num}`}
                             label={text.get('field', lang)}
                             options={this.props.tFields} 
+                            config={this.props.config} 
+                            changedConfig={this.props.changedConfig}
+                        />
+                    </>} 
+
+                    {this.props.config.history.fields[this.props.num] == 1 && this.props.num == 6 && <>
+                        <SelectInput value={`history.wSensors.${this.props.num}`}
+                            label={text.get('wirelessSensorNumber', lang)}
+                            options={this.props.wSensors} 
                             config={this.props.config} 
                             changedConfig={this.props.changedConfig}
                         />

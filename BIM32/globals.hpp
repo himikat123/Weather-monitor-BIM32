@@ -25,7 +25,7 @@
 #define SEPARATOR "**********************************************************************"
 
 struct {
-  char fw[7] = "v3.4"; // Firmware version
+  char fw[7] = "v3.5"; // Firmware version
   const char* remote_host = "www.google.com"; // Remote host to ping
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
@@ -71,6 +71,9 @@ class Config {
   unsigned int _comfort_hum_thing = 0; // Comfort humidity thingspeak field number
   int _comfort_hum_min = 40; // Minimum comfort humidity
   int _comfort_hum_max = 60; // Maximum comfort humidity
+  unsigned int _comfort_iaq_source = 0; // Comfort IAQ source
+  unsigned int _comfort_co2_source = 0; // Comfort CO2 source
+  unsigned int _comfort_co2_wsensNum = 0; // Comfort CO2 wireless sensor number
     
   //WiFi network
   char _network_ssid[NETWORKS][33] = { "", "", "" }; // SSID list
@@ -128,26 +131,26 @@ class Config {
   unsigned int _display_brightness_max[DISPLAYS] = {255, 255}; // Maximum brightness limit 0...255
   unsigned int _display_lightSensor[DISPLAYS] = {1, 1}; // Sensor type for brightness adjust: 0-Analog input, 1-MAX44009, 2-BH1750
   unsigned int _display_lightSensor_sensitivity[DISPLAYS] = {50, 50}; // Ambient light sensor sensibility 1...100
-  unsigned int _display_source_tempOut_sens = 0; // Outdoor temperature data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20
+  unsigned int _display_source_tempOut_sens = 0; // Outdoor temperature data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-BME680
   unsigned int _display_source_tempOut_wsensNum = 0; // Wireless sensor number for the outdoor temperature
   unsigned int _display_source_tempOut_temp = 0; // Sensor number for the outdoor temperature
   unsigned int _display_source_tempOut_thing = 0; // Thingspeak field number for the outdoor temperature
-  unsigned int _display_source_humOut_sens = 0; // Outdoor humidity data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-SHT21, 5-DHT22
+  unsigned int _display_source_humOut_sens = 0; // Outdoor humidity data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-SHT21, 5-DHT22, 6-BME680
   unsigned int _display_source_humOut_wsensNum = 0; // Wireless sensor number for the outdoor humidity
   unsigned int _display_source_humOut_thing = 0; // Thingspeak field number for the outdoor humidity
-  unsigned int _display_source_presOut_sens = 0; // Outdoor pressure data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180
+  unsigned int _display_source_presOut_sens = 0; // Outdoor pressure data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-BME680
   unsigned int _display_source_presOut_wsensNum = 0; // Wireless sensor number for the outdoor pressure
   unsigned int _display_source_presOut_thing = 0; // Thingspeak field number for the outdoor pressure
-  unsigned int _display_source_tempIn_sens = 0; // Indoor temperature data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-Sequence
+  unsigned int _display_source_tempIn_sens = 0; // Indoor temperature data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-Sequence, 9-BME680
   unsigned int _display_source_tempIn_wsensNum = 0; // Wireless sensor number for the indoor temperature
   unsigned int _display_source_tempIn_temp = 0; // Sensor number for the indoor temperature
   unsigned int _display_source_tempIn_thing = 0; // Thingspeak field number for the intdoor temperature
-  unsigned int _display_source_humIn_sens = 0; // Indoor humidity data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-SHT21, 5-DHT22, 6-Sequence
+  unsigned int _display_source_humIn_sens = 0; // Indoor humidity data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-SHT21, 5-DHT22, 6-Sequence, 7-BME680
   unsigned int _display_source_humIn_wsensNum = 0; // Wireless sensor number for the indoor humidity
   unsigned int _display_source_humIn_thing = 0; // Thingspeak field number for the outdoor humidity
-  unsigned int _display_source_volt_sens = 0; // Voltage data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak
+  unsigned int _display_source_volt_sens = 0; // Voltage data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak, 3-BME680-IAQ
   unsigned int _display_source_volt_wsensNum = 0; // Wireless sensor number for the voltage
-  unsigned int _display_source_volt_volt = 0; // Sensor type for the voltage: 0-Wireless sensor battery voltage, 1-Wireless sensor battery percentage, 2-PZEM-004t voltage
+  unsigned int _display_source_volt_volt = 0; // Sensor type for the voltage: 0-Wireless sensor battery voltage, 1-Wireless sensor battery percentage, 2-PZEM-004t voltage, 3-SenseAir-S8
   unsigned int _display_source_volt_thing = 0; // Thingspeak field number for the voltage
   unsigned int _display_source_bat_sens = 0; // Battery level data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak
   unsigned int _display_source_bat_wsensNum = 0; // Wireless sensor number for the battery level:
@@ -155,14 +158,14 @@ class Config {
   unsigned int _display_source_descr = 0; // Additional description data source: 0-Nothing, 1-Comfort level, 2-Sequence
   unsigned int _display_source_sequence_dur = 2; // Sequence data display duration (seconds)
   char _display_source_sequence_name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
-  unsigned int _display_source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast
+  unsigned int _display_source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
   unsigned int _display_source_sequence_thngtemp[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the temperature sequence
   unsigned int _display_source_sequence_wsenstemp[SEQUENCES][2] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Wireless sensor number and its sensor for the temperature sequence
-  unsigned int _display_source_sequence_hum[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast
+  unsigned int _display_source_sequence_hum[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast, 7-BME680
   unsigned int _display_source_sequence_thnghum[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the humidity sequence
   unsigned int _display_source_sequence_wsenshum[SEQUENCES] =  {0, 0, 0, 0}; // Wireless sensor number for the humidity sequence
   unsigned int _display_timeSlot_period[TIMESLOTS] = {2, 2, 0, 0, 0, 0, 0, 0}; // Display2 timeslot durations
-  unsigned int _display_timeSlot_sensor[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot data sources
+  unsigned int _display_timeSlot_sensor[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
   unsigned int _display_timeSlot_data[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot sensors types
   unsigned int _display_timeSlot_thing[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot thingspeak field number
   unsigned int _display_timeSlot_wsensor_num[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; //  Display2 timeslot wireless sensor number
@@ -193,6 +196,10 @@ class Config {
   float _max44009_light_corr = 0.0; // MAX44009 ambient light correction
   float _bh1750_light_corr = 0.0; // BH1750 ambient light correction
   float _analog_voltage_corr = 0.0; // Analog ambient light sensor voltage correction
+  float _bme680_temp_corr = 0.0; // BME680 temperature correction
+  float _bme680_hum_corr = 0.0; // BME680 humidity correction
+  float _bme680_pres_corr = 0.0; // BME680 pressure correction
+  float _bme680_iaq_corr = 0.0; // BME680 IAQ correction
 
   // Wireless sensors
   float _wsensor_temp_corr[WSENSORS][WSENSOR_TEMPS] = { {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0} }; // Wireless sensor temperature correction
@@ -204,6 +211,7 @@ class Config {
   float _wsensor_pow_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t power correction
   float _wsensor_enrg_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t energy correction
   float _wsensor_freq_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t frequency correction
+  float _wsensor_co2_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor SenseAir S8 CO2 correction
   float _wsensor_bat_k[WSENSORS] = {125, 125}; // Wireless sensor battery voltage ADC division factor
   unsigned int _wsensor_bat_type[WSENSORS] = {0, 0}; // Wireless sensor battery type: 0 - 3x Batteries (4.5V), 1 - LiIon battery (3.7V) 
   unsigned int _wsensor_expire[WSENSORS] = {10, 10}; // Wireless sensor data expire (minutes) 1...100
@@ -214,10 +222,10 @@ class Config {
   char _history_channelID[11] = ""; // Weather repository channel ID
   char _history_wrkey[17] = ""; // Weather repository Write API Key
   char _history_rdkey[17] = ""; // Weather repository Read API Key
-  unsigned int _history_fields[5] = {0,0,0,0,0}; // Weather repository fields data sources 
-  unsigned int _history_wSensors[5] = {0,0,0,0,0}; // Weather repository wireless sensor numbers
-  unsigned int _history_wTypes[5] = {0,0,0,0,0}; // Weather repository wireless sensor temperature sensor numbers
-  unsigned int _history_tFields[5] = {0,0,0,0,0}; // Weather repository thingspeak field numbers
+  unsigned int _history_fields[7] = {0,0,0,0,0,0,0}; // Weather repository fields data sources 
+  unsigned int _history_wSensors[7] = {0,0,0,0,0,0,0}; // Weather repository wireless sensor numbers
+  unsigned int _history_wTypes[7] = {0,0,0,0,0,0,0}; // Weather repository wireless sensor temperature sensor numbers
+  unsigned int _history_tFields[7] = {0,0,0,0,0,0,0}; // Weather repository thingspeak field numbers
   
   // Thingspeak send
   bool _thingspeakSend_turnOn = false; // Enable/disable sending data to Thingspeak
@@ -432,6 +440,10 @@ class Config {
           COPYNUM(conf["sensors"]["max44009"]["l"], _max44009_light_corr);
           COPYNUM(conf["sensors"]["bh1750"]["l"], _bh1750_light_corr);
           COPYNUM(conf["sensors"]["analog"]["v"], _analog_voltage_corr);
+          COPYNUM(conf["sensors"]["bme680"]["t"], _bme680_temp_corr);
+          COPYNUM(conf["sensors"]["bme680"]["h"], _bme680_hum_corr);
+          COPYNUM(conf["sensors"]["bme680"]["p"], _bme680_pres_corr);
+          COPYNUM(conf["sensors"]["bme680"]["i"], _bme680_iaq_corr);
 
           // Wireless sensors
           for(unsigned int i=0; i<WSENSORS; i++) {
@@ -446,6 +458,7 @@ class Config {
             COPYNUM(conf["wsensor"]["pow"]["corr"][i], _wsensor_pow_corr[i]);
             COPYNUM(conf["wsensor"]["enrg"]["corr"][i], _wsensor_enrg_corr[i]);
             COPYNUM(conf["wsensor"]["freq"]["corr"][i], _wsensor_freq_corr[i]);
+            COPYNUM(conf["wsensor"]["co2"]["corr"][i], _wsensor_co2_corr[i]);
             COPYNUM(conf["wsensor"]["bat"]["k"][i], _wsensor_bat_k[i]);
             COPYNUM(conf["wsensor"]["bat"]["type"][i], _wsensor_bat_type[i]);
             COPYNUM(conf["wsensor"]["expire"][i], _wsensor_expire[i]); 
@@ -457,7 +470,7 @@ class Config {
           COPYSTR(conf["history"]["channelID"], _history_channelID);
           COPYSTR(conf["history"]["wrkey"], _history_wrkey);
           COPYSTR(conf["history"]["rdkey"], _history_rdkey);
-          for(unsigned int i=0; i<5; i++) {
+          for(unsigned int i=0; i<7; i++) {
             COPYNUM(conf["history"]["fields"][i], _history_fields[i]);
             COPYNUM(conf["history"]["wSensors"][i], _history_wSensors[i]);
             COPYNUM(conf["history"]["wTypes"][i], _history_wTypes[i]);
@@ -510,6 +523,9 @@ class Config {
           COPYNUM(conf["comfort"]["hum"]["thing"], _comfort_hum_thing);
           COPYNUM(conf["comfort"]["hum"]["min"], _comfort_hum_min);
           COPYNUM(conf["comfort"]["hum"]["max"], _comfort_hum_max);
+          COPYNUM(conf["comfort"]["iaq"]["source"], _comfort_iaq_source);
+          COPYNUM(conf["comfort"]["co2"]["source"], _comfort_co2_source);
+          COPYNUM(conf["comfort"]["co2"]["wsensNum"], _comfort_co2_wsensNum);
 
           // Account
           COPYSTR(conf["account"]["name"], _account_name);
@@ -810,7 +826,7 @@ class Config {
   }
 
   unsigned int display_source_tempOut_sens() {
-    if(_display_source_tempOut_sens > 7) return 0;
+    if(_display_source_tempOut_sens > 8) return 0;
     return _display_source_tempOut_sens;
   }
 
@@ -830,7 +846,7 @@ class Config {
   }
 
   unsigned int display_source_humOut_sens() {
-    if(_display_source_humOut_sens > 5) return 0;
+    if(_display_source_humOut_sens > 6) return 0;
     return _display_source_humOut_sens; 
   }
 
@@ -845,7 +861,7 @@ class Config {
   }
 
   unsigned int display_source_presOut_sens() {
-    if(_display_source_presOut_sens > 4) return 0;
+    if(_display_source_presOut_sens > 5) return 0;
     return _display_source_presOut_sens;
   }
 
@@ -860,7 +876,7 @@ class Config {
   }
 
   unsigned int display_source_tempIn_sens() {
-    if(_display_source_tempIn_sens > 8) return 0;
+    if(_display_source_tempIn_sens > 9) return 0;
     return _display_source_tempIn_sens; 
   }
 
@@ -880,7 +896,7 @@ class Config {
   }
 
   unsigned int display_source_humIn_sens() {
-    if(_display_source_humIn_sens > 6) return 0;
+    if(_display_source_humIn_sens > 7) return 0;
     return _display_source_humIn_sens; 
   }
 
@@ -895,7 +911,7 @@ class Config {
   }
 
   unsigned int display_source_volt_sens() {
-    if(_display_source_volt_sens > 2) return 0;
+    if(_display_source_volt_sens > 3) return 0;
     return _display_source_volt_sens; 
   }
 
@@ -905,7 +921,7 @@ class Config {
   }
 
   unsigned int display_source_volt_volt() {
-    if(_display_source_volt_volt > 2) return 0;
+    if(_display_source_volt_volt > 3) return 0;
     return _display_source_volt_volt; 
   }
 
@@ -945,7 +961,7 @@ class Config {
 
   unsigned int display_source_sequence_temp(unsigned int slot) {
     if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_temp[slot] > 9) return 0;
+    if(_display_source_sequence_temp[slot] > 10) return 0;
     return _display_source_sequence_temp[slot];
   }
 
@@ -965,7 +981,7 @@ class Config {
 
   unsigned int display_source_sequence_hum(unsigned int slot) {
     if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_hum[slot] > 6) return 0;
+    if(_display_source_sequence_hum[slot] > 7) return 0;
     return _display_source_sequence_hum[slot];
   }
 
@@ -989,13 +1005,13 @@ class Config {
 
   unsigned int display_timeSlot_sensor(unsigned int slot) {
     if(slot >= TIMESLOTS) return 0;
-    if(_display_timeSlot_sensor[slot] > 10) return 0;
+    if(_display_timeSlot_sensor[slot] > 11) return 0;
     return _display_timeSlot_sensor[slot];
   }
 
   unsigned int display_timeSlot_data(unsigned int slot) {
     if(slot >= TIMESLOTS) return 0;
-    if(_display_timeSlot_data[slot] > 2) return 0;
+    if(_display_timeSlot_data[slot] > 3) return 0;
     return _display_timeSlot_data[slot];
   }
 
@@ -1096,6 +1112,22 @@ class Config {
     return _analog_voltage_corr;
   }
 
+  float bme680_temp_corr() {
+    return _bme680_temp_corr;
+  }
+
+  float bme680_hum_corr() {
+    return _bme680_hum_corr;
+  }
+
+  float bme680_pres_corr() {
+    return _bme680_pres_corr;
+  }
+
+  float bme680_iaq_corr() {
+    return _bme680_iaq_corr;
+  }
+
   float wsensor_temp_corr(unsigned int num, unsigned int sens) {
     if(num >= WSENSORS) return 0;
     if(sens >= WSENSOR_TEMPS) return 0;
@@ -1142,6 +1174,11 @@ class Config {
     return _wsensor_freq_corr[num];
   }
 
+  float wsensor_co2_corr(unsigned int num) {
+    if(num >= WSENSORS) return 0;
+    return _wsensor_co2_corr[num];
+  }
+
   float wsensor_bat_k(unsigned int num) {
     if(num >= WSENSORS) return 0.0;
     if(_wsensor_bat_k[num] < 10.0 or _wsensor_bat_k[num] > 250.0) return 120.0;
@@ -1182,22 +1219,22 @@ class Config {
   }
   
   unsigned int history_fields(unsigned int sensType) {
-    if(sensType >= 5) return 0;
+    if(sensType >= 7) return 0;
     return _history_fields[sensType];
   }
   
   unsigned int history_wSensors(unsigned int sensType) {
-    if(sensType >= 5) return 0;
+    if(sensType >= 7) return 0;
     return _history_wSensors[sensType];
   }
   
   unsigned int history_wTypes(unsigned int sensType) {
-    if(sensType >= 5) return 0;
+    if(sensType >= 7) return 0;
     return _history_wTypes[sensType];
   }
   
   unsigned int history_tFields(unsigned int sensType) {
-    if(sensType >= 5) return 0;
+    if(sensType >= 7) return 0;
     return _history_tFields[sensType];
   }
       
@@ -1224,13 +1261,13 @@ class Config {
 
   unsigned int thingspeakSend_fields(unsigned int num) {
     if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_fields[num] > 11) return 0;
+    if(_thingspeakSend_fields[num] > 12) return 0;
     return _thingspeakSend_fields[num];
   }
 
   unsigned int thingspeakSend_types(unsigned int num) {
     if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_types[num] > 2) return 0;
+    if(_thingspeakSend_types[num] > 3) return 0;
     return _thingspeakSend_types[num];
   }
 
@@ -1242,7 +1279,7 @@ class Config {
 
   unsigned int thingspeakSend_wtypes(unsigned int num) {
     if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_wtypes[num] > 15) return 0;
+    if(_thingspeakSend_wtypes[num] > 16) return 0;
     return _thingspeakSend_wtypes[num];
   }
 
@@ -1290,7 +1327,7 @@ class Config {
 
   unsigned int narodmonSend_sensors(unsigned int num) {
     if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_sensors[num] > 12) return 0;
+    if(_narodmonSend_sensors[num] > 13) return 0;
     return _narodmonSend_sensors[num];
   }
 
@@ -1301,7 +1338,7 @@ class Config {
 
   unsigned int narodmonSend_types(unsigned int num) {
     if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_types[num] > 2) return 0;
+    if(_narodmonSend_types[num] > 3) return 0;
     return _narodmonSend_types[num];
   }
 
@@ -1313,7 +1350,7 @@ class Config {
 
   unsigned int narodmonSend_wtypes(unsigned int num) {
     if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_wtypes[num] > 15) return 0;
+    if(_narodmonSend_wtypes[num] > 16) return 0;
     return _narodmonSend_wtypes[num];
   }
 
@@ -1365,6 +1402,18 @@ class Config {
   
   int comfort_hum_max() {
     return _comfort_hum_max;
+  }
+
+  unsigned int comfort_iaq_source() {
+    return _comfort_iaq_source;
+  }
+
+  unsigned int comfort_co2_source() {
+    return _comfort_co2_source;
+  }
+
+  unsigned int comfort_co2_wsensNum() {
+    return _comfort_co2_wsensNum;
   }
   
   String account_name() {

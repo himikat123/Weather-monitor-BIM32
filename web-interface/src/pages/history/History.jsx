@@ -18,15 +18,19 @@ class History extends HistoryFn {
             text.get('humidityOut', lang), 
             text.get('pressure', lang), 
             text.get('temperatureIn', lang), 
-            text.get('humidityIn', lang)
+            text.get('humidityIn', lang),
+            text.get('indexForAirQuality', lang),
+            'CO2'
         ];
 
         let sensors = [
-            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'BMP180', 'SHT21', 'DHT22', 'DS18B20'],
-            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'SHT21', 'DHT22'],
-            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'BMP180'],
-            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'BMP180', 'SHT21', 'DHT22', 'DS18B20'],
-            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'SHT21', 'DHT22']
+            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'BMP180', 'SHT21', 'DHT22', 'DS18B20', 'BME680'],
+            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'SHT21', 'DHT22', 'BME680'],
+            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'BMP180', 'BME680'],
+            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'BMP180', 'SHT21', 'DHT22', 'DS18B20', 'BME680'],
+            ['--', text.get('forecast', lang), text.get('wirelessSensor', lang), 'thingspeak', 'BME280', 'SHT21', 'DHT22', 'BME680'],
+            ['--', 'BME680'],
+            ['--', text.get('wirelessSensor', lang)]
         ];
 
         let wTemperatures = [];
@@ -38,7 +42,7 @@ class History extends HistoryFn {
         let tFields = [];
         for(let i=1; i<8; i++) tFields.push(text.get('field', lang) + ' ' + i);
 
-        let colors = ['FFCC00', '00FFFF', 'FF00FF', 'FFCC00', '00FFFF'];
+        let colors = ['FFCC00', '00FFFF', 'FF00FF', 'FFCC00', '00FFFF', '0000FF', '0000FF'];
 
         return(<>
             <Menu language={lang} />
@@ -99,7 +103,7 @@ class History extends HistoryFn {
                             </div>
                         </div>
                         
-                        {[...Array(5)].map((x, i) => 
+                        {[...Array(7)].map((x, i) => 
                             <HistoryBlock key={i}
                                 num={i}
                                 fields={fields[i]}

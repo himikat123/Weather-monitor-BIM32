@@ -44,6 +44,11 @@ String web_sensorsPrepare(bool logged) {
   json["max44009"]["light"] = round(sensors.get_max44009_light(0) * 10) / 10;
   json["bh1750"]["light"] = round(sensors.get_bh1750_light(0) * 10) / 10;
   json["analog"]["volt"] = round(sensors.get_analog_voltage(0) * 100) / 100;
+  json["bme680"]["temp"] = round(sensors.get_bme680_temp(0) * 10) / 10;
+  json["bme680"]["hum"] = round(sensors.get_bme680_hum(0) * 10) / 10;
+  json["bme680"]["pres"] = round(sensors.get_bme680_pres(0) * 7.5) / 10;
+  json["bme680"]["iaq"] = round(sensors.get_bme680_iaq(0) * 10) / 10;
+  json["bme680"]["iaqAccr"] = sensors.get_bme680_iaq_accuracy();
   json["weather"]["temp"] = round(weather.get_currentTemp() * 10) / 10;
   json["weather"]["hum"] = round(weather.get_currentHum() * 10) / 10;
   json["weather"]["pres"] = round(weather.get_currentPres() * 7.5) / 10;
@@ -77,6 +82,8 @@ String web_sensorsPrepare(bool logged) {
     json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType(i);
     json["wsensor"]["freq"]["data"][i] = round(wsensor.get_frequency(i, 0) * 10) / 10;
     json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType(i);
+    json["wsensor"]["co2"]["data"][i] = round(wsensor.get_co2(i, 0) * 10) / 10;
+    json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type(i);
     json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
   }
   File root = SPIFFS.open("/");
@@ -137,7 +144,7 @@ bool web_isLogged(AsyncWebServerRequest *request) {
 bool web_fileRead(AsyncWebServerRequest *request) {
   String path = request->url();
   if(!path.endsWith(".ico") && !path.endsWith(".png")) {
-    if(path == "/config.json" or path == "/alarm.json") {
+    if(path == "/config.json" or path == "/alarm.json" or path == "/bme680.json") {
       if(!web_isLogged(request)) {
         request->send(200, "text/plain", "{\"lang\": \"" + config.lang() + "\", \"state\": \"LOGIN\"}");
         return true;
@@ -544,25 +551,23 @@ void webInterface_init(void) {
   }
   SSDP.setSchemaURL("description.xml");
   SSDP.setHTTPPort(80);
-  SSDP.setName("Weather monitor");
+  SSDP.setName("Weather monitor BIM32");
   SSDP.setSerialNumber(chipId);
   SSDP.setURL("/");
   SSDP.setModelName("BIM32");
   SSDP.setModelNumber(String(global.fw));
-  SSDP.setModelURL("https://github.com/himikat123/Weather-monitor-BIM32");
+  SSDP.setModelURL("https://radiokot.ru/artfiles/6571/");
   SSDP.setManufacturer("himikat123@gmail.com");
-  SSDP.setManufacturerURL("https://radiokot.ru/artfiles/6571/");
+  SSDP.setManufacturerURL("https://github.com/himikat123/Weather-monitor-BIM32");
   SSDP.setDeviceType("rootdevice");
   SSDP.setServerName("SSDPServer/1.0");
-  SSDP.setIcons(
-    "<icon>"
-      "<mimetype>image/png</mimetype>"
-      "<height>48</height>"
-      "<width>48</width>"
-      "<depth>24</depth>"
-      "<url>icon48.png</url>"
-    "</icon>"
-  );
+  SSDP.setIcons(  "<icon>"
+                  "<mimetype>image/png</mimetype>"
+                  "<height>48</height>"
+                  "<width>48</width>"
+                  "<depth>32</depth>"
+                  "<url>icon48.png</url>"
+                  "</icon>");
   SSDP.begin();
 
   MDNS.addService("http", "tcp", 80);

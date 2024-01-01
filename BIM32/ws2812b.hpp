@@ -38,6 +38,8 @@ class WS2812b {
     void _temp(float t);
     void _hum(float h);
     void _pres(float p);
+    void _iaq(float i);
+    void _co2(float co2);
     void _wind(float sp, int wd);
     void _des(String str);
     void _print();
@@ -186,13 +188,21 @@ void WS2812b::tick() {
             if(wsensType >= 0 and wsensType <= 4) _temp(wsensor.get_temperature(wsensNum, wsensType, config.wsensor_temp_corr(wsensNum, wsensType)));
             if(wsensType == 5) _hum(wsensor.get_humidity(wsensNum, config.wsensor_hum_corr(wsensNum)));
             if(wsensType == 6) _pres(wsensor.get_pressure(wsensNum, config.wsensor_pres_corr(wsensNum)));
+            if(wsensType == 7) _co2(wsensor.get_co2(wsensNum, config.wsensor_co2_corr(wsensNum)));
           }
           else {
             if(wsensType >= 0 and wsensType <= 4) _temp(40400.0);
             if(wsensType == 5) _hum(40400.0);
             if(wsensType == 6) _pres(40400.0);
+            if(wsensType == 7) _co2(40400.0);
           }
         }; break;
+        case 11: // BME680
+          if(config.display_timeSlot_data(_timeSlot) == 0) _temp(sensors.get_bme680_temp(config.bme680_temp_corr()));
+          if(config.display_timeSlot_data(_timeSlot) == 1) _hum(sensors.get_bme680_hum(config.bme680_hum_corr()));
+          if(config.display_timeSlot_data(_timeSlot) == 2) _pres(sensors.get_bme680_pres(config.bme680_pres_corr()));
+          if(config.display_timeSlot_data(_timeSlot) == 3) _iaq(sensors.get_bme680_iaq(config.bme680_iaq_corr()));
+          break;
         default: ; break;
       }
     
@@ -283,6 +293,44 @@ void WS2812b::_pres(float p) {
     _disp_seg_img[0][1] = floor(prs % 100 / 10);
     _disp_seg_img[0][2] = prs % 10;
     _disp_seg_img[0][3] = SYMB_P;
+  }
+}
+
+/**
+ * Preparing data for displaying the IAQ
+ */
+void WS2812b::_iaq(float i) {
+  int iaq = round(i);
+  if(!sensors.checkIaq(i)) { // if the data is wrong
+    _disp_seg_img[0][0] = SYMB_A;
+    _disp_seg_img[0][1] = SYMB_MINUS;
+    _disp_seg_img[0][2] = SYMB_MINUS;
+    _disp_seg_img[0][3] = SYMB_MINUS;
+  }
+  else { // if the data is correct
+    _disp_seg_img[0][0] = SYMB_A;
+    _disp_seg_img[0][1] = iaq < 100 ? SYMB_SPACE : floor(iaq / 100);
+    _disp_seg_img[0][2] = iaq < 10 ? SYMB_SPACE : floor(iaq % 100 / 10);
+    _disp_seg_img[0][3] = iaq % 10;
+  }
+}
+
+/**
+ * Preparing data for displaying CO2
+ */
+void WS2812b::_co2(float c) {
+  int co2 = round(c);
+  if(!wsensor.checkCo2(c)) { // if the data is wrong
+    _disp_seg_img[0][0] = SYMB_MINUS;
+    _disp_seg_img[0][1] = SYMB_MINUS;
+    _disp_seg_img[0][2] = SYMB_MINUS;
+    _disp_seg_img[0][3] = SYMB_MINUS;
+  }
+  else { // if the data is correct
+    _disp_seg_img[0][0] = co2 < 1000 ? SYMB_SPACE : floor(co2 / 1000);
+    _disp_seg_img[0][1] = co2 < 100 ? SYMB_SPACE : floor(co2 % 1000 / 100);
+    _disp_seg_img[0][2] = co2 < 10 ? SYMB_SPACE : floor(co2 % 100 / 10);
+    _disp_seg_img[0][3] = co2 % 10;
   }
 }
 

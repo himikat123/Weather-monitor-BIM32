@@ -14,8 +14,10 @@ class Display1pres extends Save {
         let lang = this.props.config.lang;
         let fields = [];
         for(let i=1; i<=8; i++) fields.push(text.get('field', lang) + ' ' + i);
-        let sensorsPres = [text.get('forecast', lang), text.get('wirelessSensor', lang),
-          "Thingspeak", "BME280", "BMP180"];
+        let sensorsPres = [
+            text.get('forecast', lang), text.get('wirelessSensor', lang),
+            "Thingspeak", "BME280", "BMP180", "BME680"
+        ];
 
         return (
             <div className="col border border-secondary rounded m-4 p-3 disp-card">

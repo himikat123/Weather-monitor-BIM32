@@ -13,6 +13,7 @@
 #include <microDS18B20.h>    // v3.5.0 https://github.com/GyverLibs/microDS18B20
 #include <MAX44009.h>        // v1.2.3 https://github.com/dantudose/MAX44009
 #include <PZEM004Tv30.h>     // v1.1.2 https://github.com/mandulaj/PZEM-004T-v30
+#include <s8_uart.h>         // v1.0.1 https://github.com/jcomas/S8_UART
 
 #include <SoftwareSerial.h>
 #include "config.h"
@@ -27,11 +28,13 @@ MicroDS18B20<ONE_WIRE_4> ds18b20_4;
 MAX44009 max44009;
 SoftwareSerial pzemSWSerial(PZEM_RX, PZEM_TX);
 PZEM004Tv30 pzem(pzemSWSerial);
-
+SoftwareSerial S8_serial(SENSEAIR_RX, SENSEAIR_TX);
+S8_UART *sensor_S8;
+S8_sensor sensor; 
 
 void setup(){
   // Initialization pins to output
-  uint8_t pins[] = {8, 9, 12, 13, A0, A1, A3, SET, DONE};
+  uint8_t pins[] = {12, 13, A0, A1, A3, SET, DONE};
   for(uint8_t i = 0; i < sizeof(pins); i++) pinMode(pins[i], OUTPUT);
   
   // Determining the logical state of pins
@@ -44,7 +47,12 @@ void setup(){
   // Start serial interface
   Serial.begin(9600);
   while(!Serial);
-
+  
+  // Start each software serial port
+  pzemSWSerial.begin(9600);
+  S8_serial.begin(S8_BAUDRATE);
+  sensor_S8 = new S8_UART(S8_serial);
+  
   // Sensors initialization
   sensorsInit();
 
@@ -133,6 +141,9 @@ void dataSend(void){
     Serial.print(datas.pf, 2);
     Serial.print("]");
   #endif
+  if(detected.s8){
+    Serial.print(",\"s8\":"); Serial.print(datas.co2);
+  }
   Serial.println("}");
   Serial.flush();
 }
