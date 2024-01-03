@@ -1,3 +1,6 @@
+#include <JSON_Decoder.h> // https://github.com/Bodmer/JSON_Decoder
+#include <OpenWeather.h> // v0.3.0 https://github.com/Bodmer/OpenWeather/tree/main?tab=readme-ov-file
+
 class Weather {
   #define OPENWEATHERMAP 0
   #define WEATHERBIT 1
@@ -43,6 +46,8 @@ class Weather {
     unsigned int _currentUpdated = 0;
     String _country = "";
     String _city = "";
+    String _lon = "";
+    String _lat = "";
 
     float _dailyDayTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
     float _dailyNightTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
@@ -64,8 +69,6 @@ class Weather {
     void _updateWeatherbitDaily(void);
     void _updateOpenweathermapHourly(void);
     void _calculateDaily(void);
-    void _openweathermapHourly(void);
-    void _openweathermapHourlyViaParsingServer(void);
 };
 
 /**
@@ -185,6 +188,8 @@ void Weather::update() {
       _country          = weather["sys"]["country"].as<String>();
       _city             = weather["name"].as<String>();
       _currentDate      = weather["dt"];
+      _lon              = weather["coord"]["lon"].as<String>();
+      _lat              = weather["coord"]["lat"].as<String>();
     }
     if(config.weather_provider() == WEATHERBIT) {
       _description      = weather["data"][0]["weather"]["description"].as<String>();
@@ -275,110 +280,33 @@ void Weather::_updateOpenweathermapHourly(void) {
   Serial.println(SEPARATOR);
   Serial.println("Hourly forecast update... ");
 
-  if(config.weather_parsingServer() == "") {
-    _openweathermapHourly();
-  }
-  else _openweathermapHourlyViaParsingServer();
-}
+  if(_lat.length() and _lon.length()) {
+    OW_Weather ow;
+    OW_forecast  *forecast;
+    forecast = new OW_forecast;
+    bool parsed = ow.getForecast(forecast, config.weather_appid(OPENWEATHERMAP), _lat, _lon, "metric", "en");
+    if(parsed) {
+      _hourlyUpdated = now();
+      
+      for(unsigned int n=0; n<DAYS*8; n++) {
+        _hourlyDate[n] = forecast->dt[n];
+        _hourlyIcon[n] = forecast->icon[n].toInt();
+        _hourlyTemp[n] = forecast->temp[n];
+        Serial.println("temp[" + String(n) + "]: " + String(_hourlyTemp[n]));
+        _hourlyPres[n] = forecast->pressure[n];
+        _hourlyWindSpeed[n] = round(forecast->wind_speed[n]);
+        _hourlyWindDir[n] = forecast->wind_deg[n];
+        _hourlyPrec[n] = forecast->prec[n];
+      }
 
-/**
- * Update 3 hourly forecast from openweathermap.org via parsing server
- */
-void Weather::_openweathermapHourlyViaParsingServer(void) {
-  Serial.println("Update via parsing server... ");
-  String location = "";
-  if(config.weather_citysearch() == 0) {
-    if(config.weather_city() == "") return;
-    location = "?q=" + config.weather_city();
-  }
-  if(config.weather_citysearch() == 1) {
-    if(config.weather_cityid() == "") return;
-    location = "?id=" + config.weather_cityid();
-  }
-  if(config.weather_citysearch() == 2) {
-    if(config.weather_lat() == "" || config.weather_lon() == "") return;
-    location = "?lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
-  }
-  String url = config.weather_parsingServer();
-  url += location;
-  url += "&provider=" + String(config.weather_provider());
-  url += "&appid=" + config.weather_appid(config.weather_provider());
-  url += "&mac=" + WiFi.macAddress();
-  HTTPClient clientHourly;
-  Serial.println(url);
-  clientHourly.begin(url);
-  int httpCode = clientHourly.GET();
-  if(httpCode == HTTP_CODE_OK) {
-    String httpData = clientHourly.getString();
-    Serial.println(httpData);
-    DynamicJsonDocument hourly(8192);
-    DeserializationError errorHourly = deserializeJson(hourly, httpData);
-    if(errorHourly) {
-      Serial.println("Hourly forecast deserialization error");
-      _openweathermapHourly();
-      return;
+      Serial.print("Hourly forecast updated successfully at: ");
+      Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
+    
+      _calculateDaily();
     }
-    for(unsigned int i=0; i<DAYS*8; i++) {
-      _hourlyDate[i] = hourly["date"][i] | 0;
-      _hourlyIcon[i] = hourly["icon"][i] | 0;
-      _hourlyTemp[i] = hourly["temp"][i] | 40400.0;
-      _hourlyPres[i] = hourly["pres"][i] | 40400.0;
-      _hourlyWindSpeed[i] = hourly["wSpeed"][i] | -1.0;
-      _hourlyWindDir[i] = hourly["wDir"][i] | -1;
-      _hourlyPrec[i] = hourly["prec"][i] | -1.0;
-    }
-    httpData = "";
-    _hourlyUpdated = now();
-    Serial.print("Hourly forecast updated successfully at: ");
-    Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
-    _calculateDaily();
+    else Serial.println("Hourly forecast update error");
   }
-  else {
-    Serial.println("Hourly forecast update error");
-    _openweathermapHourly();
-  }
-  clientHourly.end();
-}
-
-/**
- * Update 3 hourly forecast direct from openweathermap.org
- */
-void Weather::_openweathermapHourly(void) {
-  Serial.println("Update from openweathermap server... ");
-  OWMfiveForecast owF5;
-  OWM_fiveForecast *ow_fcast5 = new OWM_fiveForecast[40];
-  String location = "";
-  if(config.weather_citysearch() == 0) {
-    if(config.weather_city() == "") return;
-    location = "q=" + config.weather_city();
-  }
-  if(config.weather_citysearch() == 1) {
-    if(config.weather_cityid() == "") return;
-    location = "id=" + config.weather_cityid();
-  }
-  if(config.weather_citysearch() == 2) {
-    if(config.weather_lat() == "" || config.weather_lon() == "") return;
-    location = "lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
-  }
-  unsigned int entries = owF5.updateForecast(ow_fcast5, config.weather_appid(config.weather_provider()), location);
-  for(unsigned int i=0; i<=entries; i++) { 
-    _hourlyDate[i] = ow_fcast5[i].dt.toInt();
-    _hourlyIcon[i] = ow_fcast5[i].icon.toInt();
-    _hourlyTemp[i] = (ow_fcast5[i].t_min.toFloat() + ow_fcast5[i].t_max.toFloat()) / 2;
-    _hourlyPres[i] = ow_fcast5[i].pressure.toInt();
-    _hourlyWindSpeed[i] = round(ow_fcast5[i].w_speed.toFloat());
-    _hourlyWindDir[i] = ow_fcast5[i].w_deg.toInt();
-    _hourlyPrec[i] = (ow_fcast5[i].cond == "rain" or ow_fcast5[i].cond == "snow") ? ow_fcast5[i].cond_value.toInt() : 0;
-  }
-  delete [] ow_fcast5;
-  
-  if(entries) {
-    _hourlyUpdated = now();
-    Serial.print("Hourly forecast updated successfully at: ");
-    Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
-    _calculateDaily();
-  }
-  else Serial.println("Hourly forecast update error");
+  else Serial.println("City undefined");
 }
 
 /**

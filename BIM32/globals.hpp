@@ -25,7 +25,7 @@
 #define SEPARATOR "**********************************************************************"
 
 struct {
-  char fw[7] = "v3.5"; // Firmware version
+  char fw[7] = "v3.6"; // Firmware version
   const char* remote_host = "www.google.com"; // Remote host to ping
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
@@ -97,7 +97,6 @@ class Config {
   float _weather_lon = 0.0; // Longitude
   float _weather_lat = 0.0; // Latitude
   unsigned int _weather_provider = 0; // Weather forecast provider. 0 = openweathermap.org, 1 = weatherbit.io
-  char _weather_parsingServer[128] = ""; // Parsing server web address
   char _weather_city[41] = ""; // City name
   unsigned int _weather_cityid = 0; // City ID
   unsigned int _weather_citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
@@ -338,7 +337,6 @@ class Config {
           COPYNUM(conf["weather"]["lat"], _weather_lat);
           COPYNUM(conf["weather"]["provider"], _weather_provider);
           COPYNUM(conf["weather"]["citysearch"], _weather_citysearch);
-          COPYSTR(conf["weather"]["parsingServer"], _weather_parsingServer);
         
           // Language
           COPYSTR(conf["lang"], _lang);
@@ -697,10 +695,6 @@ class Config {
   unsigned int weather_citysearch() {
     if(_weather_citysearch > 2) return 0;
     return _weather_citysearch;
-  }
-
-  String weather_parsingServer() {
-    return String(_weather_parsingServer);
   }
 
   String lang() {

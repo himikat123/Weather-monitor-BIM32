@@ -47,8 +47,7 @@
 		"lat":0,
 		"lon":0,
 		"provider":0,
-		"citysearch":0,
-		"parsingServer":""
+		"citysearch":0
 	},
 	"lang":"en",
 	"clock":{
