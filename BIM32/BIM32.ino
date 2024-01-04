@@ -2,7 +2,7 @@
  *  Weather Monitor BIM32 v3.6
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
- *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2023
+ *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
  *
  *  ESP32 Dev Module
  *  1.2 MB APP / 1.5 MB SPIFFS
@@ -101,7 +101,7 @@ void setup() {
   myNex.writeStr("page Logo");
   Serial.println(SEPARATOR);
   Serial.println(SEPARATOR);
-  Serial.println("*  Weather Monitor BIM32 " + String(global.fw) + "    © himikat123@gmail.com   2020-2023  *");
+  Serial.println("*  Weather Monitor BIM32 " + String(global.fw) + "    © himikat123@gmail.com   2020-2024  *");
   Serial.println(SEPARATOR);
   Serial.println();
 
