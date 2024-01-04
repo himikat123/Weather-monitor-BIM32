@@ -1,8 +1,8 @@
 /**
- *  Weather Monitor BIM32 v3.5
+ *  Weather Monitor BIM32 v3.6
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
- *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2023
+ *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
  *
  *  ESP32 Dev Module
  *  1.2 MB APP / 1.5 MB SPIFFS
@@ -38,7 +38,6 @@ DFRobotDFPlayerMini mp3player;
 #include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
-#include "openweathermap.hpp"
 #include "globals.hpp"
 Config config;
 #include "sensors.hpp"
@@ -102,7 +101,7 @@ void setup() {
   myNex.writeStr("page Logo");
   Serial.println(SEPARATOR);
   Serial.println(SEPARATOR);
-  Serial.println("*  Weather Monitor BIM32 " + String(global.fw) + "    © himikat123@gmail.com   2020-2023  *");
+  Serial.println("*  Weather Monitor BIM32 " + String(global.fw) + "    © himikat123@gmail.com   2020-2024  *");
   Serial.println(SEPARATOR);
   Serial.println();
 

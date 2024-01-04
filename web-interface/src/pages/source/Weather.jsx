@@ -32,51 +32,41 @@ class Weather extends WeatherFn{
                         <div className="col-12 col-md-6 col-lg-4 p-4">
                             <div className="border border-secondary rounded p-3 h-100 sensor">
 
-                            {/* weather forecast provider */}
-                            <SelectInput value="weather.provider"
-                                label={text.get('weatherForecastSource', lang)} 
-                                options={this.state.provider} 
-                                config={this.props.config} 
-                                changedConfig={this.changedConfig} 
-                            />
-                            <label className="form-label mt-3">
-                                API KEY <a href={this.state.provider[this.props.config.weather.provider]} 
-                                 target="_blank" 
-                                 rel="noreferrer">
-                                    {this.state.provider[this.props.config.weather.provider]}
-                                </a>
-                            </label>
+                                {/* weather forecast provider */}
+                                <SelectInput value="weather.provider"
+                                    label={text.get('weatherForecastSource', lang)} 
+                                    options={this.state.provider} 
+                                    config={this.props.config} 
+                                    changedConfig={this.changedConfig} 
+                                />
+                                <label className="form-label mt-3">
+                                    API KEY <a href={this.state.provider[this.props.config.weather.provider]} 
+                                    target="_blank" 
+                                    rel="noreferrer">
+                                        {this.state.provider[this.props.config.weather.provider]}
+                                    </a>
+                                </label>
 
-                            {/* openweathermap API key */}
-                            {this.props.config.weather.provider == 0 &&
-                                <TextInput maxLength="32" 
-                                    placeholder="APPID" 
-                                    value="weather.appid.0"
-                                    config={this.props.config} 
-                                    changedConfig={this.changedConfig} 
-                                />
-                            }
+                                {/* openweathermap API key */}
+                                {this.props.config.weather.provider == 0 &&
+                                    <TextInput maxLength="32" 
+                                        placeholder="APPID" 
+                                        value="weather.appid.0"
+                                        config={this.props.config} 
+                                        changedConfig={this.changedConfig} 
+                                    />
+                                }
 
-                            {/* weatherbit API key */}
-                            {this.props.config.weather.provider == 1 &&
-                                <TextInput maxLength="32" 
-                                    placeholder="KEY" 
-                                    value="weather.appid.1" 
-                                    config={this.props.config} 
-                                    changedConfig={this.changedConfig} 
-                                />
-                            }
-                            
-                            {/* Parsing server */}
-                            {this.props.config.weather.provider == 0 && <>
-                                <label className="form-label mt-3">{text.get('parsingServer', lang)}</label>
-                                <TextInput maxLength="127" 
-                                    placeholder={text.get('parsingServer', lang)}
-                                    value="weather.parsingServer" 
-                                    config={this.props.config} 
-                                    changedConfig={this.changedConfig} 
-                                />
-                            </>}</div>
+                                {/* weatherbit API key */}
+                                {this.props.config.weather.provider == 1 &&
+                                    <TextInput maxLength="32" 
+                                        placeholder="KEY" 
+                                        value="weather.appid.1" 
+                                        config={this.props.config} 
+                                        changedConfig={this.changedConfig} 
+                                    />
+                                }
+                            </div>
                         </div>
 
                         <div className="col-12 col-md-6 col-lg-4 p-4">
