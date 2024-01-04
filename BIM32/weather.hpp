@@ -292,7 +292,6 @@ void Weather::_updateOpenweathermapHourly(void) {
         _hourlyDate[n] = forecast->dt[n];
         _hourlyIcon[n] = forecast->icon[n].toInt();
         _hourlyTemp[n] = forecast->temp[n];
-        Serial.println("temp[" + String(n) + "]: " + String(_hourlyTemp[n]));
         _hourlyPres[n] = forecast->pressure[n];
         _hourlyWindSpeed[n] = round(forecast->wind_speed[n]);
         _hourlyWindDir[n] = forecast->wind_deg[n];
