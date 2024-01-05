@@ -60,7 +60,7 @@ You can connect any one, several, or all sensors from this list at once. The con
 <p align="center"><img src="img/sensors.png" alt="weather monitor BIM32 wired sensors"></p>
 
 ## Wiring diagram of the radio channel module for communication with wireless sensors
-Also, **[wireless sensors](/Wireless_sensor/README.md)** can be connected to the **weather monitor**, for this you need to add the radio channel module **HC-12** according to the diagram below.
+Also, **[wireless sensors](https://github.com/himikat123/Radio-sensor)** can be connected to the **weather monitor**, for this you need to add the radio channel module **HC-12** according to the diagram below.
 
 <p align="center"><img src="img/radio.png" alt="weather monitor BIM32 radio channel"></p>
 

@@ -60,7 +60,7 @@
 <p align="center"><img src="img/sensors.png" alt="weather monitor BIM32 wired sensors"></p>
 
 ## Схема подключения модуля радиоканала для связи с беспроводными датчиками
-Также, к **монитору погоды** можно подключить **[беспроводные датчики](/Wireless_sensor/README_RU.md)**, для этого нужно добавить модуль радиоканала **HC-12** по схеме приведенной ниже.
+Также, к **монитору погоды** можно подключить **[беспроводные датчики](https://github.com/himikat123/Radio-sensor)**, для этого нужно добавить модуль радиоканала **HC-12** по схеме приведенной ниже.
 
 <p align="center"><img src="img/radio.png" alt="weather monitor BIM32 radio channel"></p>
 
