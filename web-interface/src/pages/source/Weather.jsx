@@ -103,7 +103,7 @@ class Weather extends WeatherFn{
                                 />
                                 <div className="d-flex justify-content-center mt-3">
                                     <a className="btn btn-success mt-3" 
-                                     href="https://github.com/himikat123/Weather-monitor-BIM32/blob/master/CityID_RU.zip?raw=true" 
+                                     href="https://github.com/himikat123/City_ID_Finder/blob/master/release/City_ID_Finder.zip?raw=true" 
                                      target="_blank"
                                      rel="noreferrer"
                                     >
