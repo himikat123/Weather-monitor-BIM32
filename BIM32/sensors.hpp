@@ -431,36 +431,39 @@ void Sensors::_bme680_updateState(void) {
   if((now() - _bme680_stateTimestamp >= STATE_SAVE_PERIOD) and (iaqSensor.iaqAccuracy >= 3)) {
     Serial.println(SEPARATOR);
     Serial.print("Update BME680 state file... ");
+
+    if(SPIFFS.exists("/bme680.json")) {
+      iaqSensor.getState(_bme680_bsecState);
+      _bme680_checkIaqSensorStatus();
     
-    iaqSensor.getState(_bme680_bsecState);
-    _bme680_checkIaqSensorStatus();
+      _bme680_stateTimestamp = now();
+      _bme680_stateCounter++;
     
-    _bme680_stateTimestamp = now();
-    _bme680_stateCounter++;
+      char datetime[20];
+      sprintf(datetime, "%02d.%02d.%d %02d:%02d:%02d", day(), month(), year(), hour(), minute(), second());
     
-    char datetime[20];
-    sprintf(datetime, "%02d.%02d.%d %02d:%02d:%02d", day(), month(), year(), hour(), minute(), second());
+      StaticJsonDocument<4096> json;
+      json["timestamp"] = _bme680_stateTimestamp;
+      json["datetime"] = datetime;
+      json["counter"] = _bme680_stateCounter;
+      for(uint8_t i=0; i<BSEC_MAX_STATE_BLOB_SIZE; i++) {
+        json["data"][i] = _bme680_bsecState[i];
+      }
     
-    StaticJsonDocument<4096> json;
-    json["timestamp"] = _bme680_stateTimestamp;
-    json["datetime"] = datetime;
-    json["counter"] = _bme680_stateCounter;
-    for(uint8_t i=0; i<BSEC_MAX_STATE_BLOB_SIZE; i++) {
-      json["data"][i] = _bme680_bsecState[i];
+      String data = "";
+      serializeJsonPretty(json, data);
+      Serial.println(data);
+    
+      File file = SPIFFS.open("/bme680.json", "w");
+      if(file) {
+        file.print(data);
+        file.close();
+        data = String();
+        Serial.println("done");
+      }
+      else Serial.println("Failed to save BME680 state file");
     }
-    
-    String data = "";
-    serializeJsonPretty(json, data);
-    Serial.println(data);
-    
-    File file = SPIFFS.open("/bme680.json", "w");
-    if(file) {
-      file.print(data);
-      file.close();
-      data = String();
-      Serial.println("done");
-    }
-    else Serial.println("Failed to save BME680 state file");
+    else Serial.println("File /bme680.json does not extist");
   }
 }
 
