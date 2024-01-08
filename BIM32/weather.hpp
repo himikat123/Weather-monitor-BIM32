@@ -304,6 +304,7 @@ void Weather::_updateOpenweathermapHourly(void) {
       _calculateDaily();
     }
     else Serial.println("Hourly forecast update error");
+    delete forecast;
   }
   else Serial.println("City undefined");
 }
