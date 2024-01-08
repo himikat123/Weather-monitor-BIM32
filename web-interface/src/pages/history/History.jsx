@@ -42,7 +42,7 @@ class History extends HistoryFn {
         let tFields = [];
         for(let i=1; i<8; i++) tFields.push(text.get('field', lang) + ' ' + i);
 
-        let colors = ['FFCC00', '00FFFF', 'FF00FF', 'FFCC00', '00FFFF', '0000FF', '0000FF'];
+        let colors = ['FFCC00', '00FFFF', 'FF00FF', 'FFCC00', '00FFFF', 'FF7700', '0000FF'];
 
         return(<>
             <Menu language={lang} />
