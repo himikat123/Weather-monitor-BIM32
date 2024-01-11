@@ -157,7 +157,7 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         float co2 = wsensor.get_co2(wsensNum, config.wsensor_co2_corr(wsensNum));
         float vbat = wsensor.get_batteryVoltage(wsensNum);
         int batlvl = wsensor.get_batteryLevel(wsensNum);
-        int batprc = wsensor.get_batteryPercentage(wsensNum);
+        float batprc = wsensor.get_batteryPercentage(wsensNum);
         if(wsensType >= 0 and wsensType <= 4 and sensors.checkTemp(temp)) fields = field + String(temp);
         if(wsensType == 5 and sensors.checkHum(hum)) fields = field + String(hum);
         if(wsensType == 6 and sensors.checkPres(pres)) fields = field + String(pres);
