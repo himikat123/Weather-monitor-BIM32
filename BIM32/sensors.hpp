@@ -1,12 +1,12 @@
 #include <Wire.h>
-#include <Adafruit_BME280.h> // v2.0.2 https://github.com/adafruit/Adafruit_BME280_Library
-#include <Adafruit_BMP085.h> // v1.1.0 https://github.com/adafruit/Adafruit-BMP085-Library
+#include <Adafruit_BME280.h> // v2.2.4 https://github.com/adafruit/Adafruit_BME280_Library
+#include <Adafruit_BMP085.h> // v1.2.4 https://github.com/adafruit/Adafruit-BMP085-Library
 #include "SHT21.h" // https://github.com/markbeee/SHT21
-#include "DHTesp.h" // v1.17.0 http://desire.giesecke.tk/index.php/2018/01/30/esp32-dht11/
+#include "DHTesp.h" // v1.19.0 http://desire.giesecke.tk/index.php/2018/01/30/esp32-dht11/
 #include <MAX44009.h> // v1.2.3 https://github.com/dantudose/MAX44009
-#include <BH1750.h> // v1.1.4 https://github.com/claws/BH1750
+#include <BH1750.h> // v1.3.0 https://github.com/claws/BH1750
 #include <OneWire.h> // v2.3.7 https://github.com/PaulStoffregen/OneWire
-#include <DallasTemperature.h> // v3.9.1 https://github.com/milesburton/Arduino-Temperature-Control-Library
+#include <DallasTemperature.h> // v3.9.0 https://github.com/milesburton/Arduino-Temperature-Control-Library
 #include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
@@ -396,7 +396,7 @@ void Sensors::_bme680_loadState(void) {
   Serial.println(SEPARATOR);
   Serial.print("Read BME680 state file... ");
   
-  File file = SPIFFS.open("/bme680.json");
+  File file = LittleFS.open("/bme680.json");
   if(file) {
     while(file.available()) {
       String json = file.readString();
@@ -432,7 +432,7 @@ void Sensors::_bme680_updateState(void) {
     Serial.println(SEPARATOR);
     Serial.print("Update BME680 state file... ");
 
-    if(SPIFFS.exists("/bme680.json")) {
+    if(LittleFS.exists("/bme680.json")) {
       iaqSensor.getState(_bme680_bsecState);
       _bme680_checkIaqSensorStatus();
     
@@ -454,7 +454,7 @@ void Sensors::_bme680_updateState(void) {
       serializeJsonPretty(json, data);
       Serial.println(data);
     
-      File file = SPIFFS.open("/bme680.json", "w");
+      File file = LittleFS.open("/bme680.json", "w");
       if(file) {
         file.print(data);
         file.close();

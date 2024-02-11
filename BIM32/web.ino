@@ -86,7 +86,7 @@ String web_sensorsPrepare(bool logged) {
     json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type(i);
     json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
   }
-  File root = SPIFFS.open("/");
+  File root = LittleFS.open("/");
   if(root) {
     if(root.isDirectory()) {
       File file = root.openNextFile();
@@ -153,9 +153,9 @@ bool web_fileRead(AsyncWebServerRequest *request) {
     else path = "/index.html";
   }
   String pathWithGz = path + ".gz";
-  if(SPIFFS.exists(pathWithGz) || SPIFFS.exists(path)) {
-    if(SPIFFS.exists(pathWithGz)) path += ".gz";
-    AsyncWebServerResponse *response = request->beginResponse(SPIFFS, path);
+  if(LittleFS.exists(pathWithGz) || LittleFS.exists(path)) {
+    if(LittleFS.exists(pathWithGz)) path += ".gz";
+    AsyncWebServerResponse *response = request->beginResponse(LittleFS, path);
     if(request->hasArg("download")) response->addHeader("Content-Type", "application/octet-stream");
     else if(path.endsWith(".json")) response->addHeader("Content-Type", "application/json");
     else if(path.endsWith(".gz")) {
@@ -200,21 +200,6 @@ void web_save(AsyncWebServerRequest *request) {
     if(request->hasArg("config")) {
       if(request->arg("config")) 
         request->send(200, "text/plain", config.save(request->arg("config")) ? "ERROR" : "OK");
-      else request->send(200, "text/plain", "ERROR");
-    }
-    else request->send(200, "text/plain", "ERROR");
-  }
-  else request->send(200, "text/plain", "NOT LOGGED");
-}
-
-/**
- * Saves alarm data to alarm config file
- */
-void web_saveAlarm(AsyncWebServerRequest *request) {
-  if(web_isLogged(request)) {
-    if(request->hasArg("alarm")) {
-      if(request->arg("alarm")) 
-        request->send(200, "text/plain", config.saveAlarm(request->arg("alarm")) ? "ERROR" : "OK");
       else request->send(200, "text/plain", "ERROR");
     }
     else request->send(200, "text/plain", "ERROR");
@@ -306,7 +291,7 @@ void web_color(AsyncWebServerRequest *request) {
     if(request->hasArg("hex") and request->hasArg("num")) {
       char color[6];
       sprintf(color, "%s", request->arg("hex"));
-      config.set_color(color, (request->arg("num")).toInt());
+      config.set_color(color, (request->arg("num")).toInt(), 1);
       request->send(200, "text/plain", "OK");
     }
     else request->send(200, "text/plain", "ERROR");
@@ -428,7 +413,7 @@ void web_changePass(AsyncWebServerRequest *request) {
       String json = "{\"pass\":\"";
       json += newPass;
       json += "\"}";
-      File file = SPIFFS.open("/user.us", FILE_WRITE);
+      File file = LittleFS.open("/user.us", FILE_WRITE);
       if(file.print(json)) res = "OK";
       else res = "ERROR Write file";
       file.close();
@@ -444,7 +429,7 @@ void web_changePass(AsyncWebServerRequest *request) {
  */
 void web_fileUpload(AsyncWebServerRequest *request, String filename, size_t index, byte *data, size_t len, bool final) {
   if(web_isLogged(request)) {
-    if(!index) request->_tempFile = SPIFFS.open("/" + filename, "w");
+    if(!index) request->_tempFile = LittleFS.open("/" + filename, "w");
     if(len) request->_tempFile.write(data, len);
     if(final) request->_tempFile.close();
   }
@@ -457,9 +442,9 @@ void web_fileUpload(AsyncWebServerRequest *request, String filename, size_t inde
 void web_fileDelete(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
     String path = "/" + request->arg("file");
-    if(!SPIFFS.exists(path)) return request->send(404, "text/plain", "FileNotFound");
+    if(!LittleFS.exists(path)) return request->send(404, "text/plain", "FileNotFound");
     else {
-      SPIFFS.remove(path);
+      LittleFS.remove(path);
       request->send(200, "text/plain", "OK");
       path = String();
     }
@@ -473,36 +458,12 @@ void web_fileRename(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
     String alt = "/" + request->arg("old");
     String neu = "/" + request->arg("new");
-    if(!SPIFFS.exists(alt)) return request->send(404, "text/plain", "FileNotFound");
+    if(!LittleFS.exists(alt)) return request->send(404, "text/plain", "FileNotFound");
     else {
-      SPIFFS.rename(alt, neu);
+      LittleFS.rename(alt, neu);
       request->send(200, "text/plain", "OK");
       alt = String();
       neu = String();
-    }
-  }
-  else request->send(200, "text/plain", "NOT LOGGED");
-}
-
-/**
- * Update firmware
- */
-void web_doUpdate(AsyncWebServerRequest *request, const String& filename, size_t index, byte *data, size_t len, bool final) {
-  if(web_isLogged(request)) {
-    global.stopOS = true;
-    if(!index) {
-      content_len = request->contentLength();
-      int cmd = (filename.indexOf("fs") > -1) ? U_SPIFFS : U_FLASH;
-      if(!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) Update.printError(Serial);
-    }
-    if(Update.write(data, len) != len) Update.printError(Serial);
-    if(final) {
-      AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "wait");
-      response->addHeader("Refresh", "20");  
-      response->addHeader("Location", "/");
-      request->send(response);
-      if(!Update.end(true)) Update.printError(Serial);
-      else ESP.restart();
     }
   }
   else request->send(200, "text/plain", "NOT LOGGED");
@@ -515,7 +476,6 @@ void webInterface_init(void) {
   server.on("/data.json",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_sens(request); });
   server.on("/esp/login",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_login(request); });
   server.on("/esp/saveConfig",   HTTP_POST, [](AsyncWebServerRequest *request){ web_save(request); });
-  server.on("/esp/saveAlarm",    HTTP_POST, [](AsyncWebServerRequest *request){ web_saveAlarm(request); });
   server.on("/esp/restart",      HTTP_GET,  [](AsyncWebServerRequest *request){ web_restart(request); });
   server.on("/esp/dispToggle",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_dispToggle(request); });
   server.on("/esp/brightLimit",  HTTP_GET,  [](AsyncWebServerRequest *request){ web_brightLimit(request); });
@@ -534,11 +494,6 @@ void webInterface_init(void) {
   server.on("/description.xml",  HTTP_GET, [&](AsyncWebServerRequest *request){ request->send(200, "text/xml", SSDP.getSchema()); });
   server.on("/esp/delete",       HTTP_POST, [](AsyncWebServerRequest *request){ web_fileDelete(request); });
   server.on("/esp/rename",       HTTP_POST, [](AsyncWebServerRequest *request){ web_fileRename(request); });
-  server.on("/esp/fwUpdate",     HTTP_POST, [](AsyncWebServerRequest *request){},
-    [](AsyncWebServerRequest *request, const String& filename,
-    size_t index, byte *data, size_t len, bool final) {
-      web_doUpdate(request, filename, index, data, len, final);
-  });
   server.onNotFound([](AsyncWebServerRequest *request){ if(!web_fileRead(request)) request -> send(404); });
 
   MDNS.begin("bim32");

@@ -1,21 +1,21 @@
 /**
- *  Weather Monitor BIM32 v3.6
+ *  Weather Monitor BIM32 v4.0
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
  *
  *  ESP32 Dev Module
- *  1.2 MB APP / 1.5 MB SPIFFS
+ *  No OTA (2MB APP/2MB SPIFFS)
  *
  *  Arduino IDE v1.8.19
- *  ESP32 board v1.0.5
+ *  ESP32 board v2.0.14
  */
 
 /* Arduino libraries */
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 #include "FS.h"
-#include <SPIFFS.h>
+#include <LittleFS.h>
 #include <Update.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
@@ -23,23 +23,23 @@ WiFiClient client;
 #include <ESPmDNS.h>
 
 /* External Libraries */
-#include <ArduinoJson.h> // v6.19.3 https://github.com/bblanchon/ArduinoJson
-#include <TimeLib.h> // v1.6.0 https://playground.arduino.cc/Code/Time/
-#include <ESP32Ping.h> // v1.5 https://github.com/marian-craciunescu/ESP32Ping
-#include <AsyncTCP.h> // v1.1.1 https://github.com/me-no-dev/AsyncTCP
+#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+#include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
+#include <ESP32Ping.h> // v1.6 https://github.com/marian-craciunescu/ESP32Ping
+#include <AsyncTCP.h> // v1.1.4 https://github.com/dvarrel/AsyncTCP
 #include <ESPAsyncWebServer.h> // v1.2.3 https://github.com/me-no-dev/ESPAsyncWebServer
 AsyncWebServer server(80);
-#include <SoftwareSerial.h> // v6.16.1 https://github.com/plerup/espsoftwareserial/
+#include <SoftwareSerial.h> // v8.1.0 https://github.com/plerup/espsoftwareserial/
 SoftwareSerial Serial3;
-#include "EasyNextionLibrary.h" // v1.0.3 https://github.com/Seithan/EasyNextionLibrary
+#include "EasyNextionLibrary.h" // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
 EasyNex myNex(Serial1);
-#include "DFRobotDFPlayerMini.h" // v1.0.5 https://github.com/DFRobot/DFRobotDFPlayerMini
+#include "DFRobotDFPlayerMini.h" // v1.0.6 https://github.com/DFRobot/DFRobotDFPlayerMini
 DFRobotDFPlayerMini mp3player;
 #include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
 #include "globals.hpp"
-Config config;
+Configuration config;
 #include "sensors.hpp"
 Sensors sensors;
 #include "languages.hpp"
@@ -106,7 +106,10 @@ void setup() {
   Serial.println(SEPARATOR);
   Serial.println();
 
-  SPIFFS.begin();
+  if(!LittleFS.begin()) {
+    Serial.println("Little FS initialisation failed!");
+    while(1) yield();
+  }
   config.readConfig();
 
   ws2812b.init(); // Initialize WS2812b display
