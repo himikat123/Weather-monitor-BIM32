@@ -2012,5 +2012,12 @@
         "ru": "Обнаружено обновление прошивки, версия XXX доступна:",
         "pl": "Wykryto aktualizację oprogramowania układowego, dostępna wersja XXX:",
         "ua": "Виявлено оновлення прошивки, версія XXX доступна:"
+    },
+    "hysteresis": {
+        "en": "Hysteresis",
+        "de": "Hysterese",
+        "ru": "Гистерезис",
+        "pl": "Histereza",
+        "ua": "Гістерезис"
     }
 }

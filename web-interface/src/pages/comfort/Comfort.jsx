@@ -68,23 +68,46 @@ class Comfort extends ComfortFn {
                                     config={this.props.config} 
                                     changedConfig={(this.props.changedConfig)}
                                 />}
-                                <RangeInput value={'comfort.temp.max'}
+                                <RangeInput value={'comfort.temp.max.0'}
                                     label={text.get('tempMax', lang)} 
                                     min="-50"
                                     max="100"
-                                    limitMin={this.props.config.comfort.temp.min}
+                                    limitMin={this.props.config.comfort.temp.min[0]}
                                     limitMax="100"
                                     step="1"
                                     config={this.props.config} 
                                     changedConfig={this.changedConfig}
                                     units={"°C"}
                                 />
-                                <RangeInput value={'comfort.temp.min'}
+                                <RangeInput value={'comfort.temp.max.1'}
+                                    label={text.get('hysteresis', lang)} 
+                                    min="0"
+                                    max="10"
+                                    limitMin="0"
+                                    limitMax="10"
+                                    step="1"
+                                    config={this.props.config} 
+                                    changedConfig={this.changedConfig}
+                                    units={"°C"}
+                                />
+                                <hr />
+                                <RangeInput value={'comfort.temp.min.0'}
                                     label={text.get('tempMin', lang)} 
                                     min="-50"
                                     max="100"
                                     limitMin="-50"
-                                    limitMax={this.props.config.comfort.temp.max}
+                                    limitMax={this.props.config.comfort.temp.max[0]}
+                                    step="1"
+                                    config={this.props.config} 
+                                    changedConfig={this.changedConfig}
+                                    units={"°C"}
+                                />
+                                <RangeInput value={'comfort.temp.min.1'}
+                                    label={text.get('hysteresis', lang)} 
+                                    min="0"
+                                    max="10"
+                                    limitMin="0"
+                                    limitMax="10"
                                     step="1"
                                     config={this.props.config} 
                                     changedConfig={this.changedConfig}
@@ -115,23 +138,46 @@ class Comfort extends ComfortFn {
                                     config={this.props.config} 
                                     changedConfig={(this.props.changedConfig)}
                                 />}
-                                <RangeInput value={'comfort.hum.max'}
+                                <RangeInput value={'comfort.hum.max.0'}
                                     label={text.get('humMax', lang)} 
                                     min="0"
                                     max="100"
-                                    limitMin={this.props.config.comfort.hum.min}
+                                    limitMin={this.props.config.comfort.hum.min[0]}
                                     limitMax="100"
                                     step="1"
                                     config={this.props.config} 
                                     changedConfig={this.changedConfig}
                                     units={"%"}
                                 />
-                                <RangeInput value={'comfort.hum.min'}
+                                <RangeInput value={'comfort.hum.max.1'}
+                                    label={text.get('hysteresis', lang)} 
+                                    min="0"
+                                    max="10"
+                                    limitMin="0"
+                                    limitMax="10"
+                                    step="1"
+                                    config={this.props.config} 
+                                    changedConfig={this.changedConfig}
+                                    units={"%"}
+                                />
+                                <hr />
+                                <RangeInput value={'comfort.hum.min.0'}
                                     label={text.get('humMin', lang)} 
                                     min="0"
                                     max="100"
                                     limitMin="0"
-                                    limitMax={this.props.config.comfort.hum.max}
+                                    limitMax={this.props.config.comfort.hum.max[0]}
+                                    step="1"
+                                    config={this.props.config} 
+                                    changedConfig={this.changedConfig}
+                                    units={"%"}
+                                />
+                                <RangeInput value={'comfort.hum.min.1'}
+                                    label={text.get('hysteresis', lang)} 
+                                    min="0"
+                                    max="10"
+                                    limitMin="0"
+                                    limitMax="10"
                                     step="1"
                                     config={this.props.config} 
                                     changedConfig={this.changedConfig}

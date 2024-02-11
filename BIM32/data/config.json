@@ -5,15 +5,15 @@
 			"wsensNum":0,
 			"sens":0,
 			"thing":0,
-			"min":21,
-			"max":25
+			"min":[21,3],
+			"max":[25,5]
 		},
 		"hum":{
 			"source":0,
 			"wsensNum":0,
 			"thing":0,
-			"min":30,
-			"max":60
+			"min":[30,4],
+			"max":[60,5]
 		},
 		"iaq":{
 			"source":0
