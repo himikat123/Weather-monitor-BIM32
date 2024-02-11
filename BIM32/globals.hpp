@@ -25,7 +25,7 @@
 #define SEPARATOR "**********************************************************************"
 
 struct {
-  char fw[7] = "v3.6"; // Firmware version
+  char fw[7] = "v4.0"; // Firmware version
   const char* remote_host = "www.google.com"; // Remote host to ping
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
@@ -46,7 +46,7 @@ struct {
 TaskHandle_t task_display_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
 
-class Config {
+class Configuration {
   #define NETWORKS 3
   #define PROVIDERS 2
   #define DISPLAYS 2
@@ -60,20 +60,28 @@ class Config {
   private:
 
   // Comfort
-  unsigned int _comfort_temp_source = 0; // Comfort temperature source
+  unsigned int _comfort_temp_source = 0; // Comfort temperature source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-SHT21, 7-DHT22, 8-DS18B20, 9-BME680
   unsigned int _comfort_temp_wsensNum = 0; // Comfort temperature wireless sensor number
   unsigned int _comfort_temp_sens = 0; // Comfort temperature wireless sensor temperature sensor number
   unsigned int _comfort_temp_thing = 0; // Comfort temperature thingspeak field number
   int _comfort_temp_min = 23; // Minimum comfort temperature
   int _comfort_temp_max = 25; // Maximum comfort temperature
-  unsigned int _comfort_hum_source = 0; // Comfort humidity source
+  boolean _comfort_temp_sound = false; // Sound notification when the temperature goes beyond comfort limits
+  unsigned int _comfort_temp_min_hysteresis = 0; // Minimum comfort temperature hysteresis
+  unsigned int _comfort_temp_max_hysteresis = 0; // Maximum comfort temperature hysteresis
+  unsigned int _comfort_hum_source = 0; // Comfort humidity source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-SHT21, 6-DHT22, 7-BME680
   unsigned int _comfort_hum_wsensNum = 0; // Comfort humidity wireless sensor number
   unsigned int _comfort_hum_thing = 0; // Comfort humidity thingspeak field number
-  int _comfort_hum_min = 40; // Minimum comfort humidity
-  int _comfort_hum_max = 60; // Maximum comfort humidity
-  unsigned int _comfort_iaq_source = 0; // Comfort IAQ source
-  unsigned int _comfort_co2_source = 0; // Comfort CO2 source
+  unsigned int _comfort_hum_min = 40; // Minimum comfort humidity
+  unsigned int _comfort_hum_max = 60; // Maximum comfort humidity
+  boolean _comfort_hum_sound = 0; // Sound notification when the humidity goes beyond comfort limits
+  unsigned int _comfort_hum_min_hysteresis = 0; // Minimum comfort humidity hysteresis
+  unsigned int _comfort_hum_max_hysteresis = 0; // Maximum comfort humidity hysteresis
+  unsigned int _comfort_iaq_source = 0; // Comfort IAQ source: 0-Nothing, 1-BME680
+  boolean _comfort_iaq_sound = false; // Sound notification when the IAQ goes beyond comfort limits
+  unsigned int _comfort_co2_source = 0; // Comfort CO2 source: 0-Nothing, 1-Wireless sensor
   unsigned int _comfort_co2_wsensNum = 0; // Comfort CO2 wireless sensor number
+  boolean _comfort_co2_sound = false; // Sound notification when the CO2 goes beyond comfort limits
     
   //WiFi network
   char _network_ssid[NETWORKS][33] = { "", "", "" }; // SSID list
@@ -112,11 +120,11 @@ class Config {
   unsigned int _clock_ntp_period = 15; // NTP update period (minutes) 0...90000
 
   // Display
-  unsigned int _display_type[DISPLAYS] = {1, 0}; // Display types
-  bool _display_sacrificialLED = false; // Use "sacrificial" LED for level conversion
-  unsigned int _display_animation_type = 0; // WS2812b display animation number 0...9
-  unsigned int _display_animation_speed = 10; // WS2812b display animation speed 1...30
-  unsigned int _display_animation_points = 0; // WS2812b display animation clock points 0...4
+  unsigned int _display_type[DISPLAYS] = {0, 0}; // Display type
+  unsigned int _display_model[DISPLAYS] = {0, 0}; // Display model
+  unsigned int _display_animation_type = 0; // Segment display animation number 0...9
+  unsigned int _display_animation_speed = 10; // Segment display animation speed 1...30
+  unsigned int _display_animation_points = 0; // Segment display animation clock points 0...4
   char _display_dayTime[DISPLAYS][6] = {"07:00", "07:00"}; // Time to switch to day mode
   char _display_nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
   unsigned int _display_brightMethod[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
@@ -130,27 +138,28 @@ class Config {
   unsigned int _display_brightness_max[DISPLAYS] = {255, 255}; // Maximum brightness limit 0...255
   unsigned int _display_lightSensor[DISPLAYS] = {1, 1}; // Sensor type for brightness adjust: 0-Analog input, 1-MAX44009, 2-BH1750
   unsigned int _display_lightSensor_sensitivity[DISPLAYS] = {50, 50}; // Ambient light sensor sensibility 1...100
-  unsigned int _display_source_tempOut_sens = 0; // Outdoor temperature data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-BME680
+  unsigned int _display_source_tempOut_sens = 0; // Outdoor temperature data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-SHT21, 7-DHT22, 8-DS18B20, 9-BME680
   unsigned int _display_source_tempOut_wsensNum = 0; // Wireless sensor number for the outdoor temperature
   unsigned int _display_source_tempOut_temp = 0; // Sensor number for the outdoor temperature
   unsigned int _display_source_tempOut_thing = 0; // Thingspeak field number for the outdoor temperature
-  unsigned int _display_source_humOut_sens = 0; // Outdoor humidity data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-SHT21, 5-DHT22, 6-BME680
+  unsigned int _display_source_humOut_sens = 0; // Outdoor humidity data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-SHT21, 6-DHT22, 7-BME680
   unsigned int _display_source_humOut_wsensNum = 0; // Wireless sensor number for the outdoor humidity
   unsigned int _display_source_humOut_thing = 0; // Thingspeak field number for the outdoor humidity
-  unsigned int _display_source_presOut_sens = 0; // Outdoor pressure data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-BME680
+  unsigned int _display_source_presOut_sens = 0; // Outdoor pressure data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-BME680
   unsigned int _display_source_presOut_wsensNum = 0; // Wireless sensor number for the outdoor pressure
   unsigned int _display_source_presOut_thing = 0; // Thingspeak field number for the outdoor pressure
-  unsigned int _display_source_tempIn_sens = 0; // Indoor temperature data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-Sequence, 9-BME680
+  unsigned int _display_source_tempIn_sens = 0; // Indoor temperature data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-Sequence, 5-BME280, 6-BMP180, 7-SHT21, 8-DHT22, 9-DS18B20, 10-BME680
   unsigned int _display_source_tempIn_wsensNum = 0; // Wireless sensor number for the indoor temperature
   unsigned int _display_source_tempIn_temp = 0; // Sensor number for the indoor temperature
   unsigned int _display_source_tempIn_thing = 0; // Thingspeak field number for the intdoor temperature
-  unsigned int _display_source_humIn_sens = 0; // Indoor humidity data source: 0-Forecast, 1-Wireless sensor, 2-Thingspeak, 3-BME280, 4-SHT21, 5-DHT22, 6-Sequence, 7-BME680
+  unsigned int _display_source_humIn_sens = 0; // Indoor humidity data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-Sequence, 5-BME280, 6-SHT21, 7-DHT22, 8-BME680
   unsigned int _display_source_humIn_wsensNum = 0; // Wireless sensor number for the indoor humidity
   unsigned int _display_source_humIn_thing = 0; // Thingspeak field number for the outdoor humidity
   unsigned int _display_source_volt_sens = 0; // Voltage data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak, 3-BME680-IAQ
   unsigned int _display_source_volt_wsensNum = 0; // Wireless sensor number for the voltage
   unsigned int _display_source_volt_volt = 0; // Sensor type for the voltage: 0-Wireless sensor battery voltage, 1-Wireless sensor battery percentage, 2-PZEM-004t voltage, 3-SenseAir-S8
   unsigned int _display_source_volt_thing = 0; // Thingspeak field number for the voltage
+  unsigned int _display_source_volt_thingType = 0; // Thingspeak field voltage data type: 0-Battery voltage, 1-Battery percentage
   unsigned int _display_source_bat_sens = 0; // Battery level data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak
   unsigned int _display_source_bat_wsensNum = 0; // Wireless sensor number for the battery level:
   unsigned int _display_source_bat_thing = 0; // Thingspeak field number for the battery level
@@ -159,18 +168,19 @@ class Config {
   char _display_source_sequence_name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
   unsigned int _display_source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
   unsigned int _display_source_sequence_thngtemp[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the temperature sequence
-  unsigned int _display_source_sequence_wsenstemp[SEQUENCES][2] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Wireless sensor number and its sensor for the temperature sequence
+  unsigned int _display_source_sequence_wsenstemp[SEQUENCES][WSENSORS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Wireless sensor number and its sensor for the temperature sequence
   unsigned int _display_source_sequence_hum[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast, 7-BME680
   unsigned int _display_source_sequence_thnghum[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the humidity sequence
   unsigned int _display_source_sequence_wsenshum[SEQUENCES] =  {0, 0, 0, 0}; // Wireless sensor number for the humidity sequence
-  unsigned int _display_timeSlot_period[TIMESLOTS] = {2, 2, 0, 0, 0, 0, 0, 0}; // Display2 timeslot durations
-  unsigned int _display_timeSlot_sensor[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
-  unsigned int _display_timeSlot_data[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot sensors types
-  unsigned int _display_timeSlot_thing[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot thingspeak field number
-  unsigned int _display_timeSlot_wsensor_num[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; //  Display2 timeslot wireless sensor number
-  unsigned int _display_timeSlot_wsensor_type[TIMESLOTS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Display2 timeslot wireless sensor type 
-  char _display_timeSlot_color[TIMESLOTS][8] = { // Display2 timeslot colors 
-    "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"
+  unsigned int _display_timeSlot_period[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot durations
+  unsigned int _display_timeSlot_sensor[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
+  unsigned int _display_timeSlot_data[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot sensors types
+  unsigned int _display_timeSlot_thing[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot thingspeak field number
+  unsigned int _display_timeSlot_wsensor_num[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor number
+  unsigned int _display_timeSlot_wsensor_type[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor type 
+  char _display_timeSlot_color[TIMESLOTS][DISPLAYS][8] = { // Segment display timeslot colors 
+    {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"},
+    {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}
   };
 
   // Sound
@@ -225,9 +235,8 @@ class Config {
   unsigned int _history_wSensors[7] = {0,0,0,0,0,0,0}; // Weather repository wireless sensor numbers
   unsigned int _history_wTypes[7] = {0,0,0,0,0,0,0}; // Weather repository wireless sensor temperature sensor numbers
   unsigned int _history_tFields[7] = {0,0,0,0,0,0,0}; // Weather repository thingspeak field numbers
-  
+
   // Thingspeak send
-  bool _thingspeakSend_turnOn = false; // Enable/disable sending data to Thingspeak
   unsigned int _thingspeakSend_period = 5; // Period for sending data to Thingspeak (minutes) 1...999
   char _thingspeakSend_channelID[11] = ""; // Channel ID for sending data to Thingspeak
   char _thingspeakSend_wrkey[17] = ""; // Write API Key for sending data to Thingspeak
@@ -238,14 +247,12 @@ class Config {
   unsigned int _thingspeakSend_wtypes[THNG_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Thingspeak
 
   // Thingspeak receive
-  bool _thingspeakReceive_turnOn = false; // Enable/disable receiving data from Thingspeak
   unsigned int _thingspeakReceive_period = 5; // Period for receiving data from Thingspeak (minutes) 1...999
   char _thingspeakReceive_channelID[11] = ""; // Channel ID for receiving data from Thingspeak
   char _thingspeakReceive_rdkey[17] = ""; // Read API Key for receiving data from Thingspeak
   unsigned int _thingspeakReceive_expire = 10; // Thingspeak data expire (minutes) 1...100
-
+  
   // Narodmon send
-  bool _narodmonSend_turnOn = false; // Enable/disable sending data to Narodmon
   unsigned int _narodmonSend_period = 5; // Period for sending data to Narodmon (minutes) 1...999
   char _narodmonSend_lon[11] = ""; // Longitude for Narodmon
   char _narodmonSend_lat[11] = ""; // Latitude for Narodmon
@@ -255,13 +262,13 @@ class Config {
   unsigned int _narodmonSend_types[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send to Narodmon
   unsigned int _narodmonSend_wsensors[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send to Narodmon
   unsigned int _narodmonSend_wtypes[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Narodmon
-  unsigned int _narodmonSend_thing[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Thingspeak field number to send to Narodmon
 
   // Account
-  char _account_name[33] = "admin"; // Web interface username
-  char _account_pass[33] = "1111"; // Web interface password
+  char _account_name[33] = "admin"; // Web interface default username
+  char _account_pass[33] = "1111"; // Web interface default password
   bool _account_required = false; // Require username and password to access the web interface
 
+  // Alarm
   unsigned int _alarm_time[ALARMS][2] = { // Alarm time [hour, minute]
     {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}
   };
@@ -299,7 +306,7 @@ class Config {
     /* Read config file */
     Serial.println(SEPARATOR);
     Serial.print("Read config file... ");
-    File file = SPIFFS.open("/config.json");
+    File file = LittleFS.open("/config.json");
     if(file) {
       while(file.available()) {
         String json = file.readString();
@@ -349,7 +356,6 @@ class Config {
           COPYNUM(conf["clock"]["ntp_period"], _clock_ntp_period);
 
           // Display
-          COPYBOOL(conf["display"]["sled"], _display_sacrificialLED);
           COPYNUM(conf["display"]["animation"]["type"], _display_animation_type);
           COPYNUM(conf["display"]["animation"]["speed"], _display_animation_speed);
           COPYNUM(conf["display"]["animation"]["points"], _display_animation_points);
@@ -369,14 +375,16 @@ class Config {
             COPYNUM(conf["display"]["lightSensor"][i], _display_lightSensor[i]);
             COPYNUM(conf["display"]["lightSensor_sensitivity"][i], _display_lightSensor_sensitivity[i]);
           }
-          for(unsigned int i=0; i<TIMESLOTS; i++) {
-            COPYNUM(conf["display"]["timeSlot"]["period"][i], _display_timeSlot_period[i]);
-            COPYNUM(conf["display"]["timeSlot"]["sensor"][i], _display_timeSlot_sensor[i]);
-            COPYNUM(conf["display"]["timeSlot"]["data"][i], _display_timeSlot_data[i]);
-            COPYNUM(conf["display"]["timeSlot"]["thing"][i], _display_timeSlot_thing[i]);
-            COPYSTR(conf["display"]["timeSlot"]["color"][i], _display_timeSlot_color[i]);
-            COPYNUM(conf["display"]["timeSlot"]["wsensor"]["num"][i], _display_timeSlot_wsensor_num[i]);
-            COPYNUM(conf["display"]["timeSlot"]["wsensor"]["type"][i], _display_timeSlot_wsensor_type[i]); 
+          for(unsigned int d=0; d<DISPLAYS; d++) {
+            for(unsigned int i=0; i<TIMESLOTS; i++) {
+              COPYNUM(conf["display"]["timeSlot"]["period"][i][d], _display_timeSlot_period[i][d]);
+              COPYNUM(conf["display"]["timeSlot"]["sensor"][i][d], _display_timeSlot_sensor[i][d]);
+              COPYNUM(conf["display"]["timeSlot"]["data"][i][d], _display_timeSlot_data[i][d]);
+              COPYNUM(conf["display"]["timeSlot"]["thing"][i][d], _display_timeSlot_thing[i][d]);
+              COPYSTR(conf["display"]["timeSlot"]["color"][i][d], _display_timeSlot_color[i][d]);
+              COPYNUM(conf["display"]["timeSlot"]["wsensor"]["num"][i][d], _display_timeSlot_wsensor_num[i][d]);
+              COPYNUM(conf["display"]["timeSlot"]["wsensor"]["type"][i][d], _display_timeSlot_wsensor_type[i][d]); 
+            }  
           }
           COPYNUM(conf["display"]["source"]["tempOut"]["sens"], _display_source_tempOut_sens);
           COPYNUM(conf["display"]["source"]["tempOut"]["wsensNum"], _display_source_tempOut_wsensNum);
@@ -399,6 +407,7 @@ class Config {
           COPYNUM(conf["display"]["source"]["volt"]["wsensNum"], _display_source_volt_wsensNum);
           COPYNUM(conf["display"]["source"]["volt"]["volt"], _display_source_volt_volt);
           COPYNUM(conf["display"]["source"]["volt"]["thing"], _display_source_volt_thing);
+          COPYNUM(conf["display"]["source"]["volt"]["thingType"], _display_source_volt_thingType);
           COPYNUM(conf["display"]["source"]["bat"]["sens"], _display_source_bat_sens);
           COPYNUM(conf["display"]["source"]["bat"]["wsensNum"], _display_source_bat_wsensNum);
           COPYNUM(conf["display"]["source"]["bat"]["thing"], _display_source_bat_thing);
@@ -476,7 +485,6 @@ class Config {
           }
 
           // Thingspeak send
-          COPYBOOL(conf["thingspeakSend"]["turnOn"], _thingspeakSend_turnOn);
           COPYNUM(conf["thingspeakSend"]["period"], _thingspeakSend_period);
           COPYSTR(conf["thingspeakSend"]["channelID"], _thingspeakSend_channelID);
           COPYSTR(conf["thingspeakSend"]["wrkey"], _thingspeakSend_wrkey);
@@ -488,14 +496,12 @@ class Config {
             COPYNUM(conf["thingspeakSend"]["wtypes"][i], _thingspeakSend_wtypes[i]);
           }
           // Thingspeak receive
-          COPYBOOL(conf["thingspeakReceive"]["turnOn"], _thingspeakReceive_turnOn);
           COPYNUM(conf["thingspeakReceive"]["period"], _thingspeakReceive_period);
           COPYSTR(conf["thingspeakReceive"]["channelID"], _thingspeakReceive_channelID);
           COPYSTR(conf["thingspeakReceive"]["rdkey"], _thingspeakReceive_rdkey);
           COPYNUM(conf["thingspeakReceive"]["expire"], _thingspeakReceive_expire);
 
           // Narodmon send
-          COPYBOOL(conf["narodmonSend"]["turnOn"], _narodmonSend_turnOn);
           COPYNUM(conf["narodmonSend"]["period"], _narodmonSend_period);
           COPYSTR(conf["narodmonSend"]["lon"], _narodmonSend_lon);
           COPYSTR(conf["narodmonSend"]["lat"], _narodmonSend_lat);
@@ -506,7 +512,6 @@ class Config {
             COPYNUM(conf["narodmonSend"]["types"][i], _narodmonSend_types[i]);
             COPYNUM(conf["narodmonSend"]["wsensors"][i], _narodmonSend_wsensors[i]);
             COPYNUM(conf["narodmonSend"]["wtypes"][i], _narodmonSend_wtypes[i]);
-            COPYNUM(conf["narodmonSend"]["thing"][i], _narodmonSend_thing[i]);
           }
 
           // Comfort
@@ -514,20 +519,40 @@ class Config {
           COPYNUM(conf["comfort"]["temp"]["wsensNum"], _comfort_temp_wsensNum);
           COPYNUM(conf["comfort"]["temp"]["sens"], _comfort_temp_sens);
           COPYNUM(conf["comfort"]["temp"]["thing"], _comfort_temp_thing);
-          COPYNUM(conf["comfort"]["temp"]["min"], _comfort_temp_min);
-          COPYNUM(conf["comfort"]["temp"]["max"], _comfort_temp_max);
+          COPYNUM(conf["comfort"]["temp"]["min"][0], _comfort_temp_min);
+          COPYNUM(conf["comfort"]["temp"]["max"][0], _comfort_temp_max);
+          COPYNUM(conf["comfort"]["temp"]["min"][1], _comfort_temp_min_hysteresis);
+          COPYNUM(conf["comfort"]["temp"]["max"][1], _comfort_temp_max_hysteresis);
           COPYNUM(conf["comfort"]["hum"]["source"], _comfort_hum_source);
           COPYNUM(conf["comfort"]["hum"]["wsensNum"], _comfort_hum_wsensNum);
           COPYNUM(conf["comfort"]["hum"]["thing"], _comfort_hum_thing);
-          COPYNUM(conf["comfort"]["hum"]["min"], _comfort_hum_min);
-          COPYNUM(conf["comfort"]["hum"]["max"], _comfort_hum_max);
+          COPYNUM(conf["comfort"]["hum"]["min"][0], _comfort_hum_min);
+          COPYNUM(conf["comfort"]["hum"]["max"][0], _comfort_hum_max);
+          COPYNUM(conf["comfort"]["hum"]["min"][1], _comfort_hum_min_hysteresis);
+          COPYNUM(conf["comfort"]["hum"]["max"][1], _comfort_hum_max_hysteresis);
           COPYNUM(conf["comfort"]["iaq"]["source"], _comfort_iaq_source);
           COPYNUM(conf["comfort"]["co2"]["source"], _comfort_co2_source);
           COPYNUM(conf["comfort"]["co2"]["wsensNum"], _comfort_co2_wsensNum);
+          COPYBOOL(conf["comfort"]["temp"]["sound"], _comfort_temp_sound);
+          COPYBOOL(conf["comfort"]["hum"]["sound"], _comfort_hum_sound);
+          COPYBOOL(conf["comfort"]["iaq"]["sound"], _comfort_iaq_sound);
+          COPYBOOL(conf["comfort"]["co2"]["sound"], _comfort_co2_sound);
 
           // Account
           COPYSTR(conf["account"]["name"], _account_name);
           COPYBOOL(conf["account"]["required"], _account_required);
+
+          // Alarm
+          for(unsigned int i=0; i<ALARMS; i++) {
+            COPYNUM(conf["states"][i], _alarm_states[i]);
+            COPYNUM(conf["melodies"][i], _alarm_melodies[i]);
+            for(unsigned int k=0; k<2; k++) {
+              COPYNUM(conf["time"][i][k], _alarm_time[i][k]);
+            }
+            for(unsigned int k=0; k<7; k++) {
+              COPYNUM(conf["weekdays"][i][k], _alarm_weekdays[i][k]);
+            }
+          }
 
           Serial.println("done");
         }
@@ -539,7 +564,7 @@ class Config {
     /* Read user file */
     Serial.println(SEPARATOR);
     Serial.print("Read user file... ");
-    file = SPIFFS.open("/user.us");
+    file = LittleFS.open("/user.us");
     if(file) {
       while(file.available()) {
         String json = file.readString();
@@ -553,33 +578,6 @@ class Config {
       }
     }
     else Serial.println(" No user file found");
-
-    /* Read alarm file */
-    Serial.println(SEPARATOR);
-    Serial.print("Read alarm file... ");
-    file = SPIFFS.open("/alarm.json");
-    if(file) {
-      while(file.available()) {
-        String json = file.readString();
-        DynamicJsonDocument conf(4096);
-        DeserializationError error = deserializeJson(conf, json);
-        if(!error) {
-          for(unsigned int i=0; i<ALARMS; i++) {
-            COPYNUM(conf["states"][i], _alarm_states[i]);
-            COPYNUM(conf["melodies"][i], _alarm_melodies[i]);
-            for(unsigned int k=0; k<2; k++) {
-              COPYNUM(conf["time"][i][k], _alarm_time[i][k]);
-            }
-            for(unsigned int k=0; k<7; k++) {
-              COPYNUM(conf["weekdays"][i][k], _alarm_weekdays[i][k]);
-            }
-          }
-          Serial.println("done");
-        }
-        else Serial.println(" Alarm file corrupted");
-      }
-    }
-    else Serial.println(" No alarm file found");
   }
 
   /**
@@ -588,7 +586,7 @@ class Config {
    * @return false on success 
    */
   bool save(String json, String filename="/config.json") {
-    File file = SPIFFS.open(filename, "w");
+    File file = LittleFS.open(filename, "w");
     if(file) {
       file.print(json);
       file.close();
@@ -598,15 +596,7 @@ class Config {
     else return true;
   }
 
-  /**
-   * Save alarm data to the alarm config file
-   * @param alarm json data
-   * @return false on success 
-   */
-  bool saveAlarm(String json) {
-    return save(json, "/alarm.json");
-  }
-
+  
   /**
    * Getters
    */
@@ -728,10 +718,6 @@ class Config {
   unsigned int display_type(unsigned int num) {
     if(num >= DISPLAYS) return 0;
     return _display_type[num];
-  }
-
-  bool display_sacrificialLED() {
-    return _display_sacrificialLED;
   }
 
   unsigned int display_animation_type() {
@@ -924,6 +910,10 @@ class Config {
     return _display_source_volt_thing;
   }
 
+  unsigned int display_source_volt_thingType() {
+    return _display_source_volt_thingType;
+  }
+
   unsigned int display_source_bat_sens() {
     if(_display_source_bat_sens > 2) return 0;
     return _display_source_bat_sens;
@@ -991,43 +981,50 @@ class Config {
     return _display_source_sequence_wsenshum[slot];
   }
 
-  unsigned int display_timeSlot_period(unsigned int slot) {
+  unsigned int display_timeSlot_period(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return 0;
-    if(_display_timeSlot_period[slot] > 99) return 0;
-    return _display_timeSlot_period[slot];
+    if(displayNum >= DISPLAYS) return 0;
+    if(_display_timeSlot_period[slot][displayNum] > 99) return 0;
+    return _display_timeSlot_period[slot][displayNum];
   }
 
-  unsigned int display_timeSlot_sensor(unsigned int slot) {
+  unsigned int display_timeSlot_sensor(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return 0;
-    if(_display_timeSlot_sensor[slot] > 11) return 0;
-    return _display_timeSlot_sensor[slot];
+    if(displayNum >= DISPLAYS) return 0;
+    if(_display_timeSlot_sensor[slot][displayNum] > 11) return 0;
+    return _display_timeSlot_sensor[slot][displayNum];
   }
 
-  unsigned int display_timeSlot_data(unsigned int slot) {
+  unsigned int display_timeSlot_data(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return 0;
-    if(_display_timeSlot_data[slot] > 3) return 0;
-    return _display_timeSlot_data[slot];
+    if(displayNum >= DISPLAYS) return 0;
+    if(_display_timeSlot_data[slot][displayNum] > 3) return 0;
+    return _display_timeSlot_data[slot][displayNum];
   }
 
-  unsigned int display_timeSlot_thing(unsigned int slot) {
+  unsigned int display_timeSlot_thing(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return 0;
-    if(_display_timeSlot_thing[slot] > 7) return 0;
-    return _display_timeSlot_thing[slot];
+    if(displayNum >= DISPLAYS) return 0;
+    if(_display_timeSlot_thing[slot][displayNum] > 7) return 0;
+    return _display_timeSlot_thing[slot][displayNum];
   }
 
-  String display_timeSlot_color(unsigned int slot) {
+  String display_timeSlot_color(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return "";
-    return String(_display_timeSlot_color[slot]);
+    if(displayNum >= DISPLAYS) return "";
+    return String(_display_timeSlot_color[slot][displayNum]);
   }
 
-  unsigned int display_timeSlot_wsensor_num(unsigned int slot) {
+  unsigned int display_timeSlot_wsensor_num(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return 0;
-    return _display_timeSlot_wsensor_num[slot];
+    if(displayNum >= DISPLAYS) return 0;
+    return _display_timeSlot_wsensor_num[slot][displayNum];
   }
   
-  unsigned int display_timeSlot_wsensor_type(unsigned int slot) {
+  unsigned int display_timeSlot_wsensor_type(unsigned int slot, unsigned int displayNum) {
     if(slot >= TIMESLOTS) return 0;
-    return _display_timeSlot_wsensor_type[slot];
+    if(displayNum >= DISPLAYS) return 0;
+    return _display_timeSlot_wsensor_type[slot][displayNum];
   }
 
   unsigned int sound_vol() {
@@ -1231,10 +1228,6 @@ class Config {
     if(sensType >= 7) return 0;
     return _history_tFields[sensType];
   }
-      
-  bool thingspeakSend_turnOn() {
-    return _thingspeakSend_turnOn;
-  }
 
   unsigned int thingspeakSend_period() {
     if(_thingspeakSend_period < 1 or _thingspeakSend_period > 999) return 5;
@@ -1277,10 +1270,6 @@ class Config {
     return _thingspeakSend_wtypes[num];
   }
 
-  bool thingspeakReceive_turnOn() {
-    return _thingspeakReceive_turnOn;
-  }
-
   unsigned int thingspeakReceive_period() {
     if(_thingspeakReceive_period < 1 or _thingspeakReceive_period > 999) return 5;
     return _thingspeakReceive_period;
@@ -1296,10 +1285,6 @@ class Config {
 
   unsigned int thingspeakReceive_expire() {
     return _thingspeakReceive_expire;
-  }
-
-  bool narodmonSend_turnOn() {
-    return _narodmonSend_turnOn;
   }
 
   unsigned int narodmonSend_period() {
@@ -1348,12 +1333,6 @@ class Config {
     return _narodmonSend_wtypes[num];
   }
 
-  unsigned int narodmonSend_thing(unsigned int num) {
-    if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_thing[num] > 7) return 0;
-    return _narodmonSend_thing[num];
-  }
-
   unsigned int comfort_temp_source() {
     return _comfort_temp_source;
   }
@@ -1377,6 +1356,14 @@ class Config {
   int comfort_temp_max() {
     return _comfort_temp_max;
   }
+
+  int comfort_temp_min_hysteresis() {
+    return _comfort_temp_min_hysteresis;
+  }
+
+  int comfort_temp_max_hysteresis() {
+    return _comfort_temp_max_hysteresis;
+  }
   
   unsigned int comfort_hum_source() {
     return _comfort_hum_source;
@@ -1398,6 +1385,14 @@ class Config {
     return _comfort_hum_max;
   }
 
+  int comfort_hum_min_hysteresis() {
+    return _comfort_hum_min_hysteresis;
+  }
+
+  int comfort_hum_max_hysteresis() {
+    return _comfort_hum_max_hysteresis;
+  }
+
   unsigned int comfort_iaq_source() {
     return _comfort_iaq_source;
   }
@@ -1409,6 +1404,22 @@ class Config {
   unsigned int comfort_co2_wsensNum() {
     return _comfort_co2_wsensNum;
   }
+
+  boolean comfort_temp_sound() {
+    return _comfort_temp_sound;
+  }
+  
+  boolean comfort_hum_sound() {
+    return _comfort_hum_sound;
+  }
+ 
+  boolean comfort_iaq_sound() {
+    return _comfort_iaq_sound;
+  }
+ 
+  boolean comfort_co2_sound() {
+    return _comfort_co2_sound;
+  } 
   
   String account_name() {
     return String(_account_name);
@@ -1478,13 +1489,14 @@ class Config {
     if(points >= 0 and points <= 7) _display_animation_points = points;
   }
   
-  void set_color(char color[6], unsigned int num) {
-    if(num >= 8) return;
-    _display_timeSlot_color[num][0] = '#';
+  void set_color(char color[6], unsigned int slotNum, unsigned int displayNum) {
+    if(slotNum >= TIMESLOTS) return;
+    if(displayNum >= DISPLAYS) return;
+    _display_timeSlot_color[slotNum][displayNum][0] = '#';
     for (unsigned int i=1; i<7; i++) {
-      _display_timeSlot_color[num][i] = color[i - 1];
+      _display_timeSlot_color[slotNum][displayNum][i] = color[i - 1];
     }
-    _display_timeSlot_color[num][7] = '\0';
+    _display_timeSlot_color[slotNum][displayNum][7] = '\0';
   }
 
   void set_vol(unsigned int vol) {

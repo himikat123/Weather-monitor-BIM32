@@ -1,4 +1,4 @@
-#include <NeoPixelBus.h> // v2.6.0 https://github.com/Makuna/NeoPixelBus
+#include <NeoPixelBus.h> // v2.7.8 https://github.com/Makuna/NeoPixelBus
 
 #define PIXELS 87
 
@@ -109,10 +109,10 @@ void WS2812b::tick() {
   _connect = 10; // Disable animation of connecting to the network
   
   /* Slot switch */
-  if(millis() - _mills >= config.display_timeSlot_period(_timeSlot) * 1000 or config.display_timeSlot_period(_timeSlot) == 0) {
+  if(millis() - _mills >= config.display_timeSlot_period(_timeSlot, 1) * 1000 or config.display_timeSlot_period(_timeSlot, 1) == 0) {
     _timeSlot++;
     for(unsigned int i=_timeSlot; i<8; i++) {
-      if(config.display_timeSlot_period(_timeSlot) == 0) _timeSlot++;
+      if(config.display_timeSlot_period(_timeSlot, 1) == 0) _timeSlot++;
       else break;
     }
     if(_timeSlot > 7) _timeSlot = 0;
@@ -123,10 +123,10 @@ void WS2812b::tick() {
   if(millis() - _dotmills >= _dotfreq) {
     _dotmills = millis();
     
-    if(config.display_timeSlot_period(_timeSlot) > 0) {
+    if(config.display_timeSlot_period(_timeSlot, 1) > 0) {
       _clockdots = false;
 
-      switch(config.display_timeSlot_sensor(_timeSlot)) {
+      switch(config.display_timeSlot_sensor(_timeSlot, 1)) {
         case 0: // Clock 
           _clockdots = true;
           _clock();
@@ -135,21 +135,21 @@ void WS2812b::tick() {
           _date();
           break;
         case 2: // BME280
-          if(config.display_timeSlot_data(_timeSlot) == 0) _temp(sensors.get_bme280_temp(config.bme280_temp_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 1) _hum(sensors.get_bme280_hum(config.bme280_hum_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 2) _pres(sensors.get_bme280_pres(config.bme280_pres_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(sensors.get_bme280_temp(config.bme280_temp_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(sensors.get_bme280_hum(config.bme280_hum_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 2) _pres(sensors.get_bme280_pres(config.bme280_pres_corr()));
           break;
         case 3: // BMP180
-          if(config.display_timeSlot_data(_timeSlot) == 0) _temp(sensors.get_bmp180_temp(config.bmp180_temp_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 1) _pres(sensors.get_bmp180_pres(config.bmp180_pres_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(sensors.get_bmp180_temp(config.bmp180_temp_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 1) _pres(sensors.get_bmp180_pres(config.bmp180_pres_corr()));
           break;
         case 4: // SHT21
-          if(config.display_timeSlot_data(_timeSlot) == 0) _temp(sensors.get_sht21_temp(config.sht21_temp_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 1) _hum(sensors.get_sht21_hum(config.sht21_hum_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(sensors.get_sht21_temp(config.sht21_temp_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(sensors.get_sht21_hum(config.sht21_hum_corr()));
           break;
         case 5: // DHT22
-          if(config.display_timeSlot_data(_timeSlot) == 0) _temp(sensors.get_dht22_temp(config.dht22_temp_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 1) _hum(sensors.get_dht22_hum(config.dht22_hum_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(sensors.get_dht22_temp(config.dht22_temp_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(sensors.get_dht22_hum(config.dht22_hum_corr()));
           break;
         case 6: // DS18B20
           _temp(sensors.get_ds18b20_temp(config.ds18b20_temp_corr()));
@@ -159,31 +159,31 @@ void WS2812b::tick() {
           break;
         case 8: // Thingspeak
           if((now() - thingspeak.get_updated()) < (config.thingspeakReceive_expire() * 60)) {
-            if(config.display_timeSlot_data(_timeSlot) == 0) _temp(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot)));
-            if(config.display_timeSlot_data(_timeSlot) == 1) _hum(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot)));
-            if(config.display_timeSlot_data(_timeSlot) == 2) _pres(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot)));
+            if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot, 1)));
+            if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot, 1)));
+            if(config.display_timeSlot_data(_timeSlot, 1) == 2) _pres(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot, 1)));
           }
           else {
-            if(config.display_timeSlot_data(_timeSlot) == 0) _temp(40400.0);
-            if(config.display_timeSlot_data(_timeSlot) == 1) _hum(40400.0);
-            if(config.display_timeSlot_data(_timeSlot) == 2) _pres(40400.0);
+            if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(40400.0);
+            if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(40400.0);
+            if(config.display_timeSlot_data(_timeSlot, 1) == 2) _pres(40400.0);
           }
           break;
         case 9: // Weather
           if(now() - weather.get_currentUpdated() < 1200) {
-            if(config.display_timeSlot_data(_timeSlot) == 0) _temp(weather.get_currentTemp());
-            if(config.display_timeSlot_data(_timeSlot) == 1) _hum(weather.get_currentHum());
-            if(config.display_timeSlot_data(_timeSlot) == 2) _pres(weather.get_currentPres());
+            if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(weather.get_currentTemp());
+            if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(weather.get_currentHum());
+            if(config.display_timeSlot_data(_timeSlot, 1) == 2) _pres(weather.get_currentPres());
           }
           else {
-            if(config.display_timeSlot_data(_timeSlot) == 0) _temp(40400.0);
-            if(config.display_timeSlot_data(_timeSlot) == 1) _hum(40400.0);
-            if(config.display_timeSlot_data(_timeSlot) == 2) _pres(40400.0);
+            if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(40400.0);
+            if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(40400.0);
+            if(config.display_timeSlot_data(_timeSlot, 1) == 2) _pres(40400.0);
           }
           break;
         case 10: { // Wireless sensor
-          unsigned int wsensNum = config.display_timeSlot_wsensor_num(_timeSlot);
-          unsigned int wsensType = config.display_timeSlot_wsensor_type(_timeSlot);
+          unsigned int wsensNum = config.display_timeSlot_wsensor_num(_timeSlot, 1);
+          unsigned int wsensType = config.display_timeSlot_wsensor_type(_timeSlot, 1);
           if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
             if(wsensType >= 0 and wsensType <= 4) _temp(wsensor.get_temperature(wsensNum, wsensType, config.wsensor_temp_corr(wsensNum, wsensType)));
             if(wsensType == 5) _hum(wsensor.get_humidity(wsensNum, config.wsensor_hum_corr(wsensNum)));
@@ -198,10 +198,10 @@ void WS2812b::tick() {
           }
         }; break;
         case 11: // BME680
-          if(config.display_timeSlot_data(_timeSlot) == 0) _temp(sensors.get_bme680_temp(config.bme680_temp_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 1) _hum(sensors.get_bme680_hum(config.bme680_hum_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 2) _pres(sensors.get_bme680_pres(config.bme680_pres_corr()));
-          if(config.display_timeSlot_data(_timeSlot) == 3) _iaq(sensors.get_bme680_iaq(config.bme680_iaq_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 0) _temp(sensors.get_bme680_temp(config.bme680_temp_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 1) _hum(sensors.get_bme680_hum(config.bme680_hum_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 2) _pres(sensors.get_bme680_pres(config.bme680_pres_corr()));
+          if(config.display_timeSlot_data(_timeSlot, 1) == 3) _iaq(sensors.get_bme680_iaq(config.bme680_iaq_corr()));
           break;
         default: ; break;
       }
@@ -340,7 +340,7 @@ void WS2812b::_co2(float c) {
 void WS2812b::_print() {
   
   /* Color definition */
-  String color = config.display_timeSlot_color(_timeSlot);
+  String color = config.display_timeSlot_color(_timeSlot, 1);
   unsigned int number = strtol(&color[1], NULL, 16);
   unsigned int red = number >> 16;
   unsigned int green = number >> 8 & 0xFF;
@@ -533,15 +533,9 @@ void WS2812b::_sendToDisplay(unsigned int red[PIXELS], unsigned int green[PIXELS
   RgbColor ledOff(0);
   for(unsigned int i=0; i<PIXELS; i++) {
     RgbColor ledOn(red[i], green[i], blue[i]);
-    if(config.display_sacrificialLED()) {
-      if(i == 0) strip.SetPixelColor(i, ledOff);
-      else {
-        if(clock_pixels[i - 1] and _power) strip.SetPixelColor(i, ledOn);
-        else strip.SetPixelColor(i, ledOff);
-      }
-    }
+    if(i == 0) strip.SetPixelColor(i, ledOff);
     else {
-      if(clock_pixels[i] and _power) strip.SetPixelColor(i, ledOn);
+      if(clock_pixels[i - 1] and _power) strip.SetPixelColor(i, ledOn);
       else strip.SetPixelColor(i, ledOff);
     }
   }

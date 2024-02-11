@@ -92,7 +92,7 @@ void TaskSensors(void *pvParameters) {
       /**
        * Receive data from thingspeak
        */
-      if(config.thingspeakReceive_turnOn()) {
+      if(config.thingspeakReceive_period()) {
         if((millis() - thingspeakReceive) > (config.thingspeakReceive_period() * 60000) or thingspeakReceive == 0) {
           thingspeakReceive = millis();
           if(network.isConnected()) thingspeak.receive();
@@ -103,7 +103,7 @@ void TaskSensors(void *pvParameters) {
       /**
        * Send data to thingspeak
        */
-      if(config.thingspeakSend_turnOn()) {
+      if(config.thingspeakSend_period()) {
         if((millis() - thingspeakSend) > (config.thingspeakSend_period() * 60000) or thingspeakSend == 0) {
           thingspeakSend = millis();
           if(network.isConnected()) thingspeak.send();
@@ -114,7 +114,7 @@ void TaskSensors(void *pvParameters) {
       /**
        * Send data to narodmon
        */
-      if(config.narodmonSend_turnOn()) {
+      if(config.narodmonSend_period()) {
         if((millis() - narodmonSend) > (config.narodmonSend_period() * 60000) or narodmonSend == 0) {
           narodmonSend = millis();
           if(network.isConnected()) narodmon.send();
