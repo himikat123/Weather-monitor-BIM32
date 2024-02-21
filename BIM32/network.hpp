@@ -1,5 +1,9 @@
 class Network {
+  private:
+    bool needToPing = true;
+
   public:
+    void setNeedToPing(void);
     bool isConnected(void);
     void connect(void);
     void runAccessPoint(void);
@@ -9,7 +13,21 @@ class Network {
  * Checking for internet access
  */
 bool Network::isConnected(void) {
-  if(WiFi.status() == WL_CONNECTED and Ping.ping(global.remote_host)) return true;
+  if(WiFi.status() == WL_CONNECTED) {
+    if(needToPing) {
+      needToPing = false;
+      return Ping.ping(REMOTE_HOST);
+    }
+    else return true;
+  }
+  else return false;
+}
+
+/*
+ * Set needToPing
+ */
+void Network::setNeedToPing(void) {
+  needToPing = true;
 }
 
 /**
@@ -50,7 +68,8 @@ void Network::connect(void) {
           while(WiFi.status() != WL_CONNECTED) {
             delay(500);
             Serial.print(".");
-            ws2812b.connecting();
+            //ws2812b_1.connecting();
+            //ws2812b_2.connecting();
             if(++attempts > 20) break;
           }
           if(WiFi.status() == WL_CONNECTED) Serial.println(" connected");

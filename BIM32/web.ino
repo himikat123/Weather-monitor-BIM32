@@ -14,45 +14,49 @@ String web_timeString(unsigned int tm) {
  * Prepare sensors data
  */
 String web_sensorsPrepare(bool logged) {
-  StaticJsonDocument<4096> json;
+  JsonDocument json;
 
   json["state"] = logged ? "OK" : "LOGIN";
-  json["fw"] = global.fw;
+  json["fw"] = FW;
   json["runtime"] = lang.runtime(millis() / 1000);
   json["heap"] = String(ESP.getFreeHeap());
-  json["time"] = web_timeString(now());
+  json["time"] = now();
   json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
   json["network"]["ch"] = WiFi.channel();
-  json["network"]["sig"] = String(WiFi.RSSI()) + "dBm";
+  json["network"]["sig"] = WiFi.RSSI();
   json["network"]["mac"] = WiFi.macAddress();
   json["network"]["ip"] = WiFi.localIP().toString();
   json["network"]["mask"] = WiFi.subnetMask().toString();
   json["network"]["gw"] = WiFi.gatewayIP().toString();
   json["network"]["dns1"] = WiFi.dnsIP().toString();
   json["network"]["dns2"] = WiFi.dnsIP().toString();
-  json["bme280"]["temp"] = round(sensors.get_bme280_temp(0) * 10) / 10;
-  json["bme280"]["hum"] = round(sensors.get_bme280_hum(0) * 10) / 10;
-  json["bme280"]["pres"] = round(sensors.get_bme280_pres(0) * 7.5) / 10;
-  json["bmp180"]["temp"] = round(sensors.get_bmp180_temp(0) * 10) / 10;
-  json["bmp180"]["pres"] = round(sensors.get_bmp180_pres(0) * 7.5) / 10;
-  json["sht21"]["temp"] = round(sensors.get_sht21_temp(0) * 10) / 10;
-  json["sht21"]["hum"] = round(sensors.get_sht21_hum(0) * 10) / 10;
-  json["dht22"]["temp"] = round(sensors.get_dht22_temp(0) * 10) / 10;
-  json["dht22"]["hum"] = round(sensors.get_dht22_hum(0) * 10) / 10;
-  json["esp32"]["temp"] = round(sensors.get_esp32_temp(0) * 10) / 10;
-  json["ds18b20"]["temp"] = round(sensors.get_ds18b20_temp(0) * 10) / 10;
-  json["max44009"]["light"] = round(sensors.get_max44009_light(0) * 10) / 10;
-  json["bh1750"]["light"] = round(sensors.get_bh1750_light(0) * 10) / 10;
-  json["analog"]["volt"] = round(sensors.get_analog_voltage(0) * 100) / 100;
-  json["bme680"]["temp"] = round(sensors.get_bme680_temp(0) * 10) / 10;
-  json["bme680"]["hum"] = round(sensors.get_bme680_hum(0) * 10) / 10;
-  json["bme680"]["pres"] = round(sensors.get_bme680_pres(0) * 7.5) / 10;
-  json["bme680"]["iaq"] = round(sensors.get_bme680_iaq(0) * 10) / 10;
+  json["bme280"]["temp"] = sensors.get_bme280_temp(0);
+  json["bme280"]["hum"] = sensors.get_bme280_hum(0);
+  json["bme280"]["pres"] = sensors.get_bme280_pres(0);
+  json["bmp180"]["temp"] = sensors.get_bmp180_temp(0);
+  json["bmp180"]["pres"] = sensors.get_bmp180_pres(0);
+  json["sht21"]["temp"] = sensors.get_sht21_temp(0);
+  json["sht21"]["hum"] = sensors.get_sht21_hum(0);
+  json["dht22"]["temp"] = sensors.get_dht22_temp(0);
+  json["dht22"]["hum"] = sensors.get_dht22_hum(0);
+  json["esp32"]["temp"] = sensors.get_esp32_temp(0);
+  json["ds18b20"]["temp"] = sensors.get_ds18b20_temp(0);
+  json["max44009"]["light"] = sensors.get_max44009_light(0);
+  json["bh1750"]["light"] = sensors.get_bh1750_light(0);
+  json["analog"]["volt"] = sensors.get_analog_voltage(0);
+  json["bme680"]["temp"] = sensors.get_bme680_temp(0);
+  json["bme680"]["hum"] = sensors.get_bme680_hum(0);
+  json["bme680"]["pres"] = sensors.get_bme680_pres(0);
+  json["bme680"]["iaq"] = sensors.get_bme680_iaq(0);
   json["bme680"]["iaqAccr"] = sensors.get_bme680_iaq_accuracy();
-  json["weather"]["temp"] = round(weather.get_currentTemp() * 10) / 10;
-  json["weather"]["hum"] = round(weather.get_currentHum() * 10) / 10;
-  json["weather"]["pres"] = round(weather.get_currentPres() * 7.5) / 10;
-  json["weather"]["wind"]["speed"] = round(weather.get_currentWindSpeed() * 10) / 10;
+  json["thing"]["time"] = thingspeak.get_updated();
+  for(unsigned int i=0; i<THNG_FIELDS; i++) {
+    json["thing"]["data"][i] = thingspeak.get_field(i);
+  }
+  json["weather"]["temp"] = weather.get_currentTemp();
+  json["weather"]["hum"] = weather.get_currentHum();
+  json["weather"]["pres"] = weather.get_currentPres();
+  json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
   json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
   json["weather"]["descript"] = weather.get_description();
   for(unsigned int i=0; i<global.nets; i++) {
@@ -60,29 +64,28 @@ String web_sensorsPrepare(bool logged) {
     json["ssids"][i][1] = global.rssis[i];  
   }
   for(unsigned int i=0; i<WSENSORS; i++) {
-    if(wsensor.get_updated(i) == 0) json["wsensor"]["time"][i] = "--";
-    else json["wsensor"]["time"][i] = web_timeString(wsensor.get_updated(i));
+    json["wsensor"]["time"][i] = wsensor.get_updated(i);
     for(unsigned int n=0; n<5; n++) {
-      json["wsensor"]["temp"]["data"][n][i] = round(wsensor.get_temperature(i, n, 0) * 10) / 10;
+      json["wsensor"]["temp"]["data"][n][i] = wsensor.get_temperature(i, n, 0);
       json["wsensor"]["temp"]["name"][n][i] = wsensor.get_sensorType(i, n);
     }
-    json["wsensor"]["hum"]["data"][i] = round(wsensor.get_humidity(i, 0) * 10) / 10;
+    json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, 0);
     json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, 0);
-    json["wsensor"]["pres"]["data"][i] = round(wsensor.get_pressure(i, 0) * 10) / 10;
+    json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, 0);
     json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, 0);
-    json["wsensor"]["light"]["data"][i] = round(wsensor.get_light(i, 0) * 10) / 10;
+    json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, 0);
     json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
-    json["wsensor"]["voltage"]["data"][i] = round(wsensor.get_voltage(i, 0) * 10) / 10;
+    json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, 0);
     json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType(i);
-    json["wsensor"]["current"]["data"][i] = round(wsensor.get_current(i, 0) * 1000) / 1000;
+    json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, 0);
     json["wsensor"]["current"]["name"][i] = wsensor.get_energyType(i);
-    json["wsensor"]["power"]["data"][i] = round(wsensor.get_power(i, 0) * 10) / 10;
+    json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, 0);
     json["wsensor"]["power"]["name"][i] = wsensor.get_energyType(i);
-    json["wsensor"]["energy"]["data"][i] = round(wsensor.get_energy(i, 0));
+    json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, 0);
     json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType(i);
-    json["wsensor"]["freq"]["data"][i] = round(wsensor.get_frequency(i, 0) * 10) / 10;
+    json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, 0);
     json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType(i);
-    json["wsensor"]["co2"]["data"][i] = round(wsensor.get_co2(i, 0) * 10) / 10;
+    json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, 0);
     json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type(i);
     json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
   }
@@ -94,16 +97,16 @@ String web_sensorsPrepare(bool logged) {
       unsigned int i = 0;
       while(file) {
         float fsize = file.size();
-        String filename = String(file.name()).substring(1);
+        String filename = file.name();
         if(filename != "user.us") {
           json["fs"]["list"][i]["name"] = filename;
-          json["fs"]["list"][i++]["size"] = String(fsize / 1024);
+          json["fs"]["list"][i++]["size"] = fsize;
         }
         file = root.openNextFile();
         total += fsize;
       }
-      json["fs"]["total"] = 1280;
-      json["fs"]["free"] = round((1280 - total / 1024) * 10) / 10;
+      json["fs"]["total"] = 2048;
+      json["fs"]["free"] = (2048 - total / 1024);
     }
   }
   String data = "";
@@ -143,8 +146,8 @@ bool web_isLogged(AsyncWebServerRequest *request) {
  */
 bool web_fileRead(AsyncWebServerRequest *request) {
   String path = request->url();
-  if(!path.endsWith(".ico") && !path.endsWith(".png")) {
-    if(path == "/config.json" or path == "/alarm.json" or path == "/bme680.json") {
+  if(!path.endsWith(".ico") && !path.endsWith(".png") && !path.endsWith(".jpg") && !path.endsWith(".vlw")) {
+    if(path.endsWith(".json")) {
       if(!web_isLogged(request)) {
         request->send(200, "text/plain", "{\"lang\": \"" + config.lang() + "\", \"state\": \"LOGIN\"}");
         return true;
@@ -158,6 +161,10 @@ bool web_fileRead(AsyncWebServerRequest *request) {
     AsyncWebServerResponse *response = request->beginResponse(LittleFS, path);
     if(request->hasArg("download")) response->addHeader("Content-Type", "application/octet-stream");
     else if(path.endsWith(".json")) response->addHeader("Content-Type", "application/json");
+    else if(path.endsWith(".ico")) response->addHeader("Content-Type", "image/x-icon");
+    else if(path.endsWith(".png")) response->addHeader("Content-Type", "image/png");
+    else if(path.endsWith(".jpg")) response->addHeader("Content-Type", "image/jpg");
+    else if(path.endsWith(".vlw")) response->addHeader("Content-Type", "application/x-binary");
     else if(path.endsWith(".gz")) {
       response->addHeader("Content-Encoding", "gzip");
       response->addHeader("Content-Type", "text/html");
@@ -199,10 +206,10 @@ void web_save(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
     if(request->hasArg("config")) {
       if(request->arg("config")) 
-        request->send(200, "text/plain", config.save(request->arg("config")) ? "ERROR" : "OK");
-      else request->send(200, "text/plain", "ERROR");
+        request->send(200, "text/plain", config.save(request->arg("config")) ? "SAVE ERROR" : "OK");
+      else request->send(200, "text/plain", "CONFIG ARGUMENT EMPTY");
     }
-    else request->send(200, "text/plain", "ERROR");
+    else request->send(200, "text/plain", "NO CONFIG ARGUMENT");
   }
   else request->send(200, "text/plain", "NOT LOGGED");
 }
@@ -232,8 +239,7 @@ void web_dispToggle(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
     if(request->hasArg("num")) {
       unsigned int disp = (request->arg("num")).toInt();
-      if(disp == NEXTION) global.display1_but_pressed = true;
-      if(disp == WS2812B) global.display2_but_pressed = true;
+      global.display_but_pressed[disp ? 1 : 0] = true;
       request->send(200, "text/plain", "OK");
     }
     else request->send(200, "text/plain", "ERROR");
@@ -304,10 +310,14 @@ void web_color(AsyncWebServerRequest *request) {
  */
 void web_animation(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
-    if(request->hasArg("type")) config.set_animation_type((request->arg("type")).toInt());
-    if(request->hasArg("speed")) config.set_animation_speed((request->arg("speed")).toInt());
-    if(request->hasArg("points")) config.set_animation_points((request->arg("points")).toInt());
-    request->send(200, "text/plain", "OK");
+    if(request->hasArg("num")) {
+      int dispNum = request->arg("num").toInt();
+      if(request->hasArg("type")) config.set_animation_type(request->arg("type").toInt(), dispNum);
+      if(request->hasArg("speed")) config.set_animation_speed(request->arg("speed").toInt(), dispNum);
+      if(request->hasArg("points")) config.set_animation_points(request->arg("points").toInt(), dispNum);
+      request->send(200, "text/plain", "OK");
+    }
+    request->send(200, "text/plain", "ERROR");
   }
   else request->send(200, "text/plain", "NOT LOGGED");
 }
@@ -510,7 +520,7 @@ void webInterface_init(void) {
   SSDP.setSerialNumber(chipId);
   SSDP.setURL("/");
   SSDP.setModelName("BIM32");
-  SSDP.setModelNumber(String(global.fw));
+  SSDP.setModelNumber(FW);
   SSDP.setModelURL("https://radiokot.ru/artfiles/6571/");
   SSDP.setManufacturer("himikat123@gmail.com");
   SSDP.setManufacturerURL("https://github.com/himikat123/Weather-monitor-BIM32");

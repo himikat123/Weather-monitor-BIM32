@@ -284,7 +284,8 @@ void Weather::_updateOpenweathermapHourly(void) {
     OW_Weather ow;
     OW_forecast  *forecast;
     forecast = new OW_forecast;
-    bool parsed = ow.getForecast(forecast, config.weather_appid(OPENWEATHERMAP), _lat, _lon, "metric", "en");
+    bool parsed = ow.getForecast(forecast, config.weather_appid(OPENWEATHERMAP), _lat, _lon, "metric", "en", false);
+
     if(parsed) {
       _hourlyUpdated = now();
       

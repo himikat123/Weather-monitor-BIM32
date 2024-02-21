@@ -123,7 +123,7 @@ void WirelessSensor::receive() {
         digitalWrite(SET_HC12_PIN, LOW);
         delay(50);
         Serial2.printf("AT+C%03d\r\n", config.wsensor_channel());
-        delay(100);
+        vTaskDelay(100);
         digitalWrite(SET_HC12_PIN, HIGH);
       }
     }

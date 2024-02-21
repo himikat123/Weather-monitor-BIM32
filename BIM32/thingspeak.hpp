@@ -7,7 +7,8 @@ class Thingspeak {
     float get_field(unsigned int num);
     unsigned int get_updated();
     float get_historyField(unsigned int sensor, unsigned int slot);
-    unsigned int get_historyUpdated(unsigned int slot);  
+    unsigned int get_historyUpdated(unsigned int slot);
+    boolean is_summertime(void);
 
   private:
     String _fieldPrepare(unsigned int field);
@@ -76,7 +77,7 @@ void Thingspeak::receive() {
     tmth.Second = atoi(strtok(NULL, ":"));
     _updated = makeTime(tmth);
     _updated += config.clock_utc() * 3600;
-    _updated += config.clock_dlst() ? timentp.is_summertime() ? 3600 : 0 : 0;
+    _updated += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
     Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
   }
   else Serial.println("error, code: " + String(httpCode));
@@ -199,7 +200,7 @@ void Thingspeak::receiveHistory() {
       tmth.Second = atoi(strtok(NULL, ":"));
       _historyUpdated[i] = makeTime(tmth);
       _historyUpdated[i] += config.clock_utc() * 3600;
-      _historyUpdated[i] += config.clock_dlst() ? timentp.is_summertime() ? 3600 : 0 : 0;
+      _historyUpdated[i] += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
     }  
     Serial.println("successfull");
   }
@@ -268,90 +269,8 @@ String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
       if(config.thingspeakSend_types(fieldNum) == 2 and sensors.checkPres(weather.get_currentPres())) 
         fields = field + String(weather.get_currentPres());
     }; break;
-    
-    case 2: { // BME280
-      // Temperature
-      if(config.thingspeakSend_types(fieldNum) == 0 and 
-        sensors.checkTemp(sensors.get_bme280_temp(config.bme280_temp_corr()))) 
-          fields = field + String(sensors.get_bme280_temp(config.bme280_temp_corr()));
-      // Humidity
-      if(config.thingspeakSend_types(fieldNum) == 1 and 
-        sensors.checkHum(sensors.get_bme280_hum(config.bme280_hum_corr())))
-          fields = field + String(sensors.get_bme280_hum(config.bme280_hum_corr()));
-      // Pressure
-      if(config.thingspeakSend_types(fieldNum) == 2 and
-        sensors.checkPres(sensors.get_bme280_pres(config.bme280_pres_corr())))
-          fields = field + String(sensors.get_bme280_pres(config.bme280_pres_corr()));
-    }; break;
-    
-    case 3: { // BMP180
-      // Temperature
-      if(config.thingspeakSend_types(fieldNum) == 0 and
-        sensors.checkTemp(sensors.get_bmp180_temp(config.bmp180_temp_corr()))) 
-          fields = field + String(sensors.get_bmp180_temp(config.bmp180_temp_corr()));
-      // Pressure
-      if(config.thingspeakSend_types(fieldNum) == 1 and
-        sensors.checkPres(sensors.get_bmp180_pres(config.bmp180_pres_corr()))) 
-          fields = field + String(sensors.get_bmp180_pres(config.bmp180_pres_corr()));
-    }; break;
-    
-    case 4: { // SHT21
-      // Temperature
-      if(config.thingspeakSend_types(fieldNum) == 0 and
-        sensors.checkTemp(sensors.get_sht21_temp(config.sht21_temp_corr()))) 
-          fields = field + String(sensors.get_sht21_temp(config.sht21_temp_corr()));
-      // Humidity
-      if(config.thingspeakSend_types(fieldNum) == 1 and
-        sensors.checkHum(sensors.get_sht21_hum(config.sht21_hum_corr())))
-          fields = field + String(sensors.get_sht21_hum(config.sht21_hum_corr()));
-    }; break;
-    
-    case 5: { // DHT22
-      // Temperature
-      if(config.thingspeakSend_types(fieldNum) == 0 and
-        sensors.checkTemp(sensors.get_dht22_temp(config.dht22_temp_corr()))) 
-          fields = field + String(sensors.get_dht22_temp(config.dht22_temp_corr()));
-      // Humidity
-      if(config.thingspeakSend_types(fieldNum) == 1 and
-        sensors.checkHum(sensors.get_dht22_hum(config.dht22_hum_corr()))) 
-          fields = field + String(sensors.get_dht22_hum(config.dht22_hum_corr()));
-    }; break;
-    
-    case 6: // DS18B20
-      // Temperature
-      if(sensors.checkTemp(sensors.get_ds18b20_temp(config.ds18b20_temp_corr())))
-          fields = field + String(sensors.get_ds18b20_temp(config.ds18b20_temp_corr()));
-      break;
-    
-    case 7: // MAX44009
-      // Ambient light
-      if(sensors.checkLight(sensors.get_max44009_light(config.max44009_light_corr())))
-          fields = field + String(sensors.get_max44009_light(config.max44009_light_corr()));
-      break;
-    
-    case 8: // BH1750
-      // Ambient light
-      if(sensors.checkLight(sensors.get_bh1750_light(config.bh1750_light_corr())))
-          fields = field + String(sensors.get_bh1750_light(config.bh1750_light_corr()));
-      break;
-    
-    case 9: // Ananlog input
-      // Voltage
-      if(sensors.checkVolt(sensors.get_analog_voltage(config.analog_voltage_corr())))
-          fields = field + String(sensors.get_analog_voltage(config.analog_voltage_corr()));
-      break;
-    
-    case 10: // ESP32
-      // Temperature
-      if(config.thingspeakSend_types(fieldNum) == 0 and
-        sensors.checkTemp(sensors.get_esp32_temp(config.esp32_temp_corr())))
-          fields = field + String(sensors.get_esp32_temp(config.esp32_temp_corr()));
-      // Runtime
-      if(config.thingspeakSend_types(fieldNum) == 1) 
-        fields = field + String(millis() / 1000);
-      break;
-    
-    case 11:{ // Wireless sensor
+
+    case 2:{ // Wireless sensor
       unsigned int wsensNum = config.thingspeakSend_wsensors(fieldNum);
       unsigned int wsensType = config.thingspeakSend_wtypes(fieldNum);
       if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
@@ -384,6 +303,88 @@ String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
         if(wsensType == 16 and wsensor.checkCo2(co2)) fields = field + String(co2);
       }
     }; break;
+    
+    case 3: { // BME280
+      // Temperature
+      if(config.thingspeakSend_types(fieldNum) == 0 and 
+        sensors.checkTemp(sensors.get_bme280_temp(config.bme280_temp_corr()))) 
+          fields = field + String(sensors.get_bme280_temp(config.bme280_temp_corr()));
+      // Humidity
+      if(config.thingspeakSend_types(fieldNum) == 1 and 
+        sensors.checkHum(sensors.get_bme280_hum(config.bme280_hum_corr())))
+          fields = field + String(sensors.get_bme280_hum(config.bme280_hum_corr()));
+      // Pressure
+      if(config.thingspeakSend_types(fieldNum) == 2 and
+        sensors.checkPres(sensors.get_bme280_pres(config.bme280_pres_corr())))
+          fields = field + String(sensors.get_bme280_pres(config.bme280_pres_corr()));
+    }; break;
+    
+    case 4: { // BMP180
+      // Temperature
+      if(config.thingspeakSend_types(fieldNum) == 0 and
+        sensors.checkTemp(sensors.get_bmp180_temp(config.bmp180_temp_corr()))) 
+          fields = field + String(sensors.get_bmp180_temp(config.bmp180_temp_corr()));
+      // Pressure
+      if(config.thingspeakSend_types(fieldNum) == 1 and
+        sensors.checkPres(sensors.get_bmp180_pres(config.bmp180_pres_corr()))) 
+          fields = field + String(sensors.get_bmp180_pres(config.bmp180_pres_corr()));
+    }; break;
+    
+    case 5: { // SHT21
+      // Temperature
+      if(config.thingspeakSend_types(fieldNum) == 0 and
+        sensors.checkTemp(sensors.get_sht21_temp(config.sht21_temp_corr()))) 
+          fields = field + String(sensors.get_sht21_temp(config.sht21_temp_corr()));
+      // Humidity
+      if(config.thingspeakSend_types(fieldNum) == 1 and
+        sensors.checkHum(sensors.get_sht21_hum(config.sht21_hum_corr())))
+          fields = field + String(sensors.get_sht21_hum(config.sht21_hum_corr()));
+    }; break;
+    
+    case 6: { // DHT22
+      // Temperature
+      if(config.thingspeakSend_types(fieldNum) == 0 and
+        sensors.checkTemp(sensors.get_dht22_temp(config.dht22_temp_corr()))) 
+          fields = field + String(sensors.get_dht22_temp(config.dht22_temp_corr()));
+      // Humidity
+      if(config.thingspeakSend_types(fieldNum) == 1 and
+        sensors.checkHum(sensors.get_dht22_hum(config.dht22_hum_corr()))) 
+          fields = field + String(sensors.get_dht22_hum(config.dht22_hum_corr()));
+    }; break;
+    
+    case 7: // DS18B20
+      // Temperature
+      if(sensors.checkTemp(sensors.get_ds18b20_temp(config.ds18b20_temp_corr())))
+          fields = field + String(sensors.get_ds18b20_temp(config.ds18b20_temp_corr()));
+      break;
+    
+    case 8: // MAX44009
+      // Ambient light
+      if(sensors.checkLight(sensors.get_max44009_light(config.max44009_light_corr())))
+          fields = field + String(sensors.get_max44009_light(config.max44009_light_corr()));
+      break;
+    
+    case 9: // BH1750
+      // Ambient light
+      if(sensors.checkLight(sensors.get_bh1750_light(config.bh1750_light_corr())))
+          fields = field + String(sensors.get_bh1750_light(config.bh1750_light_corr()));
+      break;
+    
+    case 10: // Ananlog input
+      // Voltage
+      if(sensors.checkVolt(sensors.get_analog_voltage(config.analog_voltage_corr())))
+          fields = field + String(sensors.get_analog_voltage(config.analog_voltage_corr()));
+      break;
+    
+    case 11: // ESP32
+      // Temperature
+      if(config.thingspeakSend_types(fieldNum) == 0 and
+        sensors.checkTemp(sensors.get_esp32_temp(config.esp32_temp_corr())))
+          fields = field + String(sensors.get_esp32_temp(config.esp32_temp_corr()));
+      // Runtime
+      if(config.thingspeakSend_types(fieldNum) == 1) 
+        fields = field + String(millis() / 1000);
+      break;
 
     case 12: { // BME680
       // Temperature
@@ -516,4 +517,15 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
   }
  
   return fields;
+}
+
+/**
+ * Check the time and date for daylight saving time
+ * (works with an error, changes the time at 1:00)
+ */
+boolean Thingspeak::is_summertime(void) {
+  if(month() < 3 || month() > 10) return false;
+  if(month() > 3 && month() < 10) return true;
+  if((month() == 3 && (hour() + 24 * day()) >= (1 + 24 * (31 - (5 * year() / 4 + 4) % 7))) || (month() == 10 && (hour() + 24 * day()) < (1 + 24 * (31 - (5 * year() / 4 + 1) % 7)))) return true;
+  else return false;
 }

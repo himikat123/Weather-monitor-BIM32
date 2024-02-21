@@ -33,6 +33,8 @@ Bsec                iaqSensor;
 #endif
 unsigned int temprature_sens_read();
 
+#define DS18B20_RESOLUTION    12 /* DS18B20 resolution 9,10,11 or 12 bits */
+
 class Sensors {
   public:
     void init(void);
@@ -44,6 +46,9 @@ class Sensors {
     bool checkLight(float light);
     bool checkVolt(float volt);
     bool checkIaq(float iaq);
+    bool checkBatVolt(float volt);
+    bool checkBatLvl(int lvl);
+    bool checkBatPercent(int percent);
     float get_esp32_temp(float corr);
     float get_bme280_temp(float corr);
     float get_bme280_hum(float corr);
@@ -200,6 +205,27 @@ bool Sensors::checkVolt(float volt) {
  */
 bool Sensors::checkIaq(float iaq) {
   return (iaq >= 0.0 and iaq <= 500.0);
+}
+
+/**
+ * Check if battery voltage is within the normal range
+ */
+bool Sensors::checkBatVolt(float volt) {
+  return (volt >= 0.0 and volt <= 12.0);
+}
+
+/**
+ * Check if battery level is within the normal range
+ */
+bool Sensors::checkBatLvl(int lvl) {
+  return (lvl >= 1 and lvl <= 4);
+}
+
+/**
+ * Check if battery percentage is within the normal range
+ */
+bool Sensors::checkBatPercent(int percent) {
+  return (percent >= 0 and percent <= 100);
 }
 
 /**
