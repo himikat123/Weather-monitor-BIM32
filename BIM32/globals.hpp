@@ -1,32 +1,43 @@
 /* Pin definitions */
-#define SETTINGS_BUTTON_PIN    0 /* Settings button pin */
-#define DISPLAY1_BUTTON_PIN   34 /* Display 1 button pin */
-#define DISPLAY2_BUTTON_PIN   35 /* Display 2 button pin */
-#define ALARM_BUTTON_PIN      26 /* Alarm button */
-#define NEXTION_TX_PIN        32 /* Nextion display RX pin */
-#define NEXTION_RX_PIN        33 /* Nextion display TX pin */
-#define WS2812_DAT_PIN        12 /* WS2812b display pin */
-#define DHT22_PIN              4 /* DHT22 sensor pin*/
-#define PHOTORESISTOR_PIN     36 /* Photoresistor pin */
-#define ONE_WIRE_BUS_PIN      27 /* DS18B20 one-wire bus pin */
-#define SET_HC12_PIN          25 /* HC12 wireless module set pin*/
-#define AIR_HUMIDIFIER_PIN    14 /* Air humidifier pin */
-#define AIR_DRYER_PIN         13 /* Air dryer pin */
-#define AIR_HEATER_PIN        18 /* Air heater pin */
-#define AIR_COOLER_PIN         5 /* Air cooler pin */
-#define MP3_TX_PIN            23 /* MP3 module RX pin */
-#define MP3_RX_PIN            19 /* MP3 module TX pin */
-#define MP3BUSY_PIN           39 /* Busy wire pin from mp3 player */
+#define SETTINGS_BUTTON_PIN    0 // Settings button pin
+#define DISPLAY1_BUTTON_PIN   34 // Display 1 button pin
+#define DISPLAY2_BUTTON_PIN   35 // Display 2 button pin
+#define ALARM_BUTTON_PIN      26 // Alarm button
+
+#define NEXTION_TX_PIN        32 // Nextion display RX pin
+#define NEXTION_RX_PIN        33 // Nextion display TX pin
+#define TFT_BACKLIGHT         13 // ILI9341 LED pin
+// #define TFT_DC              5 // ILI9341 DC pin
+// #define TFT_CS             14 // ILI9341 CS pin
+// #define TFT_SCK            32 // ILI9341 SCK pin
+// #define TFT_DATA           33 // ILI9341 MOSI pin
+// #define TFT_DATA_OUT       18 // ILI9341 MISO pin
+#define WS2812_1_DAT_PIN      33 // WS2812b display 1 pin
+#define WS2812_2_DAT_PIN      12 // WS2812b display 2 pin
+
+#define DHT22_PIN              4 // DHT22 sensor pin
+#define PHOTORESISTOR_PIN     36 // Photoresistor pin
+#define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
+
+#define SET_HC12_PIN          25 // HC12 wireless module set pin
+//#define AIR_HUMIDIFIER_PIN    14 /* Air humidifier pin */
+//#define AIR_DRYER_PIN         13 /* Air dryer pin */
+//#define AIR_HEATER_PIN        18 /* Air heater pin */
+//#define AIR_COOLER_PIN         5 /* Air cooler pin */
+
+#define MP3_TX_PIN            23 // MP3 module RX pin
+#define MP3_RX_PIN            19 // MP3 module TX pin
+#define MP3_BUSY_PIN          39 // Busy wire pin from mp3 player
 
 
-#define DS18B20_RESOLUTION    12 /* DS18B20 resolution 9,10,11 or 12 bits */
 #define ALARMS                12 /* Number of alarms */
 
 #define SEPARATOR "**********************************************************************"
 
-struct {
-  char fw[7] = "v4.0"; // Firmware version
-  const char* remote_host = "www.google.com"; // Remote host to ping
+#define FW "v4.0"                    // Firmware version
+#define REMOTE_HOST "www.google.com" // Remote host to ping
+
+static struct {
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
   bool net_connected = false; // Is the device connected to the network?
@@ -36,14 +47,16 @@ struct {
   unsigned int rssis[30]; // List of signal strengths of available networks
   unsigned int nets = 0; // Number of available networks
   bool apMode = false; // Access point mode
-  bool display1_but_pressed = false; // display 1 button pressed flag
-  bool display2_but_pressed = false; // display 2 button pressed flag
+  bool display_but_pressed[2] = {false, false}; // display (1, 2) button pressed flag
   bool alarm_but_pressed = false; // alarm button pressed flag
-  unsigned int comfort = 0; // Comfort level code
-  bool stopOS = false; // Stop FreeRTOS
+  unsigned int comfort = 0; // Comfort level code: 1-Comfortable, 2-Hot, 3-Cold, 4-Humid, 5-Dry, 6-Hot & Humid, 7-Hot & Dry, 8-Cold & Humid, 9-Cold & Dry
+  unsigned int iaq_level = 0; // IAQ level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
+  unsigned int co2_level = 0; // CO2 level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
+  bool clockPoints = false; // ILI9341 clock points state
 } global;
 
-TaskHandle_t task_display_handle = NULL;
+TaskHandle_t task_display1_handle = NULL;
+TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
 
 class Configuration {
@@ -122,9 +135,9 @@ class Configuration {
   // Display
   unsigned int _display_type[DISPLAYS] = {0, 0}; // Display type
   unsigned int _display_model[DISPLAYS] = {0, 0}; // Display model
-  unsigned int _display_animation_type = 0; // Segment display animation number 0...9
-  unsigned int _display_animation_speed = 10; // Segment display animation speed 1...30
-  unsigned int _display_animation_points = 0; // Segment display animation clock points 0...4
+  unsigned int _display_animation_type[DISPLAYS] = {0, 0}; // Display animation number 0...9
+  unsigned int _display_animation_speed[DISPLAYS] = {10, 10}; // Display animation speed 1...30
+  unsigned int _display_animation_points[DISPLAYS] = {0, 0}; // Display animation clock points 0...4
   char _display_dayTime[DISPLAYS][6] = {"07:00", "07:00"}; // Time to switch to day mode
   char _display_nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
   unsigned int _display_brightMethod[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
@@ -310,7 +323,8 @@ class Configuration {
     if(file) {
       while(file.available()) {
         String json = file.readString();
-        DynamicJsonDocument conf(12192);
+        JsonDocument conf;
+        
         DeserializationError error = deserializeJson(conf, json);
         if(!error) {
           #define COPYSTR(from, to) strlcpy(to, from | to, sizeof(to))
@@ -356,11 +370,9 @@ class Configuration {
           COPYNUM(conf["clock"]["ntp_period"], _clock_ntp_period);
 
           // Display
-          COPYNUM(conf["display"]["animation"]["type"], _display_animation_type);
-          COPYNUM(conf["display"]["animation"]["speed"], _display_animation_speed);
-          COPYNUM(conf["display"]["animation"]["points"], _display_animation_points);
           for(unsigned int i=0; i<DISPLAYS; i++) {
             COPYNUM(conf["display"]["type"][i], _display_type[i]);
+            COPYNUM(conf["display"]["model"][i], _display_model[i]);
             COPYSTR(conf["display"]["dayTime"][i], _display_dayTime[i]);
             COPYSTR(conf["display"]["nightTime"][i], _display_nightTime[i]);
             COPYNUM(conf["display"]["brightMethod"][i], _display_brightMethod[i]);
@@ -374,17 +386,18 @@ class Configuration {
             COPYNUM(conf["display"]["brightness"]["max"][i], _display_brightness_max[i]);
             COPYNUM(conf["display"]["lightSensor"][i], _display_lightSensor[i]);
             COPYNUM(conf["display"]["lightSensor_sensitivity"][i], _display_lightSensor_sensitivity[i]);
-          }
-          for(unsigned int d=0; d<DISPLAYS; d++) {
-            for(unsigned int i=0; i<TIMESLOTS; i++) {
-              COPYNUM(conf["display"]["timeSlot"]["period"][i][d], _display_timeSlot_period[i][d]);
-              COPYNUM(conf["display"]["timeSlot"]["sensor"][i][d], _display_timeSlot_sensor[i][d]);
-              COPYNUM(conf["display"]["timeSlot"]["data"][i][d], _display_timeSlot_data[i][d]);
-              COPYNUM(conf["display"]["timeSlot"]["thing"][i][d], _display_timeSlot_thing[i][d]);
-              COPYSTR(conf["display"]["timeSlot"]["color"][i][d], _display_timeSlot_color[i][d]);
-              COPYNUM(conf["display"]["timeSlot"]["wsensor"]["num"][i][d], _display_timeSlot_wsensor_num[i][d]);
-              COPYNUM(conf["display"]["timeSlot"]["wsensor"]["type"][i][d], _display_timeSlot_wsensor_type[i][d]); 
-            }  
+            COPYNUM(conf["display"]["animation"]["type"][i], _display_animation_type[i]);
+            COPYNUM(conf["display"]["animation"]["speed"][i], _display_animation_speed[i]);
+            COPYNUM(conf["display"]["animation"]["points"][i], _display_animation_points[i]);
+            for(unsigned int t=0; t<TIMESLOTS; t++) {
+              COPYNUM(conf["display"]["timeSlot"]["period"][t][i], _display_timeSlot_period[t][i]);
+              COPYNUM(conf["display"]["timeSlot"]["sensor"][t][i], _display_timeSlot_sensor[t][i]);
+              COPYNUM(conf["display"]["timeSlot"]["data"][t][i], _display_timeSlot_data[t][i]);
+              COPYNUM(conf["display"]["timeSlot"]["thing"][t][i], _display_timeSlot_thing[t][i]);
+              COPYSTR(conf["display"]["timeSlot"]["color"][t][i], _display_timeSlot_color[t][i]);
+              COPYNUM(conf["display"]["timeSlot"]["wsensor"]["num"][t][i], _display_timeSlot_wsensor_num[t][i]);
+              COPYNUM(conf["display"]["timeSlot"]["wsensor"]["type"][t][i], _display_timeSlot_wsensor_type[t][i]); 
+            }
           }
           COPYNUM(conf["display"]["source"]["tempOut"]["sens"], _display_source_tempOut_sens);
           COPYNUM(conf["display"]["source"]["tempOut"]["wsensNum"], _display_source_tempOut_wsensNum);
@@ -720,16 +733,24 @@ class Configuration {
     return _display_type[num];
   }
 
-  unsigned int display_animation_type() {
-    return _display_animation_type;
+  unsigned int display_model(unsigned int num) {
+    if(num >= DISPLAYS) return 0;
+    return _display_model[num];
   }
 
-  unsigned int display_animation_speed() {
-    return _display_animation_speed;
+  unsigned int display_animation_type(unsigned int num) {
+    if(num >= DISPLAYS) return 0;
+    return _display_animation_type[num];
   }
 
-  unsigned int display_animation_points() {
-    return _display_animation_points;
+  unsigned int display_animation_speed(unsigned int num) {
+    if(num >= DISPLAYS) return 0;
+    return _display_animation_speed[num];
+  }
+
+  unsigned int display_animation_points(unsigned int num) {
+    if(num >= DISPLAYS) return 0;
+    return _display_animation_points[num];
   }
 
   unsigned int display_dayTime(unsigned int num, bool level) {
@@ -1477,23 +1498,23 @@ class Configuration {
     if(sensitivity >= 1 and sensitivity <= 200) _display_lightSensor_sensitivity[num] = sensitivity;
   }
 
-  void set_animation_type(unsigned int type) {
-    if(type >= 0 and type <= 9) _display_animation_type = type;
+  void set_animation_type(unsigned int type, unsigned int displayNum) {
+    if(type >= 0 and type <= 9 and displayNum < DISPLAYS) _display_animation_type[displayNum] = type;
   }
 
-  void set_animation_speed(unsigned int speed) {
-    if(speed >= 1 and speed <= 30) _display_animation_speed = speed;
+  void set_animation_speed(unsigned int speed, unsigned int displayNum) {
+    if(speed >= 1 and speed <= 30 and displayNum < DISPLAYS) _display_animation_speed[displayNum] = speed;
   }
 
-  void set_animation_points(unsigned int points) {
-    if(points >= 0 and points <= 7) _display_animation_points = points;
+  void set_animation_points(unsigned int points, unsigned int displayNum) {
+    if(points >= 0 and points <= 7 and displayNum < DISPLAYS) _display_animation_points[displayNum] = points;
   }
   
   void set_color(char color[6], unsigned int slotNum, unsigned int displayNum) {
     if(slotNum >= TIMESLOTS) return;
     if(displayNum >= DISPLAYS) return;
     _display_timeSlot_color[slotNum][displayNum][0] = '#';
-    for (unsigned int i=1; i<7; i++) {
+    for(unsigned int i=1; i<7; i++) {
       _display_timeSlot_color[slotNum][displayNum][i] = color[i - 1];
     }
     _display_timeSlot_color[slotNum][displayNum][7] = '\0';

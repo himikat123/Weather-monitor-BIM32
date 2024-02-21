@@ -4,12 +4,13 @@
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
  *
- *  ESP32 Dev Module
- *  No OTA (2MB APP/2MB SPIFFS)
+ *  Board: ESP32 Dev Module
+ *  Partition sheme: No OTA (2MB APP/2MB SPIFFS)
  *
  *  Arduino IDE v1.8.19
- *  ESP32 board v2.0.14
+ *  ESP32 board by Espressif Systems v2.0.14
  */
+
 
 /* Arduino libraries */
 #include <Arduino.h>
@@ -21,6 +22,7 @@
 #include <HTTPClient.h>
 WiFiClient client;
 #include <ESPmDNS.h>
+#include <time.h>
 
 /* External Libraries */
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
@@ -50,8 +52,6 @@ WirelessSensor wsensor;
 Weather weather;
 #include "sound.hpp"
 Sound sound;
-#include "timentp.hpp"
-TimeNTP timentp;
 #include "thingspeak.hpp"
 Thingspeak thingspeak;
 #include "narodmon.hpp"
@@ -59,10 +59,14 @@ Narodmon narodmon;
 #include "fonts.hpp"
 #include "nextion.hpp"
 Nextion nextion;
+#include "ILI9341.hpp"
+ILI9341 ili9341;
 #include "ws2812b.hpp"
-WS2812b ws2812b;
+WS2812b ws2812b_1;
+WS2812b ws2812b_2;
 #include "network.hpp"
 Network network;
+
 #include "taskdisplay.hpp"
 #include "tasksensors.hpp"
 
@@ -85,14 +89,14 @@ void setup() {
   pinMode(DISPLAY1_BUTTON_PIN, INPUT);
   pinMode(DISPLAY2_BUTTON_PIN, INPUT);
   pinMode(ALARM_BUTTON_PIN, INPUT);
-  pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);
-  pinMode(AIR_DRYER_PIN, OUTPUT);
-  pinMode(AIR_HEATER_PIN, OUTPUT);
-  pinMode(AIR_COOLER_PIN, OUTPUT);
-  digitalWrite(AIR_HUMIDIFIER_PIN, LOW);
-  digitalWrite(AIR_DRYER_PIN, LOW);
-  digitalWrite(AIR_HEATER_PIN, LOW);
-  digitalWrite(AIR_COOLER_PIN, LOW);
+  //pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);
+  //pinMode(AIR_DRYER_PIN, OUTPUT);
+  //pinMode(AIR_HEATER_PIN, OUTPUT);
+  //pinMode(AIR_COOLER_PIN, OUTPUT);
+  //digitalWrite(AIR_HUMIDIFIER_PIN, LOW);
+  //digitalWrite(AIR_DRYER_PIN, LOW);
+  //digitalWrite(AIR_HEATER_PIN, LOW);
+  //digitalWrite(AIR_COOLER_PIN, LOW);
 
   Serial.begin(115200);
   Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
@@ -102,7 +106,7 @@ void setup() {
   myNex.writeStr("page Logo");
   Serial.println(SEPARATOR);
   Serial.println(SEPARATOR);
-  Serial.println("*  Weather Monitor BIM32 " + String(global.fw) + "    © himikat123@gmail.com   2020-2024  *");
+  Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2024  *\r\n", FW);
   Serial.println(SEPARATOR);
   Serial.println();
 
@@ -112,15 +116,14 @@ void setup() {
   }
   config.readConfig();
 
-  ws2812b.init(); // Initialize WS2812b display
-
   network.connect();
   
   webInterface_init();
 
   delay(45);
 
-  xTaskCreatePinnedToCore(TaskDisplay, "TaskDisplay", 32768, NULL, 1, &task_display_handle, ARDUINO_RUNNING_CORE);
+  xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
+  xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
   xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, ARDUINO_RUNNING_CORE);
 }
 
