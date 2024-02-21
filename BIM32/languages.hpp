@@ -596,33 +596,26 @@ class Lang {
 
     String comfort(unsigned int level) {
       switch(level) {
-        case 0: {
+        case 1: {
           if(config.lang() == "de") return "Gemütlich";
           if(config.lang() == "ru") return "Комфортно";
           if(config.lang() == "pl") return "Przyjemny";
           if(config.lang() == "ua") return "Комфортно";
           return "Comfortable";
         }; break;
-        case 1: {
+        case 2: {
           if(config.lang() == "de") return "Zu heiß";
           if(config.lang() == "ru") return "Жарко";
           if(config.lang() == "pl") return "Gorąco";
           if(config.lang() == "ua") return "Жарко";
           return "Too hot";
         }; break;
-        case 2: {
+        case 3: {
           if(config.lang() == "de") return "Zu kalt";
           if(config.lang() == "ru") return "Холодно";
           if(config.lang() == "pl") return "Zimno";
           if(config.lang() == "ua") return "Холодно";
           return "Too cold";
-        }; break;
-        case 3: {
-          if(config.lang() == "de") return "Zu trocken";
-          if(config.lang() == "ru") return "Слишком сухо";
-          if(config.lang() == "pl") return "Zbyt sucho";
-          if(config.lang() == "ua") return "Занадто сухо";
-          return "Too dry";
         }; break;
         case 4: {
           if(config.lang() == "de") return "Zu feucht";
@@ -632,61 +625,68 @@ class Lang {
           return "Too humid";
         }; break;
         case 5: {
+          if(config.lang() == "de") return "Zu trocken";
+          if(config.lang() == "ru") return "Слишком сухо";
+          if(config.lang() == "pl") return "Zbyt sucho";
+          if(config.lang() == "ua") return "Занадто сухо";
+          return "Too dry";
+        }; break;
+        case 6: {
           if(config.lang() == "de") return "Heiß und feucht";
           if(config.lang() == "ru") return "Жарко и влажно";
           if(config.lang() == "pl") return "Gorąco i wilgotno";
           if(config.lang() == "ua") return "Жарко та волого";
           return "Hot and humid";
         }; break;
-        case 6: {
+        case 7: {
           if(config.lang() == "de") return "Heiß und trocken";
           if(config.lang() == "ru") return "Жарко и сухо";
           if(config.lang() == "pl") return "Gorąco i sucho";
           if(config.lang() == "ua") return "Жарко та сухо";
           return "Hot and dry";
         }; break;
-        case 7: {
+        case 8: {
           if(config.lang() == "de") return "Kalt und feucht";
           if(config.lang() == "ru") return "Холодно и влажно";
           if(config.lang() == "pl") return "Zimno i wilgotno";
           if(config.lang() == "ua") return "Холодно та волого";
           return "Cold and humid";
         }; break;
-        case 8: {
+        case 9: {
           if(config.lang() == "de") return "Kalt und trocken";
           if(config.lang() == "ru") return "Холодно и сухо";
           if(config.lang() == "pl") return "Zimno i sucho";
           if(config.lang() == "ua") return "Холодно та сухо";
           return "Cold and dry";
         }; break;
-        default: return "???"; break;
+        default: return ""; break;
       }
     }
 
     String airQuality(unsigned int level) {
       switch(level) {
-        case 0: {
+        case 1: {
           if(config.lang() == "de") return "Saubere Luft";
           if(config.lang() == "ru") return "Воздух чистый";
           if(config.lang() == "pl") return "Powietrze czyste";
           if(config.lang() == "ua") return "Повітря чисте";
           return "Clean Air";
         }; break;
-        case 1: {
+        case 2: {
           if(config.lang() == "de") return "Luft ist verschmutzt";
           if(config.lang() == "ru") return "Воздух загрязнен";
           if(config.lang() == "pl") return "Powietrze zanieczyszczone";
           if(config.lang() == "ua") return "Повітря забруднене";
           return "Air is polluted";
         }; break;
-        case 2: {
+        case 3: {
           if(config.lang() == "de") return "Luft ist stark verschmutzt";
           if(config.lang() == "ru") return "Воздух сильно загрязнен";
           if(config.lang() == "pl") return "Powietrze silnie zanieczyszczone";
           if(config.lang() == "ua") return "Повітря сильно забруднене";
           return "Air is heavily polluted";
         }; break;
-        default: return "???"; break;
+        default: return ""; break;
       }
     }
 

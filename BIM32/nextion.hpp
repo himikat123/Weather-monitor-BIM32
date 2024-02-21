@@ -6,12 +6,12 @@ class Nextion {
 
   public:
     void init(void);
-    void tick(void);
+    void refresh(void);
     void displayToggle(void);
     void displayOn(bool doinit = true);
     void displayOff(void);
     bool isDisplayOn(void);
-    void setIntensity(unsigned int brightness, bool reduc);
+    void brightness(unsigned int bright, bool reduc);
     void setDisplayRTC(void);
     void dataReceive(void);
 
@@ -73,7 +73,7 @@ void Nextion::init(void) {
   myNex.writeStr("Texts.ALARM.txt", lang.alarm());
   
   /* Initialize NX4832K035 display  */
-  if(config.display_type(0) == NX4832K035) {
+  if(config.display_model(0) == NX4832K035) {
     // config
     myNex.writeNum("BigClock.clockFormat.val", config.clock_format());
     unsigned int langCode = 0;
@@ -145,12 +145,12 @@ void Nextion::init(void) {
 /**
  * Sending all data to display
  */
-void Nextion::tick(void) {
+void Nextion::refresh(void) {
   myNex.writeNum("sleep", _power ? 0 : 1);
 
   if(_power) {
-    if(config.display_type(0) == NX4832T035) _NX4832T035_timeDate();
-    if(config.display_type(0) == NX4832K035) {
+    if(config.display_model(0) == NX4832T035) _NX4832T035_timeDate();
+    if(config.display_model(0) == NX4832K035) {
       if(global.clockSynchronize) {
         _NX4832K035_setRTC();
         global.clockSynchronize = false;
@@ -218,8 +218,8 @@ void Nextion::tick(void) {
 /**
  * Change display brightness
  */
-void Nextion::setIntensity(unsigned int brightness, bool reduc) {
-  if(_power) myNex.writeNum("dim", reduc ? round(brightness / 2) : brightness);
+void Nextion::brightness(unsigned int bright, bool reduc) {
+  if(_power) myNex.writeNum("dim", reduc ? round(bright / 2) : bright);
 }
 
 /**
@@ -258,7 +258,7 @@ bool Nextion::isDisplayOn() {
  * Set the time and date of the display with built-in RTC
  */
 void Nextion::setDisplayRTC(void) {
-  if(config.display_type(0) == NX4832K035) _NX4832K035_setRTC();
+  if(config.display_model(0) == NX4832K035) _NX4832K035_setRTC();
 }
 
 /**
@@ -315,7 +315,7 @@ void Nextion::_networkPage(void) {
     myNex.writeStr("Network.mac.txt", WiFi.macAddress());
   }
   myNex.writeStr("Network.temp.txt", String(int(round(sensors.get_esp32_temp(0)))) + "°C");
-  myNex.writeStr("Network.frmw.txt", global.fw);
+  myNex.writeStr("Network.frmw.txt", FW);
 }
 
 /**
@@ -620,52 +620,32 @@ void Nextion::_comfortLevel() {
   #define AIR_CLEAN            0
   #define AIR_POLLUTED         1
   #define AIR_HEAVILY_POLLUTED 2
-  
-  if(config.display_source_descr() == 0) { // --
+
+  /* --- */
+  if(config.display_source_descr() == 0) {
     myNex.writeNum("Main.seq.val", 0);
     myNex.writeStr("Main.comfort.txt", "");
   }
-  
-  if(config.display_source_descr() == 1) { // comfort level
+
+  /* comfort level */
+  if(config.display_source_descr() == 1) {
     myNex.writeNum("Main.seq.val", 0);
-    String comfort = "";
-    switch(global.comfort) {
-      case 1: comfort = lang.comfort(COMFORTABLE); break;
-      case 2: comfort = lang.comfort(HOT); break;
-      case 3: comfort = lang.comfort(COLD); break;
-      case 4: comfort = lang.comfort(DRY); break;
-      case 5: comfort = lang.comfort(HUMID); break;
-      case 6: comfort = lang.comfort(HOT_HUMID); break;
-      case 7: comfort = lang.comfort(HOT_DRY); break;
-      case 8: comfort = lang.comfort(COLD_HUMID); break;
-      case 9: comfort = lang.comfort(COLD_DRY); break;
-      default: comfort = ""; break;
+    String comfort = lang.comfort(global.comfort);
+
+    if(global.iaq_level) {
+      if(comfort.length()) comfort += ". ";
+      comfort += lang.airQuality(global.iaq_level);
     }
-    if(config.comfort_iaq_source() == 1) {
-      float iaq = sensors.get_bme680_iaq(config.bme680_iaq_corr());
-      if(sensors.checkIaq(iaq)) {
-        _iaq_level = AIR_CLEAN;
-        if(iaq > 100.0) _iaq_level = AIR_POLLUTED;
-        if(iaq > 200.0) _iaq_level = AIR_HEAVILY_POLLUTED;
-        if(comfort.length()) comfort += ". ";
-        comfort += lang.airQuality(_iaq_level);
-      } 
-    }
-    if(config.comfort_co2_source() == 1) {
-      if(now() - wsensor.get_updated(config.comfort_co2_wsensNum()) < config.wsensor_expire(config.comfort_co2_wsensNum()) * 60) {
-        float co2 = wsensor.get_co2(config.comfort_co2_wsensNum(), config.wsensor_co2_corr(config.comfort_co2_wsensNum()));
-        if(wsensor.checkCo2(co2)) {
-          _co2_level = AIR_CLEAN;
-          if(co2 > 800.0) _co2_level = AIR_POLLUTED;
-          if(co2 > 1400.0) _co2_level = AIR_HEAVILY_POLLUTED;
-          if(comfort.length()) comfort += ". ";
-          comfort += lang.airQuality(_co2_level);
-        }
-      } 
+
+    else if(global.co2_level) {
+      if(comfort.length()) comfort += ". ";
+      comfort += lang.airQuality(global.co2_level);
     }
     myNex.writeStr("Main.comfort.txt", comfort);
   }
-  if(config.display_source_descr() == 2) { // sequence
+
+  /* sequence */
+  if(config.display_source_descr() == 2) {
     myNex.writeNum("Main.seq.val", 1);
   }
 }
@@ -719,20 +699,20 @@ void Nextion::_thermometer(float temp) {
  */
 void Nextion::_pres(void) {
   float pres = 40400.0;
-  if(config.display_source_presOut_sens() == 0) // pressure outside from weather forecast
+  if(config.display_source_presOut_sens() == 1) // pressure outside from weather forecast
     pres = weather.get_currentPres();
-  if(config.display_source_presOut_sens() == 1) // presure outside from wireless sensor
+  if(config.display_source_presOut_sens() == 2) // presure outside from wireless sensor
     if(now() - wsensor.get_updated(config.display_source_presOut_wsensNum()) < 
     config.wsensor_expire(config.display_source_presOut_wsensNum()) * 60)
       pres = wsensor.get_pressure(config.display_source_presOut_wsensNum(), config.wsensor_pres_corr(config.display_source_presOut_wsensNum()));
-  if(config.display_source_presOut_sens() == 2) // presure outside from thingspeak
+  if(config.display_source_presOut_sens() == 3) // presure outside from thingspeak
     if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
       pres = thingspeak.get_field(config.display_source_presOut_thing());
-  if(config.display_source_presOut_sens() == 3) // pressure outside from BME280
+  if(config.display_source_presOut_sens() == 4) // pressure outside from BME280
     pres = sensors.get_bme280_pres(config.bme280_pres_corr());
-  if(config.display_source_presOut_sens() == 4) // pressure outside from BMP180
+  if(config.display_source_presOut_sens() == 5) // pressure outside from BMP180
     pres = sensors.get_bmp180_pres(config.bmp180_pres_corr());
-  if(config.display_source_presOut_sens() == 5) // pressure outside from BME680
+  if(config.display_source_presOut_sens() == 6) // pressure outside from BME680
     pres = sensors.get_bme680_pres(config.bme680_pres_corr());
   if(sensors.checkPres(pres)) 
   myNex.writeStr("Main.presOutside.txt", String(int(round(pres * 0.75))) + lang.mm());
