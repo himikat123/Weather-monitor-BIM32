@@ -51,7 +51,7 @@ void Thingspeak::receive() {
   if(httpCode == HTTP_CODE_OK) {
     httpData = client.getString();
     Serial.println(httpData);
-    StaticJsonDocument<2048> root;
+    JsonDocument root;
     DeserializationError error = deserializeJson(root, httpData);
     if(error) {
       Serial.println("Deserialization error");
@@ -172,7 +172,7 @@ void Thingspeak::receiveHistory() {
   if(httpCode == HTTP_CODE_OK) {
     httpData = client.getString();
     Serial.println(httpData);
-    StaticJsonDocument<12048> root;
+    JsonDocument root;
     DeserializationError error = deserializeJson(root, httpData);
     if(error) {
       Serial.println("Deserialization error");

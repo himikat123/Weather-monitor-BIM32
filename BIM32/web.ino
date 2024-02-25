@@ -18,8 +18,8 @@ String web_sensorsPrepare(bool logged) {
 
   json["state"] = logged ? "OK" : "LOGIN";
   json["fw"] = FW;
-  json["runtime"] = lang.runtime(millis() / 1000);
-  json["heap"] = String(ESP.getFreeHeap());
+  json["runtime"] = millis();
+  json["heap"] = ESP.getFreeHeap();
   json["time"] = now();
   json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
   json["network"]["ch"] = WiFi.channel();

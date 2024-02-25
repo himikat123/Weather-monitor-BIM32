@@ -64,7 +64,7 @@ void WirelessSensor::receive() {
     wsensorStr = Serial2.readStringUntil('\n');
     Serial.println(wsensorStr);
     if(wsensorStr.lastIndexOf("{") != -1) {
-      StaticJsonDocument<2048> root;
+      JsonDocument root;
       DeserializationError error = deserializeJson(root, wsensorStr);
       if(error) {
         Serial.println("Wireless sensor deserialization error");

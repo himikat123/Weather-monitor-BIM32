@@ -27,44 +27,39 @@ WiFiClient client;
 /* External Libraries */
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include <ESP32Ping.h> // v1.6 https://github.com/marian-craciunescu/ESP32Ping
 #include <AsyncTCP.h> // v1.1.4 https://github.com/dvarrel/AsyncTCP
 #include <ESPAsyncWebServer.h> // v1.2.3 https://github.com/me-no-dev/ESPAsyncWebServer
 AsyncWebServer server(80);
 #include <SoftwareSerial.h> // v8.1.0 https://github.com/plerup/espsoftwareserial/
 SoftwareSerial Serial3;
-#include "EasyNextionLibrary.h" // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
-EasyNex myNex(Serial1);
-#include "DFRobotDFPlayerMini.h" // v1.0.6 https://github.com/DFRobot/DFRobotDFPlayerMini
-DFRobotDFPlayerMini mp3player;
 #include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
-#include "globals.hpp"
+#include "src/globals.hpp"
 Configuration config;
-#include "sensors.hpp"
+#include "src/sensors.hpp"
 Sensors sensors;
-#include "languages.hpp"
+#include "src/languages.hpp"
 Lang lang;
-#include "wirelessSensor.hpp"
+#include "src/wirelessSensor.hpp"
 WirelessSensor wsensor;
-#include "weather.hpp"
+#include "src/weather.hpp"
 Weather weather;
-#include "sound.hpp"
+#include "src/sound.hpp"
 Sound sound;
-#include "thingspeak.hpp"
+#include "src/thingspeak.hpp"
 Thingspeak thingspeak;
-#include "narodmon.hpp"
+#include "src/narodmon.hpp"
 Narodmon narodmon;
-#include "fonts.hpp"
-#include "nextion.hpp"
+#include "src/fonts.hpp"
+#include "src/nextion.hpp"
 Nextion nextion;
-#include "ILI9341.hpp"
+#include "src/ili9341.hpp"
 ILI9341 ili9341;
-#include "ws2812b.hpp"
+#include "src/ws2812b.hpp"
 WS2812b ws2812b_1;
 WS2812b ws2812b_2;
-#include "network.hpp"
+#include "src/network.hpp"
 Network network;
 
 #include "taskdisplay.hpp"
@@ -73,9 +68,9 @@ Network network;
 
 /* FreeRTOS running cores */
 #if CONFIG_FREERTOS_UNICORE
-#define ARDUINO_RUNNING_CORE 0
+  #define ARDUINO_RUNNING_CORE 0
 #else
-#define ARDUINO_RUNNING_CORE 1
+  #define ARDUINO_RUNNING_CORE 1
 #endif
 #define FS_NO_GLOBALS
 
@@ -102,8 +97,7 @@ void setup() {
   Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
   Serial2.begin(9600);
   Serial3.begin(9600, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false);
-  myNex.writeNum("sleep", 0);
-  myNex.writeStr("page Logo");
+
   Serial.println(SEPARATOR);
   Serial.println(SEPARATOR);
   Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2024  *\r\n", FW);
@@ -116,14 +110,16 @@ void setup() {
   }
   config.readConfig();
 
+  //myNex.writeNum("sleep", 0);
+  //myNex.writeStr("page Logo");
+
+  xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
+  xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
+
   network.connect();
   
   webInterface_init();
 
-  delay(45);
-
-  xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
-  xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
   xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, ARDUINO_RUNNING_CORE);
 }
 

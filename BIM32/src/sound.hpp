@@ -1,3 +1,6 @@
+#include "DFRobotDFPlayerMini.h" // v1.0.6 https://github.com/DFRobot/DFRobotDFPlayerMini
+DFRobotDFPlayerMini mp3player;
+
 class Sound {
   public:
     void init(void);

@@ -581,7 +581,7 @@ class Configuration {
     if(file) {
       while(file.available()) {
         String json = file.readString();
-        DynamicJsonDocument conf(256);
+        JsonDocument conf;
         DeserializationError error = deserializeJson(conf, json);
         if(!error) {
           strlcpy(_account_pass, conf["pass"] | _account_pass, sizeof(_account_pass));

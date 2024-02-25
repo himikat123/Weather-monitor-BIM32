@@ -1,3 +1,5 @@
+#include <ESP32Ping.h> // v1.6 https://github.com/marian-craciunescu/ESP32Ping
+
 class Network {
   private:
     bool needToPing = true;
@@ -68,8 +70,6 @@ void Network::connect(void) {
           while(WiFi.status() != WL_CONNECTED) {
             delay(500);
             Serial.print(".");
-            //ws2812b_1.connecting();
-            //ws2812b_2.connecting();
             if(++attempts > 20) break;
           }
           if(WiFi.status() == WL_CONNECTED) Serial.println(" connected");

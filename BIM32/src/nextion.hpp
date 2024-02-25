@@ -1,3 +1,6 @@
+#include <EasyNextionLibrary.h" // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
+EasyNex myNex(Serial1);
+
 class Nextion {
   #define NX4832K035 0
   #define NX4832T035 1
@@ -608,19 +611,6 @@ void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing,
  * Display comfort level
  */
 void Nextion::_comfortLevel() {
-  #define COMFORTABLE          0
-  #define HOT                  1
-  #define COLD                 2
-  #define DRY                  3
-  #define HUMID                4
-  #define HOT_HUMID            5
-  #define HOT_DRY              6
-  #define COLD_HUMID           7
-  #define COLD_DRY             8
-  #define AIR_CLEAN            0
-  #define AIR_POLLUTED         1
-  #define AIR_HEAVILY_POLLUTED 2
-
   /* --- */
   if(config.display_source_descr() == 0) {
     myNex.writeNum("Main.seq.val", 0);
@@ -985,7 +975,7 @@ void Nextion::dataReceive(void) {
     }
     if(_customData == 1) _receivedData.concat(nextionChar);
     if(_customData == 0) {
-      StaticJsonDocument<1024> root;
+      JsonDocument root;
       DeserializationError error = deserializeJson(root, _receivedData);
       if(!error) {
         if(_receivedData.lastIndexOf("{\"h\":") != -1)

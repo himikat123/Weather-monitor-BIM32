@@ -169,7 +169,7 @@ void Weather::update() {
   if(httpCode == HTTP_CODE_OK) {
     String httpData = clientWeather.getString();
     Serial.println(httpData);
-    StaticJsonDocument<8192> weather;
+    JsonDocument weather;
     DeserializationError errorWeather = deserializeJson(weather, httpData);
     if(errorWeather) {
       Serial.println("Current weather deserialization error");
@@ -252,7 +252,7 @@ void Weather::_updateWeatherbitDaily(void) {
   if(httpCode == HTTP_CODE_OK) {
     String httpData = clientDaily.getString();
     Serial.println(httpData);
-    DynamicJsonDocument forecast(8192);
+    JsonDocument forecast;
     DeserializationError errorForecast = deserializeJson(forecast, httpData);
     if(errorForecast) {
       Serial.println("Weatherbit.io: daily forecast deserialization error");

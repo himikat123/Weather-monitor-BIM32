@@ -104,7 +104,7 @@ void TaskDisplay1(void *pvParameters) {
       // if(hour() == 12 and minute() == 0 and second() == 0) ESP.restart();
     }
 
-    vTaskDelay(1);
+    vTaskDelay(5);
   }
 }
 
@@ -161,7 +161,7 @@ void TaskDisplay2(void *pvParameters) {
       }
     }
 
-    vTaskDelay(1);
+    vTaskDelay(5);
   }
 }
 

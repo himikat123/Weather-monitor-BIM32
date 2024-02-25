@@ -427,7 +427,7 @@ void Sensors::_bme680_loadState(void) {
     while(file.available()) {
       String json = file.readString();
       
-      StaticJsonDocument<4096> state;
+      JsonDocument state;
       DeserializationError errorState = deserializeJson(state, json);
       
       if(!errorState) {
@@ -468,7 +468,7 @@ void Sensors::_bme680_updateState(void) {
       char datetime[20];
       sprintf(datetime, "%02d.%02d.%d %02d:%02d:%02d", day(), month(), year(), hour(), minute(), second());
     
-      StaticJsonDocument<4096> json;
+      JsonDocument json;
       json["timestamp"] = _bme680_stateTimestamp;
       json["datetime"] = datetime;
       json["counter"] = _bme680_stateCounter;
