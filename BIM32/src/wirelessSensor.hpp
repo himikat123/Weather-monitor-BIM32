@@ -213,7 +213,8 @@ float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor, flo
 String WirelessSensor::get_sensorType(unsigned int num, unsigned int sensor) {
   if(num >= WSENSORS or sensor > 4) return "";
   if(sensor == 0) return String(_sensorType[num]);
-  else return "DS18B20";
+  else if(sensor >= 1 and sensor <= 4 and sensors.checkTemp(_temperature[num][sensor])) return "DS18B20";
+  else return "";
 }
 
 float WirelessSensor::get_humidity(unsigned int num, float corr) {
@@ -262,7 +263,7 @@ float WirelessSensor::get_frequency(unsigned int num, float corr) {
 }
 
 String WirelessSensor::get_energyType(unsigned int num) {
-  if(num >= WSENSORS) return "";
+  if(num >= WSENSORS or !checkVolt(_voltage[num])) return "";
   return "PZEM-004t";
 }
 
@@ -272,7 +273,7 @@ float WirelessSensor::get_co2(unsigned int num, float corr) {
 }
 
 String WirelessSensor::get_co2Type(unsigned int num) {
-  if(num >= WSENSORS) return "";
+  if(num >= WSENSORS or !checkCo2(_co2[num])) return "";
   return "Senseair S8";
 }
 

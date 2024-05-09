@@ -189,20 +189,6 @@ void alarm_button() {
  * Calculate comfort level 
  */
 void comfortCalculate() {
-  #define UNDEFINED            0
-  #define COMFORTABLE          1
-  #define HOT                  2
-  #define COLD                 3
-  #define HUMID                4
-  #define DRY                  5
-  #define HOT_HUMID            6
-  #define HOT_DRY              7
-  #define COLD_HUMID           8
-  #define COLD_DRY             9
-  #define AIR_CLEAN            1
-  #define AIR_POLLUTED         2
-  #define AIR_HEAVILY_POLLUTED 3
-  
   int temp = 40400;
   int hum = 40400;
   int tempLevel = 0;

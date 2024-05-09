@@ -323,7 +323,6 @@ void Weather::_calculateDaily(void) {
   }
   for(unsigned int i=0; i<DAYS*8; i++) {
     unsigned int wd = weekday(_currentDate);
-    unsigned int hr = hour(_hourlyDate[i]);
     if(i == 0){
       _dailyDayTemp[0] = _currentTemp;;
       _dailyNightTemp[0] = _currentTemp;;

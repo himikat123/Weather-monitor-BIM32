@@ -565,34 +565,34 @@ class Lang {
       return 0;
     }
 
-    String runtime(unsigned long mil) {
-      String buf = "";
+    //String runtime(unsigned long mil) {
+    //  String buf = "";
 
-      if(mil < 60) buf = _lessThanAMinute();
-      else if(mil < 3600) {
-        buf = String(minute(mil)) + " ";
-        buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
-      }
-      else if(mil < 86400) {
-        buf = String(hour(mil)) + " "; 
-        buf += ((plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5()) + " ";
-        buf += _and() + " ";  
-        buf += String(minute(mil)) + " ";
-        buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
-      }
-      else {
-        int days = lround(mil / 86400);
-        buf = String(days) + " ";
-        buf += ((plural(days) == 1) ? _day() : (plural(days) == 2) ? _days2() : _days5()) + ", ";
-        buf += String(hour(mil)) + " ";
-        buf += ((plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5()) + " ";
-        buf += _and() + " ";
-        buf += String(minute(mil)) + " ";
-        buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
-      }
+    //  if(mil < 60) buf = _lessThanAMinute();
+    //  else if(mil < 3600) {
+    //    buf = String(minute(mil)) + " ";
+    //    buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
+    //  }
+    //  else if(mil < 86400) {
+    //    buf = String(hour(mil)) + " "; 
+    //    buf += ((plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5()) + " ";
+    //    buf += _and() + " ";  
+    //    buf += String(minute(mil)) + " ";
+    //    buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
+    //  }
+    //  else {
+    //    int days = lround(mil / 86400);
+    //    buf = String(days) + " ";
+    //    buf += ((plural(days) == 1) ? _day() : (plural(days) == 2) ? _days2() : _days5()) + ", ";
+    //    buf += String(hour(mil)) + " ";
+    //    buf += ((plural(hour(mil)) == 1) ? _hour() : (plural(hour(mil)) == 2) ? _hours2() : _hours5()) + " ";
+    //    buf += _and() + " ";
+    //    buf += String(minute(mil)) + " ";
+    //    buf += (plural(minute(mil)) == 1) ? _minute() : (plural(minute(mil)) == 2) ? _minutes2() : _minutes5();
+    //  }
       
-      return buf;
-    }
+    //  return buf;
+    //}
 
     String comfort(unsigned int level) {
       switch(level) {

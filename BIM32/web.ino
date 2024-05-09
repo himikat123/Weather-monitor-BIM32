@@ -59,6 +59,7 @@ String web_sensorsPrepare(bool logged) {
   json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
   json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
   json["weather"]["descript"] = weather.get_description();
+  json["weather"]["time"] = weather.get_currentUpdated();
   for(unsigned int i=0; i<global.nets; i++) {
     json["ssids"][i][0] = global.ssids[i];
     json["ssids"][i][1] = global.rssis[i];  
@@ -105,8 +106,8 @@ String web_sensorsPrepare(bool logged) {
         file = root.openNextFile();
         total += fsize;
       }
-      json["fs"]["total"] = 2048;
-      json["fs"]["free"] = (2048 - total / 1024);
+      json["fs"]["total"] = LittleFS.totalBytes(); //2048;
+      json["fs"]["free"] = LittleFS.totalBytes() - LittleFS.usedBytes(); //(2048 - total / 1024);
     }
   }
   String data = "";
@@ -295,8 +296,8 @@ void web_sensitivity(AsyncWebServerRequest *request) {
 void web_color(AsyncWebServerRequest *request) {
   if(web_isLogged(request)) {
     if(request->hasArg("hex") and request->hasArg("num")) {
-      char color[6];
-      sprintf(color, "%s", request->arg("hex"));
+      char color[7];
+      request->arg("hex").toCharArray(color, 6);
       config.set_color(color, (request->arg("num")).toInt(), 1);
       request->send(200, "text/plain", "OK");
     }
@@ -454,8 +455,7 @@ void web_fileDelete(AsyncWebServerRequest *request) {
     String path = "/" + request->arg("file");
     if(!LittleFS.exists(path)) return request->send(404, "text/plain", "FileNotFound");
     else {
-      LittleFS.remove(path);
-      request->send(200, "text/plain", "OK");
+      request->send(200, "text/plain", LittleFS.remove(path) ? "OK" : "ERROR");
       path = String();
     }
   }
@@ -470,8 +470,7 @@ void web_fileRename(AsyncWebServerRequest *request) {
     String neu = "/" + request->arg("new");
     if(!LittleFS.exists(alt)) return request->send(404, "text/plain", "FileNotFound");
     else {
-      LittleFS.rename(alt, neu);
-      request->send(200, "text/plain", "OK");
+      request->send(200, "text/plain", LittleFS.rename(alt, neu) ? "OK" : "ERROR");
       alt = String();
       neu = String();
     }

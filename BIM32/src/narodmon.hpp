@@ -33,7 +33,7 @@ void Narodmon::send() {
   }
   while(client.available()) {
     String line = client.readStringUntil('\r');
-    Serial.printf("Successfull. Server returned %s\r\n", line);
+    Serial.println("Successfull. Server returned" + line);
   }
   client.stop();
 }
@@ -78,7 +78,7 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         float vbat = wsensor.get_batteryVoltage(wsensNum);
         int batlvl = wsensor.get_batteryLevel(wsensNum);
         float batprc = wsensor.get_batteryPercentage(wsensNum);
-        if(wsensType >= 0 and wsensType <= 4 and sensors.checkTemp(temp)) fields = field + String(temp);
+        if(wsensType <= 4 and sensors.checkTemp(temp)) fields = field + String(temp);
         if(wsensType == 5 and sensors.checkHum(hum)) fields = field + String(hum);
         if(wsensType == 6 and sensors.checkPres(pres)) fields = field + String(pres);
         if(wsensType == 7 and sensors.checkLight(light)) fields = field + String(light);

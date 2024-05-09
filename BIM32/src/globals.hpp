@@ -37,6 +37,20 @@
 #define FW "v4.0"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
+#define UNDEFINED            0
+#define COMFORTABLE          1
+#define HOT                  2
+#define COLD                 3
+#define HUMID                4
+#define DRY                  5
+#define HOT_HUMID            6
+#define HOT_DRY              7
+#define COLD_HUMID           8
+#define COLD_DRY             9
+#define AIR_CLEAN            1
+#define AIR_POLLUTED         2
+#define AIR_HEAVILY_POLLUTED 3
+
 static struct {
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
@@ -1481,8 +1495,8 @@ class Configuration {
 
   void set_brightLimit(unsigned int min, unsigned int max, unsigned int num) {
     if(num >= DISPLAYS) return;
-    if(min >= 0 and min <= 255) _display_brightness_min[num] = min;
-    if(max >= 0 and max <= 255) _display_brightness_max[num] = max;
+    if(min <= 255) _display_brightness_min[num] = min;
+    if(max <= 255) _display_brightness_max[num] = max;
   }
   
   void set_bright(int bright, unsigned int num) {
@@ -1499,7 +1513,7 @@ class Configuration {
   }
 
   void set_animation_type(unsigned int type, unsigned int displayNum) {
-    if(type >= 0 and type <= 9 and displayNum < DISPLAYS) _display_animation_type[displayNum] = type;
+    if(type <= 9 and displayNum < DISPLAYS) _display_animation_type[displayNum] = type;
   }
 
   void set_animation_speed(unsigned int speed, unsigned int displayNum) {
@@ -1507,7 +1521,7 @@ class Configuration {
   }
 
   void set_animation_points(unsigned int points, unsigned int displayNum) {
-    if(points >= 0 and points <= 7 and displayNum < DISPLAYS) _display_animation_points[displayNum] = points;
+    if(points <= 7 and displayNum < DISPLAYS) _display_animation_points[displayNum] = points;
   }
   
   void set_color(char color[6], unsigned int slotNum, unsigned int displayNum) {

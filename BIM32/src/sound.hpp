@@ -38,14 +38,14 @@ void Sound::init(void) {
  * Change voilume
  */
 void Sound::volume(unsigned int vol) {
-  if(vol>=0 and vol<=30) mp3player.volume(vol);
+  if(vol<=30) mp3player.volume(vol);
 }
 
 /**
  * Change equalizer
  */
 void Sound::equalizer(unsigned int eq) {
-  if(eq>=0 and eq<=5) mp3player.EQ(eq);
+  if(eq<=5) mp3player.EQ(eq);
 }
 
 /**

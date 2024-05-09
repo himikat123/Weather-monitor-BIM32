@@ -14,7 +14,7 @@ class Thingspeak {
     String _fieldPrepare(unsigned int field);
     String _historyFieldPrepare(unsigned int fieldNum);
     
-    float _field[8] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
+    float _field[8] = {-40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0};
     float _historyFields[7][24] = {
       { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
       { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -288,7 +288,7 @@ String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
         int batlvl = wsensor.get_batteryLevel(wsensNum);
         float batprc = wsensor.get_batteryPercentage(wsensNum);
         
-        if(wsensType >= 0 and wsensType <= 4 and sensors.checkTemp(temp)) fields = field + String(temp);
+        if(wsensType <= 4 and sensors.checkTemp(temp)) fields = field + String(temp);
         if(wsensType == 5 and sensors.checkHum(hum)) fields = field + String(hum);
         if(wsensType == 6 and sensors.checkPres(pres)) fields = field + String(pres);
         if(wsensType == 7 and sensors.checkLight(light)) fields = field + String(light);

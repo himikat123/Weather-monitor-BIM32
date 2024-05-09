@@ -1,4 +1,4 @@
-#include <EasyNextionLibrary.h" // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
+#include <EasyNextionLibrary.h> // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
 EasyNex myNex(Serial1);
 
 class Nextion {
@@ -282,14 +282,14 @@ void Nextion::_NX4832K035_setRTC(void) {
  * Sending time and date to the NX4832T035 display that does not have a built-in RTC
  */
 void Nextion::_NX4832T035_timeDate(void) {
-  char buf[32] = "";
+  String buf = "";
   myNex.writeStr("BigClock.hour.txt", String(config.clock_format() ? hour() : hourFormat12()));
   myNex.writeStr("BigClock.minute.txt", String(minute()));
   unsigned int wd = weekday();
   myNex.writeStr("BigClock.weekday.txt", lang.weekdayShortName(wd));
-  if(config.lang() == "en") sprintf(buf, "%s %d, %d", lang.monthName(month()), day(), year());
-  else sprintf(buf, "%d %s %d", day(), lang.monthName(month()), year());
-  myNex.writeStr("BigClock.date.txt", String(buf));
+  if(config.lang() == "en") buf = lang.monthName(month()) + " " + String(day()) + ", " + String(year());
+  else buf = String(day()) + " " + lang.monthName(month()) + String(year());
+  myNex.writeStr("BigClock.date.txt", buf);
   myNex.writeStr("Main.weekday0.txt", lang.weekdayShortName(wd));
   if(++wd > 7) wd = 1;
   myNex.writeStr("Main.weekday2.txt", lang.weekdayShortName(wd));
@@ -787,7 +787,7 @@ void Nextion::_weatherForecast(void) {
  */
 void Nextion::_hourlyData(void) {
   char dat[22] = "";
-  char buf[5] = "";
+  char buf[20] = "";
   Serial1.print("Hourly.data0.txt=\"");
   if(config.weather_provider() == OPENWEATHERMAP) {
     for(unsigned int i=0; i<40; i++) {
@@ -856,7 +856,7 @@ void Nextion::_daily2hourly(void) {
  */
 void Nextion::_historyOut(void) {
   char dat[18] = "";
-  char buf[5] = "";
+  char buf[20] = "";
   Serial1.print("HistoryOut.data0.txt=\"");
   for(unsigned int i = 0; i < 24; i++) {
     // temperature
@@ -897,7 +897,7 @@ void Nextion::_historyOut(void) {
  */
 void Nextion::_historyIn(void) {
   char dat[15] = "";
-  char buf[5] = "";
+  char buf[20] = "";
   Serial1.print("HistoryIn.data0.txt=\"");
   for(unsigned int i = 0; i < 24; i++) {
     // temperature

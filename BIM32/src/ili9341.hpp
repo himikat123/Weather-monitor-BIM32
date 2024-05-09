@@ -198,14 +198,14 @@ void ILI9341::_showTime(uint8_t hr, uint8_t mn) {
   int currTime = hr * 100 + mn;
   if(_prevTime != currTime) {
     char buf[20] = "";
-    if(hr >= 0 && hr < 24) {
+    if(hr < 24) {
       sprintf(buf, "/img/digits/%d.jpg", hr / 10);
       if(hr < 10) tft.fillRect(0, 0, 32, 78, BG_COLOR);
       else _showImg(0, 0, buf);
       sprintf(buf, "/img/digits/%d.jpg", hr % 10);
       _showImg(33, 0, buf);
     }
-    if(mn >=0 && mn < 60) {
+    if(mn < 60) {
       sprintf(buf, "/img/digits/%d.jpg", mn / 10);
       _showImg(77, 0, buf);
       sprintf(buf, "/img/digits/%d.jpg", mn % 10);
@@ -262,8 +262,7 @@ void ILI9341::_showAntenna() {
 }
 
 void ILI9341::_showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
-  char buf[5] = "";
-  sprintf(buf, "%s°C", sensors.checkTemp(temp) ? String(temp) : "--");
+  String buf = sensors.checkTemp(temp) ? (String(temp) + "°C") : "--";
   _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, font == FONT3 ? CENTER : RIGHT, color);
 }
 
@@ -284,8 +283,7 @@ void ILI9341::_showTemperatureOutside(int temp) {
 }
 
 void ILI9341::_showHumidity(int hum, uint16_t x, uint16_t y) {
-  char buf[5] = "";
-  sprintf(buf, "%s%%", sensors.checkHum(hum) ? String(hum) : "--");
+  String buf = sensors.checkHum(hum) ? (String(hum) + "%") : "--";
   _printText(x, y, 58, 20, buf, FONT2, CENTER, HUMIDITY_COLOR);
 }
 
@@ -338,7 +336,7 @@ void ILI9341::_showBatteryLevel() {
   }
   if(_prevBatLevel != level) {
     if(level >= 1 && level <= 4) {
-      char buf[10] = "";
+      char buf[20] = "";
       sprintf(buf, "/img/bat/bat%d.jpg", level);
       _showImg(258, 2, buf);
       _prevBatLevel = level;
@@ -350,7 +348,7 @@ void ILI9341::_showBatteryLevel() {
 void ILI9341::_showVoltageOrPercentage() {
   float volt = 40400.0;
   int percent = 40400;
-  char buf[10] = "";
+  char buf[8] = "--";
 
   if(config.display_source_volt_sens() == 1) { // Thingspeak
     if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
@@ -360,18 +358,16 @@ void ILI9341::_showVoltageOrPercentage() {
 
     if(config.display_source_volt_volt() == 0) { // Voltage
       if(_prevVolt != volt) {
-        if(!sensors.checkBatVolt(volt)) sprintf(buf, "--%s", lang.v());
-        else sprintf(buf, "%.2f%s", volt, lang.v());
-        _printText(198, 10, 58, 16, buf, FONT1, RIGHT, BATTERY_COLOR);
+        if(sensors.checkBatVolt(volt)) sprintf(buf, "%.2f", volt);
+        _printText(198, 10, 58, 16, String(buf) + lang.v(), FONT1, RIGHT, BATTERY_COLOR);
         _prevVolt = volt;
       }
     }
 
     else if(config.display_source_volt_volt() == 1) { // Percentage
       if(_prevPercent != percent) {
-        if(!sensors.checkBatPercent(percent)) sprintf(buf, "--%%");
-        else sprintf(buf, "%d%%", percent);
-        _printText(198, 10, 58, 16, buf, FONT1, RIGHT, BATTERY_COLOR);
+        if(sensors.checkBatPercent(percent)) sprintf(buf, "%d", percent);
+        _printText(198, 10, 58, 16, String(buf) + "%", FONT1, RIGHT, BATTERY_COLOR);
         _prevPercent = percent;
       }
     }
@@ -404,20 +400,18 @@ void ILI9341::_showDescription(String description) {
 
 void ILI9341::_showPressure(int16_t pres) {
   if(_prevPresOut != pres) {
-    char buf[8] = "";
-    if(!sensors.checkPres(pres)) sprintf(buf, "--%s", lang.mm());
-    else sprintf(buf, "%d%s", (int)round(pres * 0.75), lang.mm());
-    _printText(250, 119, 70, 20, buf, FONT2, CENTER, PRESSURE_COLOR);
+    String buf = "--";
+    if(sensors.checkPres(pres)) buf = String((int)round(pres * 0.75));
+    _printText(250, 119, 70, 20, buf + lang.mm(), FONT2, CENTER, PRESSURE_COLOR);
     _prevPresOut = pres;
   }
 }
 
 void ILI9341::_showWindSpeed(int8_t windSpeed) {
   if(_prevWindSpeed != windSpeed) {
-    char buf[8] = "";
-    if(!weather.checkWind(windSpeed)) sprintf(buf, "--%s", lang.ms());
-    else sprintf(buf, "%d%s", windSpeed, lang.ms());
-    _printText(93, 146, 40, 16, buf, FONT1, LEFT, TEXT_COLOR);
+    String buf = "--";
+    if(weather.checkWind(windSpeed)) buf = String(windSpeed);
+    _printText(93, 146, 40, 16, buf + lang.ms(), FONT1, LEFT, TEXT_COLOR);
     _prevWindSpeed = windSpeed;
   }
 }
@@ -441,9 +435,8 @@ void ILI9341::_showWindDirection(int windDirection) {
 
 void ILI9341::_showUpdTime(unsigned int dateTime) {
   if(_prevUpdTime != dateTime) {
-    char buf[20] = "";
+    char buf[20] = "--";
     if(dateTime) sprintf(buf, "%02d.%02d.%d %02d:%02d:%02d", day(dateTime), month(dateTime), year(dateTime), hour(dateTime), minute(dateTime), second(dateTime));
-    else sprintf(buf, "--%s");
     _printText(186, 148, 133, 16, buf, FONT1, RIGHT, TEXT_COLOR);
     tft.drawCircle(177, 153, 5, TEXT_COLOR);
     tft.drawFastHLine(176, 148, 4, BG_COLOR);
@@ -484,10 +477,9 @@ void ILI9341::_showForecast(uint16_t x, uint8_t num, int icon, float tempMax, fl
 
   int wnd = round(wind);
   if(_prevWindSpeedDaily[num] != wnd) {
-    char buf[8] = "";
-    if(!weather.checkWind(wnd)) sprintf(buf, "--%s", lang.ms());
-    else sprintf(buf, "%d%s", wnd, lang.ms());
-    _printText(x + 31, 224, 44, 15, buf, FONT1, CENTER, TEXT_COLOR);
+    String buf = "--";
+    if(weather.checkWind(wnd)) buf = String(wnd);
+    _printText(x + 31, 224, 44, 15, buf + lang.ms(), FONT1, CENTER, TEXT_COLOR);
     _prevWindSpeedDaily[num] = wnd;
   }
 }
