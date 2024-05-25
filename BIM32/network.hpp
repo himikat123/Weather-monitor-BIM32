@@ -3,6 +3,9 @@ class Network {
     bool isConnected(void);
     void connect(void);
     void runAccessPoint(void);
+
+  private:
+    void connecting(uint8_t num);
 };
 
 /**
@@ -26,6 +29,7 @@ void Network::connect(void) {
     }
   }
   WiFi.mode(WIFI_STA);
+  WiFi.setHostname("BIM32");
   bool anySSID = false;
   for(unsigned int i=0; i<NETWORKS; i++) {
     if(String(config.network_ssid(i)) != "") anySSID = true;
@@ -33,32 +37,24 @@ void Network::connect(void) {
   if(anySSID) {
     if(WiFi.status() != WL_CONNECTED) {
       unsigned int numberOfNetworks = WiFi.scanNetworks();
-      if(numberOfNetworks > 0) {
-        int knownNetwork = -1;
-        for(int i=0; i<numberOfNetworks; i++) {
-          for(int k=0; k<NETWORKS; k++) {
-            if(WiFi.SSID(i) == config.network_ssid(k)) {
-              knownNetwork = k;
-              break;
-            }
-          }  
-        }
-        if(knownNetwork >= 0) {
-          Serial.print("Connecting to "); Serial.println(config.network_ssid(knownNetwork));
-          WiFi.begin(config.network_ssid(knownNetwork), config.network_pass(knownNetwork));
-          unsigned int attempts = 0;
-          while(WiFi.status() != WL_CONNECTED) {
-            delay(500);
-            Serial.print(".");
-            ws2812b.connecting();
-            if(++attempts > 20) break;
+      int knownNetwork = -1;
+      for(int i=0; i<numberOfNetworks; i++) {
+        for(int k=0; k<NETWORKS; k++) {
+          if(WiFi.SSID(i) == config.network_ssid(k)) {
+            knownNetwork = k;
+            break;
           }
-          if(WiFi.status() == WL_CONNECTED) Serial.println(" connected");
-          else Serial.println(" failed");
-        }
-        else Serial.println("No known networks found"); 
+        }  
       }
-      else Serial.println("No networks found");
+      if(knownNetwork >= 0) {
+        Serial.print("Connecting to "); Serial.println(config.network_ssid(knownNetwork));
+        connecting(knownNetwork);
+      }
+      else {
+        Serial.println("No known networks found");
+        Serial.println("trying to connect to network 1 in case it's a hidden network");
+        connecting(0);
+      }
     }
     if(WiFi.status() == WL_CONNECTED) {
       WiFi.setAutoConnect(true);
@@ -84,6 +80,19 @@ void Network::connect(void) {
     Serial.println("No WiFi networks configured");
     runAccessPoint();
   }
+}
+
+void Network::connecting(uint8_t num) {
+  WiFi.begin(config.network_ssid(num), config.network_pass(num));
+  unsigned int attempts = 0;
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    ws2812b.connecting();
+    if(++attempts > 20) break;
+  }
+  if(WiFi.status() == WL_CONNECTED) Serial.println(" connected");
+  else Serial.println(" failed");
 }
 
 /**
