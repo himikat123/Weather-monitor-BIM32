@@ -37,6 +37,7 @@ void Network::setNeedToPing(void) {
  */
 void Network::connect(void) {
   WiFi.disconnect();
+  Wifi.hostname("BIM32");
   Serial.println(SEPARATOR);
   Serial.println("Connecting to WiFi...");
   Serial.println("Known networks:");
