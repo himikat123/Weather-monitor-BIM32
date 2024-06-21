@@ -121,7 +121,7 @@ class Configuration {
   char _network_dns2[16] = ""; // Static DNS2 address
   
   // Access point
-  char _accessPoint_ssid[33] = "Weather monitor BIM32"; // SSID
+  char _accessPoint_ssid[33] = "BIM32"; // SSID
   char _accessPoint_pass[33] = "1234567890"; // Password
   unsigned int _accessPoint_chnl = 1; // WiFi channel number 1...13
   char _accessPoint_ip[33] = "192.168.4.1"; // IP address
@@ -613,12 +613,16 @@ class Configuration {
    * @return false on success 
    */
   bool save(String json, String filename="/config.json") {
-    File file = LittleFS.open(filename, "w");
-    if(file) {
-      file.print(json);
-      file.close();
-      readConfig();
-      return false;
+    if(json.length()) {
+      File file = LittleFS.open(filename, "w");
+      if(file) {
+        file.print(json);
+        file.close();
+        readConfig();
+        // TODO file corrupted после сохранения, хотя это не правда
+        return false;
+      }
+      else return true;
     }
     else return true;
   }
