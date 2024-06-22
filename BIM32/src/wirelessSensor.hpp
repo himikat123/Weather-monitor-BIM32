@@ -13,20 +13,20 @@ class WirelessSensor {
         bool checkBatLvl(int lvl);
         bool checkBatPercent(float percent);
         int get_updated(unsigned int num);
-        float get_temperature(unsigned int num, unsigned int sensor, float corr);
         String get_sensorType(unsigned int num, unsigned int sensor);
-        float get_humidity(unsigned int num, float corr);
-        float get_pressure(unsigned int num, float corr);
-        float get_light(unsigned int num, float corr);
         String get_lightType(unsigned int num);
-        float get_voltage(unsigned int num, float corr);
-        float get_current(unsigned int num, float corr);
-        float get_power(unsigned int num, float corr);
-        float get_energy(unsigned int num, float corr);
-        float get_frequency(unsigned int num, float corr);
         String get_energyType(unsigned int num);
-        float get_co2(unsigned int num, float corr);
         String get_co2Type(unsigned int num);
+        float get_temperature(unsigned int num, unsigned int sensor, bool corr);
+        float get_humidity(unsigned int num, bool corr);
+        float get_pressure(unsigned int num, bool corr);
+        float get_light(unsigned int num, bool corr);
+        float get_voltage(unsigned int num, bool corr);
+        float get_current(unsigned int num, bool corr);
+        float get_power(unsigned int num, bool corr);
+        float get_energy(unsigned int num, bool corr);
+        float get_frequency(unsigned int num, bool corr);
+        float get_co2(unsigned int num, bool corr);
         int get_batteryAdc(unsigned int num);
         float get_batteryVoltage(unsigned int num);
         int get_batteryLevel(unsigned int num);
@@ -212,11 +212,6 @@ int WirelessSensor::get_updated(unsigned int num) {
     return _updated[num];
 }
 
-float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor, float corr) {
-    if(num >= WSENSORS or sensor > 4) return 40400.0;
-    return _temperature[num][sensor] + corr;
-}
-
 String WirelessSensor::get_sensorType(unsigned int num, unsigned int sensor) {
     if(num >= WSENSORS or sensor > 4) return "";
     if(sensor == 0) return String(_sensorType[num]);
@@ -224,49 +219,9 @@ String WirelessSensor::get_sensorType(unsigned int num, unsigned int sensor) {
     else return "";
 }
 
-float WirelessSensor::get_humidity(unsigned int num, float corr) {
-    if(num >= WSENSORS) return 40400.0;
-    return _humidity[num] + corr;
-}
-
-float WirelessSensor::get_pressure(unsigned int num, float corr) {
-    if(num >= WSENSORS) return 40400.0;
-    return _pressure[num] + corr;
-}
-
-float WirelessSensor::get_light(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _light[num] + corr;
-}
-
 String WirelessSensor::get_lightType(unsigned int num) {
     if(num >= WSENSORS) return "";
     return String(_lightType[num]);
-}
-
-float WirelessSensor::get_voltage(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _voltage[num] + corr;
-}
-
-float WirelessSensor::get_current(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _current[num] + corr;
-}
-
-float WirelessSensor::get_power(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _power[num] + corr;
-}
-
-float WirelessSensor::get_energy(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _energy[num] + corr;
-}
-
-float WirelessSensor::get_frequency(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _frequency[num] + corr;
 }
 
 String WirelessSensor::get_energyType(unsigned int num) {
@@ -274,14 +229,59 @@ String WirelessSensor::get_energyType(unsigned int num) {
     return "PZEM-004t";
 }
 
-float WirelessSensor::get_co2(unsigned int num, float corr) {
-    if(num >= WSENSORS) return -1.0;
-    return _co2[num] + corr;
-}
-
 String WirelessSensor::get_co2Type(unsigned int num) {
     if(num >= WSENSORS or !checkCo2(_co2[num])) return "";
     return "Senseair S8";
+}
+
+float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor, bool corr) {
+    if(num >= WSENSORS or sensor > 4) return 40400.0;
+    return _temperature[num][sensor] + (corr ? config.wsensor_temp_corr(num, sensor) : 0.0);
+}
+
+float WirelessSensor::get_humidity(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return 40400.0;
+    return _humidity[num] + (corr ? config.wsensor_hum_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_pressure(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return 40400.0;
+    return _pressure[num] + (corr ? config.wsensor_pres_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_light(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _light[num] + (corr ? config.wsensor_light_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_voltage(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _voltage[num] + (corr ? config.wsensor_volt_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_current(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _current[num] + (corr ? config.wsensor_curr_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_power(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _power[num] + (corr ? config.wsensor_pow_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_energy(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _energy[num] + (corr ? config.wsensor_enrg_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_frequency(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _frequency[num] + (corr ? config.wsensor_freq_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_co2(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _co2[num] + (corr ? config.wsensor_co2_corr(num) : 0.0);
 }
 
 int WirelessSensor::get_batteryAdc(unsigned int num) {

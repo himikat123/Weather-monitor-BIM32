@@ -51,6 +51,9 @@
 #define AIR_POLLUTED         2
 #define AIR_HEAVILY_POLLUTED 3
 
+#define RAW                  false // raw data without correction
+#define CORRECTED            true  // corrected data
+
 static struct {
   bool clockSynchronized = false; // Is the time synchronized with the ntp server?
   bool clockSynchronize = false; // Should the display RTC be updated?
@@ -63,6 +66,7 @@ static struct {
   bool apMode = false; // Access point mode
   bool display_but_pressed[2] = {false, false}; // display (1, 2) button pressed flag
   bool alarm_but_pressed = false; // alarm button pressed flag
+  bool fileUploading = false; // File is uploading flag
   unsigned int comfort = 0; // Comfort level code: 1-Comfortable, 2-Hot, 3-Cold, 4-Humid, 5-Dry, 6-Hot & Humid, 7-Hot & Dry, 8-Cold & Humid, 9-Cold & Dry
   unsigned int iaq_level = 0; // IAQ level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
   unsigned int co2_level = 0; // CO2 level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted

@@ -272,16 +272,16 @@ String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
             unsigned int wsensNum = config.thingspeakSend_wsensors(fieldNum);
             unsigned int wsensType = config.thingspeakSend_wtypes(fieldNum);
             if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
-                float temp = wsensor.get_temperature(wsensNum, wsensType, config.wsensor_temp_corr(wsensNum, wsensType));
-                float hum = wsensor.get_humidity(wsensNum, config.wsensor_hum_corr(wsensNum));
-                float pres = wsensor.get_pressure(wsensNum, config.wsensor_pres_corr(wsensNum));
-                float light = wsensor.get_light(wsensNum, config.wsensor_light_corr(wsensNum));
-                float volt = wsensor.get_voltage(wsensNum, config.wsensor_volt_corr(wsensNum));
-                float cur = wsensor.get_current(wsensNum, config.wsensor_curr_corr(wsensNum));
-                float pwr = wsensor.get_power(wsensNum, config.wsensor_pow_corr(wsensNum));
-                float enrg = wsensor.get_energy(wsensNum, config.wsensor_enrg_corr(wsensNum));
-                float freq = wsensor.get_frequency(wsensNum, config.wsensor_freq_corr(wsensNum));
-                float co2 = wsensor.get_co2(wsensNum, config.wsensor_co2_corr(wsensNum));
+                float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
+                float hum = wsensor.get_humidity(wsensNum, CORRECTED);
+                float pres = wsensor.get_pressure(wsensNum, CORRECTED);
+                float light = wsensor.get_light(wsensNum, CORRECTED);
+                float volt = wsensor.get_voltage(wsensNum, CORRECTED);
+                float cur = wsensor.get_current(wsensNum, CORRECTED);
+                float pwr = wsensor.get_power(wsensNum, CORRECTED);
+                float enrg = wsensor.get_energy(wsensNum, CORRECTED);
+                float freq = wsensor.get_frequency(wsensNum, CORRECTED);
+                float co2 = wsensor.get_co2(wsensNum, CORRECTED);
                 float vbat = wsensor.get_batteryVoltage(wsensNum);
                 int batlvl = wsensor.get_batteryLevel(wsensNum);
                 float batprc = wsensor.get_batteryPercentage(wsensNum);
@@ -303,108 +303,80 @@ String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
         }; break;
         case 3: { // BME280
             // Temperature
-            if(config.thingspeakSend_types(fieldNum) == 0 and 
-                sensors.checkTemp(sensors.get_bme280_temp(config.bme280_temp_corr()))
-            ) 
-                fields = field + String(sensors.get_bme280_temp(config.bme280_temp_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 0 and sensors.checkTemp(sensors.get_bme280_temp(CORRECTED))) 
+                fields = field + String(sensors.get_bme280_temp(CORRECTED));
             // Humidity
-            if(config.thingspeakSend_types(fieldNum) == 1 and 
-                sensors.checkHum(sensors.get_bme280_hum(config.bme280_hum_corr()))
-            )
-                fields = field + String(sensors.get_bme280_hum(config.bme280_hum_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 1 and sensors.checkHum(sensors.get_bme280_hum(CORRECTED)))
+                fields = field + String(sensors.get_bme280_hum(CORRECTED));
             // Pressure
-            if(config.thingspeakSend_types(fieldNum) == 2 and
-                sensors.checkPres(sensors.get_bme280_pres(config.bme280_pres_corr()))
-            )
-                fields = field + String(sensors.get_bme280_pres(config.bme280_pres_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 2 and sensors.checkPres(sensors.get_bme280_pres(CORRECTED)))
+                fields = field + String(sensors.get_bme280_pres(CORRECTED));
         }; break;
         case 4: { // BMP180
             // Temperature
-            if(config.thingspeakSend_types(fieldNum) == 0 and
-                sensors.checkTemp(sensors.get_bmp180_temp(config.bmp180_temp_corr()))
-            ) 
-                fields = field + String(sensors.get_bmp180_temp(config.bmp180_temp_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 0 and sensors.checkTemp(sensors.get_bmp180_temp(CORRECTED))) 
+                fields = field + String(sensors.get_bmp180_temp(CORRECTED));
             // Pressure
-            if(config.thingspeakSend_types(fieldNum) == 1 and
-                sensors.checkPres(sensors.get_bmp180_pres(config.bmp180_pres_corr()))
-            )
-                fields = field + String(sensors.get_bmp180_pres(config.bmp180_pres_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 1 and sensors.checkPres(sensors.get_bmp180_pres(CORRECTED)))
+                fields = field + String(sensors.get_bmp180_pres(CORRECTED));
         }; break;
         case 5: { // SHT21
             // Temperature
-            if(config.thingspeakSend_types(fieldNum) == 0 and
-                sensors.checkTemp(sensors.get_sht21_temp(config.sht21_temp_corr()))
-            ) 
-                fields = field + String(sensors.get_sht21_temp(config.sht21_temp_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 0 and sensors.checkTemp(sensors.get_sht21_temp(CORRECTED))) 
+                fields = field + String(sensors.get_sht21_temp(CORRECTED));
             // Humidity
-            if(config.thingspeakSend_types(fieldNum) == 1 and
-                sensors.checkHum(sensors.get_sht21_hum(config.sht21_hum_corr()))
-            )
-                fields = field + String(sensors.get_sht21_hum(config.sht21_hum_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 1 and sensors.checkHum(sensors.get_sht21_hum(CORRECTED)))
+                fields = field + String(sensors.get_sht21_hum(CORRECTED));
         }; break;
         case 6: { // DHT22
             // Temperature
-            if(config.thingspeakSend_types(fieldNum) == 0 and
-                sensors.checkTemp(sensors.get_dht22_temp(config.dht22_temp_corr()))
-            )
-                fields = field + String(sensors.get_dht22_temp(config.dht22_temp_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 0 and sensors.checkTemp(sensors.get_dht22_temp(CORRECTED)))
+                fields = field + String(sensors.get_dht22_temp(CORRECTED));
             // Humidity
-            if(config.thingspeakSend_types(fieldNum) == 1 and
-                sensors.checkHum(sensors.get_dht22_hum(config.dht22_hum_corr()))
-            )
-                fields = field + String(sensors.get_dht22_hum(config.dht22_hum_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 1 and sensors.checkHum(sensors.get_dht22_hum(CORRECTED)))
+                fields = field + String(sensors.get_dht22_hum(CORRECTED));
         }; break;
         case 7: // DS18B20
             // Temperature
-            if(sensors.checkTemp(sensors.get_ds18b20_temp(config.ds18b20_temp_corr())))
-                fields = field + String(sensors.get_ds18b20_temp(config.ds18b20_temp_corr()));
+            if(sensors.checkTemp(sensors.get_ds18b20_temp(CORRECTED)))
+                fields = field + String(sensors.get_ds18b20_temp(CORRECTED));
         break;
         case 8: // MAX44009
             // Ambient light
-            if(sensors.checkLight(sensors.get_max44009_light(config.max44009_light_corr())))
-                fields = field + String(sensors.get_max44009_light(config.max44009_light_corr()));
+            if(sensors.checkLight(sensors.get_max44009_light(CORRECTED)))
+                fields = field + String(sensors.get_max44009_light(CORRECTED));
         break;
         case 9: // BH1750
             // Ambient light
-            if(sensors.checkLight(sensors.get_bh1750_light(config.bh1750_light_corr())))
-                fields = field + String(sensors.get_bh1750_light(config.bh1750_light_corr()));
+            if(sensors.checkLight(sensors.get_bh1750_light(CORRECTED)))
+                fields = field + String(sensors.get_bh1750_light(CORRECTED));
         break;
         case 10: // Ananlog input
             // Voltage
-            if(sensors.checkVolt(sensors.get_analog_voltage(config.analog_voltage_corr())))
-                fields = field + String(sensors.get_analog_voltage(config.analog_voltage_corr()));
+            if(sensors.checkVolt(sensors.get_analog_voltage(CORRECTED)))
+                fields = field + String(sensors.get_analog_voltage(CORRECTED));
         break;
         case 11: // ESP32
             // Temperature
-            if(config.thingspeakSend_types(fieldNum) == 0 and
-                sensors.checkTemp(sensors.get_esp32_temp(config.esp32_temp_corr()))
-            )
-                fields = field + String(sensors.get_esp32_temp(config.esp32_temp_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 0 and sensors.checkTemp(sensors.get_esp32_temp(CORRECTED)))
+                fields = field + String(sensors.get_esp32_temp(CORRECTED));
             // Runtime
             if(config.thingspeakSend_types(fieldNum) == 1) 
                 fields = field + String(millis() / 1000);
         break;
         case 12: { // BME680
             // Temperature
-            if(config.thingspeakSend_types(fieldNum) == 0 and 
-                sensors.checkTemp(sensors.get_bme680_temp(config.bme680_temp_corr()))
-            )
-                fields = field + String(sensors.get_bme680_temp(config.bme680_temp_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 0 and sensors.checkTemp(sensors.get_bme680_temp(CORRECTED)))
+                fields = field + String(sensors.get_bme680_temp(CORRECTED));
             // Humidity
-            if(config.thingspeakSend_types(fieldNum) == 1 and 
-                sensors.checkHum(sensors.get_bme680_hum(config.bme680_hum_corr()))
-            )
-                fields = field + String(sensors.get_bme680_hum(config.bme680_hum_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 1 and sensors.checkHum(sensors.get_bme680_hum(CORRECTED)))
+                fields = field + String(sensors.get_bme680_hum(CORRECTED));
             // Pressure
-            if(config.thingspeakSend_types(fieldNum) == 2 and
-                sensors.checkPres(sensors.get_bme680_pres(config.bme680_pres_corr()))
-            )
-                fields = field + String(sensors.get_bme680_pres(config.bme680_pres_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 2 and sensors.checkPres(sensors.get_bme680_pres(CORRECTED)))
+                fields = field + String(sensors.get_bme680_pres(CORRECTED));
             // IAQ
-            if(config.thingspeakSend_types(fieldNum) == 3 and
-                sensors.checkIaq(sensors.get_bme680_iaq(config.bme680_iaq_corr()))
-            )
-                fields = field + String(sensors.get_bme680_iaq(config.bme680_iaq_corr()));
+            if(config.thingspeakSend_types(fieldNum) == 3 and sensors.checkIaq(sensors.get_bme680_iaq(CORRECTED)))
+                fields = field + String(sensors.get_bme680_iaq(CORRECTED));
         }; break;
         default: ; break; 
     }
@@ -437,10 +409,10 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
         unsigned int wsensNum = config.history_wSensors(fieldNum);
         unsigned int wsensType = config.history_wTypes(fieldNum);
         if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
-            float temp = wsensor.get_temperature(wsensNum, wsensType, config.wsensor_temp_corr(wsensNum, wsensType));
-            float hum = wsensor.get_humidity(wsensNum, config.wsensor_hum_corr(wsensNum));
-            float pres = wsensor.get_pressure(wsensNum, config.wsensor_pres_corr(wsensNum));
-            float co2 = wsensor.get_co2(wsensNum, config.wsensor_co2_corr(wsensNum));
+            float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
+            float hum = wsensor.get_humidity(wsensNum, CORRECTED);
+            float pres = wsensor.get_pressure(wsensNum, CORRECTED);
+            float co2 = wsensor.get_co2(wsensNum, CORRECTED);
             if((fieldNum == 0 or fieldNum == 3) and sensors.checkTemp(temp)) fields = field + String(temp);
             if((fieldNum == 1 or fieldNum == 4) and sensors.checkHum(hum)) fields = field + String(hum);
             if(fieldNum == 2 and sensors.checkPres(pres)) fields = field + String(pres);
@@ -454,67 +426,67 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
     }
     
     if(config.history_fields(fieldNum) == 4 and (fieldNum == 0 or fieldNum == 3)) { // BME280 Temperature
-        if(sensors.checkTemp(sensors.get_bme280_temp(config.bme280_temp_corr()))) 
-            fields = field + String(sensors.get_bme280_temp(config.bme280_temp_corr()));
+        if(sensors.checkTemp(sensors.get_bme280_temp(CORRECTED))) 
+            fields = field + String(sensors.get_bme280_temp(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 4 and (fieldNum == 1 or fieldNum == 4)) { // BME280 Humidity 
-        if(sensors.checkHum(sensors.get_bme280_hum(config.bme280_hum_corr())))
-            fields = field + String(sensors.get_bme280_hum(config.bme280_hum_corr()));
+        if(sensors.checkHum(sensors.get_bme280_hum(CORRECTED)))
+            fields = field + String(sensors.get_bme280_hum(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 4 and fieldNum == 2) {                    // BME280 Pressure
-        if(sensors.checkPres(sensors.get_bme280_pres(config.bme280_pres_corr())))
-            fields = field + String(sensors.get_bme280_pres(config.bme280_pres_corr()));
+        if(sensors.checkPres(sensors.get_bme280_pres(CORRECTED)))
+            fields = field + String(sensors.get_bme280_pres(CORRECTED));
     }
 
     if(config.history_fields(fieldNum) == 5 and (fieldNum == 0 or fieldNum == 3)) { // BMP180 Temperature
-        if(sensors.checkTemp(sensors.get_bmp180_temp(config.bmp180_temp_corr()))) 
-            fields = field + String(sensors.get_bmp180_temp(config.bmp180_temp_corr()));
+        if(sensors.checkTemp(sensors.get_bmp180_temp(CORRECTED))) 
+            fields = field + String(sensors.get_bmp180_temp(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 5 and fieldNum == 2) {                    // BMP180 Pressure
-        if(sensors.checkPres(sensors.get_bmp180_pres(config.bmp180_pres_corr()))) 
-            fields = field + String(sensors.get_bmp180_pres(config.bmp180_pres_corr()));
+        if(sensors.checkPres(sensors.get_bmp180_pres(CORRECTED))) 
+            fields = field + String(sensors.get_bmp180_pres(CORRECTED));
     }
 
     if(config.history_fields(fieldNum) == 5 and (fieldNum == 1 or fieldNum == 4)) { // SHT21 Humidity
-        if(sensors.checkHum(sensors.get_sht21_hum(config.sht21_hum_corr())))
-            fields = field + String(sensors.get_sht21_hum(config.sht21_hum_corr()));
+        if(sensors.checkHum(sensors.get_sht21_hum(CORRECTED)))
+            fields = field + String(sensors.get_sht21_hum(CORRECTED));
     }
 
     if(config.history_fields(fieldNum) == 6 and (fieldNum == 0 or fieldNum == 3)) { // SHT21 Temperature
-        if(sensors.checkTemp(sensors.get_sht21_temp(config.sht21_temp_corr()))) 
-            fields = field + String(sensors.get_sht21_temp(config.sht21_temp_corr()));
+        if(sensors.checkTemp(sensors.get_sht21_temp(CORRECTED))) 
+            fields = field + String(sensors.get_sht21_temp(CORRECTED));
     }
 
     if(config.history_fields(fieldNum) == 6 and (fieldNum == 1 or fieldNum == 4)) { // DHT22 Humidity
-        if(sensors.checkHum(sensors.get_dht22_hum(config.dht22_hum_corr()))) 
-            fields = field + String(sensors.get_dht22_hum(config.dht22_hum_corr()));
+        if(sensors.checkHum(sensors.get_dht22_hum(CORRECTED))) 
+            fields = field + String(sensors.get_dht22_hum(CORRECTED));
     }
 
     if(config.history_fields(fieldNum) == 7 and (fieldNum == 0 or fieldNum == 3)) { // DHT22 Temperature
-        if(sensors.checkTemp(sensors.get_dht22_temp(config.dht22_temp_corr()))) 
-            fields = field + String(sensors.get_dht22_temp(config.dht22_temp_corr()));
+        if(sensors.checkTemp(sensors.get_dht22_temp(CORRECTED))) 
+            fields = field + String(sensors.get_dht22_temp(CORRECTED));
     }
   
     if(config.history_fields(fieldNum) == 8 and (fieldNum == 0 or fieldNum == 3)) { // DS18B20 Temperature
-        if(sensors.checkTemp(sensors.get_ds18b20_temp(config.ds18b20_temp_corr())))
-            fields = field + String(sensors.get_ds18b20_temp(config.ds18b20_temp_corr()));
+        if(sensors.checkTemp(sensors.get_ds18b20_temp(CORRECTED)))
+            fields = field + String(sensors.get_ds18b20_temp(CORRECTED));
     }
 
     if(config.history_fields(fieldNum) == 9 and (fieldNum == 0 or fieldNum == 3)) { // BME680 Temperature
-        if(sensors.checkTemp(sensors.get_bme680_temp(config.bme680_temp_corr()))) 
-            fields = field + String(sensors.get_bme680_temp(config.bme680_temp_corr()));
+        if(sensors.checkTemp(sensors.get_bme680_temp(CORRECTED))) 
+            fields = field + String(sensors.get_bme680_temp(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 7 and (fieldNum == 1 or fieldNum == 4)) { // BME680 Humidity 
-        if(sensors.checkHum(sensors.get_bme680_hum(config.bme680_hum_corr())))
-            fields = field + String(sensors.get_bme680_hum(config.bme680_hum_corr()));
+        if(sensors.checkHum(sensors.get_bme680_hum(CORRECTED)))
+            fields = field + String(sensors.get_bme680_hum(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 6 and fieldNum == 2) {                    // BME680 Pressure
-        if(sensors.checkPres(sensors.get_bme680_pres(config.bme680_pres_corr())))
-            fields = field + String(sensors.get_bme680_pres(config.bme680_pres_corr()));
+        if(sensors.checkPres(sensors.get_bme680_pres(CORRECTED)))
+            fields = field + String(sensors.get_bme680_pres(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 1 and fieldNum == 5) {                    // BME680 IAQ
-        if(sensors.checkIaq(sensors.get_bme680_iaq(config.bme680_iaq_corr()))) 
-            fields = field + String(sensors.get_bme680_iaq(config.bme680_iaq_corr()));
+        if(sensors.checkIaq(sensors.get_bme680_iaq(CORRECTED))) 
+            fields = field + String(sensors.get_bme680_iaq(CORRECTED));
     }
  
     return fields;

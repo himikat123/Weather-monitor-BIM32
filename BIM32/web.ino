@@ -65,24 +65,24 @@ String web_sensorsPrepare(bool logged) {
     json["network"]["dns1"] = WiFi.dnsIP().toString();
     json["network"]["dns2"] = WiFi.dnsIP().toString();
 
-    json["bme280"]["temp"] = sensors.get_bme280_temp(0);
-    json["bme280"]["hum"] = sensors.get_bme280_hum(0);
-    json["bme280"]["pres"] = sensors.get_bme280_pres(0);
-    json["bmp180"]["temp"] = sensors.get_bmp180_temp(0);
-    json["bmp180"]["pres"] = sensors.get_bmp180_pres(0);
-    json["sht21"]["temp"] = sensors.get_sht21_temp(0);
-    json["sht21"]["hum"] = sensors.get_sht21_hum(0);
-    json["dht22"]["temp"] = sensors.get_dht22_temp(0);
-    json["dht22"]["hum"] = sensors.get_dht22_hum(0);
-    json["esp32"]["temp"] = sensors.get_esp32_temp(0);
-    json["ds18b20"]["temp"] = sensors.get_ds18b20_temp(0);
-    json["max44009"]["light"] = sensors.get_max44009_light(0);
-    json["bh1750"]["light"] = sensors.get_bh1750_light(0);
-    json["analog"]["volt"] = sensors.get_analog_voltage(0);
-    json["bme680"]["temp"] = sensors.get_bme680_temp(0);
-    json["bme680"]["hum"] = sensors.get_bme680_hum(0);
-    json["bme680"]["pres"] = sensors.get_bme680_pres(0);
-    json["bme680"]["iaq"] = sensors.get_bme680_iaq(0);
+    json["bme280"]["temp"] = sensors.get_bme280_temp(RAW);
+    json["bme280"]["hum"] = sensors.get_bme280_hum(RAW);
+    json["bme280"]["pres"] = sensors.get_bme280_pres(RAW);
+    json["bmp180"]["temp"] = sensors.get_bmp180_temp(RAW);
+    json["bmp180"]["pres"] = sensors.get_bmp180_pres(RAW);
+    json["sht21"]["temp"] = sensors.get_sht21_temp(RAW);
+    json["sht21"]["hum"] = sensors.get_sht21_hum(RAW);
+    json["dht22"]["temp"] = sensors.get_dht22_temp(RAW);
+    json["dht22"]["hum"] = sensors.get_dht22_hum(RAW);
+    json["esp32"]["temp"] = sensors.get_esp32_temp(RAW);
+    json["ds18b20"]["temp"] = sensors.get_ds18b20_temp(RAW);
+    json["max44009"]["light"] = sensors.get_max44009_light(RAW);
+    json["bh1750"]["light"] = sensors.get_bh1750_light(RAW);
+    json["analog"]["volt"] = sensors.get_analog_voltage(RAW);
+    json["bme680"]["temp"] = sensors.get_bme680_temp(RAW);
+    json["bme680"]["hum"] = sensors.get_bme680_hum(RAW);
+    json["bme680"]["pres"] = sensors.get_bme680_pres(RAW);
+    json["bme680"]["iaq"] = sensors.get_bme680_iaq(RAW);
     json["bme680"]["iaqAccr"] = sensors.get_bme680_iaq_accuracy();
 
     json["thing"]["time"] = thingspeak.get_updated();
@@ -114,35 +114,35 @@ String web_sensorsPrepare(bool logged) {
     for(unsigned int i=0; i<WSENSORS; i++) {
         json["wsensor"]["time"][i] = wsensor.get_updated(i);
         for(unsigned int n=0; n<5; n++) {
-            json["wsensor"]["temp"]["data"][n][i] = wsensor.get_temperature(i, n, 0);
+            json["wsensor"]["temp"]["data"][n][i] = wsensor.get_temperature(i, n, RAW);
             json["wsensor"]["temp"]["name"][n][i] = wsensor.get_sensorType(i, n);
         }
-        json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, 0);
-        json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, 0);
-        json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, 0);
-        json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, 0);
-        json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, 0);
+        json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, RAW);
+        json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, RAW);
+        json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, RAW);
+        json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, RAW);
+        json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, RAW);
         json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
-        json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, 0);
+        json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, RAW);
         json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType(i);
-        json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, 0);
+        json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, RAW);
         json["wsensor"]["current"]["name"][i] = wsensor.get_energyType(i);
-        json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, 0);
+        json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, RAW);
         json["wsensor"]["power"]["name"][i] = wsensor.get_energyType(i);
-        json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, 0);
+        json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, RAW);
         json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType(i);
-        json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, 0);
+        json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, RAW);
         json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType(i);
-        json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, 0);
+        json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, RAW);
         json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type(i);
         json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
     }
 
-    web_listAllFilesInDir("/");
+    if(!global.fileUploading) web_listAllFilesInDir("/");
     json["fs"]["list"] = web_filelist;
     web_filelist = String();
-    json["fs"]["total"] = LittleFS.totalBytes();
-    json["fs"]["free"] = LittleFS.totalBytes() - LittleFS.usedBytes();
+    json["fs"]["total"] = global.fileUploading ? 0 : LittleFS.totalBytes();
+    json["fs"]["free"] = global.fileUploading ? 0 : LittleFS.totalBytes() - LittleFS.usedBytes();
     
     String data = "";
     serializeJson(json, data);
@@ -474,9 +474,15 @@ void web_changePass(AsyncWebServerRequest *request) {
  */
 void web_fileUpload(AsyncWebServerRequest *request, String filename, size_t index, byte *data, size_t len, bool final) {
     if(web_isLogged(request)) {
-        if(!index) request->_tempFile = LittleFS.open("/" + filename, "w");
+        if(!index) {
+            global.fileUploading = true;
+            request->_tempFile = LittleFS.open("/" + filename, "w");
+        }
         if(len) request->_tempFile.write(data, len);
-        if(final) request->_tempFile.close();
+        if(final) {
+            global.fileUploading = false,
+            request->_tempFile.close();
+        }
     }
     else request->send(200, "text/plain", "NOT LOGGED");
 }
@@ -560,12 +566,13 @@ void webInterface_init(void) {
     SSDP.setManufacturerURL("https://github.com/himikat123/Weather-monitor-BIM32");
     SSDP.setDeviceType("rootdevice");
     SSDP.setServerName("SSDPServer/1.0");
-    SSDP.setIcons("<icon>"
-        "<mimetype>image/png</mimetype>"
-        "<height>48</height>"
-        "<width>48</width>"
-        "<depth>32</depth>"
-        "<url>icon48.png</url>"
+    SSDP.setIcons(
+        "<icon>"
+            "<mimetype>image/png</mimetype>"
+            "<height>48</height>"
+            "<width>48</width>"
+            "<depth>32</depth>"
+            "<url>icon48.png</url>"
         "</icon>");
     SSDP.begin();
 
