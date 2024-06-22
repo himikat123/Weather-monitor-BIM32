@@ -183,14 +183,14 @@ void comfortCalculate() {
 
     switch(config.comfort_temp_source()) {
         case 1: temp = round(weather.get_currentTemp()); break; // temperature from weather forecast
-        case 2: { // temperature from wireless sensor
-            if(now() - wsensor.get_updated(config.comfort_temp_wsensNum()) < config.wsensor_expire(config.comfort_temp_wsensNum()) * 60)
+        case 2: // temperature from wireless sensor
+            if(wsensor.dataRelevance(config.comfort_temp_wsensNum()))
                 temp = round(wsensor.get_temperature(config.comfort_temp_wsensNum(), config.comfort_temp_sens(), CORRECTED));
-        }; break;
-        case 3: { // temperature from thingspeak
-            if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
+            break;
+        case 3: // temperature from thingspeak
+            if(thingspeak.dataRelevance()) 
                 temp = round(thingspeak.get_field(config.comfort_temp_thing()));
-        }; break;
+            break;
         case 4: temp = round(sensors.get_bme280_temp(CORRECTED)); break; // temperature from BME280
         case 5: temp = round(sensors.get_bmp180_temp(CORRECTED)); break; // temperature from BMP180
         case 6: temp = round(sensors.get_sht21_temp(CORRECTED)); break; // temperature from SHT21
@@ -202,14 +202,14 @@ void comfortCalculate() {
 
     switch(config.comfort_hum_source()) {
         case 1: hum = round(weather.get_currentHum()); break; // humidity from weather forecast
-        case 2: { // humidity from wireless sensor
-            if(now() - wsensor.get_updated(config.comfort_hum_wsensNum()) < config.wsensor_expire(config.comfort_hum_wsensNum()) * 60)
+        case 2: // humidity from wireless sensor
+            if(wsensor.dataRelevance(config.comfort_hum_wsensNum()))
                 hum = round(wsensor.get_humidity(config.comfort_hum_wsensNum(), CORRECTED));
-        }; break;
-        case 3: { // humidity from thingspeak
-            if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
+            break;
+        case 3: // humidity from thingspeak
+            if(thingspeak.dataRelevance())
                 hum = round(thingspeak.get_field(config.comfort_hum_thing()));
-        }; break;
+            break;
         case 4: hum = round(sensors.get_bme280_hum(CORRECTED)); break; // humidity from BME280
         case 5: hum = round(sensors.get_sht21_hum(CORRECTED)); break; // humidity from SHT21
         case 6: hum = round(sensors.get_dht22_hum(CORRECTED)); break; // humidity from DHT22
@@ -250,7 +250,7 @@ void comfortCalculate() {
     }
 
     if(config.comfort_co2_source() == 1) {
-        if(now() - wsensor.get_updated(config.comfort_co2_wsensNum()) < config.wsensor_expire(config.comfort_co2_wsensNum()) * 60) {
+        if(wsensor.dataRelevance(config.comfort_co2_wsensNum())) {
             float co2 = wsensor.get_co2(config.comfort_co2_wsensNum(), CORRECTED);
             if(wsensor.checkCo2(co2)) {
                 global.co2_level = AIR_CLEAN;

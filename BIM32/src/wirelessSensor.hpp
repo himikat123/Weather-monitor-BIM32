@@ -3,6 +3,7 @@ class WirelessSensor {
 
     public:
         void receive(void);
+        bool dataRelevance(uint8_t wsensNum);
         bool checkVolt(float volt);
         bool checkCurr(float curr);
         bool checkPwr(float pwr);
@@ -138,6 +139,13 @@ void WirelessSensor::receive() {
   
     vTaskDelay(1);
     wsensorStr = "";
+}
+
+/**
+ * check if data is not expired
+ */
+bool WirelessSensor::dataRelevance(uint8_t wsensNum) {
+    return (now() - _updated[wsensNum]) < (config.wsensor_expire(wsensNum) * 60);
 }
 
 /**

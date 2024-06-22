@@ -322,8 +322,7 @@ void Nextion::_networkPage(void) {
  */
 void Nextion::_voltage(void) {
     if(config.display_source_volt_sens() == 1) { /* from wireless sensor */
-        if(now() - wsensor.get_updated(config.display_source_volt_wsensNum()) < 
-        config.wsensor_expire(config.display_source_volt_wsensNum()) * 60) {
+        if(wsensor.dataRelevance(config.display_source_volt_wsensNum())) {
             if(config.display_source_volt_volt() == 0) { /* battery voltage */
                 float voltage = wsensor.get_batteryVoltage(config.display_source_volt_wsensNum());
                 if(wsensor.checkBatVolt(voltage)) {
@@ -366,7 +365,7 @@ void Nextion::_voltage(void) {
     }
     else if(config.display_source_volt_sens() == 2) { // voltage from thingspeak
         float voltage = thingspeak.get_field(config.display_source_volt_thing());
-        if((wsensor.checkVolt(voltage) or wsensor.checkBatVolt(voltage)) and ((now() - thingspeak.get_updated()) < (config.thingspeakReceive_expire() * 60))) {
+        if((wsensor.checkVolt(voltage) or wsensor.checkBatVolt(voltage)) and thingspeak.dataRelevance()) {
             myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
             myNex.writeNum("Main.uBat.xcen", 2);
             myNex.writeNum("Main.uBat.pco", 2016);
@@ -391,14 +390,13 @@ void Nextion::_voltage(void) {
 void Nextion::_battery(void) {
     if(config.display_source_bat_sens() == 1) { // battery symbol from wireless sensor
         int level = wsensor.get_batteryLevel(config.display_source_bat_wsensNum());
-        if(wsensor.checkBatLvl(level) and ((now() - wsensor.get_updated(config.display_source_bat_wsensNum())) < 
-        (config.wsensor_expire(config.display_source_bat_wsensNum()) * 60))) 
+        if(wsensor.checkBatLvl(level) and wsensor.dataRelevance(config.display_source_bat_wsensNum())) 
             myNex.writeNum("Main.bat.pic", level + 35);
         else myNex.writeNum("Main.bat.pic", 35);
     }
     else if(config.display_source_bat_sens() == 2) { // battery symbol from thingspeak
         unsigned int level = thingspeak.get_field(config.display_source_bat_thing());
-        if(wsensor.checkBatLvl(level) and ((now() - thingspeak.get_updated()) < (config.thingspeakReceive_expire() * 60)))
+        if(wsensor.checkBatLvl(level) and thingspeak.dataRelevance())
             myNex.writeNum("Main.bat.pic", level + 35);
         else myNex.writeNum("Main.bat.pic", 35);
     }
@@ -435,12 +433,12 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
     float temp = 40400.0;
     if(sens == 1) temp = weather.get_currentTemp();                                 /* temperature from weather forecast */
     if(sens == 2) {                                                                 /* temperature from wireless sensor */
-        if(now() - wsensor.get_updated(wsensNum) < config.wsensor_expire(wsensNum) * 60) {
+        if(wsensor.dataRelevance(wsensNum)) {
             temp = wsensor.get_temperature(wsensNum, tempSensor, CORRECTED);
         }
     }
     if(sens == 3) {                                                                 /* temperature from thingspeak */
-        if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+        if(thingspeak.dataRelevance()) {
             temp = thingspeak.get_field(thing);
         }
     }
@@ -469,8 +467,7 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
                 tempSequence[i] = weather.get_currentTemp();
             }
             if(config.display_source_sequence_temp(i) == 2) {                           /* wireless sensor */
-                if(now() - wsensor.get_updated(config.display_source_sequence_wsenstemp(i, 0)) < 
-                config.wsensor_expire(config.display_source_sequence_wsenstemp(i, 0)) * 60) {
+                if(wsensor.dataRelevance(config.display_source_sequence_wsenstemp(i, 0))) {
                     tempSequence[i] = wsensor.get_temperature(
                         config.display_source_sequence_wsenstemp(i, 0),
                         config.display_source_sequence_wsenstemp(i, 1),
@@ -479,7 +476,7 @@ float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int temp
                 }
             }
             if(config.display_source_sequence_temp(i) == 3) {                           /* thingspeak */
-                if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+                if(thingspeak.dataRelevance()) {
                     tempSequence[i] = thingspeak.get_field(config.display_source_sequence_thngtemp(i));
                 }
             }
@@ -533,12 +530,12 @@ void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing,
     float hum = 40400.0;
     if(sens == 1) hum = weather.get_currentHum();                                   /* humudity from weather forecast */
     if(sens == 2) {                                                                 /* humidity from wireless sensor */
-        if(now() - wsensor.get_updated(wsensNum) < config.wsensor_expire(wsensNum) * 60) {
+        if(wsensor.dataRelevance(wsensNum)) {
             hum = wsensor.get_humidity(wsensNum, CORRECTED);
         }
     }
     if(sens == 3) {                                                                 /* humidity from thingspeak */
-        if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+        if(thingspeak.dataRelevance()) {
             hum = thingspeak.get_field(thing);
         }
     }
@@ -561,8 +558,7 @@ void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing,
                 humSequence[i] = weather.get_currentHum();
             }
             if(config.display_source_sequence_hum(i) == 2) {                            /* wireless sensor */
-                if(now() - wsensor.get_updated(config.display_source_sequence_wsenshum(i)) < 
-                config.wsensor_expire(config.display_source_sequence_wsenshum(i)) * 60) {
+                if(wsensor.dataRelevance(config.display_source_sequence_wsenshum(i))) {
                     humSequence[i] = wsensor.get_humidity(
                         config.display_source_sequence_wsenshum(i),
                         CORRECTED
@@ -570,7 +566,7 @@ void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing,
                 }
             }
             if(config.display_source_sequence_hum(i) == 3) {                            /* thingspeak */
-                if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+                if(thingspeak.dataRelevance()) {
                     humSequence[i] = thingspeak.get_field(config.display_source_sequence_thnghum(i));
                 }
             }
@@ -685,11 +681,10 @@ void Nextion::_pres(void) {
     if(config.display_source_presOut_sens() == 1) // pressure outside from weather forecast
         pres = weather.get_currentPres();
     if(config.display_source_presOut_sens() == 2) // presure outside from wireless sensor
-        if(now() - wsensor.get_updated(config.display_source_presOut_wsensNum()) < 
-        config.wsensor_expire(config.display_source_presOut_wsensNum()) * 60)
+        if(wsensor.dataRelevance(config.display_source_presOut_wsensNum()))
             pres = wsensor.get_pressure(config.display_source_presOut_wsensNum(), CORRECTED);
     if(config.display_source_presOut_sens() == 3) // presure outside from thingspeak
-        if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
+        if(thingspeak.dataRelevance())
             pres = thingspeak.get_field(config.display_source_presOut_thing());
     if(config.display_source_presOut_sens() == 4) // pressure outside from BME280
         pres = sensors.get_bme280_pres(CORRECTED);

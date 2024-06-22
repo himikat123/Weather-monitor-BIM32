@@ -192,7 +192,7 @@ void WS2812b::refresh() {
                     _temp(sensors.get_esp32_temp(CORRECTED), digs);
                 break;
                 case 8: // Thingspeak
-                    if((now() - thingspeak.get_updated()) < (config.thingspeakReceive_expire() * 60)) {
+                    if(thingspeak.dataRelevance()) {
                         if(type == 0) _temp(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot, _dispNum)), digs);
                         if(type == 1) _hum(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot, _dispNum)), digs);
                         if(type == 2) _pres(thingspeak.get_field(config.display_timeSlot_thing(_timeSlot, _dispNum)), digs);
@@ -218,7 +218,7 @@ void WS2812b::refresh() {
                 case 10: { // Wireless sensor
                     unsigned int wsensNum = config.display_timeSlot_wsensor_num(_timeSlot, _dispNum);
                     unsigned int wsensType = config.display_timeSlot_wsensor_type(_timeSlot, _dispNum);
-                    if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
+                    if(wsensor.dataRelevance(wsensNum)) {
                         if(wsensType <= 4) _temp(wsensor.get_temperature(wsensNum, wsensType, CORRECTED), digs);
                         if(wsensType == 5) _hum(wsensor.get_humidity(wsensNum, CORRECTED), digs);
                         if(wsensType == 6) _pres(wsensor.get_pressure(wsensNum, CORRECTED), digs);

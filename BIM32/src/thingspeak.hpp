@@ -2,13 +2,14 @@ class Thingspeak {
     public:
         void receive();
         void send();
-        void sendHistory(void);
-        void receiveHistory(void);
+        void sendHistory();
+        void receiveHistory();
+        bool dataRelevance();
         float get_field(unsigned int num);
         int get_updated();
         float get_historyField(unsigned int sensor, unsigned int slot);
         unsigned int get_historyUpdated(unsigned int slot);
-        boolean is_summertime(void);
+        boolean is_summertime();
 
     private:
         String _fieldPrepare(unsigned int field);
@@ -209,6 +210,13 @@ void Thingspeak::receiveHistory() {
 }
 
 /**
+ * check if data is not expired
+ */
+bool Thingspeak::dataRelevance() {
+    return (now() - _updated) < (config.thingspeakReceive_expire() * 60);
+}
+
+/**
  * Get data from a field
  * @param field number
  * @return field data or obviously erroneous value
@@ -271,7 +279,7 @@ String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
         case 2:{ // Wireless sensor
             unsigned int wsensNum = config.thingspeakSend_wsensors(fieldNum);
             unsigned int wsensType = config.thingspeakSend_wtypes(fieldNum);
-            if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
+            if(wsensor.dataRelevance(wsensNum)) {
                 float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
                 float hum = wsensor.get_humidity(wsensNum, CORRECTED);
                 float pres = wsensor.get_pressure(wsensNum, CORRECTED);
@@ -408,7 +416,7 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
     if((config.history_fields(fieldNum) == 2 and fieldNum <= 4) or (config.history_fields(fieldNum) == 1 and fieldNum == 6)) {
         unsigned int wsensNum = config.history_wSensors(fieldNum);
         unsigned int wsensType = config.history_wTypes(fieldNum);
-        if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
+        if(wsensor.dataRelevance(wsensNum)) {
             float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
             float hum = wsensor.get_humidity(wsensNum, CORRECTED);
             float pres = wsensor.get_pressure(wsensNum, CORRECTED);

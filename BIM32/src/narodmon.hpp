@@ -64,7 +64,7 @@ String Narodmon::_fieldsPrepare(unsigned int fieldNum, String metrics, String ma
         case 2:{ // Wireless sensor
             unsigned int wsensNum = config.narodmonSend_wsensors(fieldNum);
             unsigned int wsensType = config.narodmonSend_wtypes(fieldNum);
-            if((now() - wsensor.get_updated(wsensNum)) < (config.wsensor_expire(wsensNum) * 60)) {
+            if(wsensor.dataRelevance(wsensNum)) {
                 float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
                 float hum = wsensor.get_humidity(wsensNum, CORRECTED);
                 float pres = wsensor.get_pressure(wsensNum, CORRECTED);

@@ -317,7 +317,7 @@ void ILI9341::_showBatteryLevel() {
     int level = 0;
     if(config.display_source_bat_sens()) {
         if(config.display_source_bat_sens() == 1) {
-            if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+            if(thingspeak.dataRelevance()) {
                 level = thingspeak.get_field(config.display_source_bat_thing());
             }
             else level = 0;
@@ -341,7 +341,7 @@ void ILI9341::_showVoltageOrPercentage() {
     char buf[8] = "--";
 
     if(config.display_source_volt_sens() == 1) { // Thingspeak
-        if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60) {
+        if(thingspeak.dataRelevance()) {
             volt = thingspeak.get_field(config.display_source_volt_thing());
             percent = round(volt);
         }
@@ -489,7 +489,7 @@ int ILI9341::_getTemp(unsigned int sens, unsigned int thing) {
     switch(sens) {
         case 1: temp = weather.get_currentTemp(); break;           // temperature from weather forecast
         case 2:                                                    // temperature from thingspeak
-            if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
+            if(thingspeak.dataRelevance())
                 temp = thingspeak.get_field(thing);
             break;
         case 3: temp = sensors.get_bme280_temp(CORRECTED); break;  // temperature from BME280
@@ -508,7 +508,7 @@ int ILI9341::_getHum(unsigned int sens, unsigned int thing) {
     switch(sens) {
         case 1: hum = weather.get_currentHum(); break;          // humudity from weather forecast
         case 2:                                                 // humidity from thingspeak
-            if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
+            if(thingspeak.dataRelevance())
                 hum = thingspeak.get_field(thing);
             break;
         case 3: hum = sensors.get_bme280_hum(CORRECTED); break; // humidity from BME280
@@ -525,7 +525,7 @@ int ILI9341::_getPres(void) {
     switch(config.display_source_presOut_sens()) {
         case 1: pres = weather.get_currentPres(); break;          // pressure outside from weather forecast
         case 2:                                                   // presure outside from thingspeak
-            if(now() - thingspeak.get_updated() < config.thingspeakReceive_expire() * 60)
+            if(thingspeak.dataRelevance())
                 pres = thingspeak.get_field(config.display_source_presOut_thing());
             break;
         case 3: pres = sensors.get_bme280_pres(CORRECTED); break; // pressure outside from BME280
