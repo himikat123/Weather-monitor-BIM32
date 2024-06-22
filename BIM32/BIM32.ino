@@ -68,59 +68,59 @@ Network network;
 
 /* FreeRTOS running cores */
 #if CONFIG_FREERTOS_UNICORE
-  #define ARDUINO_RUNNING_CORE 0
+    #define ARDUINO_RUNNING_CORE 0
 #else
-  #define ARDUINO_RUNNING_CORE 1
+    #define ARDUINO_RUNNING_CORE 1
 #endif
 #define FS_NO_GLOBALS
 
 
 /**
-   Arduino setup
-*/
+ * Arduino setup
+ */
 void setup() {
-  pinMode(SET_HC12_PIN, OUTPUT);
-  digitalWrite(SET_HC12_PIN, HIGH);
-  pinMode(DISPLAY1_BUTTON_PIN, INPUT);
-  pinMode(DISPLAY2_BUTTON_PIN, INPUT);
-  pinMode(ALARM_BUTTON_PIN, INPUT);
-  //pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);
-  //pinMode(AIR_DRYER_PIN, OUTPUT);
-  //pinMode(AIR_HEATER_PIN, OUTPUT);
-  //pinMode(AIR_COOLER_PIN, OUTPUT);
-  //digitalWrite(AIR_HUMIDIFIER_PIN, LOW);
-  //digitalWrite(AIR_DRYER_PIN, LOW);
-  //digitalWrite(AIR_HEATER_PIN, LOW);
-  //digitalWrite(AIR_COOLER_PIN, LOW);
+    pinMode(SET_HC12_PIN, OUTPUT);
+    digitalWrite(SET_HC12_PIN, HIGH);
+    pinMode(DISPLAY1_BUTTON_PIN, INPUT);
+    pinMode(DISPLAY2_BUTTON_PIN, INPUT);
+    pinMode(ALARM_BUTTON_PIN, INPUT);
+    //pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);
+    //pinMode(AIR_DRYER_PIN, OUTPUT);
+    //pinMode(AIR_HEATER_PIN, OUTPUT);
+    //pinMode(AIR_COOLER_PIN, OUTPUT);
+    //digitalWrite(AIR_HUMIDIFIER_PIN, LOW);
+    //digitalWrite(AIR_DRYER_PIN, LOW);
+    //digitalWrite(AIR_HEATER_PIN, LOW);
+    //digitalWrite(AIR_COOLER_PIN, LOW);
 
-  Serial.begin(115200);
-  Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
-  Serial2.begin(9600);
-  Serial3.begin(9600, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false);
+    Serial.begin(115200);
+    Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
+    Serial2.begin(9600);
+    Serial3.begin(9600, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false);
 
-  Serial.println(SEPARATOR);
-  Serial.println(SEPARATOR);
-  Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2024  *\r\n", FW);
-  Serial.println(SEPARATOR);
-  Serial.println();
+    Serial.println(SEPARATOR);
+    Serial.println(SEPARATOR);
+    Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2024  *\r\n", FW);
+    Serial.println(SEPARATOR);
+    Serial.println();
 
-  if(!LittleFS.begin()) {
-    Serial.println("Little FS initialisation failed!");
-    while(1) yield();
-  }
-  config.readConfig();
+    if(!LittleFS.begin()) {
+        Serial.println("Little FS initialisation failed!");
+        while(1) yield();
+    }
+    config.readConfig();
 
-  //myNex.writeNum("sleep", 0);
-  //myNex.writeStr("page Logo");
+    //myNex.writeNum("sleep", 0);
+    //myNex.writeStr("page Logo");
 
-  xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
-  xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
 
-  network.connect();
-  
-  webInterface_init();
+    network.connect();
 
-  xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, ARDUINO_RUNNING_CORE);
+    webInterface_init();
+
+    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, ARDUINO_RUNNING_CORE);
 }
 
 void loop() {
