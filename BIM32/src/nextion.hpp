@@ -1,147 +1,144 @@
 #include <EasyNextionLibrary.h> // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
-EasyNex myNex(Serial1);
+EasyNex nex(Serial1);
 
 class Nextion {
     #define NX4832K035 0
     #define NX4832T035 1
-    #define OUTDOOR    0
-    #define INDOOR     1
 
     public:
-        void init(void);
-        void refresh(void);
-        void displayToggle(void);
+        void init();
+        void refresh();
+        void displayToggle();
         void displayOn(bool doinit = true);
-        void displayOff(void);
-        bool isDisplayOn(void);
+        void displayOff();
+        bool isDisplayOn();
         void brightness(unsigned int bright, bool reduc);
-        void setDisplayRTC(void);
-        void dataReceive(void);
+        void setDisplayRTC();
+        void dataReceive();
 
     private:
         bool _power = true; // display on/off flag
         int _customData = -1; // flag of key symbols of receive from the display
         String _receivedData = "";
-        uint8_t _iaq_level = 0;
-        uint8_t _co2_level = 0;
-        uint16_t _air_color[3] = { 65520, 64512, 63488 };
+        uint16_t _air_color[4] = { 2016, 65520, 64512, 63488 };
 
-        void _NX4832K035_setRTC(void);
-        void _NX4832T035_timeDate(void);
-        void _networkPage(void);
-        void _voltage(void);
-        void _battery(void);
-        void _antenna(void);
-        float _temp(unsigned int sens, unsigned int wsensNum, unsigned int tempSensor, unsigned int thing, String field, uint8_t location);
-        void _hum(unsigned int sens, unsigned int wsensNum, unsigned int thing, String field, uint8_t location);
-        void _comfortLevel(void);
-        void _weatherDescription(void);
-        void _currentIcon(void);
+        void _NX4832K035_setRTC();
+        void _NX4832T035_timeDate();
+        void _networkPage();
+        void _voltage(String voltage, uint8_t voltageColor);
+        void _battery(int level);
+        void _antenna(int rssi, bool isApMode);
+        void _temp(float temp, String field);
+        void _hum(float hum, String field);
+        void _sequence(float* tempSequence, float* humSequence, String* nameSequence);
+        void _comfortLevel();
+        void _weatherDescription();
+        void _currentIcon();
         void _thermometer(float temp);
-        void _pres(void);
-        void _windSpeed(void);
-        void _windDirection(void);
-        void _updated(void);
-        void _weatherForecast(void);
-        void _hourlyData(void);
-        void _daily2hourly(void);
-        void _historyOut(void);
-        void _historyIn(void);
-        void _alarms(void);
+        void _pres();
+        void _windSpeed();
+        void _windDirection();
+        void _updated();
+        void _weatherForecast();
+        void _hourlyData();
+        void _daily2hourly();
+        void _historyOut();
+        void _historyIn();
+        void _alarms();
 };
 
-void Nextion::init(void) {
-    myNex.writeStr("Hourly.MM.txt", lang.mm());
-    myNex.writeStr("Hourly.MS.txt", lang.ms());
-    myNex.writeStr("HistoryIn.In.txt", lang.historyIn());
-    myNex.writeStr("HistoryOut.Out.txt", lang.historyOut());
+void Nextion::init() {
+    nex.writeStr("Hourly.MM.txt", lang.mm());
+    nex.writeStr("Hourly.MS.txt", lang.ms());
+    nex.writeStr("HistoryIn.In.txt", lang.historyIn());
+    nex.writeStr("HistoryOut.Out.txt", lang.historyOut());
     
-    myNex.writeStr("Network.NETWORK.txt", lang.network());
-    myNex.writeStr("Network.SIGNALLEVEL.txt", lang.signalLevel());
-    myNex.writeStr("Network.IPADDRESS.txt", lang.ipAddr());
-    myNex.writeStr("Network.MACADDRESS.txt", lang.macAddr());
-    myNex.writeStr("Network.ESP32TEMP.txt", lang.esp32Temp());
-    myNex.writeStr("Network.FIRMWARE.txt", lang.firmware());
+    nex.writeStr("Network.NETWORK.txt", lang.network());
+    nex.writeStr("Network.SIGNALLEVEL.txt", lang.signalLevel());
+    nex.writeStr("Network.IPADDRESS.txt", lang.ipAddr());
+    nex.writeStr("Network.MACADDRESS.txt", lang.macAddr());
+    nex.writeStr("Network.ESP32TEMP.txt", lang.esp32Temp());
+    nex.writeStr("Network.FIRMWARE.txt", lang.firmware());
 
     for(unsigned int i=0; i<4; i++) {
-        myNex.writeStr("Main.nameSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
+        nex.writeStr("Main.nameSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
     }
-    myNex.writeNum("Main.sequence.tim", config.display_source_sequence_dur() * 1000);
+    nex.writeNum("Main.sequence.tim", config.display_source_sequence_dur() * 1000);
 
     /* Alarm */
-    myNex.writeStr("Texts.ALARM.txt", lang.alarm());
+    nex.writeStr("Texts.ALARM.txt", lang.alarm());
     
     /* Initialize NX4832K035 display  */
     if(config.display_model(0) == NX4832K035) {
         // config
-        myNex.writeNum("BigClock.clockFormat.val", config.clock_format());
+        nex.writeNum("BigClock.clockFormat.val", config.clock_format());
         unsigned int langCode = 0;
         if(config.lang() == "de") langCode = 1;
         if(config.lang() == "ru") langCode = 2;
         if(config.lang() == "pl") langCode = 3;
         if(config.lang() == "ua") langCode = 4;
-        myNex.writeNum("Main.lang.val", langCode);
+        nex.writeNum("Main.lang.val", langCode);
 
         // texts
-        myNex.writeStr("Texts.JANUARY.txt", lang.january());
-        myNex.writeStr("Texts.FEBRUARY.txt", lang.february());
-        myNex.writeStr("Texts.MARCH.txt", lang.march());
-        myNex.writeStr("Texts.APRIL.txt", lang.april());
-        myNex.writeStr("Texts.MAY.txt", lang.may());
-        myNex.writeStr("Texts.JUNE.txt", lang.june());
-        myNex.writeStr("Texts.JULY.txt", lang.july());
-        myNex.writeStr("Texts.AUGUST.txt", lang.august());
-        myNex.writeStr("Texts.SEPTEMBER.txt", lang.september());
-        myNex.writeStr("Texts.OCTOBER.txt", lang.october());
-        myNex.writeStr("Texts.NOVEMBER.txt", lang.november());
-        myNex.writeStr("Texts.DECEMBER.txt", lang.december());
-        myNex.writeStr("Texts.JAN_.txt", lang.january_());
-        myNex.writeStr("Texts.FEB_.txt", lang.february_());
-        myNex.writeStr("Texts.MAR_.txt", lang.march_());
-        myNex.writeStr("Texts.APR_.txt", lang.april_());
-        myNex.writeStr("Texts.MAY_.txt", lang.may_());
-        myNex.writeStr("Texts.JUN_.txt", lang.june_());
-        myNex.writeStr("Texts.JUL_.txt", lang.july_());
-        myNex.writeStr("Texts.AUG_.txt", lang.august_());
-        myNex.writeStr("Texts.SEP_.txt", lang.september_());
-        myNex.writeStr("Texts.OCT_.txt", lang.october_());
-        myNex.writeStr("Texts.NOV_.txt", lang.november_());
-        myNex.writeStr("Texts.DEC_.txt", lang.december_());
-        myNex.writeStr("Texts.JAN.txt", lang.jan());
-        myNex.writeStr("Texts.FEB.txt", lang.feb());
-        myNex.writeStr("Texts.MAR.txt", lang.mar());
-        myNex.writeStr("Texts.APR.txt", lang.apr());
-        myNex.writeStr("Texts.MAI.txt", lang.mai());
-        myNex.writeStr("Texts.JUN.txt", lang.jun());
-        myNex.writeStr("Texts.JUL.txt", lang.jul());
-        myNex.writeStr("Texts.AUG.txt", lang.aug());
-        myNex.writeStr("Texts.SEP.txt", lang.sep());
-        myNex.writeStr("Texts.OCT.txt", lang.oct());
-        myNex.writeStr("Texts.NOV.txt", lang.nov());
-        myNex.writeStr("Texts.DEC.txt", lang.dec());
+        nex.writeStr("Texts.JANUARY.txt", lang.january());
+        nex.writeStr("Texts.FEBRUARY.txt", lang.february());
+        nex.writeStr("Texts.MARCH.txt", lang.march());
+        nex.writeStr("Texts.APRIL.txt", lang.april());
+        nex.writeStr("Texts.MAY.txt", lang.may());
+        nex.writeStr("Texts.JUNE.txt", lang.june());
+        nex.writeStr("Texts.JULY.txt", lang.july());
+        nex.writeStr("Texts.AUGUST.txt", lang.august());
+        nex.writeStr("Texts.SEPTEMBER.txt", lang.september());
+        nex.writeStr("Texts.OCTOBER.txt", lang.october());
+        nex.writeStr("Texts.NOVEMBER.txt", lang.november());
+        nex.writeStr("Texts.DECEMBER.txt", lang.december());
+        nex.writeStr("Texts.JAN_.txt", lang.january_());
+        nex.writeStr("Texts.FEB_.txt", lang.february_());
+        nex.writeStr("Texts.MAR_.txt", lang.march_());
+        nex.writeStr("Texts.APR_.txt", lang.april_());
+        nex.writeStr("Texts.MAY_.txt", lang.may_());
+        nex.writeStr("Texts.JUN_.txt", lang.june_());
+        nex.writeStr("Texts.JUL_.txt", lang.july_());
+        nex.writeStr("Texts.AUG_.txt", lang.august_());
+        nex.writeStr("Texts.SEP_.txt", lang.september_());
+        nex.writeStr("Texts.OCT_.txt", lang.october_());
+        nex.writeStr("Texts.NOV_.txt", lang.november_());
+        nex.writeStr("Texts.DEC_.txt", lang.december_());
+        nex.writeStr("Texts.JAN.txt", lang.jan());
+        nex.writeStr("Texts.FEB.txt", lang.feb());
+        nex.writeStr("Texts.MAR.txt", lang.mar());
+        nex.writeStr("Texts.APR.txt", lang.apr());
+        nex.writeStr("Texts.MAI.txt", lang.mai());
+        nex.writeStr("Texts.JUN.txt", lang.jun());
+        nex.writeStr("Texts.JUL.txt", lang.jul());
+        nex.writeStr("Texts.AUG.txt", lang.aug());
+        nex.writeStr("Texts.SEP.txt", lang.sep());
+        nex.writeStr("Texts.OCT.txt", lang.oct());
+        nex.writeStr("Texts.NOV.txt", lang.nov());
+        nex.writeStr("Texts.DEC.txt", lang.dec());
 
-        myNex.writeStr("Texts.MONDAY.txt", lang.monday());
-        myNex.writeStr("Texts.TUESDAY.txt", lang.tuesday());
-        myNex.writeStr("Texts.WEDNESDAY.txt", lang.wednesday());
-        myNex.writeStr("Texts.THURSDAY.txt", lang.thursday());
-        myNex.writeStr("Texts.FRIDAY.txt", lang.friday());
-        myNex.writeStr("Texts.SATURDAY.txt", lang.saturday());
-        myNex.writeStr("Texts.SUNDAY.txt", lang.sunday());
-        myNex.writeStr("Texts.MO.txt", lang.mo());
-        myNex.writeStr("Texts.TU.txt", lang.tu());
-        myNex.writeStr("Texts.WE.txt", lang.we());
-        myNex.writeStr("Texts.TH.txt", lang.th());
-        myNex.writeStr("Texts.FR.txt", lang.fr());
-        myNex.writeStr("Texts.SA.txt", lang.sa());
-        myNex.writeStr("Texts.SU.txt", lang.su());
+        nex.writeStr("Texts.MONDAY.txt", lang.monday());
+        nex.writeStr("Texts.TUESDAY.txt", lang.tuesday());
+        nex.writeStr("Texts.WEDNESDAY.txt", lang.wednesday());
+        nex.writeStr("Texts.THURSDAY.txt", lang.thursday());
+        nex.writeStr("Texts.FRIDAY.txt", lang.friday());
+        nex.writeStr("Texts.SATURDAY.txt", lang.saturday());
+        nex.writeStr("Texts.SUNDAY.txt", lang.sunday());
+        nex.writeStr("Texts.MO.txt", lang.mo());
+        nex.writeStr("Texts.TU.txt", lang.tu());
+        nex.writeStr("Texts.WE.txt", lang.we());
+        nex.writeStr("Texts.TH.txt", lang.th());
+        nex.writeStr("Texts.FR.txt", lang.fr());
+        nex.writeStr("Texts.SA.txt", lang.sa());
+        nex.writeStr("Texts.SU.txt", lang.su());
     }
 
-    myNex.writeNum("thup", 1);
-    myNex.writeStr("page Main");
+    nex.writeNum("thup", 1);
+    nex.writeStr("page Main");
 }
 
-void Nextion::refresh(void) {
-    myNex.writeNum("sleep", _power ? 0 : 1);
+void Nextion::refresh() {
+    nex.writeNum("sleep", _power ? 0 : 1);
 
     if(_power) {
         if(config.display_model(0) == NX4832T035) _NX4832T035_timeDate();
@@ -151,56 +148,36 @@ void Nextion::refresh(void) {
                 global.clockSynchronize = false;
             }
         }
-  
+
+        float tempSequence[4] = {404.0, 404.0, 404.0, 404.0};
+        float humSequence[4] = {404.0, 404.0, 404.0, 404.0};
+        String nameSequence[4] = {"", "", "", ""};
+        float tempIn = agregateData.lcdTempIn(tempSequence);
+        float tempOut = agregateData.lcdTempOut();
+        float humIn = agregateData.lcdHumIn(humSequence);
+        float humOut = agregateData.lcdHumOut();
+        agregateData.lcdSequenceNames(nameSequence);
+        String voltage = agregateData.lcdVoltage();
+        uint8_t voltageColor = agregateData.lcdVoltageColor();
+        int batLevel = agregateData.lcdBatteryLevel();
+        int rssi = WiFi.RSSI();
+        bool isApMode = global.apMode;
+
         _networkPage();
         _comfortLevel();
-        _voltage();
-        _battery();
-        _antenna();
-  
-        float temp = _temp(
-            // TODO зачем отправлять конфиг?
-            config.display_source_tempIn_sens(),
-            config.display_source_tempIn_wsensNum(),
-            config.display_source_tempIn_temp(),
-            config.display_source_tempIn_thing(),
-            "Main.tempInside.txt",
-            INDOOR
-        );
-  
-        _hum(
-            // TODO зачем отправлять конфиг?
-            config.display_source_humIn_sens(),
-            config.display_source_humIn_wsensNum(),
-            config.display_source_humIn_thing(),
-            "Main.humInside.txt",
-            INDOOR
-        );
+        _voltage(voltage, voltageColor);
+        _battery(batLevel);
+        _antenna(rssi, isApMode);
+
+        _temp(tempIn, "Main.tempInside.txt");
+        _hum(humIn, "Main.humInside.txt");
+        _sequence(tempSequence, humSequence, nameSequence);
   
         _weatherDescription();
         _currentIcon();
-  
-        temp = _temp(
-            // TODO зачем отправлять конфиг?
-            config.display_source_tempOut_sens(),
-            config.display_source_tempOut_wsensNum(),
-            config.display_source_tempOut_temp(),
-            config.display_source_tempOut_thing(),
-            "Main.tempOutside.txt",
-            OUTDOOR
-        );
-  
-        _thermometer(temp);
-  
-        _hum(
-            // TODO зачем отправлять конфиг?
-            config.display_source_humOut_sens(),
-            config.display_source_humOut_wsensNum(),
-            config.display_source_humOut_thing(),
-            "Main.humOutside.txt",
-            OUTDOOR
-        );
-  
+        //_thermometer(temp);
+        _temp(tempOut, "Main.tempOutside.txt");
+        _hum(humOut, "Main.humOutside.txt");
         _pres();
         _windSpeed();
         _windDirection();
@@ -218,14 +195,14 @@ void Nextion::refresh(void) {
  * Change display brightness
  */
 void Nextion::brightness(unsigned int bright, bool reduc) {
-    if(_power) myNex.writeNum("dim", reduc ? round(bright / 2) : bright);
+    if(_power) nex.writeNum("dim", reduc ? round(bright / 2) : bright);
 }
 
 /**
  * Toggles display (on/off)
  */
 void Nextion::displayToggle() {
-    if(_power) myNex.writeNum("dim", 0);
+    if(_power) nex.writeNum("dim", 0);
     else init();
     _power = !_power;
 }
@@ -242,7 +219,7 @@ void Nextion::displayOn(bool doinit) {
  * Turns off the display
  */
 void Nextion::displayOff() {
-    myNex.writeNum("dim", 0);
+    nex.writeNum("dim", 0);
     _power = false;
 }
 
@@ -256,343 +233,131 @@ bool Nextion::isDisplayOn() {
 /**
  * Set the time and date of the display with built-in RTC
  */
-void Nextion::setDisplayRTC(void) {
+void Nextion::setDisplayRTC() {
     if(config.display_model(0) == NX4832K035) _NX4832K035_setRTC();
 }
 
 /**
  * Set the time and date of the NX4832K035 display
  */
-void Nextion::_NX4832K035_setRTC(void) {
+void Nextion::_NX4832K035_setRTC() {
     if(now() > 1665606321) {
-        myNex.writeNum("rtc5", second());
-        myNex.writeNum("rtc4", minute());
-        myNex.writeNum("rtc3", hour());
-        myNex.writeNum("rtc2", day());
-        myNex.writeNum("rtc1", month());
-        myNex.writeNum("rtc0", year());
+        nex.writeNum("rtc5", second());
+        nex.writeNum("rtc4", minute());
+        nex.writeNum("rtc3", hour());
+        nex.writeNum("rtc2", day());
+        nex.writeNum("rtc1", month());
+        nex.writeNum("rtc0", year());
     }
 }
 
 /**
  * Sending time and date to the NX4832T035 display that does not have a built-in RTC
  */
-void Nextion::_NX4832T035_timeDate(void) {
+void Nextion::_NX4832T035_timeDate() {
     String buf = "";
-    myNex.writeStr("BigClock.hour.txt", String(config.clock_format() ? hour() : hourFormat12()));
-    myNex.writeStr("BigClock.minute.txt", String(minute()));
+    nex.writeStr("BigClock.hour.txt", String(config.clock_format() ? hour() : hourFormat12()));
+    nex.writeStr("BigClock.minute.txt", String(minute()));
     unsigned int wd = weekday();
-    myNex.writeStr("BigClock.weekday.txt", lang.weekdayShortName(wd));
+    nex.writeStr("BigClock.weekday.txt", lang.weekdayShortName(wd));
     if(config.lang() == "en") buf = lang.monthName(month()) + " " + String(day()) + ", " + String(year());
     else buf = String(day()) + " " + lang.monthName(month()) + String(year());
-    myNex.writeStr("BigClock.date.txt", buf);
-    myNex.writeStr("Main.weekday0.txt", lang.weekdayShortName(wd));
+    nex.writeStr("BigClock.date.txt", buf);
+    nex.writeStr("Main.weekday0.txt", lang.weekdayShortName(wd));
     if(++wd > 7) wd = 1;
-    myNex.writeStr("Main.weekday2.txt", lang.weekdayShortName(wd));
+    nex.writeStr("Main.weekday2.txt", lang.weekdayShortName(wd));
     if(++wd > 7) wd = 1;
-    myNex.writeStr("Main.weekday3.txt", lang.weekdayShortName(wd));
+    nex.writeStr("Main.weekday3.txt", lang.weekdayShortName(wd));
     if(++wd > 7) wd = 1;
-    myNex.writeStr("Main.weekday4.txt", lang.weekdayShortName(wd));
+    nex.writeStr("Main.weekday4.txt", lang.weekdayShortName(wd));
+    buf = String();
 }
 
 /**
  * Sending data to Network page
  */
-void Nextion::_networkPage(void) {
+void Nextion::_networkPage() {
     if(global.apMode) {
-        myNex.writeStr("Network.Logo.txt", "Access Point");
-        myNex.writeStr("Network.ssid.txt", config.accessPoint_ssid());
-        myNex.writeStr("Network.rssi.txt", "100%");
-        myNex.writeStr("Network.ip.txt", "192.168.4.1");
-        myNex.writeStr("Network.mac.txt", WiFi.softAPmacAddress());
+        nex.writeStr("Network.Logo.txt", "Access Point");
+        nex.writeStr("Network.ssid.txt", config.accessPoint_ssid());
+        nex.writeStr("Network.rssi.txt", "100%");
+        nex.writeStr("Network.ip.txt", config.accessPoint_ip());
+        nex.writeStr("Network.mac.txt", WiFi.softAPmacAddress());
     }
     else {
-        myNex.writeStr("Network.Logo.txt", "WiFi");
-        myNex.writeStr("Network.ssid.txt", WiFi.SSID());
-        myNex.writeStr("Network.rssi.txt", String(WiFi.RSSI()) + "dBm");
-        myNex.writeStr("Network.ip.txt", WiFi.localIP().toString());
-        myNex.writeStr("Network.mac.txt", WiFi.macAddress());
+        nex.writeStr("Network.Logo.txt", "WiFi");
+        nex.writeStr("Network.ssid.txt", WiFi.SSID());
+        nex.writeStr("Network.rssi.txt", String(WiFi.RSSI()) + "dBm");
+        nex.writeStr("Network.ip.txt", WiFi.localIP().toString());
+        nex.writeStr("Network.mac.txt", WiFi.macAddress());
     }
-    myNex.writeStr("Network.temp.txt", String(int(round(sensors.get_esp32_temp(0)))) + "°C");
-    myNex.writeStr("Network.frmw.txt", FW);
+    nex.writeStr("Network.temp.txt", String(int(round(sensors.get_esp32_temp(0)))) + "°C");
+    nex.writeStr("Network.frmw.txt", FW);
 }
 
 /**
- * Display voltage
+ * Display voltage, percentage, CO2 or IAQ
  */
-void Nextion::_voltage(void) {
-    if(config.display_source_volt_sens() == 1) { /* from wireless sensor */
-        if(wsensor.dataRelevance(config.display_source_volt_wsensNum())) {
-            if(config.display_source_volt_volt() == 0) { /* battery voltage */
-                float voltage = wsensor.get_batteryVoltage(config.display_source_volt_wsensNum());
-                if(wsensor.checkBatVolt(voltage)) {
-                    myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
-                    myNex.writeNum("Main.uBat.xcen", 2);
-                    myNex.writeNum("Main.uBat.pco", 2016);
-                }
-                else myNex.writeStr("Main.uBat.txt", "");
-            }
-            else if(config.display_source_volt_volt() == 1) { /* battery percentage */
-                float percentage = wsensor.get_batteryPercentage(config.display_source_volt_wsensNum());
-                if(wsensor.checkBatPercent(percentage)) {
-                    myNex.writeStr("Main.uBat.txt", String(percentage, 0) + "%");
-                    myNex.writeNum("Main.uBat.xcen", 2);
-                    myNex.writeNum("Main.uBat.pco", 2016);
-                }
-                else myNex.writeStr("Main.uBat.txt", "");
-            }
-            else if(config.display_source_volt_volt() == 2) { /* PZEM-004t voltage */
-                float voltage = wsensor.get_voltage(config.display_source_volt_wsensNum(), CORRECTED);
-                if(wsensor.checkVolt(voltage)) {
-                    myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
-                    myNex.writeNum("Main.uBat.xcen", 1);
-                    myNex.writeNum("Main.uBat.pco", 2016);
-                }
-                else myNex.writeStr("Main.uBat.txt", "");
-            }
-            else if(config.display_source_volt_volt() == 3) { /* SenseAir S8 CO2 level */
-                float co2 = wsensor.get_co2(config.display_source_volt_wsensNum(), CORRECTED);
-                if(wsensor.checkCo2(co2)) {
-                    myNex.writeStr("Main.uBat.txt", String((int)round(co2)) + "ppm");
-                    myNex.writeNum("Main.uBat.xcen", 1);
-                    myNex.writeNum("Main.uBat.pco", _air_color[_co2_level]);
-                }
-                else myNex.writeStr("Main.uBat.txt", "");
-            }
-            else myNex.writeStr("Main.uBat.txt", "");
-        }
-        else myNex.writeStr("Main.uBat.txt", "");
-    }
-    else if(config.display_source_volt_sens() == 2) { // voltage from thingspeak
-        float voltage = thingspeak.get_field(config.display_source_volt_thing());
-        if((wsensor.checkVolt(voltage) or wsensor.checkBatVolt(voltage)) and thingspeak.dataRelevance()) {
-            myNex.writeStr("Main.uBat.txt", String(round(voltage * 100) / 100) + lang.v());
-            myNex.writeNum("Main.uBat.xcen", 2);
-            myNex.writeNum("Main.uBat.pco", 2016);
-        }
-        else myNex.writeStr("Main.uBat.txt", "");
-    }
-    else if(config.display_source_volt_sens() == 3) { // Index for Air Quality
-        float iaq = sensors.get_bme680_iaq(CORRECTED);
-        if(sensors.checkIaq(iaq)) {
-            myNex.writeStr("Main.uBat.txt", "IAQ " + String((int)round(iaq)));
-            myNex.writeNum("Main.uBat.xcen", 1);
-            myNex.writeNum("Main.uBat.pco", _air_color[_iaq_level]);
-        }
-        else myNex.writeStr("Main.uBat.txt", "");
-    }
-    else myNex.writeStr("Main.uBat.txt", "");
+void Nextion::_voltage(String volt, uint8_t voltageColor) {
+    if(voltageColor > 3) voltageColor = 0;
+    nex.writeStr("Main.uBat.txt", volt);
+    nex.writeNum("Main.uBat.pco", _air_color[voltageColor]);
 }
 
 /**
  * Display battery symbol
  */
-void Nextion::_battery(void) {
-    if(config.display_source_bat_sens() == 1) { // battery symbol from wireless sensor
-        int level = wsensor.get_batteryLevel(config.display_source_bat_wsensNum());
-        if(wsensor.checkBatLvl(level) and wsensor.dataRelevance(config.display_source_bat_wsensNum())) 
-            myNex.writeNum("Main.bat.pic", level + 35);
-        else myNex.writeNum("Main.bat.pic", 35);
-    }
-    else if(config.display_source_bat_sens() == 2) { // battery symbol from thingspeak
-        unsigned int level = thingspeak.get_field(config.display_source_bat_thing());
-        if(wsensor.checkBatLvl(level) and thingspeak.dataRelevance())
-            myNex.writeNum("Main.bat.pic", level + 35);
-        else myNex.writeNum("Main.bat.pic", 35);
-    }
-    else myNex.writeNum("Main.bat.pic", 35);
+void Nextion::_battery(int level) {
+    if(validate.batLvl(level)) nex.writeNum("Main.bat.pic", level + 35);
+    else nex.writeNum("Main.bat.pic", 35);
 }
 
 /**
  * Display antenna symbol
  */
-void Nextion::_antenna(void) {
-    if(global.apMode) myNex.writeNum("Main.ant.pic", 70);
+void Nextion::_antenna(int rssi, bool isApMode) {
+    if(isApMode) nex.writeNum("Main.ant.pic", 70);
     else {
-        unsigned int ant = 30;
-        int rssi = WiFi.RSSI();
+        uint8_t ant = 30;
         if(rssi > -51) ant = 34;
         if(rssi < -50 && rssi > -76) ant = 33;
         if(rssi <- 75 && rssi > -96) ant = 32;
         if(rssi < -95) ant = 31;
         if(rssi >= 0) ant = 30;
-        myNex.writeNum("Main.ant.pic", ant);
+        nex.writeNum("Main.ant.pic", ant);
     }
 }
 
 /**
  * Display temperature
- * @param sens temperature source
- * @param wsensNum wireless sensor number
- * @param tempSensor temperature sensor number (for wireless sensor)
- * @param thing thinspeak field number
- * @param field name of the temperature field in the display
- * @return displayed temperature
  */
-float Nextion::_temp(unsigned int sens, unsigned int wsensNum, unsigned int tempSensor, unsigned int thing, String field, uint8_t location) {
-    float temp = 40400.0;
-    if(sens == 1) temp = weather.get_currentTemp();                                 /* temperature from weather forecast */
-    if(sens == 2) {                                                                 /* temperature from wireless sensor */
-        if(wsensor.dataRelevance(wsensNum)) {
-            temp = wsensor.get_temperature(wsensNum, tempSensor, CORRECTED);
-        }
-    }
-    if(sens == 3) {                                                                 /* temperature from thingspeak */
-        if(thingspeak.dataRelevance()) {
-            temp = thingspeak.get_field(thing);
-        }
-    }
-    if(sens + location == 4) {                                                      /* temperature from BME280 */
-        temp = sensors.get_bme280_temp(CORRECTED);
-    }
-    if(sens + location == 5) {                                                      /* temperature from BMP180 */
-        temp = sensors.get_bmp180_temp(CORRECTED);
-    }
-    if(sens + location == 6) {                                                      /* temperature from SHT21 */
-        temp = sensors.get_sht21_temp(CORRECTED);
-    }
-    if(sens + location == 7) {                                                      /* temperature from DHT22 */
-        temp = sensors.get_dht22_temp(CORRECTED);
-    }
-    if(sens + location == 8) {                                                      /* temperature from DS18B20 */
-        temp = sensors.get_ds18b20_temp(CORRECTED);
-    }
-    if(sens + location == 9) {                                                      /* temperature from BME680 */
-        temp = sensors.get_bme680_temp(CORRECTED);
-    }
-    if(sens == 4 and location == INDOOR) {                                          /* temperature from sequence */
-        float tempSequence[4] = { 40400.0, 40400.0, 40400.0, 40400.0 }; 
-        for(unsigned int i=0; i<4; i++) {
-            if(config.display_source_sequence_temp(i) == 1) {                           /* Forecast */
-                tempSequence[i] = weather.get_currentTemp();
-            }
-            if(config.display_source_sequence_temp(i) == 2) {                           /* wireless sensor */
-                if(wsensor.dataRelevance(config.display_source_sequence_wsenstemp(i, 0))) {
-                    tempSequence[i] = wsensor.get_temperature(
-                        config.display_source_sequence_wsenstemp(i, 0),
-                        config.display_source_sequence_wsenstemp(i, 1),
-                        CORRECTED
-                    );
-                }
-            }
-            if(config.display_source_sequence_temp(i) == 3) {                           /* thingspeak */
-                if(thingspeak.dataRelevance()) {
-                    tempSequence[i] = thingspeak.get_field(config.display_source_sequence_thngtemp(i));
-                }
-            }
-            if(config.display_source_sequence_temp(i) == 4) {                           /* BME280 */
-                tempSequence[i] = sensors.get_bme280_temp(CORRECTED);
-            }
-            if(config.display_source_sequence_temp(i) == 5) {                           /* BMP180 */
-                tempSequence[i] = sensors.get_bmp180_temp(CORRECTED);
-            }
-            if(config.display_source_sequence_temp(i) == 6) {                           /* SHT21 */
-                tempSequence[i] = sensors.get_sht21_temp(CORRECTED);
-            }
-            if(config.display_source_sequence_temp(i) == 7) {                           /* DHT22 */
-                tempSequence[i] = sensors.get_dht22_temp(CORRECTED);
-            }
-            if(config.display_source_sequence_temp(i) == 8) {                           /* DS18B20 */
-                tempSequence[i] = sensors.get_ds18b20_temp(CORRECTED);
-            }
-            if(config.display_source_sequence_temp(i) == 9) {                           /* BME680 */
-                tempSequence[i] = sensors.get_bme680_temp(CORRECTED);
-            }
-
-            if(sensors.checkTemp(tempSequence[i])) myNex.writeStr("Main.tempSeq" + String(i) + ".txt", String(int(round(tempSequence[i]))) + "°C");
-            else myNex.writeStr("Main.tempSeq" + String(i) + ".txt", "--");
-
-            myNex.writeStr("Main.txtSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
-        }
-    }
-
-    else {
-        if(sensors.checkTemp(temp)) myNex.writeStr(field, String(int(round(temp))) + "°C");
-        else myNex.writeStr(field, "--");
-        if(field == "Main.tempInside.txt") {
-            for(unsigned int i=0; i<4; i++) {
-                myNex.writeStr("Main.txtSeq" + String(i) + ".txt", "--");
-            }
-        }
-    }
-
-    return temp;
+void Nextion::_temp(float temp, String field) {
+    if(validate.temp(temp)) nex.writeStr(field, String(int(round(temp))) + "°C");
+    else nex.writeStr(field, "--");
 }
 
 /**
  * Display humidity
- * @param sens humidity source
- * @param wsensNum wireless sensor number
- * @param thing thinspeak field number
- * @param field name of the humidity field in the display
  */
-void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing, String field, uint8_t location) {
-    float hum = 40400.0;
-    if(sens == 1) hum = weather.get_currentHum();                                   /* humudity from weather forecast */
-    if(sens == 2) {                                                                 /* humidity from wireless sensor */
-        if(wsensor.dataRelevance(wsensNum)) {
-            hum = wsensor.get_humidity(wsensNum, CORRECTED);
-        }
-    }
-    if(sens == 3) {                                                                 /* humidity from thingspeak */
-        if(thingspeak.dataRelevance()) {
-            hum = thingspeak.get_field(thing);
-        }
-    }
-    if(sens + location == 4) {                                                      /* humidity from BME280 */
-        hum = sensors.get_bme280_hum(CORRECTED);
-    }
-    if(sens + location == 5) {                                                      /* humidity from SHT21 */
-        hum = sensors.get_sht21_hum(CORRECTED);
-    }
-    if(sens + location == 6) {                                                      /* humidity from DHT22 */
-        hum = sensors.get_dht22_hum(CORRECTED);
-    }
-    if(sens + location == 7) {                                                      /* humidity from BME680 */
-        hum = sensors.get_bme680_hum(CORRECTED);
-    }
-    if(sens == 4 and location == INDOOR) {                                          /* humidity from sequence */
-        float humSequence[4] = { 40400.0, 40400.0, 40400.0, 40400.0 }; 
-        for(unsigned int i=0; i<4; i++) {
-            if(config.display_source_sequence_hum(i) == 1) {                            /* Forecast */
-                humSequence[i] = weather.get_currentHum();
-            }
-            if(config.display_source_sequence_hum(i) == 2) {                            /* wireless sensor */
-                if(wsensor.dataRelevance(config.display_source_sequence_wsenshum(i))) {
-                    humSequence[i] = wsensor.get_humidity(
-                        config.display_source_sequence_wsenshum(i),
-                        CORRECTED
-                    );
-                }
-            }
-            if(config.display_source_sequence_hum(i) == 3) {                            /* thingspeak */
-                if(thingspeak.dataRelevance()) {
-                    humSequence[i] = thingspeak.get_field(config.display_source_sequence_thnghum(i));
-                }
-            }
-            if(config.display_source_sequence_hum(i) == 4) {                            /* BME280 */
-                humSequence[i] = sensors.get_bme280_hum(CORRECTED);
-            }
-            if(config.display_source_sequence_hum(i) == 5) {                            /* SHT21 */
-                humSequence[i] = sensors.get_sht21_hum(CORRECTED);
-            }
-            if(config.display_source_sequence_hum(i) == 6) {                            /* DHT22 */
-                humSequence[i] = sensors.get_dht22_hum(CORRECTED);
-            }
-            if(config.display_source_sequence_hum(i) == 7) {                            /* BME680 */
-                humSequence[i] = sensors.get_bme680_hum(CORRECTED);
-            }
+void Nextion::_hum(float hum, String field) {
+    if(validate.hum(hum)) nex.writeStr(field, String(int(round(hum))) + "%");
+    else nex.writeStr(field, "--");
+}
 
-            if(sensors.checkHum(humSequence[i])) { 
-                myNex.writeStr("Main.humSeq" + String(i) + ".txt", String(int(round(humSequence[i]))) + "%");
-            }
-            else myNex.writeStr("Main.humSeq" + String(i) + ".txt", "--");
-        }
-    }
+/**
+ * Display sequence
+ */
+void Nextion::_sequence(float* tempSequence, float* humSequence, String* nameSequence) {
+    for(unsigned int i=0; i<4; i++) {
+        if(validate.temp(tempSequence[i])) 
+            nex.writeStr("Main.tempSeq" + String(i) + ".txt", String(int(round(tempSequence[i]))) + "°C");
+        else nex.writeStr("Main.tempSeq" + String(i) + ".txt", "--");
 
-    else {
-        if(sensors.checkHum(hum)) myNex.writeStr(field, String(int(round(hum))) + "%");
-        else myNex.writeStr(field, "--");
+        if(validate.hum(humSequence[i]))
+            nex.writeStr("Main.humSeq" + String(i) + ".txt", String(int(round(humSequence[i]))) + "%");
+        else nex.writeStr("Main.humSeq" + String(i) + ".txt", "--");
+
+        nex.writeStr("Main.txtSeq" + String(i) + ".txt", nameSequence[i]);
     }
 }
 
@@ -602,13 +367,13 @@ void Nextion::_hum(unsigned int sens, unsigned int wsensNum, unsigned int thing,
 void Nextion::_comfortLevel() {
     /* -- */
     if(config.display_source_descr() == 0) {
-        myNex.writeNum("Main.seq.val", 0);
-        myNex.writeStr("Main.comfort.txt", "");
+        nex.writeNum("Main.seq.val", 0);
+        nex.writeStr("Main.comfort.txt", "");
     }
 
     /* comfort level */
     if(config.display_source_descr() == 1) {
-        myNex.writeNum("Main.seq.val", 0);
+        nex.writeNum("Main.seq.val", 0);
         String comfort = lang.comfort(global.comfort);
 
         if(global.iaq_level) {
@@ -620,48 +385,48 @@ void Nextion::_comfortLevel() {
             if(comfort.length()) comfort += ". ";
             comfort += lang.airQuality(global.co2_level);
         }
-        myNex.writeStr("Main.comfort.txt", comfort);
+        nex.writeStr("Main.comfort.txt", comfort);
     }
 
     /* sequence */
     if(config.display_source_descr() == 2) {
-        myNex.writeNum("Main.seq.val", 1);
+        nex.writeNum("Main.seq.val", 1);
     }
 }
 
 /**
  * Display weather description
  */
-void Nextion::_weatherDescription(void) {
-    if(weather.get_description() == "") myNex.writeStr("Main.description.txt", "--");
-    myNex.writeStr("Main.description.txt", weather.get_description());
+void Nextion::_weatherDescription() {
+    if(weather.get_description() == "") nex.writeStr("Main.description.txt", "--");
+    nex.writeStr("Main.description.txt", weather.get_description());
 }
 
 /**
  * Display current weather icon
  */
-void Nextion::_currentIcon(void) {
-    if(weather.get_currentIcon() == 0) myNex.writeNum("Main.icon0.pic", 64);
-    else myNex.writeNum("Main.icon0.pic", weather.get_currentIcon() + 9);
+void Nextion::_currentIcon() {
+    if(weather.get_currentIcon() == 0) nex.writeNum("Main.icon0.pic", 64);
+    else nex.writeNum("Main.icon0.pic", weather.get_currentIcon() + 9);
     switch(weather.get_currentIcon()) {
         case 1: {
-            if(weather.get_isDay()) myNex.writeNum("Main.icon0.pic", 10);
-            else myNex.writeNum("Main.icon0.pic", 11);
+            if(weather.get_isDay()) nex.writeNum("Main.icon0.pic", 10);
+            else nex.writeNum("Main.icon0.pic", 11);
         }; break;
         case 2: {
-            if(weather.get_isDay()) myNex.writeNum("Main.icon0.pic", 12);
-            else myNex.writeNum("Main.icon0.pic", 13);
+            if(weather.get_isDay()) nex.writeNum("Main.icon0.pic", 12);
+            else nex.writeNum("Main.icon0.pic", 13);
         }; break;
-        case 3: myNex.writeNum("Main.icon0.pic", 14); break;
-        case 4: myNex.writeNum("Main.icon0.pic", 15); break;
-        case 5: myNex.writeNum("Main.icon0.pic", 16); break;
+        case 3: nex.writeNum("Main.icon0.pic", 14); break;
+        case 4: nex.writeNum("Main.icon0.pic", 15); break;
+        case 5: nex.writeNum("Main.icon0.pic", 16); break;
         case 6: {
-            if(weather.get_isDay()) myNex.writeNum("Main.icon0.pic", 17);
-            else myNex.writeNum("Main.icon0.pic", 18);
+            if(weather.get_isDay()) nex.writeNum("Main.icon0.pic", 17);
+            else nex.writeNum("Main.icon0.pic", 18);
         }; break;
-        case 7: myNex.writeNum("Main.icon0.pic", 19); break;
-        case 8: myNex.writeNum("Main.icon0.pic", 20); break;
-        default: myNex.writeNum("Main.icon0.pic", 64); break;
+        case 7: nex.writeNum("Main.icon0.pic", 19); break;
+        case 8: nex.writeNum("Main.icon0.pic", 20); break;
+        default: nex.writeNum("Main.icon0.pic", 64); break;
     }
 }
 
@@ -670,13 +435,13 @@ void Nextion::_currentIcon(void) {
  * @param temp 
  */
 void Nextion::_thermometer(float temp) {
-    myNex.writeNum("Main.thermometer.pic", temp < 0.0 ? 40 : 41);
+    nex.writeNum("Main.thermometer.pic", temp < 0.0 ? 40 : 41);
 }
 
 /**
  * Display pressure
  */
-void Nextion::_pres(void) {
+void Nextion::_pres() {
     float pres = 40400.0;
     if(config.display_source_presOut_sens() == 1) // pressure outside from weather forecast
         pres = weather.get_currentPres();
@@ -692,33 +457,33 @@ void Nextion::_pres(void) {
         pres = sensors.get_bmp180_pres(CORRECTED);
     if(config.display_source_presOut_sens() == 6) // pressure outside from BME680
         pres = sensors.get_bme680_pres(CORRECTED);
-    if(sensors.checkPres(pres)) 
-        myNex.writeStr("Main.presOutside.txt", String(int(round(pres * 0.75))) + lang.mm());
-    else myNex.writeStr("Main.presOutside.txt", "--");
+    if(validate.pres(pres)) 
+        nex.writeStr("Main.presOutside.txt", String(int(round(pres * 0.75))) + lang.mm());
+    else nex.writeStr("Main.presOutside.txt", "--");
 }
 
 /**
  * Display wind speed
  */
-void Nextion::_windSpeed(void) {
-    if(weather.checkWind(weather.get_currentWindSpeed()))
-        myNex.writeStr("Main.wind0.txt", String(int(round(weather.get_currentWindSpeed()))) + lang.ms());
-    else myNex.writeStr("Main.wind0.txt", "--");
+void Nextion::_windSpeed() {
+    if(validate.wind(weather.get_currentWindSpeed()))
+        nex.writeStr("Main.wind0.txt", String(int(round(weather.get_currentWindSpeed()))) + lang.ms());
+    else nex.writeStr("Main.wind0.txt", "--");
 }
 
 /**
  * Display wind direction
  */
-void Nextion::_windDirection(void) {
+void Nextion::_windDirection() {
     unsigned int deg = round(float(weather.get_currentWindDir()) / 45.0);
     if(deg > 7) deg = 0;
-    myNex.writeNum("Main.windDir0.pic", deg + 42);
+    nex.writeNum("Main.windDir0.pic", deg + 42);
 }
 
 /**
  * Display the time and date of the last weather update
  */
-void Nextion::_updated(void) {
+void Nextion::_updated() {
     char buf[32] = "";
     sprintf(buf, "⭮ %02d.%02d.%d %d:%02d:%02d",
         day(weather.get_currentUpdated()),
@@ -728,40 +493,40 @@ void Nextion::_updated(void) {
         minute(weather.get_currentUpdated()),
         second(weather.get_currentUpdated())
     );
-    if(weather.get_currentUpdated() == 0) myNex.writeStr("Main.updatedTime.txt", "--");
-    else myNex.writeStr("Main.updatedTime.txt", buf);
+    if(weather.get_currentUpdated() == 0) nex.writeStr("Main.updatedTime.txt", "--");
+    else nex.writeStr("Main.updatedTime.txt", buf);
 }
 
 /**
  * Display daily weather forecast
  */
-void Nextion::_weatherForecast(void) {
+void Nextion::_weatherForecast() {
     for(unsigned int i=0; i<4; i++) {
         // icons
-        if(weather.get_dailyIcon(i) == 0) myNex.writeNum("Main.icon" + String(i + 1) + ".pic", 29);
-        else myNex.writeNum("Main.icon" + String(i + 1) + ".pic", weather.get_dailyIcon(i) + 20);
+        if(weather.get_dailyIcon(i) == 0) nex.writeNum("Main.icon" + String(i + 1) + ".pic", 29);
+        else nex.writeNum("Main.icon" + String(i + 1) + ".pic", weather.get_dailyIcon(i) + 20);
 
         // max temp
-        if(sensors.checkTemp(weather.get_dailyDayTemp(i)))
-            myNex.writeStr("Main.tempMax" + String(i + 1) + ".txt", String(int(round(weather.get_dailyDayTemp(i)))) + "°C");
-        else myNex.writeStr("Main.tempMax" + String(i + 1) + ".txt", "--");
+        if(validate.temp(weather.get_dailyDayTemp(i)))
+            nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", String(int(round(weather.get_dailyDayTemp(i)))) + "°C");
+        else nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", "--");
 
         // min temp
-        if(sensors.checkTemp(weather.get_dailyNightTemp(i)))
-            myNex.writeStr("Main.tempMin" + String(i + 1) + ".txt", String(int(round(weather.get_dailyNightTemp(i)))) + "°C");
-        else myNex.writeStr("Main.tempMin" + String(i + 1) + ".txt", "--");
+        if(validate.temp(weather.get_dailyNightTemp(i)))
+            nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", String(int(round(weather.get_dailyNightTemp(i)))) + "°C");
+        else nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", "--");
 
         // wind speed
-        if(weather.checkWind(weather.get_dailyWindSpeed(i)))
-            myNex.writeStr("Main.wind" + String(i + 1) + ".txt", String(int(round(weather.get_dailyWindSpeed(i)))) + lang.ms());
-        else myNex.writeStr("Main.wind" + String(i + 1) + ".txt", "--");
+        if(validate.wind(weather.get_dailyWindSpeed(i)))
+            nex.writeStr("Main.wind" + String(i + 1) + ".txt", String(int(round(weather.get_dailyWindSpeed(i)))) + lang.ms());
+        else nex.writeStr("Main.wind" + String(i + 1) + ".txt", "--");
     }
 }
 
 /**
  * Sending data to display hourly forecast
  */
-void Nextion::_hourlyData(void) {
+void Nextion::_hourlyData() {
     char dat[22] = "";
     char buf[20] = "";
     Serial1.print("Hourly.data0.txt=\"");
@@ -817,11 +582,11 @@ void Nextion::_hourlyData(void) {
 /**
  * Initialize daily forecast links to hourly forecast
  */
-void Nextion::_daily2hourly(void) {
+void Nextion::_daily2hourly() {
     unsigned int fd = 2;
     for(unsigned int i=0; i<40; i++) {
         if(hour(weather.get_hourlyDate(i)) == 0) {
-            if(i != 0) myNex.writeNum("Hourly.day" + String(fd++) + ".val", i);
+            if(i != 0) nex.writeNum("Hourly.day" + String(fd++) + ".val", i);
             if(fd > 4) break;
         }
     }
@@ -830,7 +595,7 @@ void Nextion::_daily2hourly(void) {
 /**
  * Sending data to display outdoor weather history
  */
-void Nextion::_historyOut(void) {
+void Nextion::_historyOut() {
     char dat[18] = "";
     char buf[20] = "";
     Serial1.print("HistoryOut.data0.txt=\"");
@@ -871,7 +636,7 @@ void Nextion::_historyOut(void) {
 /**
  * Sending data to display indoor weather history
  */
-void Nextion::_historyIn(void) {
+void Nextion::_historyIn() {
     char dat[15] = "";
     char buf[20] = "";
     Serial1.print("HistoryIn.data0.txt=\"");
@@ -908,7 +673,7 @@ void Nextion::_historyIn(void) {
 /**
  * Sending alarms data
  */
-void Nextion::_alarms(void) {
+void Nextion::_alarms() {
     char alarmData[144];
     char buf[3];
     unsigned int alarmOn = 0;
@@ -931,13 +696,13 @@ void Nextion::_alarms(void) {
     Serial1.write(0xFF);
     Serial1.write(0xFF);
     Serial1.write(0xFF);
-    myNex.writeNum("Main.alarm.pic", alarmOn ? 71 : 72);
+    nex.writeNum("Main.alarm.pic", alarmOn ? 71 : 72);
 }
 
 /**
  * Receive date and time from display
  */
-void Nextion::dataReceive(void) {
+void Nextion::dataReceive() {
     while(Serial1.available()) {
         char nextionChar = Serial1.read();
         if(nextionChar == '{' or nextionChar == '\x87') {
