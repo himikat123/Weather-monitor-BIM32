@@ -35,6 +35,8 @@ SoftwareSerial Serial3;
 #include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
+#include "src/validate.hpp"
+Validate validate;
 #include "src/globals.hpp"
 Configuration config;
 #include "src/sensors.hpp"
@@ -51,6 +53,8 @@ Sound sound;
 Thingspeak thingspeak;
 #include "src/narodmon.hpp"
 Narodmon narodmon;
+#include "src/agregateData.hpp"
+AgregateData agregateData;
 #include "src/fonts.hpp"
 #include "src/nextion.hpp"
 Nextion nextion;
@@ -110,8 +114,8 @@ void setup() {
     }
     config.readConfig();
 
-    //myNex.writeNum("sleep", 0);
-    //myNex.writeStr("page Logo");
+    //nex.writeNum("sleep", 0);
+    //nex.writeStr("page Logo");
 
     xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
     xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);

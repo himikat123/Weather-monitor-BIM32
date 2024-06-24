@@ -40,15 +40,6 @@ class Sensors {
         void init(void);
         void read(void);
         void BME680Read(void);
-        bool checkTemp(float temp);
-        bool checkHum(float hum);
-        bool checkPres(float pres);
-        bool checkLight(float light);
-        bool checkVolt(float volt);
-        bool checkIaq(float iaq);
-        bool checkBatVolt(float volt);
-        bool checkBatLvl(int lvl);
-        bool checkBatPercent(int percent);
         float get_esp32_temp(bool corr);
         float get_bme280_temp(bool corr);
         float get_bme280_hum(bool corr);
@@ -111,7 +102,7 @@ class Sensors {
         void _MAX44009Init(void);
         void _BH1750Init(void);
         void _BME680Init(void);
-        bool _bme680_checkIaqSensorStatus(void);
+        bool _bme680_validateIaqSensorStatus(void);
         void _bme680_loadState(void);
         void _bme680_updateState(void);
 
@@ -163,69 +154,6 @@ void Sensors::read(void) {
     _BH1750Read();
     _ESP32Read();
     _AnalogRead();
-}
-
-/**
- * Check if temperature is within the normal range
- */
-bool Sensors::checkTemp(float temp) {
-    return (temp >= -55.0 and temp <= 100.0);
-}
-
-/**
- * Check if humidity is within the normal range
- */
-bool Sensors::checkHum(float hum) {
-    return (hum >= 0.0 and hum <= 100.0);
-}
-
-/**
- * Check if pressure is within the normal range
- */
-bool Sensors::checkPres(float pres) {
-    return (pres >= 800.0 and pres <= 1200.0);
-}
-
-/**
- * Check if ambient light is within the normal range
- */
-bool Sensors::checkLight(float light) {
-    return (light >= 0.0 and light <= 120000.0);
-}
-
-/**
- * Check if analog voltage is within the normal range
- */
-bool Sensors::checkVolt(float volt) {
-    return (volt >= 0.0 and volt <= 3.3);
-}
-
-/**
- * Check if IAQ is within the normal range
- */
-bool Sensors::checkIaq(float iaq) {
-    return (iaq >= 0.0 and iaq <= 500.0);
-}
-
-/**
- * Check if battery voltage is within the normal range
- */
-bool Sensors::checkBatVolt(float volt) {
-    return (volt >= 0.0 and volt <= 12.0);
-}
-
-/**
- * Check if battery level is within the normal range
- */
-bool Sensors::checkBatLvl(int lvl) {
-    return (lvl >= 1 and lvl <= 4);
-}
-
-/**
- * Check if battery percentage is within the normal range
- */
-bool Sensors::checkBatPercent(int percent) {
-    return (percent >= 0 and percent <= 100);
 }
 
 /**
@@ -384,10 +312,10 @@ void Sensors::_BME680Init(void) {
     };
   
     iaqSensor.begin(BME68X_I2C_ADDR_HIGH, Wire);
-    _bme680_det = _bme680_checkIaqSensorStatus();
+    _bme680_det = _bme680_validateIaqSensorStatus();
     if(_bme680_det) {
         iaqSensor.setConfig(bsec_config_iaq);
-        _bme680_checkIaqSensorStatus();
+        _bme680_validateIaqSensorStatus();
         _bme680_loadState();
 
         bsec_virtual_sensor_t sensorList[4] = {
@@ -397,7 +325,7 @@ void Sensors::_BME680Init(void) {
             BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY
         };
         iaqSensor.updateSubscription(sensorList, 4, BSEC_SAMPLE_RATE_LP);
-        _bme680_checkIaqSensorStatus();
+        _bme680_validateIaqSensorStatus();
     }
 }
 
@@ -405,7 +333,7 @@ void Sensors::_BME680Init(void) {
  * Check BME680 Status
  * @return true if there are no problems
  */
-bool Sensors::_bme680_checkIaqSensorStatus(void) {
+bool Sensors::_bme680_validateIaqSensorStatus(void) {
     if(iaqSensor.bsecStatus != BSEC_OK) return false;
     if(iaqSensor.bme68xStatus != BME68X_OK) return false;
     return true;
@@ -434,7 +362,7 @@ void Sensors::_bme680_loadState(void) {
                 }
 
                 iaqSensor.setState(_bme680_bsecState);
-                _bme680_checkIaqSensorStatus();
+                _bme680_validateIaqSensorStatus();
 
                 Serial.println("done");
             }
@@ -456,7 +384,7 @@ void Sensors::_bme680_updateState(void) {
 
         if(LittleFS.exists("/bme680.json")) {
             iaqSensor.getState(_bme680_bsecState);
-            _bme680_checkIaqSensorStatus();
+            _bme680_validateIaqSensorStatus();
 
             _bme680_stateTimestamp = now();
             _bme680_stateCounter++;
@@ -602,7 +530,7 @@ void Sensors::BME680Read(void) {
             _bme680_iaq_accuracy = iaqSensor.iaqAccuracy;
             _bme680_updateState();
         }
-        else _bme680_checkIaqSensorStatus();
+        else _bme680_validateIaqSensorStatus();
     }
     else {
         _bme680_temp = 40400.0;

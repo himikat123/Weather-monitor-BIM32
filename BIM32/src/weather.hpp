@@ -8,8 +8,6 @@ class Weather {
 
     public:
         void update();
-        bool checkWind(float wind);
-
         float get_currentTemp();
         float get_currentHum();
         float get_currentPres();
@@ -70,13 +68,6 @@ class Weather {
         void _updateOpenweathermapHourly(void);
         void _calculateDaily(void);
 };
-
-/**
- * Check if wind speed is within the normal range
- */
-bool Weather::checkWind(float wind) {
-    return (wind >= 0.0 and wind <= 100.0);
-}
 
 /**
  * Weather icon code conversion

@@ -182,17 +182,17 @@ unsigned int get_brightness(unsigned int display_num) {
         case 1: {
             float bright = 0.0;
             if(config.display_lightSensor(display_num) == 0) {
-                bright = sensors.checkVolt(sensors.get_analog_voltage(CORRECTED)) 
+                bright = validate.volt(sensors.get_analog_voltage(CORRECTED)) 
                     ? sensors.get_analog_voltage(CORRECTED) * 30 
                     : 20;
             }
             if(config.display_lightSensor(display_num) == 1) {
-                bright = sensors.checkLight(sensors.get_max44009_light(CORRECTED)) 
+                bright = validate.light(sensors.get_max44009_light(CORRECTED)) 
                     ? sensors.get_max44009_light(CORRECTED) 
                     : 20;
             }
             if(config.display_lightSensor(display_num) == 2) {
-                bright = sensors.checkLight(sensors.get_bh1750_light(CORRECTED)) 
+                bright = validate.light(sensors.get_bh1750_light(CORRECTED)) 
                     ? sensors.get_bh1750_light(CORRECTED) 
                     : 20;
             }

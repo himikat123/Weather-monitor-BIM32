@@ -124,17 +124,17 @@ String web_sensorsPrepare(bool logged) {
         json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, RAW);
         json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
         json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, RAW);
-        json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType(i);
+        json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType();
         json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, RAW);
-        json["wsensor"]["current"]["name"][i] = wsensor.get_energyType(i);
+        json["wsensor"]["current"]["name"][i] = wsensor.get_energyType();
         json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, RAW);
-        json["wsensor"]["power"]["name"][i] = wsensor.get_energyType(i);
+        json["wsensor"]["power"]["name"][i] = wsensor.get_energyType();
         json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, RAW);
-        json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType(i);
+        json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType();
         json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, RAW);
-        json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType(i);
+        json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType();
         json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, RAW);
-        json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type(i);
+        json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type();
         json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
     }
 

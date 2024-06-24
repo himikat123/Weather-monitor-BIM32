@@ -217,13 +217,13 @@ void comfortCalculate() {
         default: hum = 40400; break;
     }
 
-    if(sensors.checkTemp(float(temp))) {
+    if(validate.temp(float(temp))) {
         if(temp > config.comfort_temp_max()) tempLevel = 1;
         if(temp < config.comfort_temp_min()) tempLevel = 2;
     }
     else tempLevel = -1;
 
-    if(sensors.checkHum(float(hum))) {
+    if(validate.hum(float(hum))) {
         if(hum > config.comfort_hum_max()) humLevel = 1;
         if(hum < config.comfort_hum_min()) humLevel = 2;
     }
@@ -241,7 +241,7 @@ void comfortCalculate() {
 
     if(config.comfort_iaq_source() == 1) {
         float iaq = sensors.get_bme680_iaq(CORRECTED);
-        if(sensors.checkIaq(iaq)) {
+        if(validate.iaq(iaq)) {
             global.iaq_level = AIR_CLEAN;
             if(iaq > 100.0) global.iaq_level = AIR_POLLUTED;
             if(iaq > 200.0) global.iaq_level = AIR_HEAVILY_POLLUTED;
@@ -252,7 +252,7 @@ void comfortCalculate() {
     if(config.comfort_co2_source() == 1) {
         if(wsensor.dataRelevance(config.comfort_co2_wsensNum())) {
             float co2 = wsensor.get_co2(config.comfort_co2_wsensNum(), CORRECTED);
-            if(wsensor.checkCo2(co2)) {
+            if(validate.co2(co2)) {
                 global.co2_level = AIR_CLEAN;
                 if(co2 > 800.0) global.co2_level = AIR_POLLUTED;
                 if(co2 > 1400.0) global.co2_level = AIR_HEAVILY_POLLUTED;

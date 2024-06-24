@@ -277,7 +277,7 @@ void WS2812b::_date() {
  */
 void WS2812b::_temp(float t, uint8_t digs) {
     int tmp = round(t);
-    if(!sensors.checkTemp(t)) { // if the data is wrong
+    if(!validate.temp(t)) { // if the data is wrong
         _disp_seg_img[0][0] = digs == DISP4 ? SYMB_MINUS : SYMB_SPACE;
         _disp_seg_img[0][1] = SYMB_MINUS;
         _disp_seg_img[0][2] = digs == DISP4 ? SYMB_DEGREE : SYMB_MINUS;
@@ -304,7 +304,7 @@ void WS2812b::_temp(float t, uint8_t digs) {
  */
 void WS2812b::_hum(float h, uint8_t digs) {
     int hm = round(h);
-    if(!sensors.checkHum(h)) { // if the data is wrong
+    if(!validate.hum(h)) { // if the data is wrong
         _disp_seg_img[0][0] = digs == DISP4 ? SYMB_MINUS : SYMB_SPACE;
         _disp_seg_img[0][1] = SYMB_MINUS;
         _disp_seg_img[0][2] = digs == DISP4 ? SYMB_SPACE : SYMB_MINUS;
@@ -331,7 +331,7 @@ void WS2812b::_hum(float h, uint8_t digs) {
  */
 void WS2812b::_pres(float p, uint8_t digs) {
     int prs = round(p * 0.75);
-    if(!sensors.checkPres(p)) { // if the data is wrong
+    if(!validate.pres(p)) { // if the data is wrong
         _disp_seg_img[0][0] = digs == DISP4 ? SYMB_MINUS : SYMB_SPACE;
         _disp_seg_img[0][1] = SYMB_MINUS;
         _disp_seg_img[0][2] = SYMB_MINUS;
@@ -355,7 +355,7 @@ void WS2812b::_pres(float p, uint8_t digs) {
  */
 void WS2812b::_iaq(float i, uint8_t digs) {
     int iaq = round(i);
-    if(!sensors.checkIaq(i)) { // if the data is wrong
+    if(!validate.iaq(i)) { // if the data is wrong
         _disp_seg_img[0][0] = digs == DISP4 ? SYMB_A : SYMB_SPACE;
         _disp_seg_img[0][1] = digs == DISP4 ? SYMB_MINUS : SYMB_A;
         _disp_seg_img[0][2] = SYMB_MINUS;
@@ -379,7 +379,7 @@ void WS2812b::_iaq(float i, uint8_t digs) {
  */
 void WS2812b::_co2(float c, uint8_t digs) {
     int co2 = round(c);
-    if(!wsensor.checkCo2(c)) { // if the data is wrong
+    if(!validate.co2(c)) { // if the data is wrong
         _disp_seg_img[0][0] = SYMB_MINUS;
         _disp_seg_img[0][1] = SYMB_MINUS;
         _disp_seg_img[0][2] = SYMB_MINUS;

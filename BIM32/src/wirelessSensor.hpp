@@ -4,20 +4,11 @@ class WirelessSensor {
     public:
         void receive(void);
         bool dataRelevance(uint8_t wsensNum);
-        bool checkVolt(float volt);
-        bool checkCurr(float curr);
-        bool checkPwr(float pwr);
-        bool checkEnrg(float enrg);
-        bool checkFrq(float frq);
-        bool checkCo2(float co2);
-        bool checkBatVolt(float volt);
-        bool checkBatLvl(int lvl);
-        bool checkBatPercent(float percent);
         int get_updated(unsigned int num);
         String get_sensorType(unsigned int num, unsigned int sensor);
         String get_lightType(unsigned int num);
-        String get_energyType(unsigned int num);
-        String get_co2Type(unsigned int num);
+        String get_energyType();
+        String get_co2Type();
         float get_temperature(unsigned int num, unsigned int sensor, bool corr);
         float get_humidity(unsigned int num, bool corr);
         float get_pressure(unsigned int num, bool corr);
@@ -148,69 +139,6 @@ bool WirelessSensor::dataRelevance(uint8_t wsensNum) {
     return (now() - _updated[wsensNum]) < (config.wsensor_expire(wsensNum) * 60);
 }
 
-/**
- * Check if PZEM-004t voltage is within the normal range
- */
-bool WirelessSensor::checkVolt(float volt) {
-    return (volt >= 80.0 and volt <= 260.0);
-}
-
-/**
- * Check if PZEM-004t current is within the normal range
- */
-bool WirelessSensor::checkCurr(float curr) {
-    return (curr >= 0.0 and curr <= 100.0);
-}
-
-/**
- * Check if PZEM-004t power is within the normal range
- */
-bool WirelessSensor::checkPwr(float pwr) {
-    return (pwr >= 0.0 and pwr <= 23000.0);
-}
-
-/**
- * Check if PZEM-004t energy is within the normal range
- */
-bool WirelessSensor::checkEnrg(float enrg) {
-    return (enrg >= 0.0 and enrg <= 10000.0);
-}
-
-/**
- * Check if PZEM-004t frequency is within the normal range
- */
-bool WirelessSensor::checkFrq(float frq) {
-    return (frq >= 45.0 and frq <= 65.0);
-}
-
-/**
- * Check if Senseair S8 CO2 is within the normal range
- */
-bool WirelessSensor::checkCo2(float co2) {
-    return (co2 >= 400.0 and co2 <= 2000.0);
-}
-
-/**
- * Check if battery voltage is within the normal range
- */
-bool WirelessSensor::checkBatVolt(float volt) {
-    return (volt >= 0.0 and volt <= 12.0);
-}
-
-/**
- * Check if battery level is within the normal range
- */
-bool WirelessSensor::checkBatLvl(int lvl) {
-    return (lvl >= 1 and lvl <= 4);
-}
-
-/**
- * Check if battery percentage is within the normal range
- */
-bool WirelessSensor::checkBatPercent(float percent) {
-    return (percent >= 0.0 and percent <= 100.0);
-}
-
 /*
  * Getters
  */
@@ -223,7 +151,7 @@ int WirelessSensor::get_updated(unsigned int num) {
 String WirelessSensor::get_sensorType(unsigned int num, unsigned int sensor) {
     if(num >= WSENSORS or sensor > 4) return "";
     if(sensor == 0) return String(_sensorType[num]);
-    else if(sensor >= 1 and sensor <= 4 and sensors.checkTemp(_temperature[num][sensor])) return "DS18B20";
+    else if(sensor >= 1 and sensor <= 4) return "DS18B20";
     else return "";
 }
 
@@ -232,13 +160,11 @@ String WirelessSensor::get_lightType(unsigned int num) {
     return String(_lightType[num]);
 }
 
-String WirelessSensor::get_energyType(unsigned int num) {
-    if(num >= WSENSORS or !checkVolt(_voltage[num])) return "";
+String WirelessSensor::get_energyType() {
     return "PZEM-004t";
 }
 
-String WirelessSensor::get_co2Type(unsigned int num) {
-    if(num >= WSENSORS or !checkCo2(_co2[num])) return "";
+String WirelessSensor::get_co2Type() {
     return "Senseair S8";
 }
 

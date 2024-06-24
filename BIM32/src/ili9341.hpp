@@ -249,7 +249,7 @@ void ILI9341::_showAntenna() {
 }
 
 void ILI9341::_showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
-    String buf = sensors.checkTemp(temp) ? (String(temp) + "°C") : "--";
+    String buf = validate.temp(temp) ? (String(temp) + "°C") : "--";
     _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, font == FONT3 ? CENTER : RIGHT, color);
 }
 
@@ -270,7 +270,7 @@ void ILI9341::_showTemperatureOutside(int temp) {
 }
 
 void ILI9341::_showHumidity(int hum, uint16_t x, uint16_t y) {
-    String buf = sensors.checkHum(hum) ? (String(hum) + "%") : "--";
+    String buf = validate.hum(hum) ? (String(hum) + "%") : "--";
     _printText(x, y, 58, 20, buf, FONT2, CENTER, HUMIDITY_COLOR);
 }
 
@@ -348,7 +348,7 @@ void ILI9341::_showVoltageOrPercentage() {
 
         if(config.display_source_volt_volt() == 0) { // Voltage
             if(_prevVolt != volt) {
-                if(sensors.checkBatVolt(volt)) sprintf(buf, "%.2f", volt);
+                if(validate.batVolt(volt)) sprintf(buf, "%.2f", volt);
                 _printText(198, 10, 58, 16, String(buf) + lang.v(), FONT1, RIGHT, BATTERY_COLOR);
                 _prevVolt = volt;
             }
@@ -356,7 +356,7 @@ void ILI9341::_showVoltageOrPercentage() {
 
         else if(config.display_source_volt_volt() == 1) { // Percentage
             if(_prevPercent != percent) {
-                if(sensors.checkBatPercent(percent)) sprintf(buf, "%d", percent);
+                if(validate.batPercent(percent)) sprintf(buf, "%d", percent);
                 _printText(198, 10, 58, 16, String(buf) + "%", FONT1, RIGHT, BATTERY_COLOR);
                 _prevPercent = percent;
             }
@@ -391,7 +391,7 @@ void ILI9341::_showDescription(String description) {
 void ILI9341::_showPressure(int16_t pres) {
     if(_prevPresOut != pres) {
         String buf = "--";
-        if(sensors.checkPres(pres)) buf = String((int)round(pres * 0.75));
+        if(validate.pres(pres)) buf = String((int)round(pres * 0.75));
         _printText(250, 119, 70, 20, buf + lang.mm(), FONT2, CENTER, PRESSURE_COLOR);
         _prevPresOut = pres;
     }
@@ -400,7 +400,7 @@ void ILI9341::_showPressure(int16_t pres) {
 void ILI9341::_showWindSpeed(int8_t windSpeed) {
     if(_prevWindSpeed != windSpeed) {
         String buf = "--";
-        if(weather.checkWind(windSpeed)) buf = String(windSpeed);
+        if(validate.wind(windSpeed)) buf = String(windSpeed);
         _printText(93, 146, 40, 16, buf + lang.ms(), FONT1, LEFT, TEXT_COLOR);
         _prevWindSpeed = windSpeed;
     }
@@ -477,7 +477,7 @@ void ILI9341::_showForecast(uint16_t x, uint8_t num, int icon, float tempMax, fl
     int wnd = round(wind);
     if(_prevWindSpeedDaily[num] != wnd) {
         String buf = "--";
-        if(weather.checkWind(wnd)) buf = String(wnd);
+        if(validate.wind(wnd)) buf = String(wnd);
         _printText(x + 31, 224, 44, 15, buf + lang.ms(), FONT1, CENTER, TEXT_COLOR);
         _prevWindSpeedDaily[num] = wnd;
     }
