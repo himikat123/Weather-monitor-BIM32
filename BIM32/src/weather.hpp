@@ -16,7 +16,7 @@ class Weather {
         unsigned int get_currentIcon();
         bool get_isDay();
         String get_description();
-        int get_currentUpdated();
+        time_t get_currentUpdated();
 
         float get_dailyDayTemp(unsigned int num);
         float get_dailyNightTemp(unsigned int num);
@@ -41,7 +41,7 @@ class Weather {
         int _currentWindDir = -1;
         unsigned int _currentIcon = 0;
         bool _is_day = false;
-        int _currentUpdated = -1;
+        time_t _currentUpdated = -1;
         String _country = "";
         String _city = "";
         String _lon = "";
@@ -368,7 +368,7 @@ String Weather::get_description() {
     return _description;
 }
 
-int Weather::get_currentUpdated() {
+time_t Weather::get_currentUpdated() {
     return _currentUpdated;
 }
 
