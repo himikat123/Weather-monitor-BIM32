@@ -622,6 +622,7 @@ class Configuration {
       if(file) {
         file.print(json);
         file.close();
+        vTaskDelay(500);
         readConfig();
         // TODO file corrupted после сохранения, хотя это не правда
         return false;

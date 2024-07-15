@@ -162,7 +162,7 @@ void TaskDisplay2(void *pvParameters) {
             }
         }
 
-        vTaskDelay(5);
+        vTaskDelay(10);
     }
 }
 

@@ -1,7 +1,9 @@
 #include <EasyNextionLibrary.h> // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
 EasyNex nex(Serial1);
 
-class Nextion {
+#include "lcdDisplay.hpp"
+
+class Nextion : LcdDisplay {
     #define NX4832K035 0
     #define NX4832T035 1
 
@@ -17,7 +19,6 @@ class Nextion {
         void dataReceive();
 
     private:
-        bool _power = true; // display on/off flag
         int _customData = -1; // flag of key symbols of receive from the display
         String _receivedData = "";
         uint16_t _air_color[4] = { 2016, 65520, 64512, 63488 };
@@ -25,21 +26,23 @@ class Nextion {
         void _NX4832K035_setRTC();
         void _NX4832T035_timeDate();
         void _networkPage();
-        void _voltage(String voltage, uint8_t voltageColor);
-        void _battery(int level);
-        void _antenna(int rssi, bool isApMode);
-        void _temp(float temp, String field);
-        void _hum(float hum, String field);
-        void _sequence(float* tempSequence, float* humSequence, String* nameSequence);
-        void _comfortLevel();
-        void _weatherDescription();
-        void _currentIcon();
-        void _thermometer(float temp);
-        void _pres();
-        void _windSpeed();
-        void _windDirection();
-        void _updated();
-        void _weatherForecast();
+        void _showVoltage();
+        void _showBattery();
+        void _showAntenna();
+        void _showTempIn();
+        void _showTempOut();
+        void _showHumIn();
+        void _showHumOut();
+        void _showPres();
+        void _showSequence();
+        void _showComfortLevel();
+        void _showWeatherDescription();
+        void _showCurrentIcon();
+        void _showThermometer();
+        void _showWindSpeed();
+        void _showWindDirection();
+        void _showUpdated();
+        void _showWeatherForecast();
         void _hourlyData();
         void _daily2hourly();
         void _historyOut();
@@ -138,9 +141,19 @@ void Nextion::init() {
 }
 
 void Nextion::refresh() {
-    nex.writeNum("sleep", _power ? 0 : 1);
+    if(millis() - _prevForced > 10000) {
+        _forced = true;
+        _prevForced = millis();
+    }
+
+    if(_prevPower != _power or _forced) {
+        nex.writeNum("sleep", _power ? 0 : 1);
+        _prevPower = _power;
+    }
 
     if(_power) {
+        _getData();
+
         if(config.display_model(0) == NX4832T035) _NX4832T035_timeDate();
         if(config.display_model(0) == NX4832K035) {
             if(global.clockSynchronize) {
@@ -149,53 +162,42 @@ void Nextion::refresh() {
             }
         }
 
-        float tempSequence[4] = {404.0, 404.0, 404.0, 404.0};
-        float humSequence[4] = {404.0, 404.0, 404.0, 404.0};
-        String nameSequence[4] = {"", "", "", ""};
-        float tempIn = agregateData.lcdTempIn(tempSequence);
-        float tempOut = agregateData.lcdTempOut();
-        float humIn = agregateData.lcdHumIn(humSequence);
-        float humOut = agregateData.lcdHumOut();
-        agregateData.lcdSequenceNames(nameSequence);
-        String voltage = agregateData.lcdVoltage();
-        uint8_t voltageColor = agregateData.lcdVoltageColor();
-        int batLevel = agregateData.lcdBatteryLevel();
-        int rssi = WiFi.RSSI();
-        bool isApMode = global.apMode;
-
         _networkPage();
-        _comfortLevel();
-        _voltage(voltage, voltageColor);
-        _battery(batLevel);
-        _antenna(rssi, isApMode);
+        _showComfortLevel();
+        _showVoltage();
+        _showBattery();
+        _showAntenna();
 
-        _temp(tempIn, "Main.tempInside.txt");
-        _hum(humIn, "Main.humInside.txt");
-        _sequence(tempSequence, humSequence, nameSequence);
+        _showTempIn();
+        _showHumIn();
+        _showSequence();
   
-        _weatherDescription();
-        _currentIcon();
-        //_thermometer(temp);
-        _temp(tempOut, "Main.tempOutside.txt");
-        _hum(humOut, "Main.humOutside.txt");
-        _pres();
-        _windSpeed();
-        _windDirection();
-        _updated();
-        _weatherForecast();
+        _showWeatherDescription();
+        _showCurrentIcon();
+        _showTempOut();
+        _showHumOut();
+        _showPres();
+        _showWindSpeed();
+        _showWindDirection();
+        _showUpdated();
+        _showWeatherForecast();
         _hourlyData();
-        _daily2hourly();
         _historyOut();
         _historyIn();
         _alarms();
     }
+    _forced = false;
 }
 
 /**
  * Change display brightness
  */
 void Nextion::brightness(unsigned int bright, bool reduc) {
-    if(_power) nex.writeNum("dim", reduc ? round(bright / 2) : bright);
+    uint8_t br = reduc ? round(bright / 2) : bright;
+    if(_prevBright != br or _forced) {
+        if(_power) nex.writeNum("dim", br);
+        _prevBright = br;
+    }
 }
 
 /**
@@ -241,7 +243,7 @@ void Nextion::setDisplayRTC() {
  * Set the time and date of the NX4832K035 display
  */
 void Nextion::_NX4832K035_setRTC() {
-    if(now() > 1665606321) {
+    if(now() > 1700000000) {
         nex.writeNum("rtc5", second());
         nex.writeNum("rtc4", minute());
         nex.writeNum("rtc3", hour());
@@ -255,271 +257,315 @@ void Nextion::_NX4832K035_setRTC() {
  * Sending time and date to the NX4832T035 display that does not have a built-in RTC
  */
 void Nextion::_NX4832T035_timeDate() {
-    String buf = "";
-    nex.writeStr("BigClock.hour.txt", String(config.clock_format() ? hour() : hourFormat12()));
-    nex.writeStr("BigClock.minute.txt", String(minute()));
-    unsigned int wd = weekday();
-    nex.writeStr("BigClock.weekday.txt", lang.weekdayShortName(wd));
-    if(config.lang() == "en") buf = lang.monthName(month()) + " " + String(day()) + ", " + String(year());
-    else buf = String(day()) + " " + lang.monthName(month()) + String(year());
-    nex.writeStr("BigClock.date.txt", buf);
-    nex.writeStr("Main.weekday0.txt", lang.weekdayShortName(wd));
-    if(++wd > 7) wd = 1;
-    nex.writeStr("Main.weekday2.txt", lang.weekdayShortName(wd));
-    if(++wd > 7) wd = 1;
-    nex.writeStr("Main.weekday3.txt", lang.weekdayShortName(wd));
-    if(++wd > 7) wd = 1;
-    nex.writeStr("Main.weekday4.txt", lang.weekdayShortName(wd));
-    buf = String();
+    if(_prevTHour != _tHour or _forced) {
+        nex.writeStr("BigClock.hour.txt", String(_tHour));
+        _prevTHour = _tHour;
+    }
+    if(_prevTMinute != _tMinute or _forced) {
+        nex.writeStr("BigClock.minute.txt", String(_tMinute));
+        _prevTMinute = _tMinute;
+    }
+    if(_prevTDay != _tDay or _prevTMonth != _tMonth or _prevTYear != _tYear or _forced) {
+        nex.writeStr("BigClock.date.txt", _tDay + " " + lang.monthName(_tMonth) + " " + _tYear);
+        _prevTDay = _tDay;
+        _prevTMonth = _tMonth;
+        _prevTYear = _tYear;
+    }
+    if(_prevTWeekday != _tWeekday or _forced) {
+        unsigned int wd = _tWeekday;
+        nex.writeStr("BigClock.weekday.txt", lang.weekdayShortName(wd));
+        nex.writeStr("Main.weekday0.txt", lang.weekdayShortName(wd));
+        if(++wd > 7) wd = 1;
+        nex.writeStr("Main.weekday2.txt", lang.weekdayShortName(wd));
+        if(++wd > 7) wd = 1;
+        nex.writeStr("Main.weekday3.txt", lang.weekdayShortName(wd));
+        if(++wd > 7) wd = 1;
+        nex.writeStr("Main.weekday4.txt", lang.weekdayShortName(wd));
+        _prevTWeekday = _tWeekday;
+    }
 }
 
 /**
  * Sending data to Network page
  */
 void Nextion::_networkPage() {
-    if(global.apMode) {
-        nex.writeStr("Network.Logo.txt", "Access Point");
-        nex.writeStr("Network.ssid.txt", config.accessPoint_ssid());
-        nex.writeStr("Network.rssi.txt", "100%");
-        nex.writeStr("Network.ip.txt", config.accessPoint_ip());
-        nex.writeStr("Network.mac.txt", WiFi.softAPmacAddress());
+    if(_prevNetLogo != _netLogo or _forced) {
+        nex.writeStr("Network.Logo.txt", _netLogo);
+        _prevNetLogo = _netLogo;
     }
-    else {
-        nex.writeStr("Network.Logo.txt", "WiFi");
-        nex.writeStr("Network.ssid.txt", WiFi.SSID());
-        nex.writeStr("Network.rssi.txt", String(WiFi.RSSI()) + "dBm");
-        nex.writeStr("Network.ip.txt", WiFi.localIP().toString());
-        nex.writeStr("Network.mac.txt", WiFi.macAddress());
+    if(_prevNetSsid != _netSsid or _forced) {
+        nex.writeStr("Network.ssid.txt", _netSsid);
+        _prevNetSsid = _netSsid;
     }
-    nex.writeStr("Network.temp.txt", String(int(round(sensors.get_esp32_temp(0)))) + "°C");
-    nex.writeStr("Network.frmw.txt", FW);
+    if(_prevNetRssi != _netRssi or _forced) {
+        nex.writeStr("Network.rssi.txt", _netRssi);
+        _prevNetRssi = _netRssi;
+    }
+    if(_prevNetIp != _netIp or _forced) {
+        nex.writeStr("Network.ip.txt", _netIp);
+        _prevNetIp = _netIp;
+    }
+    if(_prevNetMac != _netMac or _forced) {
+        nex.writeStr("Network.mac.txt", _netMac);
+        _prevNetMac = _netMac;
+    }
+    if(_prevNetTemp != _netTemp or _forced) {
+        nex.writeStr("Network.temp.txt", validate.temp(_netTemp) ? String(int(round(_netTemp))) + "°C" : "--");
+        _prevNetTemp = _netTemp;
+    }
+    if(_prevNetFw != _netFw or _forced) {
+        nex.writeStr("Network.frmw.txt", _netFw);
+        _prevNetFw = _netFw;
+    }
 }
 
 /**
  * Display voltage, percentage, CO2 or IAQ
  */
-void Nextion::_voltage(String volt, uint8_t voltageColor) {
-    if(voltageColor > 3) voltageColor = 0;
-    nex.writeStr("Main.uBat.txt", volt);
-    nex.writeNum("Main.uBat.pco", _air_color[voltageColor]);
+void Nextion::_showVoltage() {
+    if(_prevVolt != _volt or _forced) {
+        nex.writeStr("Main.uBat.txt", _volt);
+        _prevVolt = _volt;
+    } 
+    if(_prevVoltColor != _voltColor or _forced) {
+        if(_voltColor > 3) _voltColor = 0;
+        nex.writeNum("Main.uBat.pco", _air_color[_voltColor]);
+        _prevVoltColor = _voltColor;
+    }
 }
 
 /**
  * Display battery symbol
  */
-void Nextion::_battery(int level) {
-    if(validate.batLvl(level)) nex.writeNum("Main.bat.pic", level + 35);
-    else nex.writeNum("Main.bat.pic", 35);
+void Nextion::_showBattery() {
+    if(_prevBatLevel != _batLevel or _forced) {
+        nex.writeNum("Main.bat.pic", validate.batLvl(_batLevel) ? (_batLevel + 35) : 35);
+        _prevBatLevel = _batLevel;
+    }
 }
 
 /**
  * Display antenna symbol
  */
-void Nextion::_antenna(int rssi, bool isApMode) {
-    if(isApMode) nex.writeNum("Main.ant.pic", 70);
-    else {
-        uint8_t ant = 30;
-        if(rssi > -51) ant = 34;
-        if(rssi < -50 && rssi > -76) ant = 33;
-        if(rssi <- 75 && rssi > -96) ant = 32;
-        if(rssi < -95) ant = 31;
-        if(rssi >= 0) ant = 30;
+void Nextion::_showAntenna() {
+    if(_prevRssi != _rssi or _prevIsApMode != _isApMode or _forced) {
+        uint8_t ant = 0;
+        if(_isApMode) ant = 70;
+        else {
+            ant = 30;
+            if(_rssi > -51) ant = 34;
+            if(_rssi < -50 && _rssi > -76) ant = 33;
+            if(_rssi <- 75 && _rssi > -96) ant = 32;
+            if(_rssi < -95) ant = 31;
+            if(_rssi >= 0) ant = 30;
+        }
+        _prevRssi = _rssi;
+        _prevIsApMode = _isApMode;
         nex.writeNum("Main.ant.pic", ant);
     }
 }
 
 /**
- * Display temperature
+ * Display temperature inside
  */
-void Nextion::_temp(float temp, String field) {
-    if(validate.temp(temp)) nex.writeStr(field, String(int(round(temp))) + "°C");
-    else nex.writeStr(field, "--");
+void Nextion::_showTempIn() {
+    if(_prevTempIn != _tempIn or _forced) {
+        nex.writeStr("Main.tempInside.txt", validate.temp(_tempIn) 
+            ? (String(int(round(_tempIn))) + "°C") : "--"
+        );
+        _prevTempIn = _tempIn;
+    }
 }
 
 /**
- * Display humidity
+ * Display temperature outside
  */
-void Nextion::_hum(float hum, String field) {
-    if(validate.hum(hum)) nex.writeStr(field, String(int(round(hum))) + "%");
-    else nex.writeStr(field, "--");
+void Nextion::_showTempOut() {
+    if(_prevTempOut != _tempOut or _forced) {
+        _showThermometer();
+        nex.writeStr("Main.tempOutside.txt", validate.temp(_tempOut) 
+            ? (String(int(round(_tempOut))) + "°C") : "--"
+        );
+        _prevTempOut = _tempOut;
+    }
+}
+
+/**
+ * Display humidity inside
+ */
+void Nextion::_showHumIn() {
+    if(_prevHumIn != _humIn or _forced) {
+        nex.writeStr("Main.humInside.txt", validate.hum(_humIn) 
+            ? (String(int(round(_humIn))) + "%") : "--"
+        );
+        _prevHumIn = _humIn;
+    }
+}
+
+/**
+ * Display humidity outside
+ */
+void Nextion::_showHumOut() {
+    if(_prevHumOut != _humOut or _forced) {
+        nex.writeStr("Main.humOutside.txt", validate.hum(_humOut) 
+            ? (String(int(round(_humOut))) + "%") : "--"
+        );
+        _prevHumOut = _humOut;
+    }
+}
+
+/**
+ * Display pressure
+ */
+void Nextion::_showPres() {
+    if(_prevPresOut != _presOut or _forced) {
+        nex.writeStr("Main.presOutside.txt", validate.pres(_presOut) 
+            ? (String(int(round(_presOut * 0.75))) + lang.mm()) : "--"
+        );
+        _prevPresOut = _presOut;
+    }
 }
 
 /**
  * Display sequence
  */
-void Nextion::_sequence(float* tempSequence, float* humSequence, String* nameSequence) {
+void Nextion::_showSequence() {
     for(unsigned int i=0; i<4; i++) {
-        if(validate.temp(tempSequence[i])) 
-            nex.writeStr("Main.tempSeq" + String(i) + ".txt", String(int(round(tempSequence[i]))) + "°C");
-        else nex.writeStr("Main.tempSeq" + String(i) + ".txt", "--");
-
-        if(validate.hum(humSequence[i]))
-            nex.writeStr("Main.humSeq" + String(i) + ".txt", String(int(round(humSequence[i]))) + "%");
-        else nex.writeStr("Main.humSeq" + String(i) + ".txt", "--");
-
-        nex.writeStr("Main.txtSeq" + String(i) + ".txt", nameSequence[i]);
+        if(_prevTempSequence[i] != _tempSequence[i] or _forced) {
+            nex.writeStr("Main.tempSeq" + String(i) + ".txt", validate.temp(_tempSequence[i]) 
+                ? (String(int(round(_tempSequence[i]))) + "°C") : "--"
+            );
+            _prevTempSequence[i] = _tempSequence[i];
+        }
+        if(_prevHumSequence[i] != _humSequence[i] or _forced) {
+            nex.writeStr("Main.humSeq" + String(i) + ".txt", validate.hum(_humSequence[i])
+                ? (String(int(round(_humSequence[i]))) + "%") : "--"
+            );
+            _prevHumSequence[i] = _humSequence[i];
+        }
+        if(_prevNameSequence[i] != _nameSequence[i] or _forced) {
+            nex.writeStr("Main.txtSeq" + String(i) + ".txt", _nameSequence[i]);
+            _prevNameSequence[i] = _nameSequence[i];
+        }
     }
 }
 
 /**
  * Display comfort level
  */
-void Nextion::_comfortLevel() {
-    /* -- */
-    if(config.display_source_descr() == 0) {
-        nex.writeNum("Main.seq.val", 0);
-        nex.writeStr("Main.comfort.txt", "");
+void Nextion::_showComfortLevel() {
+    if(_prevComfortType != _comfortType or _forced) {
+        nex.writeNum("Main.seq.val", _comfortType == 2 ? 1 : 0);
+        _prevComfortType = _comfortType;
     }
-
-    /* comfort level */
-    if(config.display_source_descr() == 1) {
-        nex.writeNum("Main.seq.val", 0);
-        String comfort = lang.comfort(global.comfort);
-
-        if(global.iaq_level) {
-            if(comfort.length()) comfort += ". ";
-            comfort += lang.airQuality(global.iaq_level);
-        }
-
-        else if(global.co2_level) {
-            if(comfort.length()) comfort += ". ";
-            comfort += lang.airQuality(global.co2_level);
-        }
-        nex.writeStr("Main.comfort.txt", comfort);
-    }
-
-    /* sequence */
-    if(config.display_source_descr() == 2) {
-        nex.writeNum("Main.seq.val", 1);
+    if(_prevComfort != _comfort or _forced) {
+        nex.writeStr("Main.comfort.txt", _comfort);
+        _prevComfort = _comfort;
     }
 }
 
 /**
  * Display weather description
  */
-void Nextion::_weatherDescription() {
-    if(weather.get_description() == "") nex.writeStr("Main.description.txt", "--");
-    nex.writeStr("Main.description.txt", weather.get_description());
+void Nextion::_showWeatherDescription() {
+    if(_prevDescription != _description or _forced) {
+        nex.writeStr("Main.description.txt", _description == "" ? "--" : _description);
+        _prevDescription = _description;
+    }
 }
 
 /**
  * Display current weather icon
  */
-void Nextion::_currentIcon() {
-    if(weather.get_currentIcon() == 0) nex.writeNum("Main.icon0.pic", 64);
-    else nex.writeNum("Main.icon0.pic", weather.get_currentIcon() + 9);
-    switch(weather.get_currentIcon()) {
-        case 1: {
-            if(weather.get_isDay()) nex.writeNum("Main.icon0.pic", 10);
-            else nex.writeNum("Main.icon0.pic", 11);
-        }; break;
-        case 2: {
-            if(weather.get_isDay()) nex.writeNum("Main.icon0.pic", 12);
-            else nex.writeNum("Main.icon0.pic", 13);
-        }; break;
-        case 3: nex.writeNum("Main.icon0.pic", 14); break;
-        case 4: nex.writeNum("Main.icon0.pic", 15); break;
-        case 5: nex.writeNum("Main.icon0.pic", 16); break;
-        case 6: {
-            if(weather.get_isDay()) nex.writeNum("Main.icon0.pic", 17);
-            else nex.writeNum("Main.icon0.pic", 18);
-        }; break;
-        case 7: nex.writeNum("Main.icon0.pic", 19); break;
-        case 8: nex.writeNum("Main.icon0.pic", 20); break;
-        default: nex.writeNum("Main.icon0.pic", 64); break;
+void Nextion::_showCurrentIcon() {
+    if(_prevCurrIcon != _currIcon or _prevIsDay != _isDay or _forced) {
+        uint8_t icon = 64;
+        switch(_currIcon) {
+            case 1: icon = _isDay ? 10 : 11; break;
+            case 2: icon = _isDay ? 12 : 13; break;
+            case 3: icon = 14; break;
+            case 4: icon = 15; break;
+            case 5: icon = 16; break;
+            case 6: icon = _isDay ? 17 : 18; break;
+            case 7: icon = 19; break;
+            case 8: icon = 20; break;
+            default: ; break;
+        }
+        nex.writeNum("Main.icon0.pic", icon);
+        _prevCurrIcon = _currIcon;
+        _prevIsDay = _isDay;
     }
 }
 
 /**
  * Display thermometer icon (red or blue)
- * @param temp 
  */
-void Nextion::_thermometer(float temp) {
-    nex.writeNum("Main.thermometer.pic", temp < 0.0 ? 40 : 41);
-}
-
-/**
- * Display pressure
- */
-void Nextion::_pres() {
-    float pres = 40400.0;
-    if(config.display_source_presOut_sens() == 1) // pressure outside from weather forecast
-        pres = weather.get_currentPres();
-    if(config.display_source_presOut_sens() == 2) // presure outside from wireless sensor
-        if(wsensor.dataRelevance(config.display_source_presOut_wsensNum()))
-            pres = wsensor.get_pressure(config.display_source_presOut_wsensNum(), CORRECTED);
-    if(config.display_source_presOut_sens() == 3) // presure outside from thingspeak
-        if(thingspeak.dataRelevance())
-            pres = thingspeak.get_field(config.display_source_presOut_thing());
-    if(config.display_source_presOut_sens() == 4) // pressure outside from BME280
-        pres = sensors.get_bme280_pres(CORRECTED);
-    if(config.display_source_presOut_sens() == 5) // pressure outside from BMP180
-        pres = sensors.get_bmp180_pres(CORRECTED);
-    if(config.display_source_presOut_sens() == 6) // pressure outside from BME680
-        pres = sensors.get_bme680_pres(CORRECTED);
-    if(validate.pres(pres)) 
-        nex.writeStr("Main.presOutside.txt", String(int(round(pres * 0.75))) + lang.mm());
-    else nex.writeStr("Main.presOutside.txt", "--");
+void Nextion::_showThermometer() {
+    nex.writeNum("Main.thermometer.pic", _tempOut < 0.0 ? 40 : 41);
 }
 
 /**
  * Display wind speed
  */
-void Nextion::_windSpeed() {
-    if(validate.wind(weather.get_currentWindSpeed()))
-        nex.writeStr("Main.wind0.txt", String(int(round(weather.get_currentWindSpeed()))) + lang.ms());
-    else nex.writeStr("Main.wind0.txt", "--");
+void Nextion::_showWindSpeed() {
+    if(_prevWindSpd != _windSpd or _forced) {
+        nex.writeStr("Main.wind0.txt", validate.wind(_windSpd) 
+            ? (String(int(round(_windSpd))) + lang.ms()) : "--"
+        );
+        _prevWindSpd = _windSpd;
+    }
 }
 
 /**
  * Display wind direction
  */
-void Nextion::_windDirection() {
-    unsigned int deg = round(float(weather.get_currentWindDir()) / 45.0);
-    if(deg > 7) deg = 0;
-    nex.writeNum("Main.windDir0.pic", deg + 42);
+void Nextion::_showWindDirection() {
+    if(_prevWindDir != _windDir or _forced) {
+        nex.writeNum("Main.windDir0.pic", _windDir > 7 ? 42 : _windDir + 42);
+        _prevWindDir = _windDir;
+    }
 }
 
 /**
  * Display the time and date of the last weather update
  */
-void Nextion::_updated() {
-    char buf[32] = "";
-    sprintf(buf, "⭮ %02d.%02d.%d %d:%02d:%02d",
-        day(weather.get_currentUpdated()),
-        month(weather.get_currentUpdated()),
-        year(weather.get_currentUpdated()),
-        hour(weather.get_currentUpdated()),
-        minute(weather.get_currentUpdated()),
-        second(weather.get_currentUpdated())
-    );
-    if(weather.get_currentUpdated() == 0) nex.writeStr("Main.updatedTime.txt", "--");
-    else nex.writeStr("Main.updatedTime.txt", buf);
+void Nextion::_showUpdated() {
+    if(_prevWeatherUpdated != _weatherUpdated or _forced) {
+        time_t t = _weatherUpdated;
+        char buf[32] = "";
+        sprintf(buf, "⭮ %02d.%02d.%d %d:%02d:%02d", day(t), month(t), year(t), hour(t), minute(t), second(t));
+        nex.writeStr("Main.updatedTime.txt", t > 0 ? buf : "--");
+        _prevWeatherUpdated = _weatherUpdated;
+    }
 }
 
 /**
  * Display daily weather forecast
  */
-void Nextion::_weatherForecast() {
-    for(unsigned int i=0; i<4; i++) {
-        // icons
-        if(weather.get_dailyIcon(i) == 0) nex.writeNum("Main.icon" + String(i + 1) + ".pic", 29);
-        else nex.writeNum("Main.icon" + String(i + 1) + ".pic", weather.get_dailyIcon(i) + 20);
-
-        // max temp
-        if(validate.temp(weather.get_dailyDayTemp(i)))
-            nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", String(int(round(weather.get_dailyDayTemp(i)))) + "°C");
-        else nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", "--");
-
-        // min temp
-        if(validate.temp(weather.get_dailyNightTemp(i)))
-            nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", String(int(round(weather.get_dailyNightTemp(i)))) + "°C");
-        else nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", "--");
-
-        // wind speed
-        if(validate.wind(weather.get_dailyWindSpeed(i)))
-            nex.writeStr("Main.wind" + String(i + 1) + ".txt", String(int(round(weather.get_dailyWindSpeed(i)))) + lang.ms());
-        else nex.writeStr("Main.wind" + String(i + 1) + ".txt", "--");
+void Nextion::_showWeatherForecast() {
+    for(uint8_t i=0; i<4; i++) {
+        if(_prevIcons[i] != _icons[i] or _forced) {
+            nex.writeNum("Main.icon" + String(i + 1) + ".pic", _icons[i] == 0 ? 29 : (_icons[i] + 20));
+            _prevIcons[i] = _icons[i];
+        }
+        if(_prevDTemps[i] != _dTemps[i] or _forced) {
+            nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", validate.temp(_dTemps[i]) 
+                ? (String(int(round(_dTemps[i]))) + "°C") : "--"
+            );
+            _prevDTemps[i] = _dTemps[i];
+        }
+        if(_prevNTemps[i] != _nTemps[i] or _forced) {
+            nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", validate.temp(_nTemps[i]) 
+                ? (String(int(round(_nTemps[i]))) + "°C") : "--"
+            );
+            _prevNTemps[i] = _nTemps[i];
+        }
+        if(_prevWinds[i] != _winds[i] or _forced) {
+            nex.writeStr("Main.wind" + String(i + 1) + ".txt", validate.wind(_winds[i])
+                ? (String(int(round(_winds[i]))) + lang.ms()) : "--"
+            );
+            _prevWinds[i] = _winds[i];
+        }
     }
 }
 
@@ -527,56 +573,60 @@ void Nextion::_weatherForecast() {
  * Sending data to display hourly forecast
  */
 void Nextion::_hourlyData() {
-    char dat[22] = "";
-    char buf[20] = "";
-    Serial1.print("Hourly.data0.txt=\"");
-    if(config.weather_provider() == OPENWEATHERMAP) {
-        for(unsigned int i=0; i<40; i++) {
+    if((_prevHourlyChecksum != _hourlyChecksum and config.weather_provider() == OPENWEATHERMAP) or _forced) {
+        char dat[22] = "";
+        char buf[20] = "";
+        Serial1.print("Hourly.data0.txt=\"");
+
+        for(uint8_t i=0; i<40; i++) {
             // temp
             int t = round(weather.get_hourlyTemp(i) * 10);
             sprintf(buf, "%04d", t);
-            for(unsigned int k = 0; k < 4; k++) dat[k] = buf[k];
+            for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
             // pres
             unsigned int p = round(weather.get_hourlyPres(i) * 0.75);
             sprintf(buf, "%03d", p);
-            for(unsigned int k = 0; k < 3; k++) dat[4 + k] = buf[k];
+            for(uint8_t k=0; k<3; k++) dat[4 + k] = buf[k];
             // icon
             sprintf(buf, "%02d", weather.get_hourlyIcon(i));
-            for(unsigned int k = 0; k < 2; k++) dat[7 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[7 + k] = buf[k];
             // weekday
             sprintf(buf, "%d", weekday(weather.get_hourlyDate(i)) - 1);
             dat[9] = buf[0];
             // day
             sprintf(buf, "%02d", day(weather.get_hourlyDate(i)));
-            for(unsigned int k = 0; k < 2; k++) dat[10 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[10 + k] = buf[k];
             // month
             sprintf(buf, "%02d", month(weather.get_hourlyDate(i)) - 1);
-            for(unsigned int k = 0; k < 2; k++) dat[12 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[12 + k] = buf[k];
             // hour
             sprintf(buf, "%02d", hour(weather.get_hourlyDate(i)));
-            for(unsigned int k = 0; k < 2; k++) dat[14 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[14 + k] = buf[k];
             // wind speed
             unsigned int wind = round(weather.get_hourlyWindSpeed(i));
             sprintf(buf, "%02d", wind);
-            for(unsigned int k = 0; k < 2; k++) dat[16 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[16 + k] = buf[k];
             // wind direction
-            unsigned int deg = round(float(weather.get_hourlyWindDir(i)) / 45.0);
+            unsigned int deg = agregateData.lcdWindDirection(weather.get_hourlyWindDir(i));
             if(deg > 7) deg = 0;
             sprintf(buf, "%d", deg);
             dat[18] = buf[0];
             // precipitation
             int pr = round(weather.get_hourlyPrec(i) * 100);
             sprintf(buf, "%03d", pr);
-            for(unsigned int k=0; k<3; k++) dat[19 + k] = buf[k];
+            for(uint8_t k=0; k<3; k++) dat[19 + k] = buf[k];
 
             // send all to display
-            for(unsigned int k=0; k<22; k++) Serial1.print(dat[k]);
+            for(uint8_t k=0; k<22; k++) Serial1.print(dat[k]);
         }
+        Serial1.print("\"");
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+
+        _daily2hourly();
+        _prevHourlyChecksum = _hourlyChecksum;
     }
-    Serial1.print("\"");
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
 }
 
 /**
@@ -584,7 +634,7 @@ void Nextion::_hourlyData() {
  */
 void Nextion::_daily2hourly() {
     unsigned int fd = 2;
-    for(unsigned int i=0; i<40; i++) {
+    for(uint8_t i=0; i<40; i++) {
         if(hour(weather.get_hourlyDate(i)) == 0) {
             if(i != 0) nex.writeNum("Hourly.day" + String(fd++) + ".val", i);
             if(fd > 4) break;
@@ -596,107 +646,119 @@ void Nextion::_daily2hourly() {
  * Sending data to display outdoor weather history
  */
 void Nextion::_historyOut() {
-    char dat[18] = "";
-    char buf[20] = "";
-    Serial1.print("HistoryOut.data0.txt=\"");
-    for(unsigned int i = 0; i < 24; i++) {
-        // temperature
-        int t = round(thingspeak.get_historyField(0, i) * 10);
-        sprintf(buf, "%04d", t);
-        for(unsigned int k = 0; k < 4; k++) dat[k] = buf[k];
-        // humidity
-        int h = thingspeak.get_historyField(1, i);
-        sprintf(buf, "%03d", h);
-        for(unsigned int k = 0; k < 3; k++) dat[4 + k] = buf[k];
-        // pressure
-        int p = round(thingspeak.get_historyField(2, i) * 0.75);
-        sprintf(buf, "%03d", p);
-        for(unsigned int k = 0; k < 3; k++) dat[7 + k] = buf[k];
-        // day
-        sprintf(buf, "%02d", day(thingspeak.get_historyUpdated(i)));
-        for(unsigned int k = 0; k < 2; k++) dat[10 + k] = buf[k];
-        // month
-        sprintf(buf, "%02d", month(thingspeak.get_historyUpdated(i)) - 1);
-        for(unsigned int k = 0; k < 2; k++) dat[12 + k] = buf[k];
-        // hour
-        sprintf(buf, "%02d", hour(thingspeak.get_historyUpdated(i)));
-        for(unsigned int k = 0; k < 2; k++) dat[14 + k] = buf[k];
-        // minute
-        sprintf(buf, "%02d", minute(thingspeak.get_historyUpdated(i)));
-        for(unsigned int k = 0; k < 2; k++) dat[16 + k] = buf[k];
-        // send current slot
-        for(unsigned int k=0; k<18; k++) Serial1.print(dat[k]);
+    if(_prevHistoryOutChecksum != _historyOutChecksum or _forced) {
+        char dat[18] = "";
+        char buf[20] = "";
+        Serial1.print("HistoryOut.data0.txt=\"");
+        for(uint8_t i=0; i<24; i++) {
+            // temperature
+            int t = round(thingspeak.get_historyField(0, i) * 10);
+            sprintf(buf, "%04d", t);
+            for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
+            // humidity
+            int h = thingspeak.get_historyField(1, i);
+            sprintf(buf, "%03d", h);
+            for(uint8_t k=0; k<3; k++) dat[4 + k] = buf[k];
+            // pressure
+            int p = round(thingspeak.get_historyField(2, i) * 0.75);
+            sprintf(buf, "%03d", p);
+            for(uint8_t k=0; k<3; k++) dat[7 + k] = buf[k];
+            // day
+            sprintf(buf, "%02d", day(thingspeak.get_historyUpdated(i)));
+            for(uint8_t k=0; k<2; k++) dat[10 + k] = buf[k];
+            // month
+            sprintf(buf, "%02d", month(thingspeak.get_historyUpdated(i)) - 1);
+            for(uint8_t k=0; k<2; k++) dat[12 + k] = buf[k];
+            // hour
+            sprintf(buf, "%02d", hour(thingspeak.get_historyUpdated(i)));
+            for(uint8_t k=0; k<2; k++) dat[14 + k] = buf[k];
+            // minute
+            sprintf(buf, "%02d", minute(thingspeak.get_historyUpdated(i)));
+            for(uint8_t k=0; k<2; k++) dat[16 + k] = buf[k];
+            // send current slot
+            for(uint8_t k=0; k<18; k++) Serial1.print(dat[k]);
+        }
+        Serial1.print("\"");
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+
+        _prevHistoryOutChecksum = _historyOutChecksum;
     }
-    Serial1.print("\"");
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
 }
 
 /**
  * Sending data to display indoor weather history
  */
 void Nextion::_historyIn() {
-    char dat[15] = "";
-    char buf[20] = "";
-    Serial1.print("HistoryIn.data0.txt=\"");
-    for(unsigned int i = 0; i < 24; i++) {
-        // temperature
-        int t = round(thingspeak.get_historyField(3, i) * 10);
-        sprintf(buf, "%04d", t);
-        for(unsigned int k = 0; k < 4; k++) dat[k] = buf[k];
-        // humidity
-        int h = thingspeak.get_historyField(4, i);
-        sprintf(buf, "%03d", h);
-        for(unsigned int k = 0; k < 3; k++) dat[4 + k] = buf[k];
-        // day
-        sprintf(buf, "%02d", day(thingspeak.get_historyUpdated(i)));
-        for(unsigned int k = 0; k < 2; k++) dat[7 + k] = buf[k];
-        // month
-        sprintf(buf, "%02d", month(thingspeak.get_historyUpdated(i)) - 1);
-        for(unsigned int k = 0; k < 2; k++) dat[9 + k] = buf[k];
-        // hour
-        sprintf(buf, "%02d", hour(thingspeak.get_historyUpdated(i)));
-        for(unsigned int k = 0; k < 2; k++) dat[11 + k] = buf[k];
-        // minute
-        sprintf(buf, "%02d", minute(thingspeak.get_historyUpdated(i)));
-        for(unsigned int k = 0; k < 2; k++) dat[13 + k] = buf[k];
-        // send current slot
-        for(unsigned int k=0; k<15; k++) Serial1.print(dat[k]);
+    if(_prevHistoryInChecksum != _historyInChecksum or _forced) {
+        char dat[15] = "";
+        char buf[20] = "";
+        Serial1.print("HistoryIn.data0.txt=\"");
+        for(uint8_t i=0; i<24; i++) {
+            // temperature
+            int t = round(thingspeak.get_historyField(3, i) * 10);
+            sprintf(buf, "%04d", t);
+            for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
+            // humidity
+            int h = thingspeak.get_historyField(4, i);
+            sprintf(buf, "%03d", h);
+            for(uint8_t k=0; k<3; k++) dat[4 + k] = buf[k];
+            // day
+            sprintf(buf, "%02d", day(thingspeak.get_historyUpdated(i)));
+            for(uint8_t k=0; k<2; k++) dat[7 + k] = buf[k];
+            // month
+            sprintf(buf, "%02d", month(thingspeak.get_historyUpdated(i)) - 1);
+            for(uint8_t k=0; k<2; k++) dat[9 + k] = buf[k];
+            // hour
+            sprintf(buf, "%02d", hour(thingspeak.get_historyUpdated(i)));
+            for(uint8_t k=0; k<2; k++) dat[11 + k] = buf[k];
+            // minute
+            sprintf(buf, "%02d", minute(thingspeak.get_historyUpdated(i)));
+            for(uint8_t k=0; k<2; k++) dat[13 + k] = buf[k];
+            // send current slot
+            for(uint8_t k=0; k<15; k++) Serial1.print(dat[k]);
+        }
+        Serial1.print("\"");
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+
+        _prevHistoryInChecksum = _historyInChecksum;
     }
-    Serial1.print("\"");
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
 }
 
 /**
  * Sending alarms data
  */
 void Nextion::_alarms() {
-    char alarmData[144];
-    char buf[3];
-    unsigned int alarmOn = 0;
-    Serial1.print("Alarm.alarms.txt=\"");
-    for(unsigned int i=0; i<12; i++) {
-        sprintf(buf, "%02d", config.alarm_time(i, 0));
-        for(unsigned int j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
-        sprintf(buf, "%02d", config.alarm_time(i, 1));
-        for(unsigned int j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
-        for(unsigned int w=0; w<7; w++) {
-            sprintf(buf, "%d", config.alarm_weekday(i, w));
-            alarmData[i * 7 + w + 48] = buf[0];
+    if(_prevAlarmChecksum != _alarmChecksum or _forced) {
+        char alarmData[144];
+        char buf[3];
+        unsigned int alarmOn = 0;
+        Serial1.print("Alarm.alarms.txt=\"");
+        for(uint8_t i=0; i<12; i++) {
+            sprintf(buf, "%02d", config.alarm_time(i, 0));
+            for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
+            sprintf(buf, "%02d", config.alarm_time(i, 1));
+            for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
+            for(uint8_t w=0; w<7; w++) {
+                sprintf(buf, "%d", config.alarm_weekday(i, w));
+                alarmData[i * 7 + w + 48] = buf[0];
+            }
+            sprintf(buf, "%d", config.alarm_state(i));
+            alarmData[i + 132] = buf[0];
+            alarmOn |= config.alarm_state(i);
         }
-        sprintf(buf, "%d", config.alarm_state(i));
-        alarmData[i + 132] = buf[0];
-        alarmOn |= config.alarm_state(i);
+        for(uint8_t k=0; k<144; k++) Serial1.print(alarmData[k]);
+        Serial1.print("\"");
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+        nex.writeNum("Main.alarm.pic", alarmOn ? 71 : 72);
+
+        _prevAlarmChecksum = _alarmChecksum;
     }
-    for(unsigned int k=0; k<144; k++) Serial1.print(alarmData[k]);
-    Serial1.print("\"");
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
-    Serial1.write(0xFF);
-    nex.writeNum("Main.alarm.pic", alarmOn ? 71 : 72);
 }
 
 /**
