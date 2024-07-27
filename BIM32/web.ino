@@ -11,6 +11,9 @@ String web_timeString(unsigned int tm) {
     return String(buf);
 }
 
+/**
+ * Update filelist
+ */
 void web_listAllFilesInDir(String dirname) {
     File root = LittleFS.open(dirname);
     if(!root) return;
@@ -43,17 +46,6 @@ String web_sensorsPrepare(bool logged) {
     json["runtime"] = round(millis() / 1000);
     json["heap"] = ESP.getFreeHeap();
     json["time"] = now();
-    int wd = weekday();
-    json["wd"][0] = lang.weekdayShortName(wd);
-    if(++wd > 7) wd = 1;
-    json["wd"][1] = lang.weekdayShortName(wd);
-    if(++wd > 7) wd = 1;
-    json["wd"][2] = lang.weekdayShortName(wd);
-    if(++wd > 7) wd = 1;
-    json["wd"][3] = lang.weekdayShortName(wd);
-    json["units"]["v"] = lang.v();
-    json["units"]["mm"] = lang.mm();
-    json["units"]["ms"] = lang.ms();
 
     json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
     json["network"]["ch"] = WiFi.channel();
@@ -150,46 +142,28 @@ String web_sensorsPrepare(bool logged) {
 }
 
 /**
- * Returns the value of the cookie
+ * Check if the user is logged in
  */
-String web_getCookieValue(String searchString, String stringName) {
-    stringName += "=";
-    int length = stringName.length();
-    int pozStart = searchString.indexOf(stringName) + length;
-    int pozStop = searchString.indexOf(";", pozStart);
-    String cookieValue = searchString.substring(pozStart, pozStop); 
-    return cookieValue;
-}
-
-/**
- * Checks if the user is logged in
- */
-bool web_isLogged(AsyncWebServerRequest *request) {
-    if(!config.account_required()) return true;
-
-    if(request->hasHeader("Cookie")) {
-        AsyncWebHeader* h = request->getHeader("Cookie");
-        String auth = web_getCookieValue(h->value().c_str(), "code");
-        if(auth == String(code)) return true;
-        else return false;
-    }
-    else return false;
-}
-
-/**
- * Checks if the user is logged in and sends the requested file, otherwise sends the login page
- */
-bool web_fileRead(AsyncWebServerRequest *request) {
-    String path = request->url();
-    if(!path.endsWith(".ico") && !path.endsWith(".png") && !path.endsWith(".jpg") && !path.endsWith(".vlw")) {
-        if(path.endsWith(".json")) {
-            if(!web_isLogged(request)) {
-                request->send(200, "text/plain", "{\"lang\": \"" + config.lang() + "\", \"state\": \"LOGIN\"}");
-                return true;
-            }
+bool web_isLogged(AsyncWebServerRequest *request, bool answer) {
+    bool logged = false;
+    if(!config.account_required()) logged = true;
+    else {
+        if(request->hasArg("code")) {
+            String auth = request->arg("code");
+            if(auth == String(code)) logged = true;
+            else logged = false;
         }
-        else path = "/index.html";
+        else logged = false;
     }
+
+    if(!logged && answer) request->send(200, "text/plain", "NOT LOGGED IN");
+    return logged;
+}
+
+/**
+ * Read a file
+ */
+bool web_fileRead(AsyncWebServerRequest *request, String path) {
     String pathWithGz = path + ".gz";
     if(LittleFS.exists(pathWithGz) || LittleFS.exists(path)) {
         if(LittleFS.exists(pathWithGz)) path += ".gz";
@@ -212,66 +186,84 @@ bool web_fileRead(AsyncWebServerRequest *request) {
 }
 
 /**
+ * Check if the user is logged in and sends the requested file, otherwise sends the login page
+ */
+bool web_getFile(AsyncWebServerRequest *request) {
+    String path = request->url();
+    if(path.endsWith(".json") or path.endsWith(".jpg") or path.endsWith(".png") or path.endsWith(".vlw")) {
+        if(!web_isLogged(request, false)) {
+            if(path.endsWith(".json")) {
+                request->send(200, "application/json", "{\"lang\": \"" + config.lang() + "\", \"state\": \"LOGIN\"}");
+                return true;
+            }
+        }
+    }
+    else path = "/index.html";
+    return web_fileRead(request, path);
+}
+
+/**
  * Login
  * Username and password validation 
  */
 void web_login(AsyncWebServerRequest *request) {
-    String login = "";
-    String pass = "";
-    if(request->hasArg("name")) login = request->arg("name");
+    String user = "", pass = "";
+    if(request->hasArg("name")) user = request->arg("name");
     if(request->hasArg("pass")) pass = request->arg("pass");
     bool loged = false;
-    if(login == config.account_name() and pass == config.account_pass()) {
+    if(user == config.account_name() and pass == config.account_pass()) {
         loged = true;
         code = esp_random();
     }
-    AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", loged ? "OK" : "error");
-    response->addHeader("Cache-Control", "no-cache");
-    String cookie = "code=";
-    cookie += loged ? String(code) : "0";
-    cookie += "; Max-Age=7200; Path=/";
-    response->addHeader("Set-Cookie", cookie);
-    request->send(response);
+    request->send(200, "text/plain", loged ? ("OK:" + String(round(code))) : "error:1");
 }
 
 /**
- * Saves config data to config file
+ * Save config data to config file
  */
 void web_save(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("config")) {
-            if(request->arg("config")) 
-                request->send(200, "text/plain", config.save(request->arg("config")) ? "SAVE ERROR" : "OK");
+            vTaskSuspendAll();
+            String cfg = request->arg("config");
+            if(cfg.length() > 0) {
+                bool err = true;
+                File file = LittleFS.open("/config.json", "w");
+                if(file) err = !file.print(cfg);
+                config.readConfig();
+                file.close();
+                request->send(200, "text/plain", err ? "SAVE ERROR" : "OK");
+            }
             else request->send(200, "text/plain", "CONFIG ARGUMENT EMPTY");
+            cfg = String();
+            xTaskResumeAll();
         }
         else request->send(200, "text/plain", "NO CONFIG ARGUMENT");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Sends sensors data via AJAX
+ * Send sensors data via AJAX
  */
 void web_sens(AsyncWebServerRequest *request) {
-    request->send(200, "text/json", web_sensorsPrepare(web_isLogged(request)));
+    request->send(200, "text/json", web_sensorsPrepare(web_isLogged(request, false)));
 }
 
 /**
- * Restarts ESP32
+ * Restart ESP32
  */
 void web_restart(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         request->send(200, "text/plain", "OK");
         ESP.restart();
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Turns display on and off
+ * Turn display on and off
  */
 void web_dispToggle(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("num")) {
             unsigned int disp = (request->arg("num")).toInt();
             global.display_but_pressed[disp ? 1 : 0] = true;
@@ -279,56 +271,56 @@ void web_dispToggle(AsyncWebServerRequest *request) {
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Brightness limit
+ * Change brightness limit
  */
 void web_brightLimit(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("min") and request->hasArg("max") and request->hasArg("num")) {
-            config.set_brightLimit((request->arg("min")).toInt(), (request->arg("max")).toInt(), (request->arg("num")).toInt());
+            config.set_brightLimit(
+                (request->arg("min")).toInt(), 
+                (request->arg("max")).toInt(), 
+                (request->arg("num")).toInt()
+            );
             request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * Brightness adjust
  */
 void web_bright(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("bright") and request->hasArg("num")) {
             config.set_bright((request->arg("bright")).toInt(), (request->arg("num")).toInt());
             request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * Ambient light sensor sensitivity adjust
  */
 void web_sensitivity(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("bright") and request->hasArg("num")) {
             config.set_sensitivity((request->arg("bright")).toInt(), (request->arg("num")).toInt());
             request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * WS2812b display timeslot color adjust
  */
 void web_color(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("hex") and request->hasArg("num")) {
             char color[7];
             request->arg("hex").toCharArray(color, 6);
@@ -337,14 +329,13 @@ void web_color(AsyncWebServerRequest *request) {
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * WS2812b display change animation
  */
 void web_animation(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("num")) {
             int dispNum = request->arg("num").toInt();
             if(request->hasArg("type")) config.set_animation_type(request->arg("type").toInt(), dispNum);
@@ -354,103 +345,111 @@ void web_animation(AsyncWebServerRequest *request) {
         }
         request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Initializes clock syncronization with NTP server
+ * Initialize clock syncronization with NTP server
  */
 void web_syncClock(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("ntp")) {
             global.clockSynchronized = false;
             request->send(200, "text/plain", "OK");
         }
         else {
-            setTime((request->arg("h")).toInt(), 
+            setTime(
+                (request->arg("h")).toInt(), 
                 (request->arg("i")).toInt(),
                 (request->arg("s")).toInt(),
                 (request->arg("d")).toInt(),
                 (request->arg("m")).toInt(),
-                (request->arg("y")).toInt());
+                (request->arg("y")).toInt()
+            );
             nextion.setDisplayRTC();
             request->send(200, "text/plain", web_timeString(now()));
         }
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Sends via AJAX the information about the clock synchronization process
+ * Send via AJAX the information about the clock synchronization process
  */
 void web_syncdialog(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(!global.clockSynchronized) request->send(200, "text/plain", ".");
         else request->send(200, "text/plain", web_timeString(now()));
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Changes the sound volume
+ * Change sound volume
  */
 void web_soundVolume(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("vol")) {
             config.set_vol(request -> arg("vol").toInt());
             sound.volume(config.sound_vol());
-            request -> send(200, "text/plain", "OK");
+            request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Changes the equalizer settings of the mp3 player
+ * Change equalizer settings of the mp3 player
  */
 void web_soundEqualizer(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("eq")) {
             config.set_eq(request -> arg("eq").toInt());
             sound.equalizer(config.sound_eq());
-            request -> send(200, "text/plain", "OK");
+            request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Plays a sound track
+ * Play a sound track
  */
 void web_soundPlay(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(request->hasArg("folder") and request->hasArg("track")) {
             sound.play(request -> arg("folder").toInt(), request -> arg("track").toInt());
             request -> send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Stops playing a sound track
+ * Stop playing a sound track
  */
 void web_soundStop(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         sound.stopPlaying();
-        request -> send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "OK");
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
- * Changes password
+ * Restore default config
+ */
+void web_default(AsyncWebServerRequest *request) {
+    if(web_isLogged(request, true)) {
+        if(request->hasArg("config") && request->arg("config") == "default") {
+            // TODO COPY DEFAULT CONFIG TO CONFIG
+            request->send(200, "text/plain", "OK");
+        }
+        else request->send(200, "text/plain", "error");
+    }
+}
+
+/**
+ * Change password
  */
 void web_changePass(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         String oldPass = (request->hasArg("oldPass")) ? request->arg("oldPass") : "";
         String newPass = (request->hasArg("newPass")) ? request->arg("newPass") : "";
         String res = "-";
@@ -466,14 +465,13 @@ void web_changePass(AsyncWebServerRequest *request) {
         else res = "ERROR";
         request->send(200, "text/plain", res);
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * Upload a file
  */
 void web_fileUpload(AsyncWebServerRequest *request, String filename, size_t index, byte *data, size_t len, bool final) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         if(!index) {
             global.fileUploading = true;
             request->_tempFile = LittleFS.open("/" + filename, "w");
@@ -484,14 +482,13 @@ void web_fileUpload(AsyncWebServerRequest *request, String filename, size_t inde
             request->_tempFile.close();
         }
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * Delete a file
  */
 void web_fileDelete(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         String path = "/" + request->arg("file");
         if(!LittleFS.exists(path)) return request->send(404, "text/plain", "FileNotFound");
         else {
@@ -499,13 +496,13 @@ void web_fileDelete(AsyncWebServerRequest *request) {
             path = String();
         }
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
+
 /**
  * Rename a file
  */
 void web_fileRename(AsyncWebServerRequest *request) {
-    if(web_isLogged(request)) {
+    if(web_isLogged(request, true)) {
         String alt = "/" + request->arg("old");
         String neu = "/" + request->arg("new");
         if(!LittleFS.exists(alt)) return request->send(404, "text/plain", "FileNotFound");
@@ -515,35 +512,35 @@ void web_fileRename(AsyncWebServerRequest *request) {
             neu = String();
         }
     }
-    else request->send(200, "text/plain", "NOT LOGGED");
 }
 
 /**
  * Defines the functions of the web interface
  */
 void webInterface_init(void) {
-    server.on("/data.json",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_sens(request); });
-    server.on("/esp/login",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_login(request); });
-    server.on("/esp/saveConfig",   HTTP_POST, [](AsyncWebServerRequest *request){ web_save(request); });
-    server.on("/esp/restart",      HTTP_GET,  [](AsyncWebServerRequest *request){ web_restart(request); });
-    server.on("/esp/dispToggle",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_dispToggle(request); });
-    server.on("/esp/brightLimit",  HTTP_GET,  [](AsyncWebServerRequest *request){ web_brightLimit(request); });
-    server.on("/esp/bright",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_bright(request); });
-    server.on("/esp/sensitivity",  HTTP_GET,  [](AsyncWebServerRequest *request){ web_sensitivity(request); });
-    server.on("/esp/animation",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_animation(request); });
-    server.on("/esp/color",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_color(request); });
-    server.on("/esp/syncClock",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_syncClock(request); });
-    server.on("/esp/syncdialog",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_syncdialog(request); });
-    server.on("/esp/changePass",   HTTP_POST, [](AsyncWebServerRequest *request){ web_changePass(request); });
-    server.on("/esp/volume",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundVolume(request); });
-    server.on("/esp/equalizer",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundEqualizer(request); });
-    server.on("/esp/mp3play",      HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundPlay(request); });
-    server.on("/esp/mp3stop",      HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundStop(request); });
-    server.on("/esp/fileUpload",   HTTP_POST, [](AsyncWebServerRequest *request){ request->send(200); }, web_fileUpload);
-    server.on("/description.xml",  HTTP_GET, [&](AsyncWebServerRequest *request){ request->send(200, "text/xml", SSDP.getSchema()); });
-    server.on("/esp/delete",       HTTP_POST, [](AsyncWebServerRequest *request){ web_fileDelete(request); });
-    server.on("/esp/rename",       HTTP_POST, [](AsyncWebServerRequest *request){ web_fileRename(request); });
-    server.onNotFound([](AsyncWebServerRequest *request){ if(!web_fileRead(request)) request -> send(404); });
+    server.on("/data.json",         HTTP_GET,  [](AsyncWebServerRequest *request){ web_sens(request); });
+    server.on("/esp/login",         HTTP_POST, [](AsyncWebServerRequest *request){ web_login(request); });
+    server.on("/esp/saveConfig",    HTTP_POST, [](AsyncWebServerRequest *request){ web_save(request); });
+    server.on("/esp/restart",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_restart(request); });
+    server.on("/esp/dispToggle",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_dispToggle(request); });
+    server.on("/esp/brightLimit",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_brightLimit(request); });
+    server.on("/esp/bright",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_bright(request); });
+    server.on("/esp/sensitivity",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_sensitivity(request); });
+    server.on("/esp/animation",     HTTP_GET,  [](AsyncWebServerRequest *request){ web_animation(request); });
+    server.on("/esp/color",         HTTP_GET,  [](AsyncWebServerRequest *request){ web_color(request); });
+    server.on("/esp/syncClock",     HTTP_GET,  [](AsyncWebServerRequest *request){ web_syncClock(request); });
+    server.on("/esp/syncdialog",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_syncdialog(request); });
+    server.on("/esp/changePass",    HTTP_POST, [](AsyncWebServerRequest *request){ web_changePass(request); });
+    server.on("/esp/volume",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundVolume(request); });
+    server.on("/esp/equalizer",     HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundEqualizer(request); });
+    server.on("/esp/mp3play",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundPlay(request); });
+    server.on("/esp/mp3stop",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_soundStop(request); });
+    server.on("/esp/defaultConfig", HTTP_POST, [](AsyncWebServerRequest *request){ web_default(request); });
+    server.on("/esp/fileUpload",    HTTP_POST, [](AsyncWebServerRequest *request){ request->send(200); }, web_fileUpload);
+    server.on("/description.xml",   HTTP_GET, [&](AsyncWebServerRequest *request){ request->send(200, "text/xml", SSDP.getSchema()); });
+    server.on("/esp/delete",        HTTP_POST, [](AsyncWebServerRequest *request){ web_fileDelete(request); });
+    server.on("/esp/rename",        HTTP_POST, [](AsyncWebServerRequest *request){ web_fileRename(request); });
+    server.onNotFound([](AsyncWebServerRequest *request){ if(!web_getFile(request)) request -> send(404); });
 
     MDNS.begin("bim32");
 

@@ -135,7 +135,7 @@ class Configuration {
   char _weather_appid[PROVIDERS][33] = { "", "" }; // [0] -> APPID openweathermap.org, [1] -> KEY weatherbit.io
   float _weather_lon = 0.0; // Longitude
   float _weather_lat = 0.0; // Latitude
-  unsigned int _weather_provider = 0; // Weather forecast provider. 0 = openweathermap.org, 1 = weatherbit.io
+  uint8_t _weather_provider = 0; // Weather forecast provider. 0: openweathermap.org, 1: weatherbit.io, 2: open-meteo.com 
   char _weather_city[41] = ""; // City name
   unsigned int _weather_cityid = 0; // City ID
   unsigned int _weather_citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
@@ -295,8 +295,8 @@ class Configuration {
   unsigned int _narodmonSend_wtypes[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Narodmon
 
   // Account
-  char _account_name[33] = "admin"; // Web interface default username
-  char _account_pass[33] = "1111"; // Web interface default password
+  char _account_name[32] = ""; // Web interface default username
+  char _account_pass[64] = ""; // Web interface default password
   bool _account_required = false; // Require username and password to access the web interface
 
   // Alarm
@@ -610,28 +610,6 @@ class Configuration {
     }
     else Serial.println(" No user file found");
   }
-
-  /**
-   * Save json data to the config file
-   * @param json data
-   * @return false on success 
-   */
-  bool save(String json, String filename="/config.json") {
-    if(json.length()) {
-      File file = LittleFS.open(filename, "w");
-      if(file) {
-        file.print(json);
-        file.close();
-        vTaskDelay(500);
-        readConfig();
-        // TODO file corrupted после сохранения, хотя это не правда
-        return false;
-      }
-      else return true;
-    }
-    else return true;
-  }
-
   
   /**
    * Getters
@@ -713,8 +691,8 @@ class Configuration {
     return String(_weather_lat);
   }
 
-  unsigned int weather_provider() {
-    if(_weather_provider > 1) return 0;
+  uint8_t weather_provider() {
+    if(_weather_provider > 2) return 0;
     return _weather_provider;
   }
 
