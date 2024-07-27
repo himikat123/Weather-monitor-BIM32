@@ -6,6 +6,9 @@ EasyNex nex(Serial1);
 class Nextion : LcdDisplay {
     #define NX4832K035 0
     #define NX4832T035 1
+    #define OPENWEATHERMAP 0
+    #define WEATHERBIT 1
+    #define OPEN_METEO 2
 
     public:
         void init();
@@ -612,7 +615,9 @@ void Nextion::_hourlyData() {
             sprintf(buf, "%d", deg);
             dat[18] = buf[0];
             // precipitation
-            int pr = round(weather.get_hourlyPrec(i) * 100);
+            int pr = 0;
+            if(config.weather_provider() == OPEN_METEO) weather.get_hourlyPrec(i);
+            else pr = round(weather.get_hourlyPrec(i) * 100);
             sprintf(buf, "%03d", pr);
             for(uint8_t k=0; k<3; k++) dat[19 + k] = buf[k];
 

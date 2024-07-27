@@ -4,6 +4,7 @@
 class Weather {
     #define OPENWEATHERMAP 0
     #define WEATHERBIT 1
+    #define OPEN_METEO 2
     #define DAYS 5
 
     public:
@@ -62,17 +63,21 @@ class Weather {
         float _hourlyPrec[DAYS * 8];
         unsigned int _hourlyUpdated = 0;
 
-        unsigned int _convert_icon(int code);  
-        unsigned int _weatherbit_icon(int code);
+        unsigned int _convertIcon(int code);
+        String _openMeteoCode2Description(uint8_t code);
+        unsigned int _openMeteoIcon(int code);
+        unsigned int _weatherbitIcon(int code);
         void _updateWeatherbitDaily(void);
         void _updateOpenweathermapHourly(void);
+        void _updateOpenMeteoDaily(void);
+        void _updateOpenMeteoHourly(void);
         void _calculateDaily(void);
 };
 
 /**
  * Weather icon code conversion
  */
-unsigned int Weather::_convert_icon(int code) {
+unsigned int Weather::_convertIcon(int code) {
     switch(code) {
         case 1: return 1; break;
         case 2: return 2; break;
@@ -84,6 +89,28 @@ unsigned int Weather::_convert_icon(int code) {
         case 13: return 7; break;
         case 50: return 8; break;
         default: return 0; break;
+    }
+}
+
+String Weather::_openMeteoCode2Description(uint8_t code) {
+    switch(code) {
+        case 0: return lang.clearSky();
+        case 1: return lang.mainlyClear();
+        case 2: return lang.partlyCloudy();
+        case 3:	return lang.overcast();
+        case 45: return lang.fog();
+        case 48: return lang.deposRimeFog();
+        case 51: case 53: case 55: return lang.drizzle();
+        case 56: case 57: return lang.freezingDrizzle();
+        case 61: case 63: case 65: return lang.rain();
+        case 66: case 67: return lang.freezingRain();
+        case 71: case 73: case 75: return lang.snowFall();
+        case 77: return lang.snowGrains();
+        case 80: case 81: case 82: return lang.rainShowers();
+        case 85: case 86: return lang.snowShowers();
+        case 95: return lang.thunderstorm();
+        case 96: case 99: return lang.thunderstormWithHail();
+        default: return "---";
     }
 }
 
@@ -124,6 +151,7 @@ void Weather::update() {
         }
         url += "&units=metric&lang=" + config.lang();
     }
+
     else if(config.weather_provider() == WEATHERBIT) {
         url = "http://api.weatherbit.io/v2.0/current?key=" + config.weather_appid(WEATHERBIT);
         if(config.weather_citysearch() == 0) {
@@ -149,6 +177,21 @@ void Weather::update() {
         }
         url += "&lang=" + config.lang();
     }
+
+    else if(config.weather_provider() == OPEN_METEO) {
+        if(config.weather_citysearch() == 2) {
+            if(config.weather_lat() == "" || config.weather_lon() == "") {
+                Serial.println("No Coordinates");
+                return;
+            }
+            url = "http://api.open-meteo.com/v1/forecast";
+            url += "?latitude=" + config.weather_lat();
+            url += "&longitude=" + config.weather_lon();
+            url += "&current=temperature_2m,relative_humidity_2m,is_day,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m";
+            url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto";
+        }
+    }
+
     else {
         Serial.println("Wrong weather provider");
         return;
@@ -166,6 +209,7 @@ void Weather::update() {
             Serial.println("Current weather deserialization error");
             return;
         }
+
         if(config.weather_provider() == OPENWEATHERMAP) {
             _description      = weather["weather"][0]["description"].as<String>();
             _currentTemp      = weather["main"]["temp"] | 40400.0;
@@ -182,6 +226,7 @@ void Weather::update() {
             _lon              = weather["coord"]["lon"].as<String>();
             _lat              = weather["coord"]["lat"].as<String>();
         }
+
         if(config.weather_provider() == WEATHERBIT) {
             _description      = weather["data"][0]["weather"]["description"].as<String>();
             _currentTemp      = weather["data"][0]["temp"] | 40400.0;
@@ -189,12 +234,24 @@ void Weather::update() {
             _currentPres      = weather["data"][0]["pres"] | 40400.0;
             _currentWindSpeed = weather["data"][0]["wind_spd"] | -1.0;
             _currentWindDir   = weather["data"][0]["wind_dir"] | -1;
-            _currentIcon      = _weatherbit_icon(weather["data"][0]["weather"]["code"].as<int>() | 0);
             const char* pod   = weather["data"][0]["pod"] | "";
             _is_day           = (String(pod) == String('d')) ? true : false;
             _country          = weather["data"][0]["country_code"].as<String>();
             _city             = weather["data"][0]["city_name"].as<String>();
+            _currentIcon      = _weatherbitIcon(weather["data"][0]["weather"]["code"].as<int>() | 0);
         }
+
+        if(config.weather_provider() == OPEN_METEO) {
+            _description      = _openMeteoCode2Description(weather["current"]["weather_code"] | 0);
+            _currentTemp      = weather["current"]["temperature_2m"] | 40400.0;
+            _currentHum       = weather["current"]["relative_humidity_2m"] | 40400.0;
+            _currentPres      = weather["current"]["pressure_msl"] | 40400.0;
+            _currentWindSpeed = weather["current"]["wind_speed_10m"] | -1.0;
+            _currentWindDir   = weather["current"]["wind_direction_10m"] | -1;
+            _is_day           = weather["current"]["is_day"] == 0 ? false : true;
+            _currentIcon      = _openMeteoIcon(weather["current"]["weather_code"] | 0);
+        }
+
         httpData = "";
         _currentUpdated = now();
         Serial.print("Current weather updated successfully at: ");
@@ -205,12 +262,16 @@ void Weather::update() {
 
     if(config.weather_provider() == WEATHERBIT) _updateWeatherbitDaily();
     if(config.weather_provider() == OPENWEATHERMAP) _updateOpenweathermapHourly();
+    if(config.weather_provider() == OPEN_METEO) {
+        _updateOpenMeteoDaily();
+        _updateOpenMeteoHourly();
+    }
 }
 
 /**
  * Weatherbit icon code conversion
  */
-unsigned int Weather::_weatherbit_icon(int code) {
+unsigned int Weather::_weatherbitIcon(int code) {
     unsigned int icon = 4;
     if(code >= 200 and code < 300) icon = 11;
     if(code >= 300 and code < 400) icon = 9;
@@ -222,6 +283,23 @@ unsigned int Weather::_weatherbit_icon(int code) {
     if(code == 803) icon = 3;
     if(code >= 804) icon = 4;
     return icon;
+}
+
+/**
+ * Open-meteo icon code conversion
+ */
+unsigned int Weather::_openMeteoIcon(int code) {
+    switch(code) {
+        case 0: case 1: 1;
+        case 2: return 2;
+        case 3:	return 4;
+        case 45: case 48: return 50;
+        case 51: case 53: case 55: case 56: case 57: return 10;
+        case 61: case 63: case 65: case 66: case 67: case 80: case 81: case 82: return 9;
+        case 71: case 73: case 75: case 77: case 85: case 86: return 13;
+        case 95: case 96: case 99: return 11;
+        default: return 1;
+    }
 }
 
 /**
@@ -252,8 +330,8 @@ void Weather::_updateWeatherbitDaily(void) {
         for(unsigned int i=0; i<DAYS; i++) {
             _dailyDayTemp[i]   = forecast["data"][i]["high_temp"] | 40400.0;
             _dailyNightTemp[i] = forecast["data"][i]["min_temp"] | 40400.0;
-            _dailyIcon[i]      = _weatherbit_icon(forecast["data"][i]["weather"]["code"].as<int>() | 0);
             _dailyWindSpeed[i] = forecast["data"][i]["wind_spd"] | -1.0;
+            _dailyIcon[i]      = _weatherbitIcon(forecast["data"][i]["weather"]["code"].as<int>() | 0);
         }
         httpData = "";
         _dailyUpdated = now();
@@ -299,6 +377,96 @@ void Weather::_updateOpenweathermapHourly(void) {
         delete forecast;
     }
     else Serial.println("City undefined");
+}
+
+/**
+ * Update daily forecast from open-meteo.com
+ */
+void Weather::_updateOpenMeteoDaily() {
+    Serial.println(SEPARATOR);
+    Serial.println("Open-meteo.com: daily forecast update... ");
+  
+    String url = "http://api.open-meteo.com/v1/forecast";
+    url += "?latitude=" + config.weather_lat();
+    url += "&longitude=" + config.weather_lon();
+    url += "&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max";
+    url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=4";
+    HTTPClient clientDaily;
+    Serial.println(url);
+    clientDaily.begin(url);
+    int httpCode = clientDaily.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        String httpData = clientDaily.getString();
+        Serial.println(httpData);
+        JsonDocument forecast;
+        DeserializationError errorForecast = deserializeJson(forecast, httpData);
+        if(errorForecast) {
+            Serial.println("Open-meteo.com: daily forecast deserialization error");
+            return;
+        }
+        for(unsigned int i=0; i<DAYS; i++) {
+            _dailyDayTemp[i]   = forecast["daily"]["temperature_2m_max"][i] | 40400.0;
+            _dailyNightTemp[i] = forecast["daily"]["temperature_2m_min"][i] | 40400.0;
+            _dailyWindSpeed[i] = forecast["daily"]["wind_speed_10m_max"][i] | -1.0;
+            _dailyIcon[i]      = _openMeteoIcon(forecast["daily"]["weather_code"][i] | 0);
+        }
+        httpData = "";
+        _dailyUpdated = now();
+        Serial.print("Open-meteo.com: daily forecast updated successfully at: ");
+        Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
+    }
+    else Serial.println("Open-meteo.com: daily forecast update error");
+    clientDaily.end();
+}
+
+/**
+ * Update hourly forecast from open-meteo.com
+ */
+void Weather::_updateOpenMeteoHourly() {
+    Serial.println(SEPARATOR);
+    Serial.println("Open-meteo.com: hourly forecast update... ");
+  
+    String url = "http://api.open-meteo.com/v1/forecast";
+    url += "?latitude=" + config.weather_lat();
+    url += "&longitude=" + config.weather_lon();
+    url += "&hourly=temperature_2m,precipitation_probability,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m";
+    url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=6";
+    HTTPClient clientHourly;
+    Serial.println(url);
+    clientHourly.begin(url);
+    int httpCode = clientHourly.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        String httpData = clientHourly.getString();
+        Serial.println(httpData);
+        JsonDocument forecast;
+        DeserializationError errorForecast = deserializeJson(forecast, httpData);
+        if(errorForecast) {
+            Serial.println("Open-meteo.com: hourly forecast deserialization error");
+            return;
+        }
+        uint8_t n = 0;
+        for(unsigned int i=0; i<144; i++) {
+            time_t time = forecast["hourly"]["time"][i] | 0;
+            time += forecast["utc_offset_seconds"] | 0;
+            uint8_t hr = hour(time);
+            if(hr == 0 or hr == 3 or hr == 6 or hr == 9 or hr == 12 or hr == 15 or hr == 18 or hr == 21) {
+                _hourlyDate[n] = forecast["hourly"]["time"][i] | 0;
+                _hourlyTemp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
+                _hourlyPres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
+                _hourlyWindSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
+                _hourlyWindDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
+                _hourlyPrec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
+                _hourlyIcon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
+                if(n<39) n++;
+            }
+        }
+        httpData = "";
+        _hourlyUpdated = now();
+        Serial.print("Open-meteo.com: hourly forecast updated successfully at: ");
+        Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
+    }
+    else Serial.println("Open-meteo.com: hourly forecast update error");
+    clientHourly.end();
 }
 
 /**
@@ -357,7 +525,7 @@ int Weather::get_currentWindDir() {
 }
 
 unsigned int Weather::get_currentIcon() {
-    return _convert_icon(_currentIcon);
+    return _convertIcon(_currentIcon);
 }
 
 bool Weather::get_isDay() {
@@ -389,7 +557,7 @@ float Weather::get_dailyWindSpeed(unsigned int num) {
 
 unsigned int Weather::get_dailyIcon(unsigned int num) {
     if(num >= DAYS) return 0;
-    return _convert_icon(_dailyIcon[num]);
+    return _convertIcon(_dailyIcon[num]);
 }
 
 unsigned int Weather::get_hourlyDate(unsigned int num) {
