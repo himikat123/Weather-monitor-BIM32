@@ -7,35 +7,37 @@ class Narodmon {
  * Send data to norodmon
  */
 void Narodmon::send() {
-    Serial.println(SEPARATOR);
-    Serial.println("Send data to narodmon.ru... ");
+    if(config.narodmonSend_period() > 0) {
+        Serial.println(SEPARATOR);
+        Serial.println("Send data to narodmon.ru... ");
 
-    if(config.narodmonSend_lat() == "" or config.narodmonSend_lon() == "") {
-        Serial.println("No coordinates");
-        return;
-    }
+        if(config.narodmonSend_lat() == "" or config.narodmonSend_lon() == "") {
+            Serial.println("No coordinates");
+            return;
+        }
 
-    String mac = WiFi.macAddress();
-    mac.replace(":", "");
-    String buf = "#BIM" + mac;
-    buf += "#" + config.narodmonSend_name();
-    buf += "#" + config.narodmonSend_lat();
-    buf += "#" + config.narodmonSend_lon();
-    for(unsigned int i=0; i<12; i++) {
-        buf += _fieldsPrepare(i, config.narodmonSend_metrics(i), mac); 
+        String mac = WiFi.macAddress();
+        mac.replace(":", "");
+        String buf = "#BIM" + mac;
+        buf += "#" + config.narodmonSend_name();
+        buf += "#" + config.narodmonSend_lat();
+        buf += "#" + config.narodmonSend_lon();
+        for(unsigned int i=0; i<12; i++) {
+            buf += _fieldsPrepare(i, config.narodmonSend_metrics(i), mac); 
+        }
+        buf += "\n##\r\n";
+        if(!client.connect("narodmon.ru", 8283, 3000)) Serial.println("failed");
+        else {
+            Serial.println(buf);
+            client.print(buf);
+            Serial.println("Done");
+        }
+        while(client.available()) {
+            String line = client.readStringUntil('\r');
+            Serial.println("Successfull. Server returned" + line);
+        }
+        client.stop();
     }
-    buf += "\n##\r\n";
-    if(!client.connect("narodmon.ru", 8283, 3000)) Serial.println("failed");
-    else {
-        Serial.println(buf);
-        client.print(buf);
-        Serial.println("Done");
-    }
-    while(client.available()) {
-        String line = client.readStringUntil('\r');
-        Serial.println("Successfull. Server returned" + line);
-    }
-    client.stop();
 }
 
 /**
