@@ -447,17 +447,21 @@ void Weather::_updateOpenMeteoHourly() {
         uint8_t n = 0;
         for(unsigned int i=0; i<144; i++) {
             time_t time = forecast["hourly"]["time"][i] | 0;
-            time += forecast["utc_offset_seconds"] | 0;
-            uint8_t hr = hour(time);
+            time_t utc = forecast["utc_offset_seconds"] | 0;
+            uint8_t hr = hour(time + utc);
             if(hr == 0 or hr == 3 or hr == 6 or hr == 9 or hr == 12 or hr == 15 or hr == 18 or hr == 21) {
-                _hourlyDate[n] = forecast["hourly"]["time"][i] | 0;
-                _hourlyTemp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
-                _hourlyPres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
-                _hourlyWindSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
-                _hourlyWindDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
-                _hourlyPrec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
-                _hourlyIcon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
-                if(n<39) n++;
+                if((time + utc) >= now()) {
+                    _hourlyDate[n] = forecast["hourly"]["time"][i] | 0;
+                    _hourlyDate[n] += utc;
+                    _hourlyTemp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
+                    _hourlyPres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
+                    _hourlyWindSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
+                    _hourlyWindDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
+                    _hourlyPrec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
+                    _hourlyIcon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
+                    if(n<39) n++;
+                    else break;
+                }
             }
         }
         httpData = "";
