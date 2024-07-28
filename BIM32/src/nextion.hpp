@@ -266,18 +266,20 @@ void Nextion::_NX4832T035_timeDate() {
         _prevTHour = _tHour;
     }
     if(_prevTMinute != _tMinute or _forced) {
-        nex.writeStr("BigClock.minute.txt", String(_tMinute));
+        char buf[3];
+        sprintf(buf, "%02d", _tMinute);
+        nex.writeStr("BigClock.minute.txt", String(buf));
         _prevTMinute = _tMinute;
     }
     if(_prevTDay != _tDay or _prevTMonth != _tMonth or _prevTYear != _tYear or _forced) {
-        nex.writeStr("BigClock.date.txt", _tDay + " " + lang.monthName(_tMonth) + " " + _tYear);
+        nex.writeStr("BigClock.date.txt", String(_tDay) + " " + lang.monthName(_tMonth) + " " + String(_tYear));
         _prevTDay = _tDay;
         _prevTMonth = _tMonth;
         _prevTYear = _tYear;
     }
     if(_prevTWeekday != _tWeekday or _forced) {
         unsigned int wd = _tWeekday;
-        nex.writeStr("BigClock.weekday.txt", lang.weekdayShortName(wd));
+        nex.writeStr("BigClock.weekday.txt", lang.weekdayFullName(wd));
         nex.writeStr("Main.weekday0.txt", lang.weekdayShortName(wd));
         if(++wd > 7) wd = 1;
         nex.writeStr("Main.weekday2.txt", lang.weekdayShortName(wd));
@@ -577,7 +579,7 @@ void Nextion::_showWeatherForecast() {
  * Sending data to display hourly forecast
  */
 void Nextion::_hourlyData() {
-    if((_prevHourlyChecksum != _hourlyChecksum and config.weather_provider() == OPENWEATHERMAP) or _forced) {
+    if((_prevHourlyChecksum != _hourlyChecksum) or _forced) {
         char dat[22] = "";
         char buf[20] = "";
         Serial1.print("Hourly.data0.txt=\"");
@@ -739,28 +741,30 @@ void Nextion::_historyIn() {
  */
 void Nextion::_alarms() {
     if(_prevAlarmChecksum != _alarmChecksum or _forced) {
-        char alarmData[144];
-        char buf[3];
         unsigned int alarmOn = 0;
-        Serial1.print("Alarm.alarms.txt=\"");
-        for(uint8_t i=0; i<12; i++) {
-            sprintf(buf, "%02d", config.alarm_time(i, 0));
-            for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
-            sprintf(buf, "%02d", config.alarm_time(i, 1));
-            for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
-            for(uint8_t w=0; w<7; w++) {
-                sprintf(buf, "%d", config.alarm_weekday(i, w));
-                alarmData[i * 7 + w + 48] = buf[0];
+        if(config.display_model(0) == NX4832T035) {
+            char alarmData[144];
+            char buf[3];
+            Serial1.print("Alarm.alarms.txt=\"");
+            for(uint8_t i=0; i<12; i++) {
+                sprintf(buf, "%02d", config.alarm_time(i, 0));
+                for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
+                sprintf(buf, "%02d", config.alarm_time(i, 1));
+                for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
+                for(uint8_t w=0; w<7; w++) {
+                    sprintf(buf, "%d", config.alarm_weekday(i, w));
+                    alarmData[i * 7 + w + 48] = buf[0];
+                }
+                sprintf(buf, "%d", config.alarm_state(i));
+                alarmData[i + 132] = buf[0];
+                alarmOn |= config.alarm_state(i);
             }
-            sprintf(buf, "%d", config.alarm_state(i));
-            alarmData[i + 132] = buf[0];
-            alarmOn |= config.alarm_state(i);
+            for(uint8_t k=0; k<144; k++) Serial1.print(alarmData[k]);
+            Serial1.print("\"");
+            Serial1.write(0xFF);
+            Serial1.write(0xFF);
+            Serial1.write(0xFF);
         }
-        for(uint8_t k=0; k<144; k++) Serial1.print(alarmData[k]);
-        Serial1.print("\"");
-        Serial1.write(0xFF);
-        Serial1.write(0xFF);
-        Serial1.write(0xFF);
         nex.writeNum("Main.alarm.pic", alarmOn ? 71 : 72);
 
         _prevAlarmChecksum = _alarmChecksum;
