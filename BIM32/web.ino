@@ -224,19 +224,20 @@ void web_login(AsyncWebServerRequest *request) {
 void web_save(AsyncWebServerRequest *request) {
     if(web_isLogged(request, true)) {
         if(request->hasArg("config")) {
-            vTaskSuspendAll();
             String cfg = request->arg("config");
             if(cfg.length() > 0) {
-                bool err = true;
-                File file = LittleFS.open("/config.json", "w");
-                if(file) err = !file.print(cfg);
-                config.readConfig();
-                file.close();
-                request->send(200, "text/plain", err ? "SAVE ERROR" : "OK");
+                if(cfg.lastIndexOf("\"ssid\":") != -1) {
+                    bool err = true;
+                    File file = LittleFS.open("/config.json", "w");
+                    if(file) err = !file.print(cfg);
+                    file.close();
+                    request->send(200, "text/plain", err ? "SAVE ERROR" : "OK");
+                }
+                else request->send(200, "text/plain", "CONFIG ERROR");
             }
             else request->send(200, "text/plain", "CONFIG ARGUMENT EMPTY");
             cfg = String();
-            xTaskResumeAll();
+            config.readConfig();
         }
         else request->send(200, "text/plain", "NO CONFIG ARGUMENT");
     }
@@ -255,6 +256,7 @@ void web_sens(AsyncWebServerRequest *request) {
 void web_restart(AsyncWebServerRequest *request) {
     if(web_isLogged(request, true)) {
         request->send(200, "text/plain", "OK");
+        delay(1000);
         ESP.restart();
     }
 }
