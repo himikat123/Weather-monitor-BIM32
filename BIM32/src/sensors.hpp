@@ -121,11 +121,11 @@ class Sensors {
  * Initialize all sensors
  */
 void Sensors::init(void) {
+    _DS18B20Init();
+    _DHT22Init();
     _BME280Init();
     _BMP180Init();
     _SHT21Init();
-    _DHT22Init();
-    _DS18B20Init();
     _MAX44009Init();
     _BH1750Init();
     _BME680Init();
