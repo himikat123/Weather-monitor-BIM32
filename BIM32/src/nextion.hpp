@@ -84,6 +84,7 @@ void Nextion::init() {
         if(config.lang() == "pl") langCode = 3;
         if(config.lang() == "ua") langCode = 4;
         nex.writeNum("Main.lang.val", langCode);
+        nex.writeNum("Main.weather.val", config.weather_provider());
 
         // texts
         nex.writeStr("Texts.JANUARY.txt", lang.january());
@@ -616,7 +617,7 @@ void Nextion::_hourlyData() {
             dat[18] = buf[0];
             // precipitation
             int pr = 0;
-            if(config.weather_provider() == OPEN_METEO) weather.get_hourlyPrec(i);
+            if(config.weather_provider() == OPEN_METEO) pr = weather.get_hourlyPrec(i);
             else pr = round(weather.get_hourlyPrec(i) * 100);
             sprintf(buf, "%03d", pr);
             for(uint8_t k=0; k<3; k++) dat[19 + k] = buf[k];

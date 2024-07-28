@@ -690,5 +690,130 @@ class Lang {
                 case 12: return december();
                 default: return "???"; break;
             }
-        }  
+        }
+
+        String clearSky() {
+            if(config.lang() == "de") return "Klarer Himmel";
+            if(config.lang() == "pl") return "Czyste Niebo";
+            if(config.lang() == "ru" || config.lang() == "ua") return "Ясно";
+            return "Clear sky";
+        }
+
+        String mainlyClear() {
+            if(config.lang() == "de") return "Überwiegend klar";
+            if(config.lang() == "pl") return "Głównie jasne";
+            if(config.lang() == "ru") return "Преимущественно ясно";
+            if(config.lang() == "ua") return "Переважно ясно";
+            return "Mainly clear";
+        }
+
+        String partlyCloudy() {
+            if(config.lang() == "de") return "Teilweise bewölkt";
+            if(config.lang() == "pl") return "Częściowe zachmurzenie";
+            if(config.lang() == "ru") return "Переменная облачность";
+            if(config.lang() == "ua") return "Мінлива хмарність";
+            return "Partly cloudy";
+        }
+
+        String overcast() {
+            if(config.lang() == "de") return "Bedeckt";
+            if(config.lang() == "pl") return "Pochmurny";
+            if(config.lang() == "ru") return "Пасмурно";
+            if(config.lang() == "ua") return "Хмарно";
+            return "Overcast";
+        }
+
+        String fog() {
+            if(config.lang() == "de") return "Nebel";
+            if(config.lang() == "pl") return "Mgła";
+            if(config.lang() == "ru" || config.lang() == "ua") return "Туман";
+            return "Fog";
+        }
+
+        String deposRimeFog() {
+            if(config.lang() == "de") return "Ablagerung von Raureifnebel";
+            if(config.lang() == "pl") return "Deponująca się mgła szronowa";
+            if(config.lang() == "ru") return "Туман с инеем";
+            if(config.lang() == "ua") return "Туман з інеєм";
+            return "Depositing rime fog";
+        }
+
+        String drizzle() {
+            if(config.lang() == "de") return "Nieselregen";
+            if(config.lang() == "pl") return "Mżawka";
+            if(config.lang() == "ru") return "Морось";
+            if(config.lang() == "ua") return "Мряка";
+            return "Drizzle";
+        }
+
+        String freezingDrizzle() {
+            if(config.lang() == "de") return "Gefrierender Nieselregen";
+            if(config.lang() == "pl") return "Marznąca mżawka";
+            if(config.lang() == "ru") return "Изморозь";
+            if(config.lang() == "ua") return "Ізморозь";
+            return "Freezing drizzle";
+        }
+
+        String rain() {
+            if(config.lang() == "de") return "Regen";
+            if(config.lang() == "pl") return "Deszcz";
+            if(config.lang() == "ru") return "Дождь";
+            if(config.lang() == "ua") return "Дощ";
+            return "Rain";
+        }
+
+        String freezingRain() {
+            if(config.lang() == "de") return "Gefrierender Regen";
+            if(config.lang() == "pl") return "Marznący deszcz";
+            if(config.lang() == "ru") return "Ледяной дождь";
+            if(config.lang() == "ua") return "Крижаний дощ";
+            return "Freezing rain";
+        }
+
+        String snowFall() {
+            if(config.lang() == "de") return "Schneefall";
+            if(config.lang() == "pl") return "Opady śniegu";
+            if(config.lang() == "ru") return "Снегопад";
+            if(config.lang() == "ua") return "Снігопад";
+            return "Snowfall";
+        }
+
+        String snowGrains() {
+            if(config.lang() == "de") return "Schneekörner";
+            if(config.lang() == "pl") return "Ziarna śniegu";
+            if(config.lang() == "ru") return "Снежные зерна";
+            if(config.lang() == "ua") return "Снігові зерна";
+            return "Snow grains";
+        }
+
+        String rainShowers() {
+            if(config.lang() == "de") return "Regenschauer";
+            if(config.lang() == "pl") return "Przelotne opady deszczu";
+            if(config.lang() == "ru") return "Ливень";
+            if(config.lang() == "ua") return "Злива";
+            return "Rain showers";
+        }
+
+        String snowShowers() {
+            if(config.lang() == "de") return "Schneeschauer";
+            if(config.lang() == "pl") return "Opady śniegu";
+            if(config.lang() == "ru") return "Сильный снегопад";
+            if(config.lang() == "ua") return "Сильний снігопад";
+            return "Snow showers";
+        }
+
+        String thunderstorm() {
+            if(config.lang() == "de") return "Gewitter";
+            if(config.lang() == "pl") return "Burza z piorunami";
+            if(config.lang() == "ru" || config.lang() == "ua") return "Гроза";
+            return "Thunderstorm";
+        }
+
+        String thunderstormWithHail() {
+            if(config.lang() == "de") return "Gewitter mit Hagel";
+            if(config.lang() == "pl") return "Burza z gradem";
+            if(config.lang() == "ru") return "Гроза с градом";
+            if(config.lang() == "ua") return "Гроза з градом";
+            return "Thunderstorm with hail";
+        }
 };
