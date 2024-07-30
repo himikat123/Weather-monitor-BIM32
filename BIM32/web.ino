@@ -110,9 +110,9 @@ String web_sensorsPrepare(bool logged) {
             json["wsensor"]["temp"]["name"][n][i] = wsensor.get_sensorType(i, n);
         }
         json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, RAW);
-        json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, RAW);
+        json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, 0);
         json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, RAW);
-        json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, RAW);
+        json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, 0);
         json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, RAW);
         json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
         json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, RAW);
@@ -237,6 +237,7 @@ void web_save(AsyncWebServerRequest *request) {
             }
             else request->send(200, "text/plain", "CONFIG ARGUMENT EMPTY");
             cfg = String();
+            delay(300);
             config.readConfig();
         }
         else request->send(200, "text/plain", "NO CONFIG ARGUMENT");
@@ -244,10 +245,36 @@ void web_save(AsyncWebServerRequest *request) {
 }
 
 /**
+ * Save alarms data to alarm file
+ */
+void web_save_alarm(AsyncWebServerRequest *request) {
+    if(web_isLogged(request, true)) {
+        if(request->hasArg("alarm")) {
+            String alr = request->arg("alarm");
+            if(alr.length() > 0) {
+                if(alr.lastIndexOf("\"states\":") != -1) {
+                    bool err = true;
+                    File file = LittleFS.open("/alarm.json", "w");
+                    if(file) err = !file.print(alr);
+                    file.close();
+                    request->send(200, "text/plain", err ? "SAVE ERROR" : "OK");
+                }
+                else request->send(200, "text/plain", "ALARM ERROR");
+            }
+            else request->send(200, "text/plain", "ALARM ARGUMENT EMPTY");
+            alr = String();
+            delay(300);
+            config.readConfig();
+        }
+        else request->send(200, "text/plain", "NO ALARM ARGUMENT");
+    }
+}
+
+/**
  * Send sensors data via AJAX
  */
 void web_sens(AsyncWebServerRequest *request) {
-    request->send(200, "text/json", web_sensorsPrepare(web_isLogged(request, false)));
+    request->send(200, "application/json", web_sensorsPrepare(web_isLogged(request, false)));
 }
 
 /**
@@ -523,6 +550,7 @@ void webInterface_init(void) {
     server.on("/data.json",         HTTP_GET,  [](AsyncWebServerRequest *request){ web_sens(request); });
     server.on("/esp/login",         HTTP_POST, [](AsyncWebServerRequest *request){ web_login(request); });
     server.on("/esp/saveConfig",    HTTP_POST, [](AsyncWebServerRequest *request){ web_save(request); });
+    server.on("/esp/saveAlarm",     HTTP_POST, [](AsyncWebServerRequest *request){ web_save_alarm(request); });
     server.on("/esp/restart",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_restart(request); });
     server.on("/esp/dispToggle",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_dispToggle(request); });
     server.on("/esp/brightLimit",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_brightLimit(request); });

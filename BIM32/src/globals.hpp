@@ -15,9 +15,9 @@
 #define WS2812_1_DAT_PIN      33 // WS2812b display 1 pin
 #define WS2812_2_DAT_PIN      12 // WS2812b display 2 pin
 
-#define DHT22_PIN             22 // DHT22 sensor pin
+#define DHT22_PIN             14 // DHT22 sensor pin
 #define PHOTORESISTOR_PIN     36 // Photoresistor pin
-#define ONE_WIRE_BUS_PIN      21 // DS18B20 one-wire bus pin
+#define ONE_WIRE_BUS_PIN       5 // DS18B20 one-wire bus pin
 
 #define SET_HC12_PIN          25 // HC12 wireless module set pin
 //#define AIR_HUMIDIFIER_PIN    14 /* Air humidifier pin */
@@ -334,6 +334,10 @@ class Configuration {
     public:
 
     void readConfig(void) {
+        #define COPYSTR(from, to) strlcpy(to, from | to, sizeof(to))
+        #define COPYNUM(from, to) to = from | to
+        #define COPYBOOL(from, to) to = from.as<bool>() | to
+
         /* Read config file */
         Serial.println(SEPARATOR);
         Serial.print("Read config file... ");
@@ -345,10 +349,6 @@ class Configuration {
 
                 DeserializationError error = deserializeJson(conf, json);
                 if(!error) {
-                    #define COPYSTR(from, to) strlcpy(to, from | to, sizeof(to))
-                    #define COPYNUM(from, to) to = from | to
-                    #define COPYBOOL(from, to) to = from.as<bool>() | to
-
                     //WiFi network
                     for(unsigned int i=0; i<NETWORKS; i++) {
                         COPYSTR(conf["network"]["ssid"][i], _network_ssid[i]);
@@ -574,20 +574,38 @@ class Configuration {
                     COPYSTR(conf["account"]["name"], _account_name);
                     COPYBOOL(conf["account"]["required"], _account_required);
 
-                    // Alarm
-                    for(unsigned int i=0; i<ALARMS; i++) {
-                        COPYNUM(conf["states"][i], _alarm_states[i]);
-                        COPYNUM(conf["melodies"][i], _alarm_melodies[i]);
-                        for(unsigned int k=0; k<2; k++) COPYNUM(conf["time"][i][k], _alarm_time[i][k]);
-                        for(unsigned int k=0; k<7; k++) COPYNUM(conf["weekdays"][i][k], _alarm_weekdays[i][k]);
-                    }
-
                     Serial.println("done");
                 }
                 else Serial.println(" Configuration file corrupted");
             }
         }
         else Serial.println(" No configuration file found");
+
+        /* Read alarm file */
+        Serial.println(SEPARATOR);
+        Serial.print("Read alarm file... ");
+        file = LittleFS.open("/alarm.json");
+        if(file) {
+            while(file.available()) {
+                String json = file.readString();
+                JsonDocument alarms;
+
+                DeserializationError error = deserializeJson(alarms, json);
+                if(!error) {
+                    // Alarm
+                    for(unsigned int i=0; i<ALARMS; i++) {
+                        COPYNUM(alarms["alarm"]["states"][i], _alarm_states[i]);
+                        COPYNUM(alarms["alarm"]["melodies"][i], _alarm_melodies[i]);
+                        for(unsigned int k=0; k<2; k++) COPYNUM(alarms["alarm"]["time"][i][k], _alarm_time[i][k]);
+                        for(unsigned int k=0; k<7; k++) COPYNUM(alarms["alarm"]["weekdays"][i][k], _alarm_weekdays[i][k]);
+                    }
+
+                    Serial.println("done");
+                }
+                else Serial.println(" Alarm file corrupted");
+            }
+        }
+        else Serial.println(" No alarm file found");
 
         /* Read user file */
         Serial.println(SEPARATOR);

@@ -12,6 +12,7 @@ class Nextion : LcdDisplay {
 
     public:
         void init();
+        void showLogo();
         void refresh();
         void displayToggle();
         void displayOn(bool doinit = true);
@@ -141,7 +142,13 @@ void Nextion::init() {
     }
 
     nex.writeNum("thup", 1);
+    vTaskDelay(2000);
     nex.writeStr("page Main");
+}
+
+void Nextion::showLogo() {
+    nex.writeNum("sleep", 0);
+    nex.writeStr("page Logo");
 }
 
 void Nextion::refresh() {
@@ -376,9 +383,11 @@ void Nextion::_showAntenna() {
  */
 void Nextion::_showTempIn() {
     if(_prevTempIn != _tempIn or _forced) {
-        nex.writeStr("Main.tempInside.txt", validate.temp(_tempIn) 
-            ? (String(int(round(_tempIn))) + "°C") : "--"
-        );
+        if(config.display_source_tempIn_sens() != 4) {
+            nex.writeStr("Main.tempInside.txt", validate.temp(_tempIn) 
+                ? (String(int(round(_tempIn))) + "°C") : "--"
+            );
+        }
         _prevTempIn = _tempIn;
     }
 }
@@ -401,9 +410,11 @@ void Nextion::_showTempOut() {
  */
 void Nextion::_showHumIn() {
     if(_prevHumIn != _humIn or _forced) {
-        nex.writeStr("Main.humInside.txt", validate.hum(_humIn) 
-            ? (String(int(round(_humIn))) + "%") : "--"
-        );
+        if(config.display_source_humIn_sens() != 4) {
+            nex.writeStr("Main.humInside.txt", validate.hum(_humIn) 
+                ? (String(int(round(_humIn))) + "%") : "--"
+            );
+        }
         _prevHumIn = _humIn;
     }
 }
@@ -436,6 +447,7 @@ void Nextion::_showPres() {
  * Display sequence
  */
 void Nextion::_showSequence() {
+    nex.writeNum("Main.sequence.en", config.display_source_tempIn_sens() == 4 ? 1 : 0);
     for(unsigned int i=0; i<4; i++) {
         if(_prevTempSequence[i] != _tempSequence[i] or _forced) {
             nex.writeStr("Main.tempSeq" + String(i) + ".txt", validate.temp(_tempSequence[i]) 
@@ -465,7 +477,9 @@ void Nextion::_showComfortLevel() {
         _prevComfortType = _comfortType;
     }
     if(_prevComfort != _comfort or _forced) {
-        nex.writeStr("Main.comfort.txt", _comfort);
+        if(config.display_source_tempIn_sens() != 4) {
+            nex.writeStr("Main.comfort.txt", _comfort);
+        }
         _prevComfort = _comfort;
     }
 }
@@ -742,29 +756,29 @@ void Nextion::_historyIn() {
 void Nextion::_alarms() {
     if(_prevAlarmChecksum != _alarmChecksum or _forced) {
         unsigned int alarmOn = 0;
-        if(config.display_model(0) == NX4832T035) {
-            char alarmData[144];
-            char buf[3];
-            Serial1.print("Alarm.alarms.txt=\"");
-            for(uint8_t i=0; i<12; i++) {
-                sprintf(buf, "%02d", config.alarm_time(i, 0));
-                for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
-                sprintf(buf, "%02d", config.alarm_time(i, 1));
-                for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
-                for(uint8_t w=0; w<7; w++) {
-                    sprintf(buf, "%d", config.alarm_weekday(i, w));
-                    alarmData[i * 7 + w + 48] = buf[0];
-                }
-                sprintf(buf, "%d", config.alarm_state(i));
-                alarmData[i + 132] = buf[0];
-                alarmOn |= config.alarm_state(i);
+        char alarmData[144];
+        char buf[3];
+        Serial1.print("Alarm.alarms.txt=\"");
+        for(uint8_t i=0; i<12; i++) {
+            sprintf(buf, "%02d", config.alarm_time(i, 0));
+            for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
+            sprintf(buf, "%02d", config.alarm_time(i, 1));
+            for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
+            for(uint8_t w=0; w<7; w++) {
+                sprintf(buf, "%d", config.alarm_weekday(i, w));
+                alarmData[i * 7 + w + 48] = buf[0];
             }
-            for(uint8_t k=0; k<144; k++) Serial1.print(alarmData[k]);
-            Serial1.print("\"");
-            Serial1.write(0xFF);
-            Serial1.write(0xFF);
-            Serial1.write(0xFF);
+            sprintf(buf, "%d", config.alarm_state(i));
+            alarmData[i + 132] = buf[0];
+            alarmOn |= config.alarm_state(i);
         }
+        for(uint8_t k=0; k<144; k++) Serial1.print(alarmData[k]);
+        Serial1.print("\"");
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+        Serial1.write(0xFF);
+
+        nex.writeNum("Alarm.alarmUpd.en", 1);
         nex.writeNum("Main.alarm.pic", alarmOn ? 71 : 72);
 
         _prevAlarmChecksum = _alarmChecksum;
@@ -791,7 +805,8 @@ void Nextion::dataReceive() {
             JsonDocument root;
             DeserializationError error = deserializeJson(root, _receivedData);
             if(!error) {
-                if(_receivedData.lastIndexOf("{\"h\":") != -1)
+                /* Time from display */
+                if(_receivedData.lastIndexOf("{\"h\":") != -1) {
                     setTime(
                         root["h"].as<int>(), 
                         root["i"].as<int>(), 
@@ -800,6 +815,54 @@ void Nextion::dataReceive() {
                         root["m"].as<int>(), 
                         root["y"].as<int>()
                     );
+                }
+
+                /* Alarm settings from display */
+                if(_receivedData.lastIndexOf("{\"alarms\":") != -1) {
+                    uint8_t times[ALARMS][2], weekdays[ALARMS][7], states[ALARMS]; 
+                    for(uint8_t i=0; i<ALARMS; i++) {
+                        for(uint8_t n=0; n<10; n++) {
+                            uint8_t val = root["alarms"][i][n].as<int>();
+                            if(n == 0) states[i] = val;
+                            if(n == 1) times[i][0] = val;
+                            if(n == 2) times[i][1] = val;
+                            if(n >= 3) weekdays[i][n - 3] = val;
+                        }
+                    }
+                    String json = "{\"alarm\":{\"time\":[";
+                    for(uint8_t i=0; i<ALARMS; i++) {
+                        json += "[" + String(times[i][0]) + "," + String(times[i][1]) + "]";
+                        if(i < ALARMS - 1) json += ",";
+                    }
+                    json += "],\"weekdays\":[";
+                    for(uint8_t i=0; i<ALARMS; i++) {
+                        json += "[";
+                        for(uint8_t n=0; n<7; n++) {
+                            json += String(weekdays[i][n]);
+                            if(n < 6) json += ",";
+                        }
+                        json += "]";
+                        if(i < ALARMS - 1) json += ","; 
+                    }
+                    json += "],\"states\":[";
+                    for(uint8_t i=0; i<ALARMS; i++) {
+                        json += String(states[i]);
+                        if(i < ALARMS - 1) json += ",";
+                    }
+                    json += "],\"melodies\":[";
+                    for(uint8_t i=0; i<ALARMS; i++) {
+                        json += config.alarm_melodie(i);
+                        if(i < ALARMS - 1) json += ",";
+                    }
+                    json += "]}}";
+                    bool err = true;
+                    File file = LittleFS.open("/alarm.json", "w");
+                    if(file) err = !file.print(json);
+                    file.close();
+
+                    delay(300);
+                    config.readConfig();
+                }
             }
             _receivedData = "";
             _customData = -1;
