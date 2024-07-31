@@ -98,7 +98,6 @@ void setup() {
     //digitalWrite(AIR_COOLER_PIN, LOW);
 
     Serial.begin(115200);
-    Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
     Serial2.begin(9600);
     Serial3.begin(9600, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false);
 
@@ -109,13 +108,17 @@ void setup() {
     Serial.println();
 
     if(!LittleFS.begin()) {
-        Serial.println("Little FS initialisation failed!");
+        Serial.println("LittleFS initialisation failed!");
         while(1) yield();
     }
     config.readConfig();
 
-    //nex.writeNum("sleep", 0);
-    //nex.writeStr("page Logo");
+    if(config.display_type(0) == 1 and config.display_model(0) < 2) {
+        Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
+        nextion.showLogo();
+    }
+    //TODO озвучка комфорта
+    //TODO управление комфортом
 
     xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
     xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
