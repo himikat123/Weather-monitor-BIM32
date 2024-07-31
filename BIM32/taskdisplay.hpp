@@ -34,7 +34,6 @@ void TaskDisplay1(void *pvParameters) {
 
     while(1) {
         if(config.display_type(DISPLAY_1)) {
-
             /* Display 1 toogle if display button was pressed */
             if(global.display_but_pressed[DISPLAY_1]) {
                 buttonWasPressed = !buttonWasPressed;
@@ -65,8 +64,8 @@ void TaskDisplay1(void *pvParameters) {
                 millis_05s = millis();
 
                 /* ILI9341 clock points refresh */
-                if(config.display_type(DISPLAY_1) == D_ILI9341) {
-                    ili9341.clockPoints();
+                if(config.display_type(DISPLAY_1) == LCD) {
+                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.clockPoints();
                 }
 
                 /* WS2812b brightness change and display update */
@@ -95,8 +94,12 @@ void TaskDisplay1(void *pvParameters) {
                 }
             }
 
-            /* Receive data from Nextion */
-            nextion.dataReceive();
+            if(config.display_type(DISPLAY_1) == LCD) {
+                if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                    /* Receive data from Nextion */
+                    nextion.dataReceive();
+                }
+            }
 
             /**
              * Automatic daily restart of the device at the specified time.
@@ -105,7 +108,7 @@ void TaskDisplay1(void *pvParameters) {
             // if(hour() == 12 and minute() == 0 and second() == 0) ESP.restart();
         }
 
-        vTaskDelay(5);
+        vTaskDelay(10);
     }
 }
 

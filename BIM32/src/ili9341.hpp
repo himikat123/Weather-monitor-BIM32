@@ -1,3 +1,9 @@
+#include "fontUbuntu14.hpp"
+#include "fontUbuntu21.hpp"
+#include "fontUbuntu29.hpp"
+
+#include "FS.h"
+#include <LittleFS.h>
 #include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
 TFT_eSPI tft = TFT_eSPI();
 #include <TJpg_Decoder.h> // v1.0.8 https://github.com/Bodmer/TJpg_Decoder
@@ -16,9 +22,9 @@ class ILI9341 {
     #define FONT1 0
     #define FONT2 1
     #define FONT3 2
-    #define FONT1_FILE "/fonts/Ubuntu-14"
-    #define FONT2_FILE "/fonts/Ubuntu-21"
-    #define FONT3_FILE "/fonts/Ubuntu-29"
+    //#define FONT1_FILE "/Ubuntu-14"
+    //#define FONT2_FILE "/Ubuntu-21"
+    //#define FONT3_FILE "/Ubuntu-29"
 
     #define BG_COLOR          0x0000 // black
     #define FRAME_COLOR       0x001F // blue
@@ -99,15 +105,6 @@ class ILI9341 {
  * Display and fonts initialisation
  */
 void ILI9341::init(void) {
-    bool font_missing = false;
-    if(LittleFS.exists(String(FONT1_FILE) + ".vlw") == false) font_missing = true;
-    if(LittleFS.exists(String(FONT2_FILE) + ".vlw") == false) font_missing = true;
-    if(LittleFS.exists(String(FONT3_FILE) + ".vlw") == false) font_missing = true;
-    if(font_missing) {
-        Serial.println("Font missing in LittleFS, did you upload it?");
-        while(1) yield();
-    }
-    
     tft.begin();
     tft.setRotation(3);
 
@@ -164,7 +161,7 @@ void ILI9341::brightness(unsigned int bright) {
 }
 
 void ILI9341::_showImg(uint16_t x, uint16_t y, String img) {
-    if(LittleFS.exists(img)) TJpgDec.drawFsJpg(x, y, img, LittleFS);
+    TJpgDec.drawFsJpg(x, y, img, LittleFS);
 }
 
 void ILI9341::_drawSkeleton() {
@@ -179,6 +176,9 @@ void ILI9341::_drawSkeleton() {
     _showImg(143, 109, "/img/symb/hum.jpg");
     _showImg(222, 109, "/img/symb/pres.jpg");
     _showImg(61, 146, "/img/symb/wind.jpg");
+    _showImg(33, 0, "/img/digits/0.jpg");
+    _showImg(77, 0, "/img/digits/0.jpg");
+    _showImg(109, 0, "/img/digits/0.jpg");
 }
 
 void ILI9341::_showTime(uint8_t hr, uint8_t mn) {
@@ -210,11 +210,9 @@ void ILI9341::_showWeekday(String wd) {
 }
 
 void ILI9341::clockPoints() {
-    if(_prevClockPoints != global.clockPoints) {
-        tft.fillCircle(70, 24, 3, global.clockPoints ? CLOCK_COLOR : BG_COLOR);
-        tft.fillCircle(70, 52, 3, global.clockPoints ? CLOCK_COLOR : BG_COLOR);
-        _prevClockPoints = global.clockPoints;
-    }
+    tft.fillCircle(70, 24, 3, _prevClockPoints ? CLOCK_COLOR : BG_COLOR);
+    tft.fillCircle(70, 52, 3, _prevClockPoints ? CLOCK_COLOR : BG_COLOR);
+    _prevClockPoints = !_prevClockPoints;
 }
 
 void ILI9341::_showAntenna() {
@@ -300,9 +298,9 @@ void ILI9341::_showComfort(unsigned int comfort) {
 
 void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color) {
     tft.fillRect(x, y, width, height, BG_COLOR);
-    if(font == FONT1) tft.loadFont(FONT1_FILE, LittleFS);
-    else if(font == FONT2) tft.loadFont(FONT2_FILE, LittleFS);
-    else if(font == FONT3) tft.loadFont(FONT3_FILE, LittleFS);
+    if(font == FONT1) tft.loadFont(Ubuntu_14);
+    else if(font == FONT2) tft.loadFont(Ubuntu_21);
+    else if(font == FONT3) tft.loadFont(Ubuntu_29);
     tft.setTextColor(color, BG_COLOR);
     uint16_t w = tft.textWidth(text);
     if(align == CENTER) x += (width / 2) - (w / 2);
@@ -366,14 +364,20 @@ void ILI9341::_showVoltageOrPercentage() {
 
 void ILI9341::_showWeatherIcon(unsigned int icon, bool isDay) {
     if(_prevIcon != (isDay ? (icon * 100) : icon)) {
-        char buf[30] = "";
-        bool validIcon = false, diffIcon = false;
-        if(icon == 3) icon = 2;
-        if(icon == 1 || icon == 2 || icon == 11) diffIcon = true;
-        if(icon == 4 || icon == 9 || icon == 10 || icon == 13 || icon == 50 || diffIcon) validIcon = true;
-        if(validIcon) sprintf(buf, "/img/icons/big/%02d%s.jpg", icon, diffIcon ? isDay ? "_d" : "_n" : "");
-        else sprintf(buf, "/img/icons/big/loading.jpg");
-        _showImg(0, 104, buf);
+        String path = "/img/icons/big/";
+        switch(icon) {
+            case 1: path += isDay ? "01_d" : "01_n"; break;
+            case 2: path += isDay ? "02_d" : "02_n"; break;
+            case 3: path += "04"; break;
+            case 4: path += "09"; break;
+            case 5: path += "10"; break;
+            case 6: path += isDay ? "11_d" : "11_n"; break;
+            case 7: path += "13"; break;
+            case 8: path += "50"; break;
+            default: path += "loading"; break;
+        }
+        path += ".jpg";
+        _showImg(0, 104, path);
         _prevIcon = isDay ? (icon * 100) : icon;
     }
 }
@@ -447,13 +451,20 @@ void ILI9341::_showUpdTime(unsigned int dateTime) {
 
 void ILI9341::_showForecast(uint16_t x, uint8_t num, int icon, float tempMax, float tempMin, float wind, String wd) {
     if(_prevDailyIcon[num] != icon) {
-        char buf[30] = "";
-        bool validIcon = false;
-        if(icon == 3) icon = 2;
-        if(icon == 1 || icon == 2 || icon == 4 || icon == 9 || icon == 10 || icon == 11 || icon == 13 || icon == 50) validIcon = true;
-        if(validIcon) sprintf(buf, "/img/icons/small/%02d.jpg", icon);
-        else sprintf(buf, "/img/icons/small/loading.jpg");
-        _showImg(x + 2, 183, buf);
+        String path = "/img/icons/small/";
+        switch(icon) {
+            case 1: path += "01"; break;
+            case 2: path += "02"; break;
+            case 3: path += "04"; break;
+            case 4: path += "09"; break;
+            case 5: path += "10"; break;
+            case 6: path += "11"; break;
+            case 7: path += "13"; break;
+            case 8: path += "50"; break;
+            default: path += "loading"; break;
+        }
+        path += ".jpg";
+        _showImg(x + 2, 183, path);
         _prevDailyIcon[num] = icon;
     }
 
