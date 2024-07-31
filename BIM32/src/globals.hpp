@@ -15,9 +15,9 @@
 #define WS2812_1_DAT_PIN      33 // WS2812b display 1 pin
 #define WS2812_2_DAT_PIN      12 // WS2812b display 2 pin
 
-#define DHT22_PIN             14 // DHT22 sensor pin
+#define DHT22_PIN              4 // DHT22 sensor pin
 #define PHOTORESISTOR_PIN     36 // Photoresistor pin
-#define ONE_WIRE_BUS_PIN       5 // DS18B20 one-wire bus pin
+#define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
 
 #define SET_HC12_PIN          25 // HC12 wireless module set pin
 //#define AIR_HUMIDIFIER_PIN    14 /* Air humidifier pin */
