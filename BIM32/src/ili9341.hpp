@@ -32,6 +32,7 @@ class ILI9341 : LcdDisplay {
     public:
         void init();
         void showLogo();
+        void showHomeScreen();
         void refresh();
         void clockPoints();
         void brightness(unsigned int bright);
@@ -79,9 +80,6 @@ void ILI9341::init(void) {
     tft.setSwapBytes(true);
     TJpgDec.setJpgScale(1);
     TJpgDec.setCallback(tft_output);
-    
-    tft.fillScreen(0);
-    _drawSkeleton();
 
     pinMode(TFT_BACKLIGHT, OUTPUT);
     brightness(1023);
@@ -89,6 +87,12 @@ void ILI9341::init(void) {
 
 void ILI9341::showLogo() {
     _showImg(0, 0, "/img/logo.jpg");
+    vTaskDelay(2000);
+}
+
+void ILI9341::showHomeScreen() {
+    tft.fillScreen(0);
+    _drawSkeleton();
 }
 
 /**
@@ -154,8 +158,9 @@ void ILI9341::refresh() {
 
 void ILI9341::brightness(unsigned int bright) {
     if(_power) {
+        uint8_t brgt = global.reduc[0] ? round(bright / 2) : bright;
         float r = 100 * log10(2) / log10(255);
-        uint16_t br = round(pow(2, (bright / r)));
+        uint16_t br = round(pow(2, (brgt / r)));
         if(br < 1023) analogWrite(TFT_BACKLIGHT, br);
         _prevBright = bright;
     }
@@ -394,7 +399,7 @@ void ILI9341::_showWeatherIcon() {
  */
 void ILI9341::_showDescription() {
     if(_prevDescription != _description) {
-        tft.loadFont("/fonts/Ubuntu-21", LittleFS);
+        tft.loadFont(Ubuntu_21);
         uint16_t w = tft.textWidth(_description);
         tft.unloadFont();
         _printText(0, 84, 319, 20, _description, w > 316 ? FONT1 : FONT2, CENTER, TEXT_COLOR);
