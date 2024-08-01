@@ -9,19 +9,14 @@ bool isOffTime(unsigned int dispNum, bool buttonWasPressed);
 void TaskDisplay1(void *pvParameters) {
     (void) pvParameters;
 
-    const uint8_t LCD          = 1;
-    const uint8_t NEOPIXEL     = 2;
-    const uint8_t D_NX4832K035 = 0;
-    const uint8_t D_NX4832T035 = 1;
-    const uint8_t D_ILI9341    = 2;
-
     unsigned int millis_5s = 0;
     unsigned int millis_05s = 0;
     bool buttonWasPressed = false;
 
     if(config.display_type(DISPLAY_1) == LCD) {
-        /* Initialize Nextion display */
+        /* Initialize display */
         if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.init();
+        if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.showHomeScreen();
     }
 
     /* Initialize WS2812b display 1 */
@@ -67,8 +62,8 @@ void TaskDisplay1(void *pvParameters) {
                 }
 
                 /* LCD/TFT display brightness change */
-                nextion.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
-                ili9341.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                nextion.brightness(get_brightness(DISPLAY_1));
+                ili9341.brightness(get_brightness(DISPLAY_1));
 
                 /* WS2812b display slow down points blinking frequency if the device isn't connected to the network */
                 ws2812b_1.setDotFreq(global.net_connected ? 500 : 1000);
@@ -81,7 +76,7 @@ void TaskDisplay1(void *pvParameters) {
                 }
                 else if(!buttonWasPressed && config.display_nightOff(DISPLAY_1)) {
                     nextion.displayOn(false);
-                    ili9341.displayOn(false);
+                    ili9341.displayOn();
                     ws2812b_1.displayOn();
                 }
             }
@@ -107,14 +102,14 @@ void TaskDisplay1(void *pvParameters) {
 void TaskDisplay2(void *pvParameters) {
     (void) pvParameters;
 
-    const uint8_t NEOPIXEL = 1;
+    const uint8_t D_NEOPIXEL = 1;
 
     unsigned int bright_update = 0;
     unsigned int disp_millis = 0;
     bool buttonWasPressed = false;
 
     /* Initialize WS2812b display 2 */
-    if(config.display_type(DISPLAY_2) == NEOPIXEL) {
+    if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
         ws2812b_2.init(DISPLAY_2, WS2812_2_DAT_PIN);
     }
 
@@ -125,14 +120,14 @@ void TaskDisplay2(void *pvParameters) {
             if(global.display_but_pressed[DISPLAY_2]) {
                 global.display_but_pressed[DISPLAY_2] = false;
                 global.disp_autoOff[DISPLAY_2] = millis();
-                if(config.display_type(DISPLAY_2) == NEOPIXEL) {
+                if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
                     ws2812b_2.displayToggle();
                 }
                 buttonWasPressed = !buttonWasPressed;
             }
 
             /* WS2812b brightness change and display update (once in 0.5 second) */
-            if(config.display_type(DISPLAY_2) == NEOPIXEL) {
+            if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
                 if(millis() - disp_millis > 500) {
                     disp_millis = millis();
                     ws2812b_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);

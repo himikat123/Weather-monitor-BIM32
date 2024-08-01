@@ -16,7 +16,7 @@ class Nextion : LcdDisplay {
         void displayOn(bool doinit = true);
         void displayOff();
         bool isDisplayOn();
-        void brightness(unsigned int bright, bool reduc);
+        void brightness(unsigned int bright);
         void setDisplayRTC();
         void dataReceive();
 
@@ -201,8 +201,8 @@ void Nextion::refresh() {
 /**
  * Change display brightness
  */
-void Nextion::brightness(unsigned int bright, bool reduc) {
-    uint8_t br = reduc ? round(bright / 2) : bright;
+void Nextion::brightness(unsigned int bright) {
+    uint8_t br = global.reduc[0] ? round(bright / 2) : bright;
     if(_prevBright != br or _forced) {
         if(_power) nex.writeNum("dim", br);
         _prevBright = br;

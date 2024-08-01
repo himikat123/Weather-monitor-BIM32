@@ -115,7 +115,7 @@ void setup() {
     config.readConfig();
 
     if(config.display_type(0) == LCD) {
-        if(config.display_model(0) < D_NX4832K035 or config.display_model(0) < D_NX4832T035) {
+        if(config.display_model(0) == D_NX4832K035 or config.display_model(0) == D_NX4832T035) {
             Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
             nextion.showLogo();
         }

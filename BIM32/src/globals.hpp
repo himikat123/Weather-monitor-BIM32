@@ -54,6 +54,12 @@
 #define RAW                  false // raw data without correction
 #define CORRECTED            true  // corrected data
 
+#define LCD                  1
+#define NEOPIXEL             2
+#define D_NX4832K035         0
+#define D_NX4832T035         1
+#define D_ILI9341            2
+
 static struct {
     bool clockSynchronized = false; // Is the time synchronized with the ntp server?
     bool clockSynchronize = false; // Should the display RTC be updated?
