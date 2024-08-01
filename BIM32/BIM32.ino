@@ -56,6 +56,7 @@ Narodmon narodmon;
 #include "src/agregateData.hpp"
 AgregateData agregateData;
 #include "src/fonts.hpp"
+#include "src/lcdDisplay.hpp"
 #include "src/nextion.hpp"
 Nextion nextion;
 #include "src/ili9341.hpp"
@@ -97,7 +98,7 @@ void setup() {
     //digitalWrite(AIR_HEATER_PIN, LOW);
     //digitalWrite(AIR_COOLER_PIN, LOW);
 
-    Serial.begin(115200);
+    Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);
     Serial3.begin(9600, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false);
 
@@ -113,10 +114,17 @@ void setup() {
     }
     config.readConfig();
 
-    if(config.display_type(0) == 1 and config.display_model(0) < 2) {
-        Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
-        nextion.showLogo();
+    if(config.display_type(0) == LCD) {
+        if(config.display_model(0) < D_NX4832K035 or config.display_model(0) < D_NX4832T035) {
+            Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
+            nextion.showLogo();
+        }
+        if(config.display_model(DISPLAY_1) == D_ILI9341) {
+            ili9341.init();
+            ili9341.showLogo();
+        }
     }
+
     //TODO озвучка комфорта
     //TODO управление комфортом
 

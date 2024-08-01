@@ -22,9 +22,6 @@ void TaskDisplay1(void *pvParameters) {
     if(config.display_type(DISPLAY_1) == LCD) {
         /* Initialize Nextion display */
         if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.init();
-
-        /* Initialize ILI9341 display */
-        if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.init();
     }
 
     /* Initialize WS2812b display 1 */
@@ -42,7 +39,7 @@ void TaskDisplay1(void *pvParameters) {
 
                 if(config.display_type(DISPLAY_1) == LCD) {
                     if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.displayToggle();
-                    //if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.displayToggle();/////////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.displayToggle();
                 }
 
                 if(config.display_type(DISPLAY_1) == NEOPIXEL) {
@@ -50,22 +47,17 @@ void TaskDisplay1(void *pvParameters) {
                 }
             }
 
-            /* LCD/TFT display refresh once in 5 seconds */
-            if(config.display_type(DISPLAY_1) == LCD) {
-                if(millis() - millis_5s >= 5000) {
-                    millis_5s = millis();
-                    if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.refresh();
-                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.refresh();
-                }
-            }
-
             /* Once in 0.5 second */
             if(millis() - millis_05s >= 500) {
                 millis_05s = millis();
 
-                /* ILI9341 clock points refresh */
                 if(config.display_type(DISPLAY_1) == LCD) {
-                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.clockPoints();
+                    /* LCD Display update */
+                    if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.refresh();
+                    if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                        ili9341.refresh();
+                        ili9341.clockPoints();
+                    }
                 }
 
                 /* WS2812b brightness change and display update */
@@ -76,7 +68,7 @@ void TaskDisplay1(void *pvParameters) {
 
                 /* LCD/TFT display brightness change */
                 nextion.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
-                //ili9341.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]); ///////////////////////!!!!!!!!!!!!!!!!!!!!!!!
+                ili9341.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
 
                 /* WS2812b display slow down points blinking frequency if the device isn't connected to the network */
                 ws2812b_1.setDotFreq(global.net_connected ? 500 : 1000);
@@ -84,12 +76,12 @@ void TaskDisplay1(void *pvParameters) {
                 /* Check if need and it's time to turn off the display */
                 if(isOffTime(DISPLAY_1, buttonWasPressed)) { 
                     if(nextion.isDisplayOn()) nextion.displayOff();
-                    //if(ili9341.isDisplayOn()) ili9341.displayOff(); //////////////////!!!!!!!!!!!!!!!!!
+                    if(ili9341.isDisplayOn()) ili9341.displayOff();
                     if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
                 }
                 else if(!buttonWasPressed && config.display_nightOff(DISPLAY_1)) {
                     nextion.displayOn(false);
-                    //ili9341.displayOn(false); //////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    ili9341.displayOn(false);
                     ws2812b_1.displayOn();
                 }
             }

@@ -1,8 +1,6 @@
 #include <EasyNextionLibrary.h> // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
 EasyNex nex(Serial1);
 
-#include "lcdDisplay.hpp"
-
 class Nextion : LcdDisplay {
     #define NX4832K035 0
     #define NX4832T035 1
