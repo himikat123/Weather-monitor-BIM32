@@ -2,23 +2,24 @@
 
 class Network {
     private:
-        bool needToPing = true;
-        void connecting(uint8_t num);
+        bool _needToPing = true;
+        void _connecting(uint8_t num);
 
     public:
-        void setNeedToPing(void);
-        bool isConnected(void);
-        void connect(void);
-        void runAccessPoint(void);
+        void setNeedToPing();
+        bool isConnected();
+        void connect();
+        void runAccessPoint();
+        void scanNetworks();
 };
 
 /**
  * Checking for internet access
  */
-bool Network::isConnected(void) {
+bool Network::isConnected() {
     if(WiFi.status() == WL_CONNECTED) {
-        if(needToPing) {
-            needToPing = false;
+        if(_needToPing) {
+            _needToPing = false;
             return Ping.ping(REMOTE_HOST);
         }
         else return true;
@@ -29,14 +30,14 @@ bool Network::isConnected(void) {
 /*
  * Set needToPing
  */
-void Network::setNeedToPing(void) {
-    needToPing = true;
+void Network::setNeedToPing() {
+    _needToPing = true;
 }
 
 /**
  * Connect to WiFi network
  */
-void Network::connect(void) {
+void Network::connect() {
     WiFi.disconnect();
     Serial.println(SEPARATOR);
     Serial.println("Connecting to WiFi...");
@@ -66,12 +67,12 @@ void Network::connect(void) {
             }
             if(knownNetwork >= 0) {
                 Serial.print("Connecting to "); Serial.println(config.network_ssid(knownNetwork));
-                connecting(knownNetwork);
+                _connecting(knownNetwork);
             }
             else {
                 Serial.println("No known networks found");
                 Serial.println("trying to connect to network 1 in case it's a hidden network");
-                connecting(0); 
+                _connecting(0); 
             }
         }
         if(WiFi.status() == WL_CONNECTED) {
@@ -101,13 +102,12 @@ void Network::connect(void) {
     }
 }
 
-void Network::connecting(uint8_t num) {
+void Network::_connecting(uint8_t num) {
     WiFi.begin(config.network_ssid(num), config.network_pass(num));
     unsigned int attempts = 0;
     while(WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
-        //ws2812b.connecting();
         if(++attempts > 20) break;
     }
     if(WiFi.status() == WL_CONNECTED) Serial.println(" connected");
@@ -117,7 +117,7 @@ void Network::connecting(uint8_t num) {
 /**
  * Start Access point
  */
-void Network::runAccessPoint(void) {
+void Network::runAccessPoint() {
     if(!global.apMode) {
         global.apMode = true;
         Serial.println();
@@ -131,5 +131,17 @@ void Network::runAccessPoint(void) {
         WiFi.softAP(config.accessPoint_ssid(), config.accessPoint_pass());
         Serial.println(SEPARATOR);
         Serial.println();
+    }
+}
+
+/**
+ * Scan available networks
+ */
+void Network::scanNetworks() {
+    global.nets = WiFi.scanNetworks();
+    if(global.nets > 29) global.nets = 29;
+    for(unsigned int i=0; i<global.nets; i++) {
+        WiFi.SSID(i).toCharArray(global.ssids[i], sizeof(global.ssids[i]));
+        global.rssis[i] = abs(WiFi.RSSI(i));
     }
 }

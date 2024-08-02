@@ -58,17 +58,12 @@ void TaskSensors(void *pvParameters) {
          */
         if(millis() - networks_update > 20000) {
             networks_update = millis();
-            global.nets = WiFi.scanNetworks();
-            if(global.nets > 29) global.nets = 29;
-            for(unsigned int i=0; i<global.nets; i++) {
-                WiFi.SSID(i).toCharArray(global.ssids[i], sizeof(global.ssids[i]));
-                global.rssis[i] = abs(WiFi.RSSI(i));
-            }
+            network.scanNetworks();
         }
 
         wsensor.receive(); /* Receive from wireless sensor */
-        sound.hourlySignal(); /* Hourly signal */
-        sound.alarm(); /* Alarm */
+        //sound.hourlySignal(); /* Hourly signal */
+        //sound.alarm(); /* Alarm */
 
         if(!global.apMode) {
             /**
