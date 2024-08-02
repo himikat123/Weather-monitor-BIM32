@@ -9,7 +9,6 @@ bool isOffTime(unsigned int dispNum, bool buttonWasPressed);
 void TaskDisplay1(void *pvParameters) {
     (void) pvParameters;
 
-    unsigned int millis_5s = 0;
     unsigned int millis_05s = 0;
     bool buttonWasPressed = false;
 
