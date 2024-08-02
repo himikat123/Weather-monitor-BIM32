@@ -290,7 +290,7 @@ unsigned int Weather::_weatherbitIcon(int code) {
  */
 unsigned int Weather::_openMeteoIcon(int code) {
     switch(code) {
-        case 0: case 1: 1;
+        case 0: case 1: return 1;
         case 2: return 2;
         case 3:	return 4;
         case 45: case 48: return 50;
