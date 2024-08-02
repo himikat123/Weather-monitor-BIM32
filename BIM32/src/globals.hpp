@@ -1315,7 +1315,7 @@ class Configuration {
   }
 
   unsigned int thingspeakReceive_period() {
-    if(_thingspeakReceive_period < 1 or _thingspeakReceive_period > 999) return 5;
+    if(_thingspeakReceive_period > 999) return 5;
     return _thingspeakReceive_period;
   }
 
@@ -1332,7 +1332,7 @@ class Configuration {
   }
 
   unsigned int narodmonSend_period() {
-    if(_narodmonSend_period < 1 or _narodmonSend_period > 999) return 5;
+    if(_narodmonSend_period > 999) return 5;
     return _narodmonSend_period;
   }
 
