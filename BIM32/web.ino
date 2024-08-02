@@ -132,6 +132,7 @@ String web_sensorsPrepare(bool logged) {
     }
 
     if(global.fsInfoUpdate) {
+        web_filelist = String();
         web_listAllFilesInDir("/");
         fsTotal = LittleFS.totalBytes();
         fsUsed = fsTotal - LittleFS.usedBytes();
