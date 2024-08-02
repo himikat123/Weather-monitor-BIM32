@@ -271,7 +271,7 @@ void Nextion::_NX4832T035_timeDate() {
         _prevTHour = _tHour;
     }
     if(_prevTMinute != _tMinute or _forced) {
-        char buf[3];
+        char buf[4];
         sprintf(buf, "%02d", _tMinute);
         nex.writeStr("BigClock.minute.txt", String(buf));
         _prevTMinute = _tMinute;
@@ -551,7 +551,7 @@ void Nextion::_showUpdated() {
     if(_prevWeatherUpdated != _weatherUpdated or _forced) {
         time_t t = _weatherUpdated;
         char buf[32] = "";
-        sprintf(buf, "⭮ %02d.%02d.%d %d:%02d:%02d", day(t), month(t), year(t), hour(t), minute(t), second(t));
+        sprintf(buf, "⭮ %02d.%02d.%d %02d:%02d:%02d", day(t), month(t), year(t), hour(t), minute(t), second(t));
         nex.writeStr("Main.updatedTime.txt", t > 0 ? buf : "--");
         _prevWeatherUpdated = _weatherUpdated;
     }
@@ -853,9 +853,8 @@ void Nextion::dataReceive() {
                         if(i < ALARMS - 1) json += ",";
                     }
                     json += "]}}";
-                    bool err = true;
                     File file = LittleFS.open("/alarm.json", "w");
-                    if(file) err = !file.print(json);
+                    if(file) file.print(json);
                     file.close();
 
                     delay(300);

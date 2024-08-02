@@ -457,7 +457,7 @@ void ILI9341::_showUpdTime() {
     if(_prevWeatherUpdated != _weatherUpdated) {
         time_t t = _weatherUpdated;
         char buf[32] = "";
-        sprintf(buf, "%02d.%02d.%d %d:%02d:%02d", day(t), month(t), year(t), hour(t), minute(t), second(t));
+        sprintf(buf, "%02d.%02d.%d %02d:%02d:%02d", day(t), month(t), year(t), hour(t), minute(t), second(t));
         _printText(186, 148, 133, 16, t > 0 ? buf : "--", FONT1, RIGHT, TEXT_COLOR);
         tft.drawCircle(177, 153, 5, TEXT_COLOR);
         tft.drawFastHLine(176, 148, 4, BG_COLOR);
