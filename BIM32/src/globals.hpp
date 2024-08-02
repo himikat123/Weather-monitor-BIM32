@@ -2,7 +2,8 @@
 #define SETTINGS_BUTTON_PIN    0 // Settings button pin
 #define DISPLAY1_BUTTON_PIN   34 // Display 1 button pin
 #define DISPLAY2_BUTTON_PIN   35 // Display 2 button pin
-#define ALARM_BUTTON_PIN      26 // Alarm button
+#define ALARM_BUTTON_PIN      26 // Alarm button pin
+#define MP3_BUSY_PIN          39 // MP3 player busy pin
 
 #define NEXTION_TX_PIN        32 // Nextion display RX pin
 #define NEXTION_RX_PIN        33 // Nextion display TX pin
@@ -72,6 +73,7 @@ static struct {
     bool apMode = false; // Access point mode
     bool display_but_pressed[2] = {false, false}; // display (1, 2) button pressed flag
     bool alarm_but_pressed = false; // alarm button pressed flag
+    bool mp3_busy = true; // mp3 player busy pin
     bool fsInfoUpdate = true; // FS info update flag
     unsigned int comfort = 0; // Comfort level code: 1-Comfortable, 2-Hot, 3-Cold, 4-Humid, 5-Dry, 6-Hot & Humid, 7-Hot & Dry, 8-Cold & Humid, 9-Cold & Dry
     unsigned int iaq_level = 0; // IAQ level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
@@ -1274,7 +1276,7 @@ class Configuration {
   }
 
   unsigned int thingspeakSend_period() {
-    if(_thingspeakSend_period < 1 or _thingspeakSend_period > 999) return 5;
+    if(_thingspeakSend_period > 999) return 5;
     return _thingspeakSend_period;
   }
 

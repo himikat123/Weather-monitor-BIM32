@@ -89,6 +89,7 @@ void setup() {
     pinMode(DISPLAY1_BUTTON_PIN, INPUT);
     pinMode(DISPLAY2_BUTTON_PIN, INPUT);
     pinMode(ALARM_BUTTON_PIN, INPUT);
+    pinMode(MP3_BUSY_PIN, INPUT);
     //pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);
     //pinMode(AIR_DRYER_PIN, OUTPUT);
     //pinMode(AIR_HEATER_PIN, OUTPUT);

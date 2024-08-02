@@ -1,16 +1,15 @@
-void display1_toggle(void);
-void display2_toggle(void);
-void alarm_button(void);
-void comfortCalculate(void);
-void get_time(void);
-boolean is_summertime(void);
+void display1_toggle();
+void display2_toggle();
+void alarm_button();
+void mp3_busy();
+void comfortCalculate();
+void get_time();
+boolean is_summertime();
 
 void TaskSensors(void *pvParameters) {
     (void) pvParameters;
 
     sensors.init();
-    sensors.read();
-    sound.init();
 
     unsigned int ntp_update = 0;
     unsigned int sensors_update = 0;
@@ -23,6 +22,7 @@ void TaskSensors(void *pvParameters) {
     attachInterrupt(DISPLAY1_BUTTON_PIN, display1_toggle, FALLING);
     attachInterrupt(DISPLAY2_BUTTON_PIN, display2_toggle, FALLING);
     attachInterrupt(ALARM_BUTTON_PIN, alarm_button, FALLING);
+    attachInterrupt(MP3_BUSY_PIN, mp3_busy, FALLING);
 
     // HC12 wireless module channel number request
     digitalWrite(SET_HC12_PIN, LOW);
@@ -30,6 +30,8 @@ void TaskSensors(void *pvParameters) {
     Serial2.println("AT+RC");
     delay(100);
     digitalWrite(SET_HC12_PIN, HIGH);
+
+    sound.init();
 
     while(1) {
         // Enter access point mode if "Settings" button is pressed
@@ -62,8 +64,8 @@ void TaskSensors(void *pvParameters) {
         }
 
         wsensor.receive(); /* Receive from wireless sensor */
-        //sound.hourlySignal(); /* Hourly signal */
-        //sound.alarm(); /* Alarm */
+        sound.hourlySignal(); /* Hourly signal */
+        sound.alarm(); /* Alarm */
 
         if(!global.apMode) {
             /**
@@ -165,6 +167,14 @@ void display2_toggle() {
  */
 void alarm_button() {
     global.alarm_but_pressed = true;
+    sound.stopPlaying();
+}
+
+/**
+ * Check if mp3 player is busy
+ */
+void mp3_busy() {
+    global.mp3_busy = false;
 }
 
 /**
