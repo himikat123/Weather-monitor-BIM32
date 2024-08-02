@@ -1,6 +1,8 @@
 RTC_DATA_ATTR double code = esp_random();
 size_t content_len;
 String web_filelist = "";
+size_t fsUsed = 0;
+size_t fsTotal = 0;
 
 /**
  * Get current date and time as a string
@@ -47,6 +49,10 @@ String web_sensorsPrepare(bool logged) {
     json["heap"] = ESP.getFreeHeap();
     json["time"] = now();
 
+    for(unsigned int i=0; i<global.nets; i++) {
+        json["ssids"][i][0] = global.ssids[i];
+        json["ssids"][i][1] = global.rssis[i];  
+    }
     json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
     json["network"]["ch"] = WiFi.channel();
     json["network"]["sig"] = WiFi.RSSI();
@@ -98,11 +104,6 @@ String web_sensorsPrepare(bool logged) {
         json["weather"]["daily"]["icon"][i] = weather.get_dailyIcon(i);
     }
 
-    for(unsigned int i=0; i<global.nets; i++) {
-        json["ssids"][i][0] = global.ssids[i];
-        json["ssids"][i][1] = global.rssis[i];  
-    }
-
     for(unsigned int i=0; i<WSENSORS; i++) {
         json["wsensor"]["time"][i] = wsensor.get_updated(i);
         for(unsigned int n=0; n<5; n++) {
@@ -130,12 +131,16 @@ String web_sensorsPrepare(bool logged) {
         json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
     }
 
-    if(!global.fileUploading) web_listAllFilesInDir("/");
+    if(global.fsInfoUpdate) {
+        web_listAllFilesInDir("/");
+        fsTotal = LittleFS.totalBytes();
+        fsUsed = fsTotal - LittleFS.usedBytes();
+        global.fsInfoUpdate = false;
+    }
     json["fs"]["list"] = web_filelist;
-    web_filelist = String();
-    json["fs"]["total"] = global.fileUploading ? 0 : LittleFS.totalBytes();
-    json["fs"]["free"] = global.fileUploading ? 0 : LittleFS.totalBytes() - LittleFS.usedBytes();
-    
+    json["fs"]["total"] = fsTotal;
+    json["fs"]["free"] = fsUsed;
+
     String data = "";
     serializeJson(json, data);
     return data;
@@ -231,6 +236,7 @@ void web_save(AsyncWebServerRequest *request) {
                     File file = LittleFS.open("/config.json", "w");
                     if(file) err = !file.print(cfg);
                     file.close();
+                    global.fsInfoUpdate = true;
                     request->send(200, "text/plain", err ? "SAVE ERROR" : "OK");
                 }
                 else request->send(200, "text/plain", "CONFIG ERROR");
@@ -257,6 +263,7 @@ void web_save_alarm(AsyncWebServerRequest *request) {
                     File file = LittleFS.open("/alarm.json", "w");
                     if(file) err = !file.print(alr);
                     file.close();
+                    global.fsInfoUpdate = true;
                     request->send(200, "text/plain", err ? "SAVE ERROR" : "OK");
                 }
                 else request->send(200, "text/plain", "ALARM ERROR");
@@ -468,6 +475,7 @@ void web_default(AsyncWebServerRequest *request) {
     if(web_isLogged(request, true)) {
         if(request->hasArg("config") && request->arg("config") == "default") {
             // TODO COPY DEFAULT CONFIG TO CONFIG
+            global.fsInfoUpdate = true;
             request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "error");
@@ -502,12 +510,11 @@ void web_changePass(AsyncWebServerRequest *request) {
 void web_fileUpload(AsyncWebServerRequest *request, String filename, size_t index, byte *data, size_t len, bool final) {
     if(web_isLogged(request, true)) {
         if(!index) {
-            global.fileUploading = true;
             request->_tempFile = LittleFS.open("/" + filename, "w");
         }
         if(len) request->_tempFile.write(data, len);
         if(final) {
-            global.fileUploading = false,
+            global.fsInfoUpdate = true,
             request->_tempFile.close();
         }
     }
@@ -523,6 +530,7 @@ void web_fileDelete(AsyncWebServerRequest *request) {
         else {
             request->send(200, "text/plain", LittleFS.remove(path) ? "OK" : "ERROR");
             path = String();
+            global.fsInfoUpdate = true;
         }
     }
 }
@@ -539,6 +547,7 @@ void web_fileRename(AsyncWebServerRequest *request) {
             request->send(200, "text/plain", LittleFS.rename(alt, neu) ? "OK" : "ERROR");
             alt = String();
             neu = String();
+            global.fsInfoUpdate = true;
         }
     }
 }
