@@ -118,9 +118,6 @@ String Weather::_openMeteoCode2Description(uint8_t code) {
  * Weather update
  */
 void Weather::update() {
-    Serial.println(SEPARATOR);
-    Serial.println("Current weather update... ");
-
     String url = "";
     if(config.weather_provider() == OPENWEATHERMAP) {
         if(config.weather_appid(OPENWEATHERMAP) == "") {
