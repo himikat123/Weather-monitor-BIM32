@@ -108,7 +108,7 @@ void Network::_connecting(uint8_t num) {
     while(WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
-        if(++attempts > 20) break;
+        if(++attempts > 50) break;
     }
     if(WiFi.status() == WL_CONNECTED) Serial.println(" connected");
     else Serial.println(" failed");

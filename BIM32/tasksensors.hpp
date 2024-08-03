@@ -71,7 +71,7 @@ void TaskSensors(void *pvParameters) {
             /**
              * Network connection if not connected and if not Access point mode
              */
-            if(WiFi.localIP().toString() == "0.0.0.0" or WiFi.status() != WL_CONNECTED) {
+            if(WiFi.localIP().toString() == "0.0.0.0" or !network.isConnected()) {
                 global.net_connected = false;
                 network.connect();
                 vTaskDelay(1000);
@@ -81,9 +81,11 @@ void TaskSensors(void *pvParameters) {
             /**
              * Time synchronization with NTP server
              */
-            if(config.clock_ntp_period()) {
+            if(config.clock_ntp_period() > 0) {
                 if((millis() - ntp_update) > config.clock_ntp_period() * 60000 or !global.clockSynchronized) {
                     ntp_update = millis();
+                    Serial.println(SEPARATOR);
+                    Serial.print("NTP synchronization... ");
                     if(network.isConnected()) get_time();
                     else Serial.println("No internet connection");
                     vTaskDelay(100);
@@ -93,9 +95,11 @@ void TaskSensors(void *pvParameters) {
             /**
              * Receive data from thingspeak
              */
-            if(config.thingspeakReceive_period()) {
+            if(config.thingspeakReceive_period() > 0) {
                 if((millis() - thingspeakReceive) > (config.thingspeakReceive_period() * 60000) or thingspeakReceive == 0) {
                     thingspeakReceive = millis();
+                    Serial.println(SEPARATOR);
+                    Serial.println("Receive data from thingspeak.com... ");
                     if(network.isConnected()) thingspeak.receive();
                     else Serial.println("No internet connection");
                 }
@@ -104,9 +108,11 @@ void TaskSensors(void *pvParameters) {
             /**
              * Send data to thingspeak
              */
-            if(config.thingspeakSend_period()) {
+            if(config.thingspeakSend_period() > 0) {
                 if((millis() - thingspeakSend) > (config.thingspeakSend_period() * 60000) or thingspeakSend == 0) {
                     thingspeakSend = millis();
+                    Serial.println(SEPARATOR);
+                    Serial.println("Send data to thingspeak.com... ");
                     if(network.isConnected()) thingspeak.send();
                     else Serial.println("No internet connection");
                 }
@@ -115,9 +121,11 @@ void TaskSensors(void *pvParameters) {
             /**
              * Send data to narodmon
              */
-            if(config.narodmonSend_period()) {
+            if(config.narodmonSend_period() > 0) {
                 if((millis() - narodmonSend) > (config.narodmonSend_period() * 60000) or narodmonSend == 0) {
                     narodmonSend = millis();
+                    Serial.println(SEPARATOR);
+                    Serial.println("Send data to narodmon.ru... ");
                     if(network.isConnected()) narodmon.send();
                     else Serial.println("No internet connection");
                 }
@@ -128,6 +136,8 @@ void TaskSensors(void *pvParameters) {
              * every 20 minutes
              */
             if(now() - weather.get_currentUpdated() > 1200) {
+                Serial.println(SEPARATOR);
+                Serial.println("Current weather update... ");
                 if(network.isConnected()) weather.update();
                 else Serial.println("No internet connection");
             }
@@ -135,10 +145,18 @@ void TaskSensors(void *pvParameters) {
             /**
              * Update history repository
              */
-            if(now() - historyUpdate > config.history_period() * 60) {
-                historyUpdate = now();
-                thingspeak.sendHistory();
-                thingspeak.receiveHistory();
+            if(config.history_period() > 0) {
+                if(now() - historyUpdate > config.history_period() * 60) {
+                    historyUpdate = now();
+                    Serial.println(SEPARATOR);
+                    Serial.println("Send data to weather history repository... ");
+                    if(network.isConnected()) thingspeak.sendHistory();
+                    else Serial.println("No internet connection");
+                    Serial.println(SEPARATOR);
+                    Serial.println("Receive data from weather history repository... ");
+                    if(network.isConnected()) thingspeak.receiveHistory();
+                    else Serial.println("No internet connection");
+                }
             }
         }
 
@@ -272,8 +290,6 @@ void comfortCalculate() {
  */
 void get_time(void) {
     if(global.net_connected) {
-        Serial.println(SEPARATOR);
-        Serial.print("NTP synchronization... ");
         configTime(config.clock_utc() * 3600, 0, config.clock_ntp());
         struct tm tmstruct;
         vTaskDelay(1000);

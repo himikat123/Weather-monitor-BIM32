@@ -32,42 +32,154 @@ class Thingspeak {
  * Receive data from thingspeak
  */
 void Thingspeak::receive() {
-    if(config.thingspeakReceive_period() > 0) {
-        Serial.println(SEPARATOR);
-        Serial.println("Receive data from thingspeak.com... ");
-        if(config.thingspeakReceive_channelID() == "") {
-            Serial.println("No Channel ID");
+    if(config.thingspeakReceive_channelID() == "") {
+        Serial.println("No Channel ID");
+        return;
+    }
+    if(config.thingspeakReceive_rdkey() == "") {
+        Serial.println("No Read API Key");
+        return;
+    }
+    String url = "http://api.thingspeak.com/channels/" + config.thingspeakReceive_channelID();
+    url += "/feeds.json?api_key=" + config.thingspeakReceive_rdkey() + "&results=1";
+    String httpData = "";
+    HTTPClient client;
+    Serial.println(url);
+    client.begin(url);
+    int httpCode = client.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        httpData = client.getString();
+        Serial.println(httpData);
+        JsonDocument root;
+        DeserializationError error = deserializeJson(root, httpData);
+        if(error) {
+            Serial.println("Deserialization error");
             return;
         }
-        if(config.thingspeakReceive_rdkey() == "") {
-            Serial.println("No Read API Key");
+        String thing_tm  = root["feeds"][0]["created_at"];
+        _field[0] = root["feeds"][0]["field1"];
+        _field[1] = root["feeds"][0]["field2"];
+        _field[2] = root["feeds"][0]["field3"];
+        _field[3] = root["feeds"][0]["field4"];    
+        _field[4] = root["feeds"][0]["field5"];
+        _field[5] = root["feeds"][0]["field6"];
+        _field[6] = root["feeds"][0]["field7"];
+        _field[7] = root["feeds"][0]["field8"];
+        TimeElements tmth;
+        char buf[22];
+        thing_tm.toCharArray(buf, 22);
+        tmth.Year = atoi(strtok(buf, "-")) - 1970;
+        tmth.Month = atoi(strtok(NULL, "-"));
+        tmth.Day = atoi(strtok(NULL, "T"));
+        tmth.Hour = atoi(strtok(NULL, ":"));
+        tmth.Minute = atoi(strtok(NULL, ":"));
+        tmth.Second = atoi(strtok(NULL, ":"));
+        _updated = makeTime(tmth);
+        _updated += config.clock_utc() * 3600;
+        _updated += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
+        Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
+    }
+    else Serial.println("error, code: " + String(httpCode));
+    client.end();
+}
+
+/**
+ * Send data to thingspeak
+ */
+void Thingspeak::send() {
+    if(config.thingspeakSend_wrkey() == "") {
+        Serial.println("No Write API Key");
+        return;
+    }
+
+    String url = "http://api.thingspeak.com/update?api_key=" + config.thingspeakSend_wrkey();
+    for(unsigned int i=0; i<8; i++) {
+        url += _fieldPrepare(i);
+    }
+
+    String httpData = "";
+    HTTPClient client;
+    Serial.println(url);
+    client.begin(url);
+    int httpCode = client.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        httpData = client.getString();
+        Serial.println(httpData);
+        Serial.println("successfull");
+    }
+    else Serial.println("error, code: " + String(httpCode));
+    client.end();
+    httpData = "";
+}
+
+/**
+ * Send data to weather history repository
+ */
+void Thingspeak::sendHistory() {
+    if(config.history_wrkey() == "") {
+        Serial.println("No Write API Key");
+        return;
+    }
+
+    String url = "http://api.thingspeak.com/update?api_key=" + config.history_wrkey();
+    for(unsigned int i=0; i<7; i++) {
+        url += _historyFieldPrepare(i);
+    }
+
+    String httpData = "";
+    HTTPClient client;
+    Serial.println(url);
+    client.begin(url);
+    int httpCode = client.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        httpData = client.getString();
+        Serial.println(httpData);
+        Serial.println("successfull");
+    }
+    else Serial.println("error, code: " + String(httpCode));
+    client.end();
+    httpData = "";
+}
+
+/**
+ * Receive data from weather history repository
+ */
+void Thingspeak::receiveHistory() {
+    if(config.history_channelID() == "") {
+        Serial.println("No Channel ID");
+        return;
+    }
+    if(config.history_rdkey() == "") {
+        Serial.println("No Read API Key");
+        return;
+    }
+    String url = "http://api.thingspeak.com/channels/" + config.history_channelID();
+    url += "/feeds.json?api_key=" + config.history_rdkey() + "&results=24";
+    String httpData = "";
+    HTTPClient client;
+    Serial.println(url);
+    client.begin(url);
+    int httpCode = client.GET();
+    if(httpCode == HTTP_CODE_OK) {
+        httpData = client.getString();
+        Serial.println(httpData);
+        JsonDocument root;
+        DeserializationError error = deserializeJson(root, httpData);
+        if(error) {
+            Serial.println("Deserialization error");
             return;
         }
-        String url = "http://api.thingspeak.com/channels/" + config.thingspeakReceive_channelID();
-        url += "/feeds.json?api_key=" + config.thingspeakReceive_rdkey() + "&results=1";
-        String httpData = "";
-        HTTPClient client;
-        Serial.println(url);
-        client.begin(url);
-        int httpCode = client.GET();
-        if(httpCode == HTTP_CODE_OK) {
-            httpData = client.getString();
-            Serial.println(httpData);
-            JsonDocument root;
-            DeserializationError error = deserializeJson(root, httpData);
-            if(error) {
-                Serial.println("Deserialization error");
-                return;
-            }
-            String thing_tm  = root["feeds"][0]["created_at"];
-            _field[0] = root["feeds"][0]["field1"];
-            _field[1] = root["feeds"][0]["field2"];
-            _field[2] = root["feeds"][0]["field3"];
-            _field[3] = root["feeds"][0]["field4"];    
-            _field[4] = root["feeds"][0]["field5"];
-            _field[5] = root["feeds"][0]["field6"];
-            _field[6] = root["feeds"][0]["field7"];
-            _field[7] = root["feeds"][0]["field8"];
+        String thing_tm  = root["feeds"][0]["created_at"];
+        for(int i=0; i<24; i++) {
+            _historyFields[0][i] = root["feeds"][i]["field1"].isNull() ? -99.0 : root["feeds"][i]["field1"];
+            _historyFields[1][i] = root["feeds"][i]["field2"].isNull() ? -99.0 : root["feeds"][i]["field2"];
+            _historyFields[2][i] = root["feeds"][i]["field3"].isNull() ? -99.0 : root["feeds"][i]["field3"];
+            _historyFields[3][i] = root["feeds"][i]["field4"].isNull() ? -99.0 : root["feeds"][i]["field4"];
+            _historyFields[4][i] = root["feeds"][i]["field5"].isNull() ? -99.0 : root["feeds"][i]["field5"];
+            _historyFields[5][i] = root["feeds"][i]["field6"].isNull() ? -99.0 : root["feeds"][i]["field6"];
+            _historyFields[6][i] = root["feeds"][i]["field7"].isNull() ? -99.0 : root["feeds"][i]["field7"];
+
+            String thing_tm  = root["feeds"][i]["created_at"];
             TimeElements tmth;
             char buf[22];
             thing_tm.toCharArray(buf, 22);
@@ -77,144 +189,14 @@ void Thingspeak::receive() {
             tmth.Hour = atoi(strtok(NULL, ":"));
             tmth.Minute = atoi(strtok(NULL, ":"));
             tmth.Second = atoi(strtok(NULL, ":"));
-            _updated = makeTime(tmth);
-            _updated += config.clock_utc() * 3600;
-            _updated += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
-            Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
+            _historyUpdated[i] = makeTime(tmth);
+            _historyUpdated[i] += config.clock_utc() * 3600;
+            _historyUpdated[i] += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
         }
-        else Serial.println("error, code: " + String(httpCode));
-        client.end();
+        Serial.println("successfull");
     }
-}
-
-/**
- * Send data to thingspeak
- */
-void Thingspeak::send() {
-    if(config.thingspeakSend_period() > 0) {
-        Serial.println(SEPARATOR);
-        Serial.println("Send data to thingspeak.com... ");
-
-        if(config.thingspeakSend_wrkey() == "") {
-            Serial.println("No Write API Key");
-            return;
-        }
-
-        String url = "http://api.thingspeak.com/update?api_key=" + config.thingspeakSend_wrkey();
-        for(unsigned int i=0; i<8; i++) {
-            url += _fieldPrepare(i);
-        }
-
-        String httpData = "";
-        HTTPClient client;
-        Serial.println(url);
-        client.begin(url);
-        int httpCode = client.GET();
-        if(httpCode == HTTP_CODE_OK) {
-            httpData = client.getString();
-            Serial.println(httpData);
-            Serial.println("successfull");
-        }
-        else Serial.println("error, code: " + String(httpCode));
-        client.end();
-        httpData = "";
-    }
-}
-
-/**
- * Send data to weather history repository
- */
-void Thingspeak::sendHistory() {
-    if(config.history_period() > 0) {
-        Serial.println(SEPARATOR);
-        Serial.println("Send data to weather history repository... ");
-
-        if(config.history_wrkey() == "") {
-            Serial.println("No Write API Key");
-            return;
-        }
-  
-        String url = "http://api.thingspeak.com/update?api_key=" + config.history_wrkey();
-        for(unsigned int i=0; i<7; i++) {
-            url += _historyFieldPrepare(i);
-        }
-
-        String httpData = "";
-        HTTPClient client;
-        Serial.println(url);
-        client.begin(url);
-        int httpCode = client.GET();
-        if(httpCode == HTTP_CODE_OK) {
-            httpData = client.getString();
-            Serial.println(httpData);
-            Serial.println("successfull");
-        }
-        else Serial.println("error, code: " + String(httpCode));
-        client.end();
-        httpData = "";
-    }
-}
-
-/**
- * Receive data from weather history repository
- */
-void Thingspeak::receiveHistory() {
-    if(config.history_period() > 0) {
-        Serial.println(SEPARATOR);
-        Serial.println("Receive data from weather history repository... ");
-        if(config.history_channelID() == "") {
-            Serial.println("No Channel ID");
-            return;
-        }
-        if(config.history_rdkey() == "") {
-            Serial.println("No Read API Key");
-            return;
-        }
-        String url = "http://api.thingspeak.com/channels/" + config.history_channelID();
-        url += "/feeds.json?api_key=" + config.history_rdkey() + "&results=24";
-        String httpData = "";
-        HTTPClient client;
-        Serial.println(url);
-        client.begin(url);
-        int httpCode = client.GET();
-        if(httpCode == HTTP_CODE_OK) {
-            httpData = client.getString();
-            Serial.println(httpData);
-            JsonDocument root;
-            DeserializationError error = deserializeJson(root, httpData);
-            if(error) {
-                Serial.println("Deserialization error");
-                return;
-            }
-            String thing_tm  = root["feeds"][0]["created_at"];
-            for(int i=0; i<24; i++) {
-                _historyFields[0][i] = root["feeds"][i]["field1"].isNull() ? -99.0 : root["feeds"][i]["field1"];
-                _historyFields[1][i] = root["feeds"][i]["field2"].isNull() ? -99.0 : root["feeds"][i]["field2"];
-                _historyFields[2][i] = root["feeds"][i]["field3"].isNull() ? -99.0 : root["feeds"][i]["field3"];
-                _historyFields[3][i] = root["feeds"][i]["field4"].isNull() ? -99.0 : root["feeds"][i]["field4"];
-                _historyFields[4][i] = root["feeds"][i]["field5"].isNull() ? -99.0 : root["feeds"][i]["field5"];
-                _historyFields[5][i] = root["feeds"][i]["field6"].isNull() ? -99.0 : root["feeds"][i]["field6"];
-                _historyFields[6][i] = root["feeds"][i]["field7"].isNull() ? -99.0 : root["feeds"][i]["field7"];
-
-                String thing_tm  = root["feeds"][i]["created_at"];
-                TimeElements tmth;
-                char buf[22];
-                thing_tm.toCharArray(buf, 22);
-                tmth.Year = atoi(strtok(buf, "-")) - 1970;
-                tmth.Month = atoi(strtok(NULL, "-"));
-                tmth.Day = atoi(strtok(NULL, "T"));
-                tmth.Hour = atoi(strtok(NULL, ":"));
-                tmth.Minute = atoi(strtok(NULL, ":"));
-                tmth.Second = atoi(strtok(NULL, ":"));
-                _historyUpdated[i] = makeTime(tmth);
-                _historyUpdated[i] += config.clock_utc() * 3600;
-                _historyUpdated[i] += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
-            }
-            Serial.println("successfull");
-        }
-        else Serial.println("error, code: " + String(httpCode));
-        client.end();
-    }
+    else Serial.println("error, code: " + String(httpCode));
+    client.end();
 }
 
 /**
