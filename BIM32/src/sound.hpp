@@ -65,15 +65,29 @@ void Sound::play(unsigned int folder, unsigned int track) {
     vTaskDelay(100);
     volume(config.sound_vol());
     vTaskDelay(100);
-    if(folder==1 and track<=25) {
+
+    if(folder==2 and track<=20) {
+        folder = 6;
+        track++;
+    }
+    if(folder==1 and track<=33) {
         if(String(config.lang()) == "de") folder = 2;
         else if(String(config.lang()) == "ru") folder = 3;
         else if(String(config.lang()) == "pl") folder = 4;
         else if(String(config.lang()) == "ua") folder = 5;
-        _sendCommand(0x0F, folder, track == 0 ? 24 : track);
+        if(track == 0) track = 24;
     }
-    if(folder==2 and track<=32) _sendCommand(0x0F, 6, track + 1);
-    if(folder==3 and track<=12) _sendCommand(0x0F, 7, track);
+    _sendCommand(0x0F, folder, track);
+    vTaskDelay(200);
+    
+    time_t mils = millis();
+    while(1) {
+        if(!digitalRead(MP3_BUSY_PIN)) break;
+        if(millis() - mils > 10000) {
+            _sendCommand(0x0F, folder, track);
+            break;
+        }
+    }
 }
 
 /**
@@ -88,7 +102,6 @@ void Sound::stopPlaying(void) {
  */
 void Sound::hourlySignal() {
     if(minute() == 0 and _hourly_rang != hour()) {
-        _hourly_rang = hour();
         switch(config.sound_hourly()) {
             case 0: _playHourlySignal(); break;
             case 2: if(weather.get_isDay()) _playHourlySignal(); break;
@@ -103,8 +116,7 @@ void Sound::hourlySignal() {
  */
 void Sound::_playHourlySignal() {
     if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
-        play(1, 25);
-        vTaskDelay(1800);
+        _hourly_rang = hour();
         play(1, hour());
     }
 }
