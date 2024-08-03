@@ -297,6 +297,19 @@ void web_restart(AsyncWebServerRequest *request) {
 }
 
 /**
+ * Change language
+ */
+void web_changeLang(AsyncWebServerRequest *request) {
+    if(web_isLogged(request, true)) {
+        if(request->hasArg("lang")) {
+            config.set_lang(request->arg("lang"));
+            request->send(200, "text/plain", "OK");
+        }
+        else request->send(200, "text/plain", "error");
+    }
+}
+
+/**
  * Turn display on and off
  */
 void web_dispToggle(AsyncWebServerRequest *request) {
@@ -562,6 +575,7 @@ void webInterface_init(void) {
     server.on("/esp/saveConfig",    HTTP_POST, [](AsyncWebServerRequest *request){ web_save(request); });
     server.on("/esp/saveAlarm",     HTTP_POST, [](AsyncWebServerRequest *request){ web_save_alarm(request); });
     server.on("/esp/restart",       HTTP_GET,  [](AsyncWebServerRequest *request){ web_restart(request); });
+    server.on("/esp/changelang",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_changeLang(request); });
     server.on("/esp/dispToggle",    HTTP_GET,  [](AsyncWebServerRequest *request){ web_dispToggle(request); });
     server.on("/esp/brightLimit",   HTTP_GET,  [](AsyncWebServerRequest *request){ web_brightLimit(request); });
     server.on("/esp/bright",        HTTP_GET,  [](AsyncWebServerRequest *request){ web_bright(request); });

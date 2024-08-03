@@ -851,705 +851,709 @@ class Configuration {
         return _display_lightSensor_sensitivity[num];
     }
 
-  unsigned int display_source_tempOut_sens() {
-    if(_display_source_tempOut_sens > 8) return 0;
-    return _display_source_tempOut_sens;
-  }
-
-  unsigned int display_source_tempOut_wsensNum() {
-    if(_display_source_tempOut_wsensNum >= WSENSORS) return 0;
-    return _display_source_tempOut_wsensNum;
-  }
-
-  unsigned int display_source_tempOut_temp() {
-    if(_display_source_tempOut_temp >= WSENSOR_TEMPS) return 0;
-    return _display_source_tempOut_temp; 
-  }
-
-  unsigned int display_source_tempOut_thing() {
-    if(_display_source_tempOut_thing >= THNG_FIELDS) return 0;
-    return _display_source_tempOut_thing; 
-  }
-
-  unsigned int display_source_humOut_sens() {
-    if(_display_source_humOut_sens > 6) return 0;
-    return _display_source_humOut_sens; 
-  }
-
-  unsigned int display_source_humOut_wsensNum() {
-    if(_display_source_humOut_wsensNum >= WSENSORS) return 0;
-    return _display_source_humOut_wsensNum; 
-  }
-
-  unsigned int display_source_humOut_thing() {
-    if(_display_source_humOut_thing >= THNG_FIELDS) return 0;
-    return _display_source_humOut_thing; 
-  }
-
-  unsigned int display_source_presOut_sens() {
-    if(_display_source_presOut_sens > 5) return 0;
-    return _display_source_presOut_sens;
-  }
-
-  unsigned int display_source_presOut_wsensNum() {
-    if(_display_source_presOut_wsensNum >= WSENSORS) return 0;
-    return _display_source_presOut_wsensNum;
-  }
-
-  unsigned int display_source_presOut_thing() {
-    if(_display_source_presOut_thing >= THNG_FIELDS) return 0;
-    return _display_source_presOut_thing; 
-  }
-
-  unsigned int display_source_tempIn_sens() {
-    if(_display_source_tempIn_sens > 9) return 0;
-    return _display_source_tempIn_sens; 
-  }
-
-  unsigned int display_source_tempIn_wsensNum() {
-    if(_display_source_tempIn_wsensNum >= WSENSORS) return 0;
-    return _display_source_tempIn_wsensNum;
-  }
-
-  unsigned int display_source_tempIn_temp() {
-    if(_display_source_tempIn_temp >= WSENSOR_TEMPS) return 0;
-    return _display_source_tempIn_temp; 
-  }
-
-  unsigned int display_source_tempIn_thing() {
-    if(_display_source_tempIn_thing >= THNG_FIELDS) return 0;
-    return _display_source_tempIn_thing;
-  }
-
-  unsigned int display_source_humIn_sens() {
-    if(_display_source_humIn_sens > 7) return 0;
-    return _display_source_humIn_sens; 
-  }
-
-  unsigned int display_source_humIn_wsensNum() {
-    if(_display_source_humIn_wsensNum >= WSENSORS) return 0;
-    return _display_source_humIn_wsensNum; 
-  }
-
-  unsigned int display_source_humIn_thing() {
-    if(_display_source_humIn_thing >= THNG_FIELDS) return 0;
-    return _display_source_humIn_thing; 
-  }
-
-  unsigned int display_source_volt_sens() {
-    if(_display_source_volt_sens > 3) return 0;
-    return _display_source_volt_sens; 
-  }
-
-  unsigned int display_source_volt_wsensNum() {
-    if(_display_source_volt_wsensNum >= WSENSORS) return 0;
-    return _display_source_volt_wsensNum;
-  }
-
-  unsigned int display_source_volt_volt() {
-    if(_display_source_volt_volt > 3) return 0;
-    return _display_source_volt_volt; 
-  }
-
-  unsigned int display_source_volt_thing() {
-    if(_display_source_volt_thing >= THNG_FIELDS) return 0;
-    return _display_source_volt_thing;
-  }
-
-  unsigned int display_source_volt_thingType() {
-    return _display_source_volt_thingType;
-  }
-
-  unsigned int display_source_bat_sens() {
-    if(_display_source_bat_sens > 2) return 0;
-    return _display_source_bat_sens;
-  }
-
-  unsigned int display_source_bat_wsensNum() {
-    if(_display_source_bat_wsensNum >= WSENSORS) return 0;
-    return _display_source_bat_wsensNum; 
-  }
-
-  unsigned int display_source_bat_thing() {
-    if(_display_source_bat_thing >= THNG_FIELDS) return 0;
-    return _display_source_bat_thing;
-  }
-
-  unsigned int display_source_descr() {
-    if(_display_source_descr > 2) return 0;
-    return _display_source_descr; 
-  }
-
-  unsigned int display_source_sequence_dur() {
-    return _display_source_sequence_dur;
-  }
-
-  String display_source_sequence_name(unsigned int slot) {
-    if(slot >= SEQUENCES) return "";
-    return String(_display_source_sequence_name[slot]);
-  }
-
-  unsigned int display_source_sequence_temp(unsigned int slot) {
-    if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_temp[slot] > 10) return 0;
-    return _display_source_sequence_temp[slot];
-  }
-
-  unsigned int display_source_sequence_thngtemp(unsigned int slot) {
-    if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_thngtemp[slot] >= THNG_FIELDS) return 0;
-    return _display_source_sequence_thngtemp[slot];
-  }
-
-  unsigned int display_source_sequence_wsenstemp(unsigned int slot, unsigned int ws) {
-    if(slot >= SEQUENCES) return 0;
-    if(ws > 1) return 0;
-    if(ws == 0 and _display_source_sequence_wsenstemp[slot][0] >= WSENSORS) return 0;
-    if(ws == 1 and _display_source_sequence_wsenstemp[slot][1] >= WSENSOR_TEMPS) return 0;
-    return _display_source_sequence_wsenstemp[slot][ws];
-  }
-
-  unsigned int display_source_sequence_hum(unsigned int slot) {
-    if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_hum[slot] > 7) return 0;
-    return _display_source_sequence_hum[slot];
-  }
-
-  unsigned int display_source_sequence_thnghum(unsigned int slot) {
-    if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_thnghum[slot] >= THNG_FIELDS) return 0;
-    return _display_source_sequence_thnghum[slot];
-  }
-
-  unsigned int display_source_sequence_wsenshum(unsigned int slot) {
-    if(slot >= SEQUENCES) return 0;
-    if(_display_source_sequence_wsenshum[slot] >= WSENSORS) return 0;
-    return _display_source_sequence_wsenshum[slot];
-  }
-
-  unsigned int display_timeSlot_period(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return 0;
-    if(displayNum >= DISPLAYS) return 0;
-    if(_display_timeSlot_period[slot][displayNum] > 99) return 0;
-    return _display_timeSlot_period[slot][displayNum];
-  }
-
-  unsigned int display_timeSlot_sensor(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return 0;
-    if(displayNum >= DISPLAYS) return 0;
-    if(_display_timeSlot_sensor[slot][displayNum] > 11) return 0;
-    return _display_timeSlot_sensor[slot][displayNum];
-  }
-
-  unsigned int display_timeSlot_data(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return 0;
-    if(displayNum >= DISPLAYS) return 0;
-    if(_display_timeSlot_data[slot][displayNum] > 3) return 0;
-    return _display_timeSlot_data[slot][displayNum];
-  }
-
-  unsigned int display_timeSlot_thing(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return 0;
-    if(displayNum >= DISPLAYS) return 0;
-    if(_display_timeSlot_thing[slot][displayNum] > 7) return 0;
-    return _display_timeSlot_thing[slot][displayNum];
-  }
-
-  String display_timeSlot_color(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return "";
-    if(displayNum >= DISPLAYS) return "";
-    return String(_display_timeSlot_color[slot][displayNum]);
-  }
-
-  unsigned int display_timeSlot_wsensor_num(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return 0;
-    if(displayNum >= DISPLAYS) return 0;
-    return _display_timeSlot_wsensor_num[slot][displayNum];
-  }
-  
-  unsigned int display_timeSlot_wsensor_type(unsigned int slot, unsigned int displayNum) {
-    if(slot >= TIMESLOTS) return 0;
-    if(displayNum >= DISPLAYS) return 0;
-    return _display_timeSlot_wsensor_type[slot][displayNum];
-  }
-
-  unsigned int sound_vol() {
-    return _sound_vol;
-  }
-  
-  unsigned int sound_eq() {
-    return _sound_eq;
-  }
-  
-  unsigned int sound_hourly() {
-    return _sound_hourly;
-  }
-  
-  unsigned int sound_hour_from() {
-    return _sound_hour_from;
-  }
-  
-  unsigned int sound_hour_to() {
-    return _sound_hour_to;
-  }
-
-  float bme280_temp_corr() {
-    return _bme280_temp_corr;
-  }
-
-  float bme280_hum_corr() {
-    return _bme280_hum_corr;
-  }
-
-  float bme280_pres_corr() {
-    return _bme280_pres_corr;
-  }
-
-  float bmp180_temp_corr() {
-    return _bmp180_temp_corr;
-  }
-
-  float bmp180_pres_corr() {
-    return _bmp180_pres_corr;
-  }
-
-  float sht21_temp_corr() {
-    return _sht21_temp_corr;
-  }
-
-  float sht21_hum_corr() {
-    return _sht21_hum_corr;
-  }
-
-  float dht22_temp_corr() {
-    return _dht22_temp_corr;
-  }
-
-  float dht22_hum_corr() {
-    return _dht22_hum_corr;
-  }
-
-  float ds18b20_temp_corr() {
-    return _ds18b20_temp_corr;
-  }
-
-  float esp32_temp_corr() {
-    return _esp32_temp_corr;
-  }
-
-  float max44009_light_corr() {
-    return _max44009_light_corr;
-  }
-
-  float bh1750_light_corr() {
-    return _bh1750_light_corr;
-  }
-
-  float analog_voltage_corr() {
-    return _analog_voltage_corr;
-  }
-
-  float bme680_temp_corr() {
-    return _bme680_temp_corr;
-  }
-
-  float bme680_hum_corr() {
-    return _bme680_hum_corr;
-  }
-
-  float bme680_pres_corr() {
-    return _bme680_pres_corr;
-  }
-
-  float bme680_iaq_corr() {
-    return _bme680_iaq_corr;
-  }
-
-  float wsensor_temp_corr(unsigned int num, unsigned int sens) {
-    if(num >= WSENSORS) return 0;
-    if(sens >= WSENSOR_TEMPS) return 0;
-    return _wsensor_temp_corr[num][sens];
-  }
-
-  float wsensor_hum_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_hum_corr[num];
-  }
-
-  float wsensor_pres_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_pres_corr[num];
-  }
-
-  float wsensor_light_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_light_corr[num];
-  }
-
-  float wsensor_volt_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_volt_corr[num];
-  }
-
-  float wsensor_curr_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_curr_corr[num];
-  }
-
-  float wsensor_pow_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_pow_corr[num];
-  }
-
-  float wsensor_enrg_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_enrg_corr[num];
-  }
-
-  float wsensor_freq_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_freq_corr[num];
-  }
-
-  float wsensor_co2_corr(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    return _wsensor_co2_corr[num];
-  }
-
-  float wsensor_bat_k(unsigned int num) {
-    if(num >= WSENSORS) return 0.0;
-    if(_wsensor_bat_k[num] < 10.0 or _wsensor_bat_k[num] > 250.0) return 120.0;
-    return _wsensor_bat_k[num];
-  };
-
-  unsigned int wsensor_bat_type(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    if(_wsensor_bat_type[num] > 1) return 0;
-    return _wsensor_bat_type[num];
-  };
-
-  unsigned int wsensor_channel() {
-    if(_wsensor_channel < 1 or _wsensor_channel > 100) return 1;
-    return _wsensor_channel;
-  };
-
-  unsigned int wsensor_expire(unsigned int num) {
-    if(num >= WSENSORS) return 0;
-    if(_wsensor_expire[num] < 1 or _wsensor_expire[num] > 100) return 10;
-    return _wsensor_expire[num];
-  }
-
-  unsigned int history_period() {
-    return _history_period;
-  }
-  
-  String history_channelID() {
-    return _history_channelID;
-  }
-  
-  String history_wrkey() {
-    return _history_wrkey;
-  }
-  
-  String history_rdkey() {
-    return _history_rdkey;
-  }
-  
-  unsigned int history_fields(unsigned int sensType) {
-    if(sensType >= 7) return 0;
-    return _history_fields[sensType];
-  }
-  
-  unsigned int history_wSensors(unsigned int sensType) {
-    if(sensType >= 7) return 0;
-    return _history_wSensors[sensType];
-  }
-  
-  unsigned int history_wTypes(unsigned int sensType) {
-    if(sensType >= 7) return 0;
-    return _history_wTypes[sensType];
-  }
-  
-  unsigned int history_tFields(unsigned int sensType) {
-    if(sensType >= 7) return 0;
-    return _history_tFields[sensType];
-  }
-
-  unsigned int thingspeakSend_period() {
-    if(_thingspeakSend_period > 999) return 5;
-    return _thingspeakSend_period;
-  }
-
-  String thingspeakSend_channelID() {
-    return String(_thingspeakSend_channelID);
-  }
-
-  String thingspeakSend_wrkey() {
-    return String(_thingspeakSend_wrkey);
-  }
-
-  String thingspeakSend_rdkey() {
-    return String(_thingspeakSend_rdkey);
-  }
-
-  unsigned int thingspeakSend_fields(unsigned int num) {
-    if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_fields[num] > 12) return 0;
-    return _thingspeakSend_fields[num];
-  }
-
-  unsigned int thingspeakSend_types(unsigned int num) {
-    if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_types[num] > 3) return 0;
-    return _thingspeakSend_types[num];
-  }
-
-  unsigned int thingspeakSend_wsensors(unsigned int num) {
-    if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_wsensors[num] >= WSENSORS) return 0;
-    return _thingspeakSend_wsensors[num];
-  }
-
-  unsigned int thingspeakSend_wtypes(unsigned int num) {
-    if(num >= THNG_FIELDS) return 0;
-    if(_thingspeakSend_wtypes[num] > 16) return 0;
-    return _thingspeakSend_wtypes[num];
-  }
-
-  unsigned int thingspeakReceive_period() {
-    if(_thingspeakReceive_period > 999) return 5;
-    return _thingspeakReceive_period;
-  }
-
-  String thingspeakReceive_channelID() {
-    return String(_thingspeakReceive_channelID);
-  }
-
-  String thingspeakReceive_rdkey() {
-    return String(_thingspeakReceive_rdkey);
-  }
-
-  unsigned int thingspeakReceive_expire() {
-    return _thingspeakReceive_expire;
-  }
-
-  unsigned int narodmonSend_period() {
-    if(_narodmonSend_period > 999) return 5;
-    return _narodmonSend_period;
-  }
-
-  String narodmonSend_lon() {
-    return String(_narodmonSend_lon);
-  }
-
-  String narodmonSend_lat() {
-    return String(_narodmonSend_lat);
-  }
-
-  String narodmonSend_name() {
-    return String(_narodmonSend_name);
-  }
-
-  unsigned int narodmonSend_sensors(unsigned int num) {
-    if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_sensors[num] > 13) return 0;
-    return _narodmonSend_sensors[num];
-  }
-
-  String narodmonSend_metrics(unsigned int num) {
-    if(num >= NAROD_FIELDS) return "";
-    return String(_narodmonSend_metrics[num]);
-  }
-
-  unsigned int narodmonSend_types(unsigned int num) {
-    if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_types[num] > 3) return 0;
-    return _narodmonSend_types[num];
-  }
-
-  unsigned int narodmonSend_wsensors(unsigned int num) {
-    if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_wsensors[num] >= WSENSORS) return 0;
-    return _narodmonSend_wsensors[num];
-  }
-
-  unsigned int narodmonSend_wtypes(unsigned int num) {
-    if(num >= NAROD_FIELDS) return 0;
-    if(_narodmonSend_wtypes[num] > 16) return 0;
-    return _narodmonSend_wtypes[num];
-  }
-
-  unsigned int comfort_temp_source() {
-    return _comfort_temp_source;
-  }
-  
-  unsigned int comfort_temp_wsensNum() {
-    return _comfort_temp_wsensNum;
-  }
-  
-  unsigned int comfort_temp_sens() {
-    return _comfort_temp_sens;
-  }
-  
-  unsigned int comfort_temp_thing() {
-    return _comfort_temp_thing;
-  }
-  
-  int comfort_temp_min() {
-    return _comfort_temp_min;
-  }
-  
-  int comfort_temp_max() {
-    return _comfort_temp_max;
-  }
-
-  int comfort_temp_min_hysteresis() {
-    return _comfort_temp_min_hysteresis;
-  }
-
-  int comfort_temp_max_hysteresis() {
-    return _comfort_temp_max_hysteresis;
-  }
-  
-  unsigned int comfort_hum_source() {
-    return _comfort_hum_source;
-  }
-  
-  unsigned int comfort_hum_wsensNum() {
-    return _comfort_hum_wsensNum;
-  }
-  
-  unsigned int comfort_hum_thing() {
-    return _comfort_hum_thing;
-  }
-  
-  int comfort_hum_min() {
-    return _comfort_hum_min;
-  }
-  
-  int comfort_hum_max() {
-    return _comfort_hum_max;
-  }
-
-  int comfort_hum_min_hysteresis() {
-    return _comfort_hum_min_hysteresis;
-  }
-
-  int comfort_hum_max_hysteresis() {
-    return _comfort_hum_max_hysteresis;
-  }
-
-  unsigned int comfort_iaq_source() {
-    return _comfort_iaq_source;
-  }
-
-  unsigned int comfort_co2_source() {
-    return _comfort_co2_source;
-  }
-
-  unsigned int comfort_co2_wsensNum() {
-    return _comfort_co2_wsensNum;
-  }
-
-  boolean comfort_temp_sound() {
-    return _comfort_temp_sound;
-  }
-  
-  boolean comfort_hum_sound() {
-    return _comfort_hum_sound;
-  }
- 
-  boolean comfort_iaq_sound() {
-    return _comfort_iaq_sound;
-  }
- 
-  boolean comfort_co2_sound() {
-    return _comfort_co2_sound;
-  } 
-  
-  String account_name() {
-    return String(_account_name);
-  }
-
-  String account_pass() {
-    return String(_account_pass);
-  }
-
-  bool account_required() {
-    return _account_required;
-  }
-
-  unsigned int alarm_time(unsigned int alarm_num, unsigned int level) {
-    if(alarm_num > ALARMS or level > 1) return 7;
-    return _alarm_time[alarm_num][level];
-  }
-  
-  unsigned int alarm_weekday(unsigned int alarm_num, unsigned int week_day) {
-    if(alarm_num > ALARMS or week_day > 6) return 0;
-    return _alarm_weekdays[alarm_num][week_day];
-  };
-  
-  unsigned int alarm_state(unsigned int alarm_num) {
-    if(alarm_num > ALARMS) return 0;
-    return _alarm_states[alarm_num];
-  }
-  
-  unsigned int alarm_melodie(unsigned int alarm_num) {
-    if(alarm_num > ALARMS) return 0;
-    return _alarm_melodies[alarm_num];
-  }
-  
-
-  /* 
-   * Setters
-   */
-
-  void set_brightLimit(unsigned int min, unsigned int max, unsigned int num) {
-    if(num >= DISPLAYS) return;
-    if(min <= 255) _display_brightness_min[num] = min;
-    if(max <= 255) _display_brightness_max[num] = max;
-  }
-  
-  void set_bright(int bright, unsigned int num) {
-    if(num >= DISPLAYS) return;
-    if(bright >= 0 and bright <= 255) {
-      _display_brightness_day[num] = bright;
-      _display_brightness_night[num] = bright;
+    unsigned int display_source_tempOut_sens() {
+        if(_display_source_tempOut_sens > 8) return 0;
+        return _display_source_tempOut_sens;
     }
-  }
 
-  void set_sensitivity(int sensitivity, unsigned int num) {
-    if(num >= DISPLAYS) return;
-    if(sensitivity >= 1 and sensitivity <= 200) _display_lightSensor_sensitivity[num] = sensitivity;
-  }
-
-  void set_animation_type(unsigned int type, unsigned int displayNum) {
-    if(type <= 9 and displayNum < DISPLAYS) _display_animation_type[displayNum] = type;
-  }
-
-  void set_animation_speed(unsigned int speed, unsigned int displayNum) {
-    if(speed >= 1 and speed <= 30 and displayNum < DISPLAYS) _display_animation_speed[displayNum] = speed;
-  }
-
-  void set_animation_points(unsigned int points, unsigned int displayNum) {
-    if(points <= 7 and displayNum < DISPLAYS) _display_animation_points[displayNum] = points;
-  }
-  
-  void set_color(char color[6], unsigned int slotNum, unsigned int displayNum) {
-    if(slotNum >= TIMESLOTS) return;
-    if(displayNum >= DISPLAYS) return;
-    _display_timeSlot_color[slotNum][displayNum][0] = '#';
-    for(unsigned int i=1; i<7; i++) {
-      _display_timeSlot_color[slotNum][displayNum][i] = color[i - 1];
+    unsigned int display_source_tempOut_wsensNum() {
+        if(_display_source_tempOut_wsensNum >= WSENSORS) return 0;
+        return _display_source_tempOut_wsensNum;
     }
-    _display_timeSlot_color[slotNum][displayNum][7] = '\0';
-  }
 
-  void set_vol(unsigned int vol) {
-    _sound_vol = vol;
-  }
+    unsigned int display_source_tempOut_temp() {
+        if(_display_source_tempOut_temp >= WSENSOR_TEMPS) return 0;
+        return _display_source_tempOut_temp; 
+    }
 
-  void set_eq(unsigned int eq) {
-    _sound_eq = eq;
-  }
+    unsigned int display_source_tempOut_thing() {
+        if(_display_source_tempOut_thing >= THNG_FIELDS) return 0;
+        return _display_source_tempOut_thing; 
+    }
+
+    unsigned int display_source_humOut_sens() {
+        if(_display_source_humOut_sens > 6) return 0;
+        return _display_source_humOut_sens; 
+    }
+
+    unsigned int display_source_humOut_wsensNum() {
+        if(_display_source_humOut_wsensNum >= WSENSORS) return 0;
+        return _display_source_humOut_wsensNum; 
+    }
+
+    unsigned int display_source_humOut_thing() {
+        if(_display_source_humOut_thing >= THNG_FIELDS) return 0;
+        return _display_source_humOut_thing; 
+    }
+
+    unsigned int display_source_presOut_sens() {
+        if(_display_source_presOut_sens > 5) return 0;
+        return _display_source_presOut_sens;
+    }
+
+    unsigned int display_source_presOut_wsensNum() {
+        if(_display_source_presOut_wsensNum >= WSENSORS) return 0;
+        return _display_source_presOut_wsensNum;
+    }
+
+    unsigned int display_source_presOut_thing() {
+        if(_display_source_presOut_thing >= THNG_FIELDS) return 0;
+        return _display_source_presOut_thing; 
+    }
+
+    unsigned int display_source_tempIn_sens() {
+        if(_display_source_tempIn_sens > 9) return 0;
+        return _display_source_tempIn_sens; 
+    }
+
+    unsigned int display_source_tempIn_wsensNum() {
+        if(_display_source_tempIn_wsensNum >= WSENSORS) return 0;
+        return _display_source_tempIn_wsensNum;
+    }
+
+    unsigned int display_source_tempIn_temp() {
+        if(_display_source_tempIn_temp >= WSENSOR_TEMPS) return 0;
+        return _display_source_tempIn_temp; 
+    }
+
+    unsigned int display_source_tempIn_thing() {
+        if(_display_source_tempIn_thing >= THNG_FIELDS) return 0;
+        return _display_source_tempIn_thing;
+    }
+
+    unsigned int display_source_humIn_sens() {
+        if(_display_source_humIn_sens > 7) return 0;
+        return _display_source_humIn_sens; 
+    }
+
+    unsigned int display_source_humIn_wsensNum() {
+        if(_display_source_humIn_wsensNum >= WSENSORS) return 0;
+        return _display_source_humIn_wsensNum; 
+    }
+
+    unsigned int display_source_humIn_thing() {
+        if(_display_source_humIn_thing >= THNG_FIELDS) return 0;
+        return _display_source_humIn_thing; 
+    }
+
+    unsigned int display_source_volt_sens() {
+        if(_display_source_volt_sens > 3) return 0;
+        return _display_source_volt_sens; 
+    }
+
+    unsigned int display_source_volt_wsensNum() {
+        if(_display_source_volt_wsensNum >= WSENSORS) return 0;
+        return _display_source_volt_wsensNum;
+    }
+
+    unsigned int display_source_volt_volt() {
+        if(_display_source_volt_volt > 3) return 0;
+        return _display_source_volt_volt; 
+    }
+
+    unsigned int display_source_volt_thing() {
+        if(_display_source_volt_thing >= THNG_FIELDS) return 0;
+        return _display_source_volt_thing;
+    }
+
+    unsigned int display_source_volt_thingType() {
+        return _display_source_volt_thingType;
+    }
+
+    unsigned int display_source_bat_sens() {
+        if(_display_source_bat_sens > 2) return 0;
+        return _display_source_bat_sens;
+    }
+
+    unsigned int display_source_bat_wsensNum() {
+        if(_display_source_bat_wsensNum >= WSENSORS) return 0;
+        return _display_source_bat_wsensNum; 
+    }
+
+    unsigned int display_source_bat_thing() {
+        if(_display_source_bat_thing >= THNG_FIELDS) return 0;
+        return _display_source_bat_thing;
+    }
+
+    unsigned int display_source_descr() {
+        if(_display_source_descr > 2) return 0;
+        return _display_source_descr; 
+    }
+
+    unsigned int display_source_sequence_dur() {
+        return _display_source_sequence_dur;
+    }
+
+    String display_source_sequence_name(unsigned int slot) {
+        if(slot >= SEQUENCES) return "";
+        return String(_display_source_sequence_name[slot]);
+    }
+
+    unsigned int display_source_sequence_temp(unsigned int slot) {
+        if(slot >= SEQUENCES) return 0;
+        if(_display_source_sequence_temp[slot] > 10) return 0;
+        return _display_source_sequence_temp[slot];
+    }
+
+    unsigned int display_source_sequence_thngtemp(unsigned int slot) {
+        if(slot >= SEQUENCES) return 0;
+        if(_display_source_sequence_thngtemp[slot] >= THNG_FIELDS) return 0;
+        return _display_source_sequence_thngtemp[slot];
+    }
+
+    unsigned int display_source_sequence_wsenstemp(unsigned int slot, unsigned int ws) {
+        if(slot >= SEQUENCES) return 0;
+        if(ws > 1) return 0;
+        if(ws == 0 and _display_source_sequence_wsenstemp[slot][0] >= WSENSORS) return 0;
+        if(ws == 1 and _display_source_sequence_wsenstemp[slot][1] >= WSENSOR_TEMPS) return 0;
+        return _display_source_sequence_wsenstemp[slot][ws];
+    }
+
+    unsigned int display_source_sequence_hum(unsigned int slot) {
+        if(slot >= SEQUENCES) return 0;
+        if(_display_source_sequence_hum[slot] > 7) return 0;
+        return _display_source_sequence_hum[slot];
+    }
+
+    unsigned int display_source_sequence_thnghum(unsigned int slot) {
+        if(slot >= SEQUENCES) return 0;
+        if(_display_source_sequence_thnghum[slot] >= THNG_FIELDS) return 0;
+        return _display_source_sequence_thnghum[slot];
+    }
+
+    unsigned int display_source_sequence_wsenshum(unsigned int slot) {
+        if(slot >= SEQUENCES) return 0;
+        if(_display_source_sequence_wsenshum[slot] >= WSENSORS) return 0;
+        return _display_source_sequence_wsenshum[slot];
+    }
+
+    unsigned int display_timeSlot_period(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return 0;
+        if(displayNum >= DISPLAYS) return 0;
+        if(_display_timeSlot_period[slot][displayNum] > 99) return 0;
+        return _display_timeSlot_period[slot][displayNum];
+    }
+
+    unsigned int display_timeSlot_sensor(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return 0;
+        if(displayNum >= DISPLAYS) return 0;
+        if(_display_timeSlot_sensor[slot][displayNum] > 11) return 0;
+        return _display_timeSlot_sensor[slot][displayNum];
+    }
+
+    unsigned int display_timeSlot_data(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return 0;
+        if(displayNum >= DISPLAYS) return 0;
+        if(_display_timeSlot_data[slot][displayNum] > 3) return 0;
+        return _display_timeSlot_data[slot][displayNum];
+    }
+
+    unsigned int display_timeSlot_thing(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return 0;
+        if(displayNum >= DISPLAYS) return 0;
+        if(_display_timeSlot_thing[slot][displayNum] > 7) return 0;
+        return _display_timeSlot_thing[slot][displayNum];
+    }
+
+    String display_timeSlot_color(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return "";
+        if(displayNum >= DISPLAYS) return "";
+        return String(_display_timeSlot_color[slot][displayNum]);
+    }
+
+    unsigned int display_timeSlot_wsensor_num(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return 0;
+        if(displayNum >= DISPLAYS) return 0;
+        return _display_timeSlot_wsensor_num[slot][displayNum];
+    }
+  
+    unsigned int display_timeSlot_wsensor_type(unsigned int slot, unsigned int displayNum) {
+        if(slot >= TIMESLOTS) return 0;
+        if(displayNum >= DISPLAYS) return 0;
+        return _display_timeSlot_wsensor_type[slot][displayNum];
+    }
+
+    unsigned int sound_vol() {
+        return _sound_vol;
+    }
+  
+    unsigned int sound_eq() {
+        return _sound_eq;
+    }
+  
+    unsigned int sound_hourly() {
+        return _sound_hourly;
+    }
+  
+    unsigned int sound_hour_from() {
+        return _sound_hour_from;
+    }
+  
+    unsigned int sound_hour_to() {
+        return _sound_hour_to;
+    }
+
+    float bme280_temp_corr() {
+        return _bme280_temp_corr;
+    }
+
+    float bme280_hum_corr() {
+        return _bme280_hum_corr;
+    }
+
+    float bme280_pres_corr() {
+        return _bme280_pres_corr;
+    }
+
+    float bmp180_temp_corr() {
+        return _bmp180_temp_corr;
+    }
+
+    float bmp180_pres_corr() {
+        return _bmp180_pres_corr;
+    }
+
+    float sht21_temp_corr() {
+        return _sht21_temp_corr;
+    }
+
+    float sht21_hum_corr() {
+        return _sht21_hum_corr;
+    }
+
+    float dht22_temp_corr() {
+        return _dht22_temp_corr;
+    }
+
+    float dht22_hum_corr() {
+        return _dht22_hum_corr;
+    }
+
+    float ds18b20_temp_corr() {
+        return _ds18b20_temp_corr;
+    }
+
+    float esp32_temp_corr() {
+        return _esp32_temp_corr;
+    }
+
+    float max44009_light_corr() {
+        return _max44009_light_corr;
+    }
+
+    float bh1750_light_corr() {
+        return _bh1750_light_corr;
+    }
+
+    float analog_voltage_corr() {
+        return _analog_voltage_corr;
+    }
+
+    float bme680_temp_corr() {
+        return _bme680_temp_corr;
+    }
+
+    float bme680_hum_corr() {
+        return _bme680_hum_corr;
+    }
+
+    float bme680_pres_corr() {
+        return _bme680_pres_corr;
+    }
+
+    float bme680_iaq_corr() {
+        return _bme680_iaq_corr;
+    }
+
+    float wsensor_temp_corr(unsigned int num, unsigned int sens) {
+        if(num >= WSENSORS) return 0;
+        if(sens >= WSENSOR_TEMPS) return 0;
+        return _wsensor_temp_corr[num][sens];
+    }
+
+    float wsensor_hum_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_hum_corr[num];
+    }
+
+    float wsensor_pres_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_pres_corr[num];
+    }
+
+    float wsensor_light_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_light_corr[num];
+    }
+
+    float wsensor_volt_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_volt_corr[num];
+    }
+
+    float wsensor_curr_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_curr_corr[num];
+    }
+
+    float wsensor_pow_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_pow_corr[num];
+    }
+
+    float wsensor_enrg_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_enrg_corr[num];
+    }
+
+    float wsensor_freq_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_freq_corr[num];
+    }
+
+    float wsensor_co2_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        return _wsensor_co2_corr[num];
+    }
+
+    float wsensor_bat_k(unsigned int num) {
+        if(num >= WSENSORS) return 0.0;
+        if(_wsensor_bat_k[num] < 10.0 or _wsensor_bat_k[num] > 250.0) return 120.0;
+        return _wsensor_bat_k[num];
+    };
+
+    unsigned int wsensor_bat_type(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        if(_wsensor_bat_type[num] > 1) return 0;
+        return _wsensor_bat_type[num];
+    };
+
+    unsigned int wsensor_channel() {
+        if(_wsensor_channel < 1 or _wsensor_channel > 100) return 1;
+        return _wsensor_channel;
+    };
+
+    unsigned int wsensor_expire(unsigned int num) {
+        if(num >= WSENSORS) return 0;
+        if(_wsensor_expire[num] < 1 or _wsensor_expire[num] > 100) return 10;
+        return _wsensor_expire[num];
+    }
+
+    unsigned int history_period() {
+        return _history_period;
+    }
+  
+    String history_channelID() {
+        return _history_channelID;
+    }
+  
+    String history_wrkey() {
+        return _history_wrkey;
+    }
+  
+    String history_rdkey() {
+        return _history_rdkey;
+    }
+  
+    unsigned int history_fields(unsigned int sensType) {
+        if(sensType >= 7) return 0;
+        return _history_fields[sensType];
+    }
+  
+    unsigned int history_wSensors(unsigned int sensType) {
+        if(sensType >= 7) return 0;
+        return _history_wSensors[sensType];
+    }
+  
+    unsigned int history_wTypes(unsigned int sensType) {
+        if(sensType >= 7) return 0;
+        return _history_wTypes[sensType];
+    }
+  
+    unsigned int history_tFields(unsigned int sensType) {
+        if(sensType >= 7) return 0;
+        return _history_tFields[sensType];
+    }
+
+    unsigned int thingspeakSend_period() {
+        if(_thingspeakSend_period > 999) return 5;
+        return _thingspeakSend_period;
+    }
+
+    String thingspeakSend_channelID() {
+        return String(_thingspeakSend_channelID);
+    }
+
+    String thingspeakSend_wrkey() {
+        return String(_thingspeakSend_wrkey);
+    }
+
+    String thingspeakSend_rdkey() {
+        return String(_thingspeakSend_rdkey);
+    }
+
+    unsigned int thingspeakSend_fields(unsigned int num) {
+        if(num >= THNG_FIELDS) return 0;
+        if(_thingspeakSend_fields[num] > 12) return 0;
+        return _thingspeakSend_fields[num];
+    }
+
+    unsigned int thingspeakSend_types(unsigned int num) {
+        if(num >= THNG_FIELDS) return 0;
+        if(_thingspeakSend_types[num] > 3) return 0;
+        return _thingspeakSend_types[num];
+    }
+
+    unsigned int thingspeakSend_wsensors(unsigned int num) {
+        if(num >= THNG_FIELDS) return 0;
+        if(_thingspeakSend_wsensors[num] >= WSENSORS) return 0;
+        return _thingspeakSend_wsensors[num];
+    }
+
+    unsigned int thingspeakSend_wtypes(unsigned int num) {
+        if(num >= THNG_FIELDS) return 0;
+        if(_thingspeakSend_wtypes[num] > 16) return 0;
+        return _thingspeakSend_wtypes[num];
+    }
+
+    unsigned int thingspeakReceive_period() {
+        if(_thingspeakReceive_period > 999) return 5;
+        return _thingspeakReceive_period;
+    }
+
+    String thingspeakReceive_channelID() {
+        return String(_thingspeakReceive_channelID);
+    }
+
+    String thingspeakReceive_rdkey() {
+        return String(_thingspeakReceive_rdkey);
+    }
+
+    unsigned int thingspeakReceive_expire() {
+        return _thingspeakReceive_expire;
+    }
+
+    unsigned int narodmonSend_period() {
+        if(_narodmonSend_period > 999) return 5;
+        return _narodmonSend_period;
+    }
+
+    String narodmonSend_lon() {
+        return String(_narodmonSend_lon);
+    }
+
+    String narodmonSend_lat() {
+        return String(_narodmonSend_lat);
+    }
+
+    String narodmonSend_name() {
+        return String(_narodmonSend_name);
+    }
+
+    unsigned int narodmonSend_sensors(unsigned int num) {
+        if(num >= NAROD_FIELDS) return 0;
+        if(_narodmonSend_sensors[num] > 13) return 0;
+        return _narodmonSend_sensors[num];
+    }
+
+    String narodmonSend_metrics(unsigned int num) {
+        if(num >= NAROD_FIELDS) return "";
+        return String(_narodmonSend_metrics[num]);
+    }
+
+    unsigned int narodmonSend_types(unsigned int num) {
+        if(num >= NAROD_FIELDS) return 0;
+        if(_narodmonSend_types[num] > 3) return 0;
+        return _narodmonSend_types[num];
+    }
+
+    unsigned int narodmonSend_wsensors(unsigned int num) {
+        if(num >= NAROD_FIELDS) return 0;
+        if(_narodmonSend_wsensors[num] >= WSENSORS) return 0;
+        return _narodmonSend_wsensors[num];
+    }
+
+    unsigned int narodmonSend_wtypes(unsigned int num) {
+        if(num >= NAROD_FIELDS) return 0;
+        if(_narodmonSend_wtypes[num] > 16) return 0;
+        return _narodmonSend_wtypes[num];
+    }
+
+    unsigned int comfort_temp_source() {
+        return _comfort_temp_source;
+    }
+  
+    unsigned int comfort_temp_wsensNum() {
+        return _comfort_temp_wsensNum;
+    }
+  
+    unsigned int comfort_temp_sens() {
+        return _comfort_temp_sens;
+    }
+  
+    unsigned int comfort_temp_thing() {
+        return _comfort_temp_thing;
+    }
+  
+    int comfort_temp_min() {
+        return _comfort_temp_min;
+    }
+  
+    int comfort_temp_max() {
+        return _comfort_temp_max;
+    }
+
+    int comfort_temp_min_hysteresis() {
+        return _comfort_temp_min_hysteresis;
+    }
+
+    int comfort_temp_max_hysteresis() {
+        return _comfort_temp_max_hysteresis;
+    }
+  
+    unsigned int comfort_hum_source() {
+        return _comfort_hum_source;
+    }
+
+    unsigned int comfort_hum_wsensNum() {
+        return _comfort_hum_wsensNum;
+    }
+
+    unsigned int comfort_hum_thing() {
+        return _comfort_hum_thing;
+    }
+
+    int comfort_hum_min() {
+        return _comfort_hum_min;
+    }
+
+    int comfort_hum_max() {
+        return _comfort_hum_max;
+    }
+
+    int comfort_hum_min_hysteresis() {
+        return _comfort_hum_min_hysteresis;
+    }
+
+    int comfort_hum_max_hysteresis() {
+        return _comfort_hum_max_hysteresis;
+    }
+
+    unsigned int comfort_iaq_source() {
+        return _comfort_iaq_source;
+    }
+
+    unsigned int comfort_co2_source() {
+        return _comfort_co2_source;
+    }
+
+    unsigned int comfort_co2_wsensNum() {
+        return _comfort_co2_wsensNum;
+    }
+
+    boolean comfort_temp_sound() {
+        return _comfort_temp_sound;
+    }
+  
+    boolean comfort_hum_sound() {
+        return _comfort_hum_sound;
+    }
+ 
+    boolean comfort_iaq_sound() {
+        return _comfort_iaq_sound;
+    }
+ 
+    boolean comfort_co2_sound() {
+        return _comfort_co2_sound;
+    } 
+  
+    String account_name() {
+        return String(_account_name);
+    }
+
+    String account_pass() {
+        return String(_account_pass);
+    }
+
+    bool account_required() {
+        return _account_required;
+    }
+
+    unsigned int alarm_time(unsigned int alarm_num, unsigned int level) {
+        if(alarm_num > ALARMS or level > 1) return 7;
+        return _alarm_time[alarm_num][level];
+    }
+  
+    unsigned int alarm_weekday(unsigned int alarm_num, unsigned int week_day) {
+        if(alarm_num > ALARMS or week_day > 6) return 0;
+        return _alarm_weekdays[alarm_num][week_day];
+    };
+  
+    unsigned int alarm_state(unsigned int alarm_num) {
+        if(alarm_num > ALARMS) return 0;
+        return _alarm_states[alarm_num];
+    }
+  
+    unsigned int alarm_melodie(unsigned int alarm_num) {
+        if(alarm_num > ALARMS) return 0;
+        return _alarm_melodies[alarm_num];
+    }
+  
+
+    /* 
+     * Setters
+     */
+
+    void set_brightLimit(unsigned int min, unsigned int max, unsigned int num) {
+        if(num >= DISPLAYS) return;
+        if(min <= 255) _display_brightness_min[num] = min;
+        if(max <= 255) _display_brightness_max[num] = max;
+    }
+
+    void set_bright(int bright, unsigned int num) {
+        if(num >= DISPLAYS) return;
+        if(bright >= 0 and bright <= 255) {
+            _display_brightness_day[num] = bright;
+            _display_brightness_night[num] = bright;
+        }
+    }
+
+    void set_sensitivity(int sensitivity, unsigned int num) {
+        if(num >= DISPLAYS) return;
+        if(sensitivity >= 1 and sensitivity <= 200) _display_lightSensor_sensitivity[num] = sensitivity;
+    }
+
+    void set_animation_type(unsigned int type, unsigned int displayNum) {
+        if(type <= 9 and displayNum < DISPLAYS) _display_animation_type[displayNum] = type;
+    }
+
+    void set_animation_speed(unsigned int speed, unsigned int displayNum) {
+        if(speed >= 1 and speed <= 30 and displayNum < DISPLAYS) _display_animation_speed[displayNum] = speed;
+    }
+
+    void set_animation_points(unsigned int points, unsigned int displayNum) {
+        if(points <= 7 and displayNum < DISPLAYS) _display_animation_points[displayNum] = points;
+    }
+  
+    void set_color(char color[6], unsigned int slotNum, unsigned int displayNum) {
+        if(slotNum >= TIMESLOTS) return;
+        if(displayNum >= DISPLAYS) return;
+        _display_timeSlot_color[slotNum][displayNum][0] = '#';
+        for(unsigned int i=1; i<7; i++) {
+            _display_timeSlot_color[slotNum][displayNum][i] = color[i - 1];
+        }
+        _display_timeSlot_color[slotNum][displayNum][7] = '\0';
+    }
+
+    void set_vol(unsigned int vol) {
+        _sound_vol = vol;
+    }
+
+    void set_eq(unsigned int eq) {
+        _sound_eq = eq;
+    }
+
+    void set_lang(String lng) {
+        lng.toCharArray(_lang, 3);
+    }
 };
