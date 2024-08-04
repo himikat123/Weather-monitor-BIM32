@@ -193,13 +193,13 @@ void Weather::update() {
         Serial.println("Wrong weather provider");
         return;
     }
-    Serial.println(url);
+    //Serial.println(url);
     HTTPClient clientWeather;
     clientWeather.begin(url);
     int httpCode = clientWeather.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientWeather.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         JsonDocument weather;
         DeserializationError errorWeather = deserializeJson(weather, httpData);
         if(errorWeather) {
@@ -312,12 +312,12 @@ void Weather::_updateWeatherbitDaily(void) {
     if(config.weather_citysearch() == 2) url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
     url += "&key=" + config.weather_appid(WEATHERBIT);
     HTTPClient clientDaily;
-    Serial.println(url);
+    //Serial.println(url);
     clientDaily.begin(url);
     int httpCode = clientDaily.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientDaily.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         JsonDocument forecast;
         DeserializationError errorForecast = deserializeJson(forecast, httpData);
         if(errorForecast) {
@@ -389,12 +389,12 @@ void Weather::_updateOpenMeteoDaily() {
     url += "&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max";
     url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=4";
     HTTPClient clientDaily;
-    Serial.println(url);
+    //Serial.println(url);
     clientDaily.begin(url);
     int httpCode = clientDaily.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientDaily.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         JsonDocument forecast;
         DeserializationError errorForecast = deserializeJson(forecast, httpData);
         if(errorForecast) {
@@ -429,12 +429,12 @@ void Weather::_updateOpenMeteoHourly() {
     url += "&hourly=temperature_2m,precipitation_probability,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m";
     url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=6";
     HTTPClient clientHourly;
-    Serial.println(url);
+    //Serial.println(url);
     clientHourly.begin(url);
     int httpCode = clientHourly.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientHourly.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         JsonDocument forecast;
         DeserializationError errorForecast = deserializeJson(forecast, httpData);
         if(errorForecast) {

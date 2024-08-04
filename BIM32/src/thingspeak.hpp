@@ -44,12 +44,12 @@ void Thingspeak::receive() {
     url += "/feeds.json?api_key=" + config.thingspeakReceive_rdkey() + "&results=1";
     String httpData = "";
     HTTPClient client;
-    Serial.println(url);
+    //Serial.println(url);
     client.begin(url);
     int httpCode = client.GET();
     if(httpCode == HTTP_CODE_OK) {
         httpData = client.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         JsonDocument root;
         DeserializationError error = deserializeJson(root, httpData);
         if(error) {
@@ -99,12 +99,12 @@ void Thingspeak::send() {
 
     String httpData = "";
     HTTPClient client;
-    Serial.println(url);
+    //Serial.println(url);
     client.begin(url);
     int httpCode = client.GET();
     if(httpCode == HTTP_CODE_OK) {
         httpData = client.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         Serial.println("successfull");
     }
     else Serial.println("error, code: " + String(httpCode));
@@ -128,7 +128,7 @@ void Thingspeak::sendHistory() {
 
     String httpData = "";
     HTTPClient client;
-    Serial.println(url);
+    //Serial.println(url);
     client.begin(url);
     int httpCode = client.GET();
     if(httpCode == HTTP_CODE_OK) {

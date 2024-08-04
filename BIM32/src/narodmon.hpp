@@ -24,7 +24,7 @@ void Narodmon::send() {
     buf += "\n##\r\n";
     if(!client.connect("narodmon.ru", 8283, 3000)) Serial.println("failed");
     else {
-        Serial.println(buf);
+        //Serial.println(buf);
         client.print(buf);
         Serial.println("Done");
     }
