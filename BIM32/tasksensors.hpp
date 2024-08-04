@@ -46,7 +46,6 @@ void TaskSensors(void *pvParameters) {
             sensors_update = millis();
             sensors.read();
             comfort.calculate();
-            comfort.soundNotify();
             comfort.devicesControl();
         }
 
@@ -66,8 +65,6 @@ void TaskSensors(void *pvParameters) {
         }
 
         wsensor.receive(); /* Receive from wireless sensor */
-        sound.hourlySignal(); /* Hourly signal */
-        sound.alarm(); /* Alarm */
 
         if(!global.apMode) {
             /**
@@ -162,6 +159,10 @@ void TaskSensors(void *pvParameters) {
             }
         }
 
+        comfort.soundNotify();
+        sound.hourlySignal(); /* Hourly signal */
+        sound.alarm(); /* Alarm */
+
         network.setNeedToPing();
 
         vTaskDelay(50);
@@ -215,7 +216,7 @@ void get_time(void) {
             global.clockSynchronize = true;
             global.clockSynchronized = true;
             Serial.print("successful: ");
-            Serial.printf("%d:%02d:%02d %02d-%02d-%d\r\n", hour(), minute(), second(), day(), month(), year());
+            Serial.printf("%d:%02d:%02d %02d.%02d.%d\r\n", hour(), minute(), second(), day(), month(), year());
         }
         else {
             Serial.println("failed");

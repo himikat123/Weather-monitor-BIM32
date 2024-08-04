@@ -12,6 +12,7 @@ class Sound {
         void airNotify(unsigned int airLevel);
 
     private:
+        bool _isAllowed();
         void _playHourlySignal();
         void _reset();
         uint16_t _chckSum(uint8_t *sdata);
@@ -83,15 +84,19 @@ void Sound::play(unsigned int folder, unsigned int track) {
         else if(String(config.lang()) == "ua") folder = 5;
         if(track == 0) track = 24;
     }
-    _sendCommand(0x0F, folder, track);
-    vTaskDelay(200);
-    
-    time_t mils = millis();
-    while(1) {
-        if(!digitalRead(MP3_BUSY_PIN)) break;
-        if(millis() - mils > 10000) {
-            _sendCommand(0x0F, folder, track);
-            break;
+    for(uint8_t i=0; i<5; i++) {
+        _sendCommand(0x0F, folder, track);
+        time_t mils = millis();
+        while(1) {
+            if(!digitalRead(MP3_BUSY_PIN)) {
+                i = 5;
+                break;
+            }
+            if(millis() - mils > 10000) {
+                _reset();
+                vTaskDelay(1000);
+                break;
+            }
         }
     }
 }
@@ -103,17 +108,27 @@ void Sound::stopPlaying(void) {
     _sendCommand(0x16, 0x00, 0x00);
 }
 
+/**
+ * Check if sound is allowed
+ */
+bool Sound::_isAllowed() {
+    if(_mp3_found and digitalRead(MP3_BUSY_PIN)) {
+        switch(config.sound_hourly()) {
+            case 0: return true;
+            case 2: if(weather.get_isDay()) return true;
+            case 3: if(hour() >= config.sound_hour_from() and hour() <= config.sound_hour_to()) return true;
+            default: return false;
+        }
+    }
+    return false;
+}
+
 /** 
  * Check if it is time to play hourly signal and playing
  */
 void Sound::hourlySignal() {
     if(minute() == 0 and _hourly_rang != hour()) {
-        switch(config.sound_hourly()) {
-            case 0: _playHourlySignal(); break;
-            case 2: if(weather.get_isDay()) _playHourlySignal(); break;
-            case 3: if(hour() >= config.sound_hour_from() and hour() <= config.sound_hour_to()) _playHourlySignal(); break;
-            default: ; break;
-        }
+        _playHourlySignal();
     }
 }
 
@@ -121,7 +136,7 @@ void Sound::hourlySignal() {
  * Playing an hourly sound and speaking the time every hour
  */
 void Sound::_playHourlySignal() {
-    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+    if(_isAllowed()) {
         _hourly_rang = hour();
         play(1, hour());
     }
@@ -135,16 +150,7 @@ void Sound::alarm() {
         for(int i=0; i<ALARMS; i++) {
             if(config.alarm_state(i) and config.alarm_weekday(i, weekday() == 1 ? 6 : weekday() - 2)) {
                 if(config.alarm_time(i, 0) == hour() and config.alarm_time(i, 1) == minute() and _alarm_rang != minute()) { 
-                    time_t mils = millis();
                     play(2, config.alarm_melodie(i));
-                    vTaskDelay(200);
-                    while(1) {
-                        if(!digitalRead(MP3_BUSY_PIN)) break;
-                        if(millis() - mils > 5000) {
-                            play(2, config.alarm_melodie(i));
-                            break;
-                        }
-                    }
                     _alarm_rang = minute();
                 }
             }
@@ -152,15 +158,15 @@ void Sound::alarm() {
         if(minute() == 0 and second() >= 0 and second() <= 5) _alarm_rang = 60;
 
         // Stop alarm ringing if the alarm button was pressed
-        if(global.alarm_but_pressed) {
-            stopPlaying();
-            global.alarm_but_pressed = false;
-        }
+        //if(global.alarm_but_pressed) {
+        //    stopPlaying();
+        //    global.alarm_but_pressed = false;
+        //}
     }
 }
 
 void Sound::tempNotify(int tempLevel) {
-    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+    if(_isAllowed()) {
         if(_prevTempLevel != tempLevel) {
             _prevTempLevel = tempLevel;
             switch(tempLevel) {
@@ -174,7 +180,7 @@ void Sound::tempNotify(int tempLevel) {
 }
 
 void Sound::humNotify(int humLevel) {
-    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+    if(_isAllowed()) {
         if(_prevHumLevel != humLevel) {
             _prevHumLevel = humLevel;
             switch(humLevel) {
@@ -188,7 +194,7 @@ void Sound::humNotify(int humLevel) {
 }
 
 void Sound::airNotify(unsigned int airLevel) {
-    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+    if(_isAllowed()) {
         if(_prevAirLevel != airLevel) {
             _prevAirLevel = airLevel;
             switch(airLevel) {
@@ -224,6 +230,13 @@ void Sound::_sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte) {
     uint16_t sum = _chckSum(sdata);
     sdata[7] = (uint8_t)(sum >> 8);
     sdata[8] = (uint8_t)(sum);
-    Serial3.write(sdata, 10);
-    delay(10);
+    Serial.flush();
+    vTaskDelay(200);
+    Serial.updateBaudRate(9600);
+    vTaskDelay(100);
+    Serial.write(sdata, 10);
+    Serial.flush();
+    vTaskDelay(200);
+    Serial.updateBaudRate(115200);
+    delay(100);
 }

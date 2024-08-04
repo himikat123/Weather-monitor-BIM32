@@ -30,8 +30,6 @@ WiFiClient client;
 #include <AsyncTCP.h> // v1.1.4 https://github.com/dvarrel/AsyncTCP
 #include <ESPAsyncWebServer.h> // v1.2.3 https://github.com/me-no-dev/ESPAsyncWebServer
 AsyncWebServer server(80);
-#include <SoftwareSerial.h> // v8.1.0 https://github.com/plerup/espsoftwareserial/
-SoftwareSerial Serial3;
 #include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
@@ -92,18 +90,9 @@ void setup() {
     pinMode(DISPLAY2_BUTTON_PIN, INPUT);
     pinMode(ALARM_BUTTON_PIN, INPUT);
     pinMode(MP3_BUSY_PIN, INPUT);
-    //pinMode(AIR_HUMIDIFIER_PIN, OUTPUT);
-    //pinMode(AIR_DRYER_PIN, OUTPUT);
-    //pinMode(AIR_HEATER_PIN, OUTPUT);
-    //pinMode(AIR_COOLER_PIN, OUTPUT);
-    //digitalWrite(AIR_HUMIDIFIER_PIN, LOW);
-    //digitalWrite(AIR_DRYER_PIN, LOW);
-    //digitalWrite(AIR_HEATER_PIN, LOW);
-    //digitalWrite(AIR_COOLER_PIN, LOW);
 
     Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);
-    Serial3.begin(9600, SWSERIAL_8N1, MP3_RX_PIN, MP3_TX_PIN, false);
 
     Serial.println(SEPARATOR);
     Serial.println(SEPARATOR);
