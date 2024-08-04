@@ -66,6 +66,8 @@ WS2812b ws2812b_1;
 WS2812b ws2812b_2;
 #include "src/network.hpp"
 Network network;
+#include "src/comfort.hpp"
+Comfort comfort;
 
 #include "taskdisplay.hpp"
 #include "tasksensors.hpp"

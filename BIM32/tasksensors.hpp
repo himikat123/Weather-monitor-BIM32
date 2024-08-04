@@ -45,7 +45,8 @@ void TaskSensors(void *pvParameters) {
         if(millis() - sensors_update > 5000) {
             sensors_update = millis();
             sensors.read();
-            comfortCalculate();
+            comfort.calculate();
+            comfort.soundNotify();
         }
 
         /**
@@ -167,21 +168,21 @@ void TaskSensors(void *pvParameters) {
 }
 
 /**
- * Check if display 1 button was pressed
+ * Interrupt from display 1 button
  */
 void display1_toggle() {
     global.display_but_pressed[0] = true;
 }
 
 /**
- * Check if display 2 button was pressed
+ * Interrupt from display 2 button
  */
 void display2_toggle() {
     global.display_but_pressed[1] = true;
 }
 
 /**
- * Check if alarm button was pressed
+ * Interrupt from alarm button
  */
 void alarm_button() {
     global.alarm_but_pressed = true;
@@ -189,100 +190,10 @@ void alarm_button() {
 }
 
 /**
- * Check if mp3 player is busy
+ * Interrupt from mp3 player busy pin
  */
 void mp3_busy() {
     global.mp3_busy = false;
-}
-
-/**
- * Calculate comfort level 
- */
-void comfortCalculate() {
-    int temp = 40400;
-    int hum = 40400;
-    int tempLevel = 0;
-    int humLevel = 0;
-
-    switch(config.comfort_temp_source()) {
-        case 1: temp = round(weather.get_currentTemp()); break; // temperature from weather forecast
-        case 2: // temperature from wireless sensor
-            if(wsensor.dataRelevance(config.comfort_temp_wsensNum()))
-                temp = round(wsensor.get_temperature(config.comfort_temp_wsensNum(), config.comfort_temp_sens(), CORRECTED));
-            break;
-        case 3: // temperature from thingspeak
-            if(thingspeak.dataRelevance()) 
-                temp = round(thingspeak.get_field(config.comfort_temp_thing()));
-            break;
-        case 4: temp = round(sensors.get_bme280_temp(CORRECTED)); break; // temperature from BME280
-        case 5: temp = round(sensors.get_bmp180_temp(CORRECTED)); break; // temperature from BMP180
-        case 6: temp = round(sensors.get_sht21_temp(CORRECTED)); break; // temperature from SHT21
-        case 7: temp = round(sensors.get_dht22_temp(CORRECTED)); break; // temperature from DHT22
-        case 8: temp = round(sensors.get_ds18b20_temp(CORRECTED)); break; // temperature from DS18B20
-        case 9: temp = round(sensors.get_bme680_temp(CORRECTED)); break; // temperature from BME680
-        default: temp = 40400; break;
-    }
-
-    switch(config.comfort_hum_source()) {
-        case 1: hum = round(weather.get_currentHum()); break; // humidity from weather forecast
-        case 2: // humidity from wireless sensor
-            if(wsensor.dataRelevance(config.comfort_hum_wsensNum()))
-                hum = round(wsensor.get_humidity(config.comfort_hum_wsensNum(), CORRECTED));
-            break;
-        case 3: // humidity from thingspeak
-            if(thingspeak.dataRelevance())
-                hum = round(thingspeak.get_field(config.comfort_hum_thing()));
-            break;
-        case 4: hum = round(sensors.get_bme280_hum(CORRECTED)); break; // humidity from BME280
-        case 5: hum = round(sensors.get_sht21_hum(CORRECTED)); break; // humidity from SHT21
-        case 6: hum = round(sensors.get_dht22_hum(CORRECTED)); break; // humidity from DHT22
-        case 7: hum = round(sensors.get_bme680_hum(CORRECTED)); break; // humidity from BME680
-        default: hum = 40400; break;
-    }
-
-    if(validate.temp(float(temp))) {
-        if(temp > config.comfort_temp_max()) tempLevel = 1;
-        if(temp < config.comfort_temp_min()) tempLevel = 2;
-    }
-    else tempLevel = -1;
-
-    if(validate.hum(float(hum))) {
-        if(hum > config.comfort_hum_max()) humLevel = 1;
-        if(hum < config.comfort_hum_min()) humLevel = 2;
-    }
-    else humLevel = -1;
-
-    if(tempLevel == -1 && humLevel == -1) global.comfort = UNDEFINED;
-    if(tempLevel == 1 && humLevel < 1) global.comfort = HOT;
-    if(tempLevel == 2 && humLevel < 1) global.comfort = COLD;
-    if(tempLevel < 1 && humLevel == 1) global.comfort = HUMID;
-    if(tempLevel < 1 && humLevel == 2) global.comfort = DRY;
-    if(tempLevel == 1 && humLevel == 1) global.comfort = HOT_HUMID;
-    if(tempLevel == 1 && humLevel == 2) global.comfort = HOT_DRY;
-    if(tempLevel == 2 && humLevel == 1) global.comfort = COLD_HUMID;
-    if(tempLevel == 2 && humLevel == 2) global.comfort = COLD_DRY;
-
-    if(config.comfort_iaq_source() == 1) {
-        float iaq = sensors.get_bme680_iaq(CORRECTED);
-        if(validate.iaq(iaq)) {
-            global.iaq_level = AIR_CLEAN;
-            if(iaq > 100.0) global.iaq_level = AIR_POLLUTED;
-            if(iaq > 200.0) global.iaq_level = AIR_HEAVILY_POLLUTED;
-        }
-        else global.iaq_level = 0;
-    }
-
-    if(config.comfort_co2_source() == 1) {
-        if(wsensor.dataRelevance(config.comfort_co2_wsensNum())) {
-            float co2 = wsensor.get_co2(config.comfort_co2_wsensNum(), CORRECTED);
-            if(validate.co2(co2)) {
-                global.co2_level = AIR_CLEAN;
-                if(co2 > 800.0) global.co2_level = AIR_POLLUTED;
-                if(co2 > 1400.0) global.co2_level = AIR_HEAVILY_POLLUTED;
-            }
-            else global.co2_level = 0;
-        } 
-    }
 }
 
 /**

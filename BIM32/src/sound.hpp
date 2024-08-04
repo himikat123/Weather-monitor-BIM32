@@ -7,6 +7,9 @@ class Sound {
         void stopPlaying(void);
         void hourlySignal(void);
         void alarm(void);
+        void tempNotify(int tempLevel);
+        void humNotify(int humLevel);
+        void airNotify(unsigned int airLevel);
 
     private:
         void _playHourlySignal();
@@ -16,6 +19,9 @@ class Sound {
 
         unsigned int _alarm_rang = 60;
         unsigned int _hourly_rang = 0;
+        int _prevTempLevel = TEMP_COMFORTABLE;
+        int _prevHumLevel = HUM_COMFORTABLE;
+        unsigned int _prevAirLevel = AIR_CLEAN;
         boolean _mp3_found = false;
 };
 
@@ -149,6 +155,48 @@ void Sound::alarm() {
         if(global.alarm_but_pressed) {
             stopPlaying();
             global.alarm_but_pressed = false;
+        }
+    }
+}
+
+void Sound::tempNotify(int tempLevel) {
+    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+        if(_prevTempLevel != tempLevel) {
+            _prevTempLevel = tempLevel;
+            switch(tempLevel) {
+                case TEMP_COMFORTABLE: play(1, 25); break;
+                case TEMP_TOO_COLD: play(1, 26); break;
+                case TEMP_TOO_HOT: play(1, 27); break;
+                default: ; break;
+            }
+        }
+    }
+}
+
+void Sound::humNotify(int humLevel) {
+    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+        if(_prevHumLevel != humLevel) {
+            _prevHumLevel = humLevel;
+            switch(humLevel) {
+                case HUM_COMFORTABLE: play(1, 28); break;
+                case HUM_TOO_HUMID: play(1, 29); break;
+                case HUM_TOO_DRY: play(1, 30); break;
+                default: ; break;
+            }
+        }
+    }
+}
+
+void Sound::airNotify(unsigned int airLevel) {
+    if(_mp3_found && digitalRead(MP3_BUSY_PIN)) {
+        if(_prevAirLevel != airLevel) {
+            _prevAirLevel = airLevel;
+            switch(airLevel) {
+                case AIR_CLEAN: play(1, 31); break;
+                case AIR_POLLUTED: play(1, 32); break;
+                case AIR_HEAVILY_POLLUTED: play(1, 33); break;
+                default: ; break;
+            }
         }
     }
 }

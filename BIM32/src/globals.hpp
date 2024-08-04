@@ -48,6 +48,14 @@
 #define HOT_DRY              7
 #define COLD_HUMID           8
 #define COLD_DRY             9
+#define TEMP_UNDEFINED      -1
+#define TEMP_COMFORTABLE     0
+#define TEMP_TOO_HOT         1
+#define TEMP_TOO_COLD        2
+#define HUM_UNDEFINED       -1
+#define HUM_COMFORTABLE      0
+#define HUM_TOO_HUMID        1
+#define HUM_TOO_DRY          2
 #define AIR_CLEAN            1
 #define AIR_POLLUTED         2
 #define AIR_HEAVILY_POLLUTED 3
@@ -76,8 +84,8 @@ static struct {
     bool mp3_busy = true; // mp3 player busy pin
     bool fsInfoUpdate = true; // FS info update flag
     unsigned int comfort = 0; // Comfort level code: 1-Comfortable, 2-Hot, 3-Cold, 4-Humid, 5-Dry, 6-Hot & Humid, 7-Hot & Dry, 8-Cold & Humid, 9-Cold & Dry
-    unsigned int iaq_level = 0; // IAQ level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
-    unsigned int co2_level = 0; // CO2 level code: 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
+    unsigned int iaq_level = 0; // IAQ level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
+    unsigned int co2_level = 0; // CO2 level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
     bool clockPoints = false; // ILI9341 clock points state
 } global;
 
@@ -103,19 +111,19 @@ class Configuration {
     unsigned int _comfort_temp_wsensNum = 0; // Comfort temperature wireless sensor number
     unsigned int _comfort_temp_sens = 0; // Comfort temperature wireless sensor temperature sensor number
     unsigned int _comfort_temp_thing = 0; // Comfort temperature thingspeak field number
-    int _comfort_temp_min = 23; // Minimum comfort temperature
-    int _comfort_temp_max = 25; // Maximum comfort temperature
+    float _comfort_temp_min = 23.0; // Minimum comfort temperature
+    float _comfort_temp_max = 25.0; // Maximum comfort temperature
     boolean _comfort_temp_sound = false; // Sound notification when the temperature goes beyond comfort limits
-    unsigned int _comfort_temp_min_hysteresis = 0; // Minimum comfort temperature hysteresis
-    unsigned int _comfort_temp_max_hysteresis = 0; // Maximum comfort temperature hysteresis
+    float _comfort_temp_min_hysteresis = 0.0; // Minimum comfort temperature hysteresis
+    float _comfort_temp_max_hysteresis = 0; // Maximum comfort temperature hysteresis
     unsigned int _comfort_hum_source = 0; // Comfort humidity source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-SHT21, 6-DHT22, 7-BME680
     unsigned int _comfort_hum_wsensNum = 0; // Comfort humidity wireless sensor number
     unsigned int _comfort_hum_thing = 0; // Comfort humidity thingspeak field number
-    unsigned int _comfort_hum_min = 40; // Minimum comfort humidity
-    unsigned int _comfort_hum_max = 60; // Maximum comfort humidity
+    float _comfort_hum_min = 40.0; // Minimum comfort humidity
+    float _comfort_hum_max = 60.0; // Maximum comfort humidity
     boolean _comfort_hum_sound = 0; // Sound notification when the humidity goes beyond comfort limits
-    unsigned int _comfort_hum_min_hysteresis = 0; // Minimum comfort humidity hysteresis
-    unsigned int _comfort_hum_max_hysteresis = 0; // Maximum comfort humidity hysteresis
+    float _comfort_hum_min_hysteresis = 0; // Minimum comfort humidity hysteresis
+    float _comfort_hum_max_hysteresis = 0; // Maximum comfort humidity hysteresis
     unsigned int _comfort_iaq_source = 0; // Comfort IAQ source: 0-Nothing, 1-BME680
     boolean _comfort_iaq_sound = false; // Sound notification when the IAQ goes beyond comfort limits
     unsigned int _comfort_co2_source = 0; // Comfort CO2 source: 0-Nothing, 1-Wireless sensor
@@ -1395,19 +1403,19 @@ class Configuration {
         return _comfort_temp_thing;
     }
   
-    int comfort_temp_min() {
+    float comfort_temp_min() {
         return _comfort_temp_min;
     }
   
-    int comfort_temp_max() {
+    float comfort_temp_max() {
         return _comfort_temp_max;
     }
 
-    int comfort_temp_min_hysteresis() {
+    float comfort_temp_min_hysteresis() {
         return _comfort_temp_min_hysteresis;
     }
 
-    int comfort_temp_max_hysteresis() {
+    float comfort_temp_max_hysteresis() {
         return _comfort_temp_max_hysteresis;
     }
   
@@ -1423,19 +1431,19 @@ class Configuration {
         return _comfort_hum_thing;
     }
 
-    int comfort_hum_min() {
+    float comfort_hum_min() {
         return _comfort_hum_min;
     }
 
-    int comfort_hum_max() {
+    float comfort_hum_max() {
         return _comfort_hum_max;
     }
 
-    int comfort_hum_min_hysteresis() {
+    float comfort_hum_min_hysteresis() {
         return _comfort_hum_min_hysteresis;
     }
 
-    int comfort_hum_max_hysteresis() {
+    float comfort_hum_max_hysteresis() {
         return _comfort_hum_max_hysteresis;
     }
 
