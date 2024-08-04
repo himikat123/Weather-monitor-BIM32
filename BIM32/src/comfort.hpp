@@ -30,11 +30,11 @@ void Comfort::calculate() {
     _co2 = agregateData.comfortCo2();
 
     if(validate.temp(_temp)) {
-        if(_temp < (config.comfort_temp_min() - config.comfort_temp_min_hysteresis())) _heater = true;
-        if(_temp > (config.comfort_temp_min() + config.comfort_temp_min_hysteresis())) _heater = false;
+        if(_temp < (config.comfort_temp_min() - (config.comfort_temp_min_hysteresis() / 2))) _heater = true;
+        if(_temp > (config.comfort_temp_min() + (config.comfort_temp_min_hysteresis() / 2))) _heater = false;
 
-        if(_temp > (config.comfort_temp_max() + config.comfort_temp_max_hysteresis())) _cooler = true;
-        if(_temp < (config.comfort_temp_max() - config.comfort_temp_max_hysteresis())) _cooler = false;
+        if(_temp > (config.comfort_temp_max() + (config.comfort_temp_max_hysteresis() / 2))) _cooler = true;
+        if(_temp < (config.comfort_temp_max() - (config.comfort_temp_max_hysteresis() / 2))) _cooler = false;
 
         if(!_heater and !_cooler) _tempLevel = TEMP_COMFORTABLE;
         if(_heater and !_cooler) _tempLevel = TEMP_TOO_COLD;
