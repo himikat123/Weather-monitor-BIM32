@@ -56,6 +56,7 @@
 #define HUM_COMFORTABLE      0
 #define HUM_TOO_HUMID        1
 #define HUM_TOO_DRY          2
+#define AIR_UNDEFINED        0
 #define AIR_CLEAN            1
 #define AIR_POLLUTED         2
 #define AIR_HEAVILY_POLLUTED 3
@@ -115,15 +116,15 @@ class Configuration {
     float _comfort_temp_max = 25.0; // Maximum comfort temperature
     boolean _comfort_temp_sound = false; // Sound notification when the temperature goes beyond comfort limits
     float _comfort_temp_min_hysteresis = 0.0; // Minimum comfort temperature hysteresis
-    float _comfort_temp_max_hysteresis = 0; // Maximum comfort temperature hysteresis
+    float _comfort_temp_max_hysteresis = 0.0; // Maximum comfort temperature hysteresis
     unsigned int _comfort_hum_source = 0; // Comfort humidity source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-SHT21, 6-DHT22, 7-BME680
     unsigned int _comfort_hum_wsensNum = 0; // Comfort humidity wireless sensor number
     unsigned int _comfort_hum_thing = 0; // Comfort humidity thingspeak field number
     float _comfort_hum_min = 40.0; // Minimum comfort humidity
     float _comfort_hum_max = 60.0; // Maximum comfort humidity
     boolean _comfort_hum_sound = 0; // Sound notification when the humidity goes beyond comfort limits
-    float _comfort_hum_min_hysteresis = 0; // Minimum comfort humidity hysteresis
-    float _comfort_hum_max_hysteresis = 0; // Maximum comfort humidity hysteresis
+    float _comfort_hum_min_hysteresis = 0.0; // Minimum comfort humidity hysteresis
+    float _comfort_hum_max_hysteresis = 0.0; // Maximum comfort humidity hysteresis
     unsigned int _comfort_iaq_source = 0; // Comfort IAQ source: 0-Nothing, 1-BME680
     boolean _comfort_iaq_sound = false; // Sound notification when the IAQ goes beyond comfort limits
     unsigned int _comfort_co2_source = 0; // Comfort CO2 source: 0-Nothing, 1-Wireless sensor

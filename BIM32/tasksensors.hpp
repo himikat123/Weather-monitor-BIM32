@@ -47,6 +47,7 @@ void TaskSensors(void *pvParameters) {
             sensors.read();
             comfort.calculate();
             comfort.soundNotify();
+            comfort.devicesControl();
         }
 
         /**

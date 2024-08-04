@@ -179,8 +179,8 @@ void Sound::humNotify(int humLevel) {
             _prevHumLevel = humLevel;
             switch(humLevel) {
                 case HUM_COMFORTABLE: play(1, 28); break;
-                case HUM_TOO_HUMID: play(1, 29); break;
-                case HUM_TOO_DRY: play(1, 30); break;
+                case HUM_TOO_DRY: play(1, 29); break;
+                case HUM_TOO_HUMID: play(1, 30); break;
                 default: ; break;
             }
         }

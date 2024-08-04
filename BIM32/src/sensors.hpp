@@ -8,6 +8,7 @@
 #include <OneWire.h> // v2.3.7 https://github.com/PaulStoffregen/OneWire
 #include <DallasTemperature.h> // v3.9.0 https://github.com/milesburton/Arduino-Temperature-Control-Library
 #include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
+#include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature   term(&oneWire);
@@ -21,6 +22,7 @@ Adafruit_BME280     bme;
 Adafruit_Sensor     *bme_temp = bme.getTemperatureSensor();
 Adafruit_Sensor     *bme_pressure = bme.getPressureSensor();
 Adafruit_Sensor     *bme_humidity = bme.getHumiditySensor();
+Adafruit_PCF8574    pcf8574;
 Bsec                iaqSensor;
 
 
@@ -59,6 +61,7 @@ class Sensors {
         float get_bme680_pres(bool corr);
         float get_bme680_iaq(bool corr);
         uint8_t get_bme680_iaq_accuracy();
+        void comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier);
 
     private:
         bool _bme280_det = false;
@@ -69,6 +72,7 @@ class Sensors {
         bool _max44009_det = false;
         bool _bh1750_det = false;
         bool _bme680_det = false;
+        bool _pcf8574_det = false;
         uint8_t _bme680_bsecState[BSEC_MAX_STATE_BLOB_SIZE] = {0};
         uint16_t _bme680_stateUpdateCounter = 0;
         unsigned int _bme680_stateCounter = 0;
@@ -102,6 +106,7 @@ class Sensors {
         void _MAX44009Init(void);
         void _BH1750Init(void);
         void _BME680Init(void);
+        void _PCF8574Init(void);
         bool _bme680_validateIaqSensorStatus(void);
         void _bme680_loadState(void);
         void _bme680_updateState(void);
@@ -129,6 +134,7 @@ void Sensors::init(void) {
     _MAX44009Init();
     _BH1750Init();
     _BME680Init();
+    _PCF8574Init();
     Serial.println(SEPARATOR);
     Serial.println("Sensor initialization");
     Serial.printf("%s %s%s\r\n", "DS18B20:  ", _ds18b20_det ? "" : "NOT ", "Detected");
@@ -139,6 +145,7 @@ void Sensors::init(void) {
     Serial.printf("%s %s%s\r\n", "MAX44009: ", _max44009_det ? "" : "NOT ", "Detected");
     Serial.printf("%s %s%s\r\n", "BH1750:   ", _bh1750_det ? "" : "NOT ", "Detected");
     Serial.printf("%s %s%s\r\n", "BME680:   ", _bme680_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "PCF8574:  ", _pcf8574_det ? "" : "NOT ", "Detected");
 }
 
 /**
@@ -301,6 +308,17 @@ void Sensors::_MAX44009Init(void) {
  */
 void Sensors::_BH1750Init(void) {
     if(lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2)) _bh1750_det = true;
+}
+
+/**
+ * Initialize PCF8574 port-expander
+ */
+void Sensors::_PCF8574Init(void) {
+    if(pcf8574.begin(0x20, &Wire)) {
+        _pcf8574_det = true;
+        for(uint8_t i=0; i<8; i++) pcf8574.pinMode(i, OUTPUT);
+        for(uint8_t i=0; i<8; i++) pcf8574.digitalWrite(i, LOW);
+    }
 }
 
 /**
@@ -537,5 +555,18 @@ void Sensors::BME680Read(void) {
         _bme680_hum = 40400.0;
         _bme680_pres = 40400.0;
         _bme680_iaq = 40400.0;
+    }
+}
+
+/**
+ * Send data to PCF8574
+ */
+void Sensors::comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier) {
+    if(_pcf8574_det) {
+        pcf8574.digitalWrite(0, heater);
+        pcf8574.digitalWrite(1, cooler);
+        pcf8574.digitalWrite(2, humidifier);
+        pcf8574.digitalWrite(3, dehumidifier);
+        pcf8574.digitalWrite(4, purifier);
     }
 }
