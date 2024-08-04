@@ -128,9 +128,6 @@ void setup() {
         }
     }
 
-    //TODO озвучка комфорта
-    //TODO управление комфортом
-
     xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
     xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
 
