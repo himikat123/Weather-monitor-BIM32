@@ -489,11 +489,23 @@ void web_soundStop(AsyncWebServerRequest *request) {
 void web_default(AsyncWebServerRequest *request) {
     if(web_isLogged(request, true)) {
         if(request->hasArg("config") && request->arg("config") == "default") {
-            // TODO COPY DEFAULT CONFIG TO CONFIG
+            char ibuffer[64];
+            if(LittleFS.exists("/config.json") == true) LittleFS.remove("/config.json");
+            File def = LittleFS.open("/defaultConfig.json", "r");
+            File cfg = LittleFS.open("/config.json", "w");
+            if(def and cfg) {
+                while(def.available()) {
+                    byte i = def.readBytes(ibuffer, 64);
+                    cfg.write((uint8_t *)ibuffer, i);
+                }
+                request->send(200, "text/plain", "OK");
+            }
+            cfg.close();
+            def.close();
             global.fsInfoUpdate = true;
-            request->send(200, "text/plain", "OK");
+            request->send(200, "text/plain", "error");
         }
-        else request->send(200, "text/plain", "error");
+        else request->send(200, "text/plain", "bad args");
     }
 }
 
