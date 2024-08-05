@@ -416,6 +416,7 @@ void web_syncClock(AsyncWebServerRequest *request) {
                 (request->arg("y")).toInt()
             );
             nextion.setDisplayRTC();
+            sensors.set_ds3231_timeDate();
             request->send(200, "text/plain", web_timeString(now()));
         }
     }

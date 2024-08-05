@@ -9,6 +9,7 @@
 #include <DallasTemperature.h> // v3.9.0 https://github.com/milesburton/Arduino-Temperature-Control-Library
 #include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
 #include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
+#include "DS3232.h" // v0.4.1 https://github.com/RobTillaart/DS3232
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature   term(&oneWire);
@@ -24,7 +25,7 @@ Adafruit_Sensor     *bme_pressure = bme.getPressureSensor();
 Adafruit_Sensor     *bme_humidity = bme.getHumiditySensor();
 Adafruit_PCF8574    pcf8574;
 Bsec                iaqSensor;
-
+DS3231              rtc;
 
 #ifdef __cplusplus
   extern "C"{
@@ -61,6 +62,8 @@ class Sensors {
         float get_bme680_pres(bool corr);
         float get_bme680_iaq(bool corr);
         uint8_t get_bme680_iaq_accuracy();
+        void get_ds3231_timeDate();
+        void set_ds3231_timeDate();
         void comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier);
 
     private:
@@ -73,6 +76,7 @@ class Sensors {
         bool _bh1750_det = false;
         bool _bme680_det = false;
         bool _pcf8574_det = false;
+        bool _ds3231_det = false;
         uint8_t _bme680_bsecState[BSEC_MAX_STATE_BLOB_SIZE] = {0};
         uint16_t _bme680_stateUpdateCounter = 0;
         unsigned int _bme680_stateCounter = 0;
@@ -107,9 +111,10 @@ class Sensors {
         void _BH1750Init(void);
         void _BME680Init(void);
         void _PCF8574Init(void);
-        bool _bme680_validateIaqSensorStatus(void);
-        void _bme680_loadState(void);
-        void _bme680_updateState(void);
+        bool _BME680_validateIaqSensorStatus(void);
+        void _BME680_loadState(void);
+        void _BME680_updateState(void);
+        void _DS3231Init(void);
 
         void _BME280Read(void);
         void _BMP180Read(void);
@@ -135,6 +140,7 @@ void Sensors::init(void) {
     _BH1750Init();
     _BME680Init();
     _PCF8574Init();
+    _DS3231Init();
     Serial.println(SEPARATOR);
     Serial.println("Sensor initialization");
     Serial.printf("%s %s%s\r\n", "DS18B20:  ", _ds18b20_det ? "" : "NOT ", "Detected");
@@ -146,6 +152,7 @@ void Sensors::init(void) {
     Serial.printf("%s %s%s\r\n", "BH1750:   ", _bh1750_det ? "" : "NOT ", "Detected");
     Serial.printf("%s %s%s\r\n", "BME680:   ", _bme680_det ? "" : "NOT ", "Detected");
     Serial.printf("%s %s%s\r\n", "PCF8574:  ", _pcf8574_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "DS3231:   ", _ds3231_det ? "" : "NOT ", "Detected");
 }
 
 /**
@@ -322,6 +329,16 @@ void Sensors::_PCF8574Init(void) {
 }
 
 /**
+ * Initialize DS3231 RTC
+ */
+void Sensors::_DS3231Init() {
+    if(rtc.begin() == DS3232_OK) {
+        _ds3231_det = true;
+        get_ds3231_timeDate();
+    }
+}
+
+/**
  * Initialize BME680 sensor
  */
 void Sensors::_BME680Init(void) {
@@ -330,11 +347,11 @@ void Sensors::_BME680Init(void) {
     };
   
     iaqSensor.begin(BME68X_I2C_ADDR_HIGH, Wire);
-    _bme680_det = _bme680_validateIaqSensorStatus();
+    _bme680_det = _BME680_validateIaqSensorStatus();
     if(_bme680_det) {
         iaqSensor.setConfig(bsec_config_iaq);
-        _bme680_validateIaqSensorStatus();
-        _bme680_loadState();
+        _BME680_validateIaqSensorStatus();
+        _BME680_loadState();
 
         bsec_virtual_sensor_t sensorList[4] = {
             BSEC_OUTPUT_IAQ,
@@ -343,7 +360,7 @@ void Sensors::_BME680Init(void) {
             BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY
         };
         iaqSensor.updateSubscription(sensorList, 4, BSEC_SAMPLE_RATE_LP);
-        _bme680_validateIaqSensorStatus();
+        _BME680_validateIaqSensorStatus();
     }
 }
 
@@ -351,7 +368,7 @@ void Sensors::_BME680Init(void) {
  * Check BME680 Status
  * @return true if there are no problems
  */
-bool Sensors::_bme680_validateIaqSensorStatus(void) {
+bool Sensors::_BME680_validateIaqSensorStatus(void) {
     if(iaqSensor.bsecStatus != BSEC_OK) return false;
     if(iaqSensor.bme68xStatus != BME68X_OK) return false;
     return true;
@@ -360,7 +377,7 @@ bool Sensors::_bme680_validateIaqSensorStatus(void) {
 /**
  * Load BME680 state from EEPROM
  */
-void Sensors::_bme680_loadState(void) {
+void Sensors::_BME680_loadState(void) {
     Serial.println(SEPARATOR);
     Serial.print("Read BME680 state file... ");
 
@@ -380,7 +397,7 @@ void Sensors::_bme680_loadState(void) {
                 }
 
                 iaqSensor.setState(_bme680_bsecState);
-                _bme680_validateIaqSensorStatus();
+                _BME680_validateIaqSensorStatus();
 
                 Serial.println("done");
             }
@@ -393,7 +410,7 @@ void Sensors::_bme680_loadState(void) {
 /**
  * Update BME680 status file
  */
-void Sensors::_bme680_updateState(void) {
+void Sensors::_BME680_updateState(void) {
     #define STATE_SAVE_PERIOD  UINT32_C(6 * 60 * 60)           /* 6 hours - 4 times a day */
 
     if((now() - _bme680_stateTimestamp >= STATE_SAVE_PERIOD) and (iaqSensor.iaqAccuracy >= 3)) {
@@ -402,7 +419,7 @@ void Sensors::_bme680_updateState(void) {
 
         if(LittleFS.exists("/bme680.json")) {
             iaqSensor.getState(_bme680_bsecState);
-            _bme680_validateIaqSensorStatus();
+            _BME680_validateIaqSensorStatus();
 
             _bme680_stateTimestamp = now();
             _bme680_stateCounter++;
@@ -546,15 +563,48 @@ void Sensors::BME680Read(void) {
             _bme680_pres = iaqSensor.pressure / 100.0F;
             _bme680_iaq = iaqSensor.iaq;
             _bme680_iaq_accuracy = iaqSensor.iaqAccuracy;
-            _bme680_updateState();
+            _BME680_updateState();
         }
-        else _bme680_validateIaqSensorStatus();
+        else _BME680_validateIaqSensorStatus();
     }
     else {
         _bme680_temp = 40400.0;
         _bme680_hum = 40400.0;
         _bme680_pres = 40400.0;
         _bme680_iaq = 40400.0;
+    }
+}
+
+/**
+ * Get time & date from DS3231 RTC
+ */
+void Sensors::get_ds3231_timeDate() {
+    if(_ds3231_det) {
+        rtc.read();
+        setTime(
+            rtc.hours(), 
+            rtc.minutes(), 
+            rtc.seconds(), 
+            rtc.day(), 
+            rtc.month(), 
+            2000 + rtc.year()
+        );
+    }
+}
+
+/**
+ * Set time & date to DS3231 RTC
+ */
+void Sensors::set_ds3231_timeDate() {
+    if(_ds3231_det) {
+        if(year() > 2000) rtc.setYear(year() - 2000);
+        rtc.setMonth(month());
+        rtc.setDay(day());
+        rtc.setWeekDay(weekday());
+        rtc.setHours(hour());
+        rtc.setMinutes(minute());
+        rtc.setSeconds(second());
+        rtc.write();
     }
 }
 

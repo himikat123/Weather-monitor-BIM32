@@ -139,6 +139,7 @@ void TaskSensors(void *pvParameters) {
                 Serial.println("Current weather update... ");
                 if(network.isConnected()) weather.update();
                 else Serial.println("No internet connection");
+                sensors.get_ds3231_timeDate();
             }
 
             /**
@@ -215,6 +216,8 @@ void get_time(void) {
             setTime(t);
             global.clockSynchronize = true;
             global.clockSynchronized = true;
+            nextion.setDisplayRTC();
+            sensors.set_ds3231_timeDate();
             Serial.print("successful: ");
             Serial.printf("%d:%02d:%02d %02d.%02d.%d\r\n", hour(), minute(), second(), day(), month(), year());
         }
