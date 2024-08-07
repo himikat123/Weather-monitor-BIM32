@@ -13,6 +13,7 @@ class Sound {
 
     private:
         bool _isAllowed();
+        bool _hourlyCheck();
         void _playHourlySignal();
         void _reset();
         uint16_t _chckSum(uint8_t *sdata);
@@ -116,10 +117,29 @@ bool Sound::_isAllowed() {
         switch(config.sound_hourly()) {
             case 0: return true;
             case 2: if(weather.get_isDay()) return true;
-            case 3: if(hour() >= config.sound_hour_from() and hour() <= config.sound_hour_to()) return true;
+            case 3: return _hourlyCheck();
             default: return false;
         }
     }
+    return false;
+}
+
+bool Sound::_hourlyCheck() {
+    TimeElements timeElm;
+    timeElm.Year = year() - 1970; 
+    timeElm.Month = month(); 
+    timeElm.Day = day(); 
+    timeElm.Hour = config.sound_hour_from(); 
+    timeElm.Minute = 0; 
+    timeElm.Second = 0;
+    unsigned int timestampFrom = makeTime(timeElm);
+    if(hour() < config.sound_hour_from()) timestampFrom -= 86400;
+
+    timeElm.Hour = config.sound_hour_to();
+    unsigned int timestampTo = makeTime(timeElm);
+
+    if(timestampFrom > timestampTo) timestampTo += 86400;
+    if(timestampFrom <= now() && now() <= timestampTo) return true;
     return false;
 }
 
