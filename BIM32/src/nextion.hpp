@@ -146,6 +146,7 @@ void Nextion::init() {
 
 void Nextion::showLogo() {
     nex.writeNum("sleep", 0);
+    nex.writeNum("dim", 100);
     nex.writeStr("page Logo");
 }
 
