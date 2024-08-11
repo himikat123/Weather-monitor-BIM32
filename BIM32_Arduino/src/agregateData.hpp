@@ -279,7 +279,7 @@ int AgregateData::lcdBatteryLevel() {
     else if(config.display_source_bat_sens() == 2) { // battery symbol from thingspeak
         if(thingspeak.dataRelevance()) {
             level = thingspeak.get_field(config.display_source_bat_thing());
-            if(level > 4) level = 4;
+            if(level == 5) level = 4;
         }
     }
     return level;
