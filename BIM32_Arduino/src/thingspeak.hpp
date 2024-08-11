@@ -157,12 +157,12 @@ void Thingspeak::receiveHistory() {
     url += "/feeds.json?api_key=" + config.history_rdkey() + "&results=24";
     String httpData = "";
     HTTPClient client;
-    Serial.println(url);
+    //Serial.println(url);
     client.begin(url);
     int httpCode = client.GET();
     if(httpCode == HTTP_CODE_OK) {
         httpData = client.getString();
-        Serial.println(httpData);
+        //Serial.println(httpData);
         JsonDocument root;
         DeserializationError error = deserializeJson(root, httpData);
         if(error) {
