@@ -861,7 +861,7 @@ class Configuration {
     }
 
     unsigned int display_source_tempOut_sens() {
-        if(_display_source_tempOut_sens > 8) return 0;
+        if(_display_source_tempOut_sens > 9) return 0;
         return _display_source_tempOut_sens;
     }
 
@@ -881,7 +881,7 @@ class Configuration {
     }
 
     unsigned int display_source_humOut_sens() {
-        if(_display_source_humOut_sens > 6) return 0;
+        if(_display_source_humOut_sens > 7) return 0;
         return _display_source_humOut_sens; 
     }
 
@@ -896,7 +896,7 @@ class Configuration {
     }
 
     unsigned int display_source_presOut_sens() {
-        if(_display_source_presOut_sens > 5) return 0;
+        if(_display_source_presOut_sens > 6) return 0;
         return _display_source_presOut_sens;
     }
 
@@ -911,7 +911,7 @@ class Configuration {
     }
 
     unsigned int display_source_tempIn_sens() {
-        if(_display_source_tempIn_sens > 9) return 0;
+        if(_display_source_tempIn_sens > 10) return 0;
         return _display_source_tempIn_sens; 
     }
 
@@ -931,7 +931,7 @@ class Configuration {
     }
 
     unsigned int display_source_humIn_sens() {
-        if(_display_source_humIn_sens > 7) return 0;
+        if(_display_source_humIn_sens > 8) return 0;
         return _display_source_humIn_sens; 
     }
 
