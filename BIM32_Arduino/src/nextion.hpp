@@ -446,7 +446,7 @@ void Nextion::_showPres() {
  * Display sequence
  */
 void Nextion::_showSequence() {
-    nex.writeNum("Main.sequence.en", config.display_source_tempIn_sens() == 4 ? 1 : 0);
+    if(_forced) nex.writeNum("Main.sequence.en", config.display_source_tempIn_sens() == 4 ? 1 : 0);
     for(unsigned int i=0; i<4; i++) {
         if(_prevTempSequence[i] != _tempSequence[i] or _forced) {
             nex.writeStr("Main.tempSeq" + String(i) + ".txt", validate.temp(_tempSequence[i]) 
