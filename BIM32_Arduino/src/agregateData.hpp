@@ -272,12 +272,15 @@ uint8_t AgregateData::lcdVoltageColor() {
 int AgregateData::lcdBatteryLevel() {
     int level = -1;
     if(config.display_source_bat_sens() == 1) { // battery symbol from wireless sensor
-        if(wsensor.dataRelevance(config.display_source_bat_wsensNum()))
+        if(wsensor.dataRelevance(config.display_source_bat_wsensNum())) {
             level = wsensor.get_batteryLevel(config.display_source_bat_wsensNum());
+        }
     }
     else if(config.display_source_bat_sens() == 2) { // battery symbol from thingspeak
-        if(thingspeak.dataRelevance())
+        if(thingspeak.dataRelevance()) {
             level = thingspeak.get_field(config.display_source_bat_thing());
+            if(level > 4) level = 4;
+        }
     }
     return level;
 }
