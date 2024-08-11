@@ -88,6 +88,12 @@ void TaskDisplay1(void *pvParameters) {
             }
 
             /**
+             * BME680 sensor update
+             * try as often as possible, the sensor will update when it decides
+             */
+            sensors.BME680Read();
+
+            /**
              * Automatic daily restart of the device at the specified time.
              * Uncomment this line and specify the time if you need autorestart. 
              */

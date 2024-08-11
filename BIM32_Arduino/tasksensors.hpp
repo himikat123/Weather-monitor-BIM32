@@ -50,12 +50,6 @@ void TaskSensors(void *pvParameters) {
         }
 
         /**
-         * BME680 sensor update
-         * try as often as possible, the sensor will update when it decides
-         */
-        sensors.BME680Read();
-
-        /**
          * List of available networks update
          * every 20 seconds
          */

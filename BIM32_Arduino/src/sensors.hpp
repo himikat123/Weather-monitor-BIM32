@@ -396,10 +396,13 @@ void Sensors::_BME680_loadState(void) {
                     _bme680_bsecState[i] = state["data"][i];
                 }
 
-                iaqSensor.setState(_bme680_bsecState);
-                _BME680_validateIaqSensorStatus();
+                if(_bme680_stateCounter > 0) {
+                    iaqSensor.setState(_bme680_bsecState);
+                    _BME680_validateIaqSensorStatus();
 
-                Serial.println("done");
+                    Serial.println("done");
+                }
+                else Serial.println("state file is empty");
             }
             else Serial.println(" BME680 state file corrupted");
         }
