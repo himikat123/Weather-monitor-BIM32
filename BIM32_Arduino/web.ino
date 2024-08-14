@@ -371,10 +371,10 @@ void web_sensitivity(AsyncWebServerRequest *request) {
  */
 void web_color(AsyncWebServerRequest *request) {
     if(web_isLogged(request, true)) {
-        if(request->hasArg("hex") and request->hasArg("num")) {
+        if(request->hasArg("hex") and request->hasArg("slot") and request->hasArg("num")) {
             char color[7];
             request->arg("hex").toCharArray(color, 6);
-            config.set_color(color, (request->arg("num")).toInt(), 1);
+            config.set_color(color, (request->arg("slot")).toInt(), (request->arg("num")).toInt());
             request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");
