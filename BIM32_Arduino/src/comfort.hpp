@@ -62,15 +62,19 @@ void Comfort::calculate() {
     }
 
     if(validate.iaq(_iaq)) {
-        _iaqLevel = AIR_CLEAN;
-        if(_iaq > 100.0) _iaqLevel = AIR_POLLUTED;
+        if(_iaq < 90.0) _iaqLevel = AIR_CLEAN;
+        if(_iaq >= 90.0 and _iaq <= 100.0 and _iaqLevel == AIR_HEAVILY_POLLUTED) _iaqLevel = AIR_CLEAN;
+        if(_iaq > 100.0 and _iaq < 190.0) _iaqLevel = AIR_POLLUTED;
+        if(_iaq >= 190.0 and _iaq <= 200.0 and _iaqLevel == AIR_CLEAN) _iaqLevel = AIR_POLLUTED;
         if(_iaq > 200.0) _iaqLevel = AIR_HEAVILY_POLLUTED;
     }
     else _iaqLevel = AIR_UNDEFINED;
 
     if(validate.co2(_co2)) {
-        _co2Level = AIR_CLEAN;
-        if(_co2 > 800.0) _co2Level = AIR_POLLUTED;
+        if(_co2 < 700.0) _co2Level = AIR_CLEAN;
+        if(_co2 >= 700.0 and _co2 <= 800.0 and _co2Level == AIR_HEAVILY_POLLUTED) _co2Level = AIR_CLEAN;
+        if(_co2 > 800.0 and _co2 < 1300.0) _co2Level = AIR_POLLUTED;
+        if(_co2 >= 1300.0 and _co2 <= 1400.0 and _co2Level == AIR_CLEAN) _co2Level = AIR_POLLUTED;
         if(_co2 > 1400.0) _co2Level = AIR_HEAVILY_POLLUTED;
     }
     else _co2Level = AIR_UNDEFINED;
