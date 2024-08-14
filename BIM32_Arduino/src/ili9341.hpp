@@ -34,7 +34,6 @@ class ILI9341 : LcdDisplay {
         void showLogo();
         void showHomeScreen();
         void refresh();
-        void clockPoints();
         void brightness(unsigned int bright);
         void displayToggle();
         void displayOn();
@@ -42,15 +41,22 @@ class ILI9341 : LcdDisplay {
         bool isDisplayOn();
 
     private:
+        uint8_t _prevFont = 5;
         unsigned int _prevBright = 40400;
         uint16_t _air_color[4] = { BATTERY_COLOR, 0xFFE0, 0xFD20, 0xF800 };
+        uint32_t _sequenceMillis = 0;
+        uint8_t _sequenceSlot = 0;
 
+        void _sequenceSlotSkip();
+        void _sequenceSlotNext();
         void _showImg(uint16_t x, uint16_t y, String img);
         void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color);
         void _showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color);
         void _showHumidity(int hum, uint16_t x, uint16_t y);
         void _showTime();
+        void _clockPoints();
         void _showWeekday();
+        void _showWeekdays();
         void _showAntenna();
         void _drawSkeleton();
         void _showTemperatureInside();
@@ -67,7 +73,9 @@ class ILI9341 : LcdDisplay {
         void _showWindSpeed();
         void _showWindDirection();
         void _showUpdTime();
-        void _showForecast();
+        void _showForecastIcons();
+        void _showForecastTemps();
+        void _showForecastWinds();
 };
 
 /**
@@ -129,30 +137,31 @@ bool ILI9341::isDisplayOn() {
 void ILI9341::refresh() {
     if(_power) {
         _getData();
+        _sequenceSlotSkip();
 
-        _showTime();
-        clockPoints();
-        _showWeekday();
-        _showBatteryLevel();
-        _showVoltageOrPercentage();
-        _showAntenna();
-        
-        _showComfort();
         _showTemperatureInside();
-        _showHumidityInside();
-
-        _showWeatherIcon();
-        _showDescription();
         _showTemperatureOutside();
+        _showHumidityInside();
         _showHumidityOutside();
         _showPressure();
+        _showWeekday();
+        _showForecastTemps();
+        _showDescription();
+        _showWeekdays();
+        _showForecastWinds();
+        _showVoltageOrPercentage();
+        _showComfort();
         _showWindSpeed();
-        _showWindDirection();
         _showUpdTime();
-        
-        _showForecast();
-        _showForecast();
-        _showForecast();
+        _showTime();
+        _clockPoints();
+        _showBatteryLevel();
+        _showAntenna();
+        _showWeatherIcon();
+        _showWindDirection();
+        _showForecastIcons();
+
+        _sequenceSlotNext();
     }
 }
 
@@ -172,17 +181,21 @@ void ILI9341::_showImg(uint16_t x, uint16_t y, String img) {
 }
 
 void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color) {
+    if(_prevFont != font) {
+        if(font == FONT1) tft.loadFont(Ubuntu_14);
+        else if(font == FONT2) tft.loadFont(Ubuntu_21);
+        else if(font == FONT3) tft.loadFont(Ubuntu_29);
+        _prevFont = font;
+    }
     tft.fillRect(x, y, width, height, BG_COLOR);
-    if(font == FONT1) tft.loadFont(Ubuntu_14);
-    else if(font == FONT2) tft.loadFont(Ubuntu_21);
-    else if(font == FONT3) tft.loadFont(Ubuntu_29);
     tft.setTextColor(color, BG_COLOR);
-    uint16_t w = tft.textWidth(text);
-    if(align == CENTER) x += (width / 2) - (w / 2);
-    if(align == RIGHT) x += width - w - 4;
+    if(align == CENTER or align == RIGHT) {
+        uint16_t w = tft.textWidth(text);
+        if(align == RIGHT) x += width - w - 4;
+        else x += (width / 2) - (w / 2);
+    }
     tft.setCursor(x, y);
     tft.print(text);
-    tft.unloadFont();
 }
 
 /**
@@ -239,8 +252,13 @@ void ILI9341::_showTime() {
 
 void ILI9341::_showWeekday() {
     if(_prevTWeekday != _tWeekday) {
+        _printText(146, 6, 40, 20, lang.weekdayShortName(_tWeekday), FONT2, LEFT, CLOCK_COLOR);
+    }
+}
+
+void ILI9341::_showWeekdays() {
+    if(_prevTWeekday != _tWeekday) {
         unsigned int wd = _tWeekday;
-        _printText(146, 6, 40, 20, lang.weekdayShortName(wd), FONT2, LEFT, CLOCK_COLOR);
         _printText(33, 168, 40, 16, lang.weekdayShortName(wd), FONT1, CENTER, TEXT_COLOR);
         if(++wd > 7) wd = 1;
         _printText(139, 168, 40, 16, lang.weekdayShortName(wd), FONT1, CENTER, TEXT_COLOR);
@@ -253,7 +271,7 @@ void ILI9341::_showWeekday() {
 /**
  * Display clock points
  */
-void ILI9341::clockPoints() {
+void ILI9341::_clockPoints() {
     boolean points = millis() % 1000 > 500;
     tft.fillCircle(70, 24, 3, points ? CLOCK_COLOR : BG_COLOR);
     tft.fillCircle(70, 52, 3, points ? CLOCK_COLOR : BG_COLOR);
@@ -279,14 +297,31 @@ void ILI9341::_showAntenna() {
     }
 }
 
+void ILI9341::_sequenceSlotSkip() {
+    for(uint8_t i=0; i<4; i++) {
+        if(config.display_source_sequence_name(_sequenceSlot) == "") {
+            if(_sequenceSlot < 3) _sequenceSlot++;
+            else _sequenceSlot = 0;
+        }
+        else i = 4;
+    }
+}
+
+void ILI9341::_sequenceSlotNext() {
+    if(millis() - _sequenceMillis > config.display_source_sequence_dur() * 1000) {
+        _sequenceMillis = millis();
+        if(_sequenceSlot < 3) _sequenceSlot++;
+        else _sequenceSlot = 0;
+    }
+}
+
 /**
  * Display temperature inside
  */
 void ILI9341::_showTemperatureInside() {
+    if(config.display_source_tempIn_sens() == 4) _tempIn = _tempSequence[_sequenceSlot];
     if(_prevTempIn != _tempIn) {
-        if(config.display_source_tempIn_sens() != 4) {
-            _showTemperature(int(round(_tempIn)), 173, 53, FONT3, TEMPERATURE_COLOR);
-        }
+        _showTemperature(int(round(_tempIn)), 173, 53, FONT3, TEMPERATURE_COLOR);
         _prevTempIn = _tempIn;
     }
 }
@@ -314,10 +349,9 @@ void ILI9341::_showThermometer() {
  * Display humidity inside
  */
 void ILI9341::_showHumidityInside() {
+    if(config.display_source_humIn_sens() == 4) _humIn = _humSequence[_sequenceSlot];
     if(_prevHumIn != _humIn) {
-        if(config.display_source_humIn_sens() != 4) {
-            _showHumidity(int(round(_humIn)), 264, 58);
-        }
+        _showHumidity(int(round(_humIn)), 264, 58);
         _prevHumIn = _humIn;
     }
 }
@@ -336,12 +370,11 @@ void ILI9341::_showHumidityOutside() {
  * Display comfort level
  */
 void ILI9341::_showComfort() {
+    if(config.display_source_descr() == 2) _comfort = _nameSequence[_sequenceSlot];
     if(_prevComfort != _comfort) {
-        if(config.display_source_tempIn_sens() != 4) {
-            _printText(145, 28, 175, 16, _comfort, FONT1, CENTER, TEXT_COLOR);
-        }
+        _printText(145, 28, 175, 16, _comfort, FONT1, CENTER, TEXT_COLOR);
         _prevComfort = _comfort;
-    } // TODO добавить отображение последовательности
+    }
 }
 
 /**
@@ -468,9 +501,9 @@ void ILI9341::_showUpdTime() {
 }
 
 /**
- * Display daily weather forecast
+ * Display daily forecast icons
  */
-void ILI9341::_showForecast() {
+void ILI9341::_showForecastIcons() {
     for(uint8_t i=0; i<3; i++) {
         if(_prevIcons[i] != _icons[i]) {
             String path = "/img/icons/small/";
@@ -489,7 +522,14 @@ void ILI9341::_showForecast() {
             _showImg(i * 106 + 2, 183, path);
             _prevIcons[i] = _icons[i];
         }
+    }
+}
 
+/**
+ * Display daily forecast temperatures
+ */
+void ILI9341::_showForecastTemps() {
+    for(uint8_t i=0; i<3; i++) {
         if(_prevDTemps[i] != _dTemps[i]) {
             _showTemperature(int(round(_dTemps[i])), i * 106 + 49, 183, FONT2, TEMPERATURE_COLOR);
             _prevDTemps[i] = _dTemps[i];
@@ -499,7 +539,14 @@ void ILI9341::_showForecast() {
             _showTemperature(int(round(_nTemps[i])), i * 106 + 49, 203, FONT2, TEMP_MIN_COLOR);
             _prevNTemps[i] = _nTemps[i];
         }
+    }
+}
 
+/**
+ * Display daily forecast winds
+ */
+void ILI9341::_showForecastWinds() {
+    for(uint8_t i=0; i<3; i++) {
         if(_prevWinds[i] != _winds[i]) {
             String wnd = validate.wind(_winds[i]) ? String(int(round(_winds[i]))) + lang.ms() : "--";
             _printText(i * 106 + 31, 224, 44, 15, wnd, FONT1, CENTER, TEXT_COLOR);

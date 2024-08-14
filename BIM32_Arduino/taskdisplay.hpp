@@ -50,7 +50,6 @@ void TaskDisplay1(void *pvParameters) {
                     if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.refresh();
                     if(config.display_model(DISPLAY_1) == D_ILI9341) {
                         ili9341.refresh();
-                        ili9341.clockPoints();
                     }
                 }
 
