@@ -4,9 +4,7 @@
 # Монитор погоды BIM32
 ## Монитор погоды на ESP32
 
-<p align="center"><img src="img/main_RU.gif" alt="Weather monitor based on ESP32"></p> 
-
-<p align="center"><img src="img/clocks_RU.gif" alt="Weather monitor based on ESP32"></p> 
+<p align="center"><img src="img/mainRU.gif" alt="Weather monitor based on ESP32"></p> 
 
 ### Краткий список возможностей монитора погоды:
 
@@ -94,7 +92,7 @@
 - подтягивающие резисторы этих кнопок все равно нужно установить.
 ```
 
-<p align="center"><img src="schematic/bim32.png" alt="weather monitor bim32 schematic diagramm"></p>
+<p align="center"><img src="schematic/bim32.png" alt="weather monitor BIM32 schematic diagramm"></p>
 
 ## Прошивка монитора погоды
 
@@ -103,43 +101,27 @@
 Чтоб прошить **дисплей**, нужно скопировать файл прошивки дисплея (файл с названием модели вашего дисплея .tft) из папки **bin** на **micro-sd** карту (карта должна быть отформатирована в файловой системе **FAT32**). Затем вставить флешку в слот **micro-sd** дисплея и подать ему питание. Дисплей сам прошьется с флешки, прогресс прошивки будет отображен на экране.
 
 Для прошивки **ESP32**:
-1. Добавляем в **Arduino IDE** поддержку **ESP32**, находим [инструкцию](https://www.google.ru/search?newwindow=1&sxsrf=ALeKk01SY0YVvecPGZL1p6_dmI2_zcbuzQ%3A1604686083566&ei=A5GlX-mXIoeckwX0lbiYCw&q=esp32+arduino+ide+%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0&oq=arduino+%D1%83%D1%81%D1%82esp32&gs_lcp=CgZwc3ktYWIQAxgAMggIABAIEAcQHjoECAAQRzoHCCMQsAIQJzoECAAQDToECCMQJzoFCAAQywE6BggAEAcQHlDcpgFY89oBYPzmAWgAcAJ4AIABb4gBzwaSAQM2LjOYAQCgAQGqAQdnd3Mtd2l6yAEIwAEB&sclient=psy-ab)
-2. Добавляем в **Ардуино** плагин для заливки **SPIFFS** находим [инструкцию](https://www.google.ru/search?newwindow=1&sxsrf=ALeKk01Btxvm4RWeH8qgpglopKEEPCEwiw%3A1604686179645&ei=Y5GlX_bkJsHUkwXEqpSICg&q=esp32+arduino+%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0+sketch+upload&oq=esp32+arduino+%D1%83%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0+sketch+upload&gs_lcp=CgZwc3ktYWIQAzoECAAQRzoHCCMQsAIQJzoICAAQCBANEB46BAgjECc6BggAEAgQHlC7Slj5dGDdeWgGcAJ4AIABiAGIAa0LkgEDNy43mAEAoAEBqgEHZ3dzLXdpesgBCMABAQ&sclient=psy-ab&ved=0ahUKEwi2otrtwe7sAhVB6qQKHUQVBaEQ4dUDCA0&uact=5)
-3. Распаковываем библиотеки из файла **libraries.zip** в папку `C:/Users/Username/Documents/Arduino/libraries`
-4. Открываем файл `C:/Users/Username/AppData/Local/Arduino15/packages/esp32/hardware/esp32/1.0.5/platform.txt` и находим (поиском) строчку
-`compiler.elf2hex.extra_flags=`, добавьте новую строку: `compiler.libraries.ldflags=`
+1. Скачайте [flash_download_tools](https://www.google.ru/search?q=flash_download_tools&newwindow=1&sca_esv=4c45a275ab92484d&sca_upv=1&sxsrf=ADLYWIKABHoClkV3fuZFKFFkTmLn9S1onw%3A1723726086702&source=hp&ei=Bvm9ZrK1KNqNxc8P9e37kAc&iflsig=AL9hbdgAAAAAZr4HFqMJWLi4kydydvv2N3KLJxvQ3WYk&oq=fl&gs_lp=Egdnd3Mtd2l6IgJmbCoCCAAyChAjGIAEGCcYigUyChAjGIAEGCcYigUyBBAjGCcyBRAAGIAEMgUQABiABDILEC4YgAQYxwEYrwEyBRAAGIAEMgsQLhiABBjRAxjHATIFEAAYgAQyBRAAGIAESIIZUNkIWKQKcAF4AJABAJgBYqABqQGqAQEyuAEDyAEA-AEBmAIDoAK2AagCCsICBxAjGCcY6gLCAgUQLhiABJgDBZIHAzIuMaAHuxk&sclient=gws-wiz)
+2. Запустите его, выбирите ESP32 DownloadTool
+3. Выберите бинарные файлы прошивки (находятся в папке bin) и адреса как на скриншоте. И номер COM-порта
+4. Нажмите кнопку Start в программе прошивки и кнопку Settins прибора (кнопка BOOT на модуле ESP32)
 
-<img src="img/bsec1.png" alt="BSEC flags">
+<p align="center"><img src="img/flash_download_tool.png" alt="weather monitor BIM32 flashing"></p>
 
-Потом, в этом же файле, находим `{compiler.c.elf.libs}` и добавляем за ним, в ту же строку: `{compiler.libraries.ldflags}`
+После прошивки **монитор погоды** нужно настроить. Ненастроенный прибор сам включает точку доступа (создает WiFi сеть) **BIM32** с паролем сети по умолчанию **1234567890**. А в дальнейшем, чтоб ее снова включить, нужно нажать и удерживать нажатой кнопку **Settings**, пока на экране вместо символа антенны не появится символ точки доступа. Подключив ноутбук или телефон к сети **BIM32** нужно открыть браузер и перейти по адресу **http://192.168.4.1**. Введите логин **admin** и пароль **1111** чтоб открыть страницу настроек. В дальнейшем, в целях безопасности, рекомендуется сменить пароль по умолчанию.
 
-<img src="img/bsec2.png" alt="BSEC ldflags">
-
-5. Прошиваем плату скетчем
-6. Прошиваем файлы файловой системы **SPIFFS**, в Ардуино нужно выбрать **Инструмены --> ESP32 Sketch Data Upload**
-
-После прошивки **монитор погоды** нужно настроить. Ненастроенный прибор сам включает точку доступа (создает WiFi сеть) **Weather monitor BIM32** с паролем сети по умолчанию **1234567890**. А в дальнейшем, чтоб ее снова включить, нужно нажать и удерживать нажатой кнопку **Settings**, пока на экране вместо символа антенны не появится символ точки доступа. Подключив ноутбук или телефон к сети **Weather monitor BIM32** нужно открыть браузер и перейти по адресу **http://192.168.4.1**. Введите логин **admin** и пароль **1111** чтоб открыть страницу настроек. В дальнейшем, в целях безопасности, рекомендуется сменить пароль по умолчанию.
-
-<p align="center"><img src="img/login_RU.jpg" alt="weather monitor bim32 ws2812b display"></p>
+<p align="center"><img src="img/login.png" alt="weather monitor BIM32 login"></p>
 
 Также, когда прибор уже настроен и подключен к сети, в настройки можно попасть и без нажатия кнопки **Settings**, достаточно ввести в браузере IP-адрес **монитора погоды**. Узнать этот адрес можно тапнув по символу антенны на экране **монитора погоды**.
 
-<p align="center"><img src="img/about_RU.jpg" alt="weather monitor bim32 about"></p><hr />
+<p align="center"><img src="img/aboutRU.png" alt="weather monitor bim32 about"></p><hr />
 
-## Демо страницы настроек можно посмотреть <a href="https://bim32demo.000webhostapp.com/" target="_blank">здесь</a><hr />
+## Демо страницы настроек можно посмотреть <a href="https://himikat123.github.io/Web-Interface-BIM/" target="_blank">здесь</a>
 
 ## Фотки монитора погоды
-Ну и в конце, традиционно несколько фоток получившегося устройства. Корпус напечатан на 3д принтере и состоит из девяти частей: сам корпус, задняя стенка, крышка micro-sd карт, кнопки и пять держателей платы. 
-
-<p align="center"><img src="img/device4.jpg" alt="weather monitor BIM32"></p>
-
-<p align="center"><img src="img/device3.jpg" alt="weather monitor BIM32"></p>
-
-<p align="center"><img src="img/device2.jpg" alt="weather monitor BIM32"></p>
+Ну и в конце, традиционно несколько фоток получившегося устройства. Корпус напечатан на 3д принтере, файлы для 3д печати вы найдете в папке **enclosure/STL/**. 
 
 <p align="center"><img src="img/device1_RU.jpg" alt="weather monitor BIM32"></p>
-
-<p align="center"><img src="img/bigClock.gif" alt="weather monitor BIM32 big clock"></p>
 
 <hr>
 
