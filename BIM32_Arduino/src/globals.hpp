@@ -8,11 +8,17 @@
 #define NEXTION_TX_PIN        32 // Nextion display RX pin
 #define NEXTION_RX_PIN        33 // Nextion display TX pin
 #define TFT_BACKLIGHT         13 // ILI9341 LED pin
+// #define TFT_RESET          EN // ILI9341 RESET pin
 // #define TFT_DC              5 // ILI9341 DC pin
 // #define TFT_CS             14 // ILI9341 CS pin
 // #define TFT_SCK            32 // ILI9341 SCK pin
-// #define TFT_DATA           33 // ILI9341 MOSI pin
-// #define TFT_DATA_OUT       18 // ILI9341 MISO pin
+// #define TFT_DATA           33 // ILI9341 SDI pin
+// #define TFT_DATA_OUT       NC // ILI9341 SDO pin
+// #define TFT_T_CLK          32 // ILI9341 T_CLK pin
+// #define TFT_T_CS          RXD // ILI9341 T_CS pin
+// #define TFT_T_DIN          33 // ILI9341 T_DIN pin
+// #define TFT_T_DO           18 // ILI9341 T_DO pin
+// #define TFT_T_IRQ          NC // ILI9341 T_IRQ pin
 #define WS2812_1_DAT_PIN      33 // WS2812b display 1 pin
 #define WS2812_2_DAT_PIN      12 // WS2812b display 2 pin
 
