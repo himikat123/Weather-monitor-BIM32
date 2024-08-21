@@ -435,6 +435,7 @@ void ILI9341::_showDescription() {
         tft.loadFont(Ubuntu_21);
         uint16_t w = tft.textWidth(_description);
         tft.unloadFont();
+        _prevFont = 5;
         _printText(0, 84, 319, 20, _description, w > 316 ? FONT1 : FONT2, CENTER, TEXT_COLOR);
         _prevDescription = _description;
     }
