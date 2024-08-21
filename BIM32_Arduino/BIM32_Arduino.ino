@@ -55,8 +55,8 @@ Thingspeak thingspeak;
 Narodmon narodmon;
 #include "src/mqtt.hpp"
 MQTT mqtt;
-#include "src/agregateData.hpp"
-AgregateData agregateData;
+#include "src/agregateLcdData.hpp"
+AgregateLcdData agregateLcdData;
 #include "src/fonts.hpp"
 #include "src/lcdDisplay.hpp"
 #include "src/nextion.hpp"
@@ -68,6 +68,8 @@ WS2812b ws2812b_1;
 WS2812b ws2812b_2;
 #include "src/network.hpp"
 Network network;
+#include "src/agregateComfortData.hpp"
+AgregateComfortData agregateComfortData;
 #include "src/comfort.hpp"
 Comfort comfort;
 

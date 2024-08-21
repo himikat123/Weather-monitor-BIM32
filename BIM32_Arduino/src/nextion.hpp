@@ -626,7 +626,7 @@ void Nextion::_hourlyData() {
             sprintf(buf, "%02d", wind);
             for(uint8_t k=0; k<2; k++) dat[16 + k] = buf[k];
             // wind direction
-            unsigned int deg = agregateData.lcdWindDirection(weather.get_hourlyWindDir(i));
+            unsigned int deg = agregateLcdData.windDirection(weather.get_hourlyWindDir(i));
             if(deg > 7) deg = 0;
             sprintf(buf, "%d", deg);
             dat[18] = buf[0];

@@ -6,7 +6,6 @@ class AgregateSendData {
 float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNum, uint8_t wsensType) {
     float data = -40400.0;
     switch(field) {
-        case 0: ; break; // --
         case 1: { // Weather
             // Temperature
             if(type == 0 and validate.temp(weather.get_currentTemp()))
@@ -18,7 +17,7 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             if(type == 2 and validate.pres(weather.get_currentPres())) 
                 data = weather.get_currentPres();
         }; break;
-        case 2:{ // Wireless sensor
+        case 2: { // Wireless sensor
             if(wsensor.dataRelevance(wsensNum)) {
                 float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
                 float hum = wsensor.get_humidity(wsensNum, CORRECTED);
@@ -104,14 +103,14 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             if(validate.volt(sensors.get_analog_voltage(CORRECTED)))
                 data = sensors.get_analog_voltage(CORRECTED);
         break;
-        case 11: // ESP32
+        case 11: { // ESP32
             // Temperature
             if(type == 0 and validate.temp(sensors.get_esp32_temp(CORRECTED)))
                 data = sensors.get_esp32_temp(CORRECTED);
             // Runtime
             if(type == 1) 
                 data = millis() / 1000;
-        break;
+        }; break;
         case 12: { // BME680
             // Temperature
             if(type == 0 and validate.temp(sensors.get_bme680_temp(CORRECTED)))

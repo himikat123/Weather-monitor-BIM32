@@ -24,10 +24,10 @@ class Comfort {
  * Calculate comfort level 
  */
 void Comfort::calculate() {
-    _temp = agregateData.comfortTemp();
-    _hum = agregateData.comfortHum();
-    _iaq = agregateData.comfortIaq();
-    _co2 = agregateData.comfortCo2();
+    _temp = agregateComfortData.temp();
+    _hum = agregateComfortData.hum();
+    _iaq = agregateComfortData.iaq();
+    _co2 = agregateComfortData.co2();
 
     if(validate.temp(_temp)) {
         if(_temp < (config.comfort_temp_min() - (config.comfort_temp_min_hysteresis() / 2))) _heater = true;
@@ -93,6 +93,9 @@ void Comfort::calculate() {
     if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_DRY) global.comfort = COLD_DRY;
     global.iaq_level = _iaqLevel;
     global.co2_level = _co2Level;
+    Serial.print("tempLevel: "); Serial.println(_tempLevel);
+    Serial.print("humLevel: "); Serial.println(_humLevel);
+    Serial.print("comfort: "); Serial.println(global.comfort);
 }
 
 void Comfort::soundNotify() {
