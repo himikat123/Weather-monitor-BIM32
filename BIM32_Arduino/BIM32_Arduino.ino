@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v4.0
+ *  Weather Monitor BIM32 v4.1
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
@@ -47,10 +47,14 @@ WirelessSensor wsensor;
 Weather weather;
 #include "src/sound.hpp"
 Sound sound;
+#include "src/agregateSendData.hpp"
+AgregateSendData agregateSendData;
 #include "src/thingspeak.hpp"
 Thingspeak thingspeak;
 #include "src/narodmon.hpp"
 Narodmon narodmon;
+#include "src/mqtt.hpp"
+MQTT mqtt;
 #include "src/agregateData.hpp"
 AgregateData agregateData;
 #include "src/fonts.hpp"

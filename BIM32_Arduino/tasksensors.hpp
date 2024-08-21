@@ -17,6 +17,7 @@ void TaskSensors(void *pvParameters) {
     unsigned int thingspeakReceive = 0;
     unsigned int thingspeakSend = 0;
     unsigned int narodmonSend = 0;
+    unsigned int mqttSend = 0;
     unsigned int historyUpdate = 0;
 
     attachInterrupt(DISPLAY1_BUTTON_PIN, display1_toggle, FALLING);
@@ -32,6 +33,7 @@ void TaskSensors(void *pvParameters) {
     digitalWrite(SET_HC12_PIN, HIGH);
 
     sound.init();
+    mqtt.init();
 
     while(1) {
         // Enter access point mode if "Settings" button is pressed
@@ -123,6 +125,21 @@ void TaskSensors(void *pvParameters) {
                     else Serial.println("No internet connection");
                 }
             }
+
+            /**
+             * Send data via MQTT
+             */
+            if(config.mqttSend_period() > 0 and network.isConnected()) {
+                if(mqtt.loop()) {
+                    if((millis() - mqttSend) > (config.mqttSend_period() * 1000) or mqttSend == 0) {
+                        mqttSend = millis();
+                        Serial.println(SEPARATOR);
+                        Serial.println("Send data via MQTT...");
+                        if(network.isConnected()) mqtt.send();
+                        else Serial.println("No internet connection");
+                    }
+                }
+            }
     
             /**
              * Weather update
@@ -157,7 +174,6 @@ void TaskSensors(void *pvParameters) {
         comfort.soundNotify();
         sound.hourlySignal(); /* Hourly signal */
         sound.alarm(); /* Alarm */
-
         network.setNeedToPing();
 
         vTaskDelay(50);

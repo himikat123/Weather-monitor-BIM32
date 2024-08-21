@@ -41,7 +41,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v4.0"                    // Firmware version
+#define FW "v4.1"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -110,6 +110,7 @@ class Configuration {
     #define WSENSOR_TEMPS 5
     #define THNG_FIELDS 8
     #define NAROD_FIELDS 12
+    #define MQTT_TOPICS 12
 
     private:
 
@@ -281,7 +282,7 @@ class Configuration {
     unsigned int _wsensor_channel = 1; // Wireless sensors channel number 1...100
 
     // Weather history repository
-    unsigned int _history_period = 60; // Period data update (minutes) 1...999
+    unsigned int _history_period = 0; // Period data update (minutes) 0...999
     char _history_channelID[11] = ""; // Weather repository channel ID
     char _history_wrkey[17] = ""; // Weather repository Write API Key
     char _history_rdkey[17] = ""; // Weather repository Read API Key
@@ -291,7 +292,7 @@ class Configuration {
     unsigned int _history_tFields[7] = {0,0,0,0,0,0,0}; // Weather repository thingspeak field numbers
 
     // Thingspeak send
-    unsigned int _thingspeakSend_period = 5; // Period for sending data to Thingspeak (minutes) 1...999
+    unsigned int _thingspeakSend_period = 0; // Period for sending data to Thingspeak (minutes) 0...999
     char _thingspeakSend_channelID[11] = ""; // Channel ID for sending data to Thingspeak
     char _thingspeakSend_wrkey[17] = ""; // Write API Key for sending data to Thingspeak
     char _thingspeakSend_rdkey[17] = ""; // Read API Key for sending data to Thingspeak
@@ -301,22 +302,34 @@ class Configuration {
     unsigned int _thingspeakSend_wtypes[THNG_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Thingspeak
 
     // Thingspeak receive
-    unsigned int _thingspeakReceive_period = 5; // Period for receiving data from Thingspeak (minutes) 1...999
+    unsigned int _thingspeakReceive_period = 0; // Period for receiving data from Thingspeak (minutes) 0...999
     char _thingspeakReceive_channelID[11] = ""; // Channel ID for receiving data from Thingspeak
     char _thingspeakReceive_rdkey[17] = ""; // Read API Key for receiving data from Thingspeak
     unsigned int _thingspeakReceive_expire = 10; // Thingspeak data expire (minutes) 1...100
 
     // Narodmon send
-    unsigned int _narodmonSend_period = 5; // Period for sending data to Narodmon (minutes) 1...999
+    unsigned int _narodmonSend_period = 0; // Period for sending data to Narodmon (minutes) 0...999
     char _narodmonSend_lon[11] = ""; // Longitude for Narodmon
     char _narodmonSend_lat[11] = ""; // Latitude for Narodmon
     char _narodmonSend_name[17] = "BIM"; // Sensor name
     unsigned int _narodmonSend_sensors[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Data sources to send to Narodmon fields
-    char _narodmonSend_metrics[NAROD_FIELDS][17] {"T", "H", "P", "W", "F", "D", "S", "J", "F", "Y", "X", "C"}; // Sensor metrics to send to Narodmon fields
+    char _narodmonSend_metrics[NAROD_FIELDS][17] {"", "", "", "", "", "", "", "", "", "", "", ""}; // Sensor metrics to send to Narodmon fields
     unsigned int _narodmonSend_types[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send to Narodmon
     unsigned int _narodmonSend_wsensors[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send to Narodmon
     unsigned int _narodmonSend_wtypes[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Narodmon
 
+    // MQTT send
+    unsigned int _mqttSend_period = 0; // Period for sending data via MQTT (seconds) 0...999
+    char _mqttSend_broker[33] = ""; // MQTT broker address
+    unsigned int _mqttSend_port = 1883; // MQTT port
+    char _mqttSend_user[33] = ""; // MQTT username
+    char _mqttSend_pass[33] = ""; // MQTT password
+    unsigned int _mqttSend_sensors[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Data sources to send via MQTT
+    unsigned int _mqttSend_types[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send via MQTT
+    unsigned int _mqttSend_wsensors[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send via MQTT
+    unsigned int _mqttSend_wtypes[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send via MQTT
+    char _mqttSend_topics[12][17] = {"", "", "", "", "", "", "", "", "", "", "", ""}; // Topic names for sending via MQTT
+    
     // Account
     char _account_name[32] = ""; // Web interface default username
     char _account_pass[64] = ""; // Web interface default password
@@ -567,6 +580,20 @@ class Configuration {
                         COPYNUM(conf["narodmonSend"]["types"][i], _narodmonSend_types[i]);
                         COPYNUM(conf["narodmonSend"]["wsensors"][i], _narodmonSend_wsensors[i]);
                         COPYNUM(conf["narodmonSend"]["wtypes"][i], _narodmonSend_wtypes[i]);
+                    }
+
+                    // MQTT send
+                    COPYNUM(conf["mqttSend"]["period"], _mqttSend_period);
+                    COPYSTR(conf["mqttSend"]["broker"], _mqttSend_broker);
+                    COPYNUM(conf["mqttSend"]["port"], _mqttSend_port);
+                    COPYSTR(conf["mqttSend"]["user"], _mqttSend_user);
+                    COPYSTR(conf["mqttSend"]["pass"], _mqttSend_pass);
+                    for(unsigned int i=0; i<MQTT_TOPICS; i++) {
+                        COPYNUM(conf["mqttSend"]["sensors"][i], _mqttSend_sensors[i]);
+                        COPYNUM(conf["mqttSend"]["types"][i], _mqttSend_types[i]);
+                        COPYNUM(conf["mqttSend"]["wsensors"][i], _mqttSend_wsensors[i]);
+                        COPYNUM(conf["mqttSend"]["wtypes"][i], _mqttSend_wtypes[i]);
+                        COPYSTR(conf["mqttSend"]["topics"][i], _mqttSend_topics[i]);
                     }
 
                     // Comfort
@@ -1392,6 +1419,57 @@ class Configuration {
         if(num >= NAROD_FIELDS) return 0;
         if(_narodmonSend_wtypes[num] > 16) return 0;
         return _narodmonSend_wtypes[num];
+    }
+
+    unsigned int mqttSend_period() {
+        if(_mqttSend_period > 999) return 60;
+        return _mqttSend_period;
+    }
+
+    char* mqttSend_broker() {
+        return _mqttSend_broker;
+    }
+
+    unsigned int mqttSend_port() {
+        if(_mqttSend_port > 65535) return 1883;
+        return _mqttSend_port;
+    }
+
+    char* mqttSend_user() {
+        return _mqttSend_user;
+    }
+
+    char* mqttSend_pass() {
+        return _mqttSend_pass;
+    };
+
+    unsigned int mqttSend_sensors(unsigned int num) {
+        if(num >= MQTT_TOPICS) return 0;
+        if(_mqttSend_sensors[num] > 13) return 0;
+        return _mqttSend_sensors[num];
+    }
+
+    unsigned int mqttSend_types(unsigned int num) {
+        if(num >= MQTT_TOPICS) return 0;
+        if(_mqttSend_types[num] > 3) return 0;
+        return _mqttSend_types[num];
+    }
+
+    unsigned int mqttSend_wsensors(unsigned int num) {
+        if(num >= MQTT_TOPICS) return 0;
+        if(_mqttSend_wsensors[num] >= WSENSORS) return 0;
+        return _mqttSend_wsensors[num];
+    }
+
+    unsigned int mqttSend_wtypes(unsigned int num) {
+        if(num >= MQTT_TOPICS) return 0;
+        if(_mqttSend_wtypes[num] > 16) return 0;
+        return _mqttSend_wtypes[num];
+    }
+
+    char* mqttSend_topics(unsigned int num) {
+        if(num >= MQTT_TOPICS) return (char*) "";
+        return _mqttSend_topics[num];
     }
 
     unsigned int comfort_temp_source() {
