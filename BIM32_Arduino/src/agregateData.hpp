@@ -259,10 +259,10 @@ uint8_t AgregateData::lcdVoltageColor() {
     switch(config.display_source_volt_sens()) {
         case 1: { /* from wireless sensor */
             if(config.display_source_volt_volt() == 3) /* SenseAir S8 CO2 level */
-                type = global.co2_level + 1;
+                type = global.co2_level;
         }; break; 
         case 3: { // iaq from BME680
-            type = global.iaq_level + 1;
+            type = global.iaq_level;
         }; break;
         default: ; break;
     }
