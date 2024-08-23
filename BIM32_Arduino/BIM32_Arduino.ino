@@ -55,14 +55,17 @@ Thingspeak thingspeak;
 Narodmon narodmon;
 #include "src/mqtt.hpp"
 MQTT mqtt;
+#include "src/fonts.hpp"
 #include "src/agregateLcdData.hpp"
 AgregateLcdData agregateLcdData;
-#include "src/fonts.hpp"
 #include "src/lcdDisplay.hpp"
 #include "src/nextion.hpp"
 Nextion nextion;
 #include "src/ili9341.hpp"
 ILI9341 ili9341;
+#include "src/agregateSegmentData.hpp"
+AgregateSegmentData agregateSegmentData;
+#include "src/segmentDisplay.hpp"
 #include "src/ws2812b.hpp"
 WS2812b ws2812b_1;
 WS2812b ws2812b_2;
@@ -99,6 +102,13 @@ void setup() {
 
     Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);
+    Serial2.onReceive([]() {
+        while(Serial2.available()) {
+            char c = Serial2.read();
+            Serial.printf("'%c' [0x%02x] ", c, c);
+        }
+        Serial.println();
+    });
 
     Serial.println(SEPARATOR);
     Serial.println(SEPARATOR);
