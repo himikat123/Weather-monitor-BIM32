@@ -41,6 +41,8 @@ void TaskDisplay1(void *pvParameters) {
                 }
             }
 
+            ws2812b_1.refresh();
+
             /* Once in 0.5 second */
             if(millis() - millis_05s >= 500) {
                 millis_05s = millis();
@@ -56,7 +58,6 @@ void TaskDisplay1(void *pvParameters) {
                 /* WS2812b brightness change and display update */
                 if(config.display_type(DISPLAY_1) == NEOPIXEL) {
                     ws2812b_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
-                    ws2812b_1.refresh();
                 }
 
                 /* LCD/TFT display brightness change */
@@ -130,18 +131,15 @@ void TaskDisplay2(void *pvParameters) {
                 buttonWasPressed = !buttonWasPressed;
             }
 
-            /* WS2812b brightness change and display update (once in 0.5 second) */
+            /* WS2812b display update */
             if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
-                if(millis() - disp_millis > 500) {
-                    disp_millis = millis();
-                    ws2812b_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);
-                    ws2812b_2.refresh();
-                }
+                ws2812b_2.refresh();
             }
 
             /* Brightness change once in 1 second */
             if((millis() - bright_update) > 1000) {
                 bright_update = millis();
+                ws2812b_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);
 
                 /* WS2812b display slow down points blinking frequency if the device isn't connected to the network */
                 ws2812b_2.setDotFreq(global.net_connected ? 500 : 1000);
