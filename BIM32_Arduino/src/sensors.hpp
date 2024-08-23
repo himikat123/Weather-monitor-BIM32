@@ -440,7 +440,7 @@ void Sensors::_BME680_updateState(void) {
 
             String data = "";
             serializeJsonPretty(json, data);
-            Serial.println(data);
+            //Serial.println(data);
 
             File file = LittleFS.open("/bme680.json", "w");
             if(file) {
