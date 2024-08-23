@@ -2,7 +2,8 @@ class WirelessSensor {
     #define WSENSORS 2
 
     public:
-        void receive(void);
+        void handleReceive();
+        void receive();
         bool dataRelevance(uint8_t wsensNum);
         int get_updated(unsigned int num);
         String get_sensorType(unsigned int num, unsigned int sensor);
@@ -25,7 +26,9 @@ class WirelessSensor {
         float get_batteryPercentage(unsigned int num);
 
     private:
-        int _updated[WSENSORS] = {-1, -1};      // Last update timestamp
+        uint16_t receivedIndex = 0;
+        char receivedData[1024];
+        int _updated[WSENSORS] = {-1, -1};               // Last update timestamp
         float _temperature[WSENSORS][5] = {              // Temperature
             {40400.0, 40400.0, 40400.0, 40400.0, 40400.0}, 
             {40400.0, 40400.0, 40400.0, 40400.0, 40400.0} 
@@ -47,83 +50,103 @@ class WirelessSensor {
         float _batteryPercentage[WSENSORS] = {-1, -1};   // Battery percentage
 };
 
+void WirelessSensor::handleReceive() {
+    while(Serial2.available()) {
+        char c = Serial2.read();
+        receivedData[receivedIndex] = c;
+        if(receivedIndex < 1023) receivedIndex++;
+    }
+}
+
 void WirelessSensor::receive() {
     String wsensorStr = "";
-    while(Serial2.available()) {
+    char lastChar = receivedData[receivedIndex];
+    char last_char = receivedData[receivedIndex - 1];
+    if(lastChar == '\n' or lastChar == '}' or last_char == '\n' or last_char == '}') {
+        receivedIndex = 0;
         Serial.println(SEPARATOR);
         Serial.println("Wireless sensor receive... ");
 
-        wsensorStr = Serial2.readStringUntil('\n');
+        String received = String(receivedData);
+        int index = received.indexOf('\n');
+        wsensorStr = received.substring(0, index);
         Serial.println(wsensorStr);
-        if(wsensorStr.lastIndexOf("{") != -1) {
-            JsonDocument root;
-            DeserializationError error = deserializeJson(root, wsensorStr);
-            if(error) {
-                Serial.println("Wireless sensor deserialization error");
-                return;
-            }
-            int number = root["num"];
-            if(number >= 0 and number < WSENSORS) {
-                _updated[number] = now();
-
-                strlcpy(_sensorType[number], root["s"] | "", sizeof(_sensorType[number]));
-                strlcpy(_lightType[number], root["a"] | "", sizeof(_lightType[number]));
-
-                _temperature[number][0] = root["t"] | 40400.0;
-                _temperature[number][1] = root["ds"][0] | 40400.0;
-                _temperature[number][2] = root["ds"][1] | 40400.0;
-                _temperature[number][3] = root["ds"][2] | 40400.0;
-                _temperature[number][4] = root["ds"][3] | 40400.0;
-
-                _humidity[number] = root["h"] | 40400.0;
-                _pressure[number] = root["p"] | 40400.0;
-
-                _light[number] = root["l"] | -1.0;
-
-                _voltage[number] = root["pzem"][0] | -1.0;
-                _current[number] = root["pzem"][1] | -1.0;
-                _power[number] = root["pzem"][2] | -1.0;
-                _energy[number] = root["pzem"][3] | -1.0;
-                _frequency[number] = root["pzem"][4] | -1.0;
-
-                _co2[number] = root["s8"] | -1.0;
-
-                _adc[number] = root["b"] | -1;
-                _batteryVoltage[number] = (float)_adc[number] / (300.0 - config.wsensor_bat_k(number));
-                if(_batteryVoltage[number] > 0.0) {
-                    float umin = 3.75;
-                    float umax = 3.9;
-                    if(config.wsensor_bat_type(number) == 0) umax = 4.5;
-                    float stp = (umax - umin) / 4;
-                    if(_batteryVoltage[number] < (umin + stp)) _batteryLevel[number] = 1;
-                    else if(_batteryVoltage[number] < (umin + stp * 2)) _batteryLevel[number] = 2;
-                    else if(_batteryVoltage[number] < (umin + stp * 3)) _batteryLevel[number] = 3;
-                    else _batteryLevel[number] = 4;
-                    _batteryPercentage[number] = (_batteryVoltage[number] - umin) * 100.0 / (umax - umin); 
-                    if(_batteryPercentage[number] > 100.0) _batteryPercentage[number] = 100.0;
+        for(uint8_t i=0; i<3; i++) {
+            int startJson = wsensorStr.indexOf("{");
+            int endJson = wsensorStr.indexOf("}");
+            if(startJson != -1 and endJson != -1) {
+                JsonDocument root;
+                String js = wsensorStr.substring(startJson, endJson + 1);
+                wsensorStr = wsensorStr.substring(endJson + 1);
+                DeserializationError error = deserializeJson(root, js);
+                if(error) {
+                    Serial.println("Wireless sensor deserialization error");
+                    return;
                 }
+                int number = root["num"];
+                if(number >= 0 and number < WSENSORS) {
+                    _updated[number] = now();
 
-                Serial.printf("Sensor %d updated", number);
-                if(_updated > 0)
-                    Serial.printf(
-                        " at: %d:%02d:%02d\r\n", 
-                        hour(_updated[number]), 
-                        minute(_updated[number]), 
-                        second(_updated[number])
-                    );
-                else Serial.println(": never");
+                    strlcpy(_sensorType[number], root["s"] | "", sizeof(_sensorType[number]));
+                    strlcpy(_lightType[number], root["a"] | "", sizeof(_lightType[number]));
+
+                    _temperature[number][0] = root["t"] | 40400.0;
+                    _temperature[number][1] = root["ds"][0] | 40400.0;
+                    _temperature[number][2] = root["ds"][1] | 40400.0;
+                    _temperature[number][3] = root["ds"][2] | 40400.0;
+                    _temperature[number][4] = root["ds"][3] | 40400.0;
+
+                    _humidity[number] = root["h"] | 40400.0;
+                    _pressure[number] = root["p"] | 40400.0;
+
+                    _light[number] = root["l"] | -1.0;
+
+                    _voltage[number] = root["pzem"][0] | -1.0;
+                    _current[number] = root["pzem"][1] | -1.0;
+                    _power[number] = root["pzem"][2] | -1.0;
+                    _energy[number] = root["pzem"][3] | -1.0;
+                    _frequency[number] = root["pzem"][4] | -1.0;
+
+                    _co2[number] = root["s8"] | -1.0;
+
+                    _adc[number] = root["b"] | -1;
+                    _batteryVoltage[number] = (float)_adc[number] / (300.0 - config.wsensor_bat_k(number));
+                    if(_batteryVoltage[number] > 0.0) {
+                        float umin = 3.75;
+                        float umax = 3.9;
+                        if(config.wsensor_bat_type(number) == 0) umax = 4.5;
+                        float stp = (umax - umin) / 4;
+                        if(_batteryVoltage[number] < (umin + stp)) _batteryLevel[number] = 1;
+                        else if(_batteryVoltage[number] < (umin + stp * 2)) _batteryLevel[number] = 2;
+                        else if(_batteryVoltage[number] < (umin + stp * 3)) _batteryLevel[number] = 3;
+                        else _batteryLevel[number] = 4;
+                        _batteryPercentage[number] = (_batteryVoltage[number] - umin) * 100.0 / (umax - umin); 
+                        if(_batteryPercentage[number] > 100.0) _batteryPercentage[number] = 100.0;
+                    }
+
+                    Serial.printf("Sensor %d updated", number);
+                    if(_updated > 0)
+                        Serial.printf(
+                            " at: %d:%02d:%02d\r\n", 
+                            hour(_updated[number]), 
+                            minute(_updated[number]), 
+                            second(_updated[number])
+                        );
+                    else Serial.println(": never");
+                }
             }
-        }
 
-        if(wsensorStr.lastIndexOf("OK+RC") != -1) {
-            unsigned int ch = wsensorStr.substring(5).toInt();
-            if(ch != config.wsensor_channel()) {
-                Serial.println("Changing channel number");
-                digitalWrite(SET_HC12_PIN, LOW);
-                delay(50);
-                Serial2.printf("AT+C%03d\r\n", config.wsensor_channel());
-                vTaskDelay(100);
-                digitalWrite(SET_HC12_PIN, HIGH);
+            int rc = wsensorStr.indexOf("OK+RC");
+            if(rc != -1) {
+                unsigned int ch = wsensorStr.substring(rc + 5, rc + 8).toInt();
+                if(ch != config.wsensor_channel()) {
+                    Serial.println("Changing channel number");
+                    digitalWrite(SET_HC12_PIN, LOW);
+                    delay(50);
+                    Serial2.printf("AT+C%03d\r\n", config.wsensor_channel());
+                    vTaskDelay(100);
+                    digitalWrite(SET_HC12_PIN, HIGH);
+                }
             }
         }
     }

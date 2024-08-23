@@ -103,11 +103,7 @@ void setup() {
     Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);
     Serial2.onReceive([]() {
-        while(Serial2.available()) {
-            char c = Serial2.read();
-            Serial.printf("'%c' [0x%02x] ", c, c);
-        }
-        Serial.println();
+        wsensor.handleReceive();
     });
 
     Serial.println(SEPARATOR);
