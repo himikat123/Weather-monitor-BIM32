@@ -178,10 +178,10 @@ void Sound::alarm() {
         if(minute() == 0 and second() >= 0 and second() <= 5) _alarm_rang = 60;
 
         // Stop alarm ringing if the alarm button was pressed
-        //if(global.alarm_but_pressed) {
-        //    stopPlaying();
-        //    global.alarm_but_pressed = false;
-        //}
+        if(global.alarm_but_pressed) {
+            stopPlaying();
+            global.alarm_but_pressed = false;
+        }
     }
 }
 
