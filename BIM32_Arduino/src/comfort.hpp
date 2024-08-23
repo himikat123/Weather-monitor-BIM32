@@ -9,10 +9,10 @@ class Comfort {
         float _hum = 40400.0;
         float _iaq = 40400.0;
         float _co2 = 40400.0;
-        int _tempLevel = 0;
-        int _humLevel = 0;
-        unsigned int _iaqLevel = AIR_CLEAN;
-        unsigned int _co2Level = AIR_CLEAN;
+        int _tempLevel = TEMP_COMFORTABLE;
+        int _humLevel = HUM_COMFORTABLE;
+        int _iaqLevel = AIR_CLEAN;
+        int _co2Level = AIR_CLEAN;
         bool _heater = false;
         bool _cooler = false;
         bool _humidifier = false;
@@ -43,6 +43,7 @@ void Comfort::calculate() {
     else {
         _heater = false;
         _cooler = false;
+        _tempLevel = TEMP_UNDEFINED;
     }
 
     if(validate.hum(_hum)) {
@@ -59,6 +60,7 @@ void Comfort::calculate() {
     else {
         _humidifier = false;
         _dehumidifier = false;
+        _humLevel = HUM_UNDEFINED;
     }
 
     if(validate.iaq(_iaq)) {
@@ -93,9 +95,6 @@ void Comfort::calculate() {
     if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_DRY) global.comfort = COLD_DRY;
     global.iaq_level = _iaqLevel;
     global.co2_level = _co2Level;
-    Serial.print("tempLevel: "); Serial.println(_tempLevel);
-    Serial.print("humLevel: "); Serial.println(_humLevel);
-    Serial.print("comfort: "); Serial.println(global.comfort);
 }
 
 void Comfort::soundNotify() {
