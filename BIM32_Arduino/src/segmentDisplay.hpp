@@ -22,8 +22,6 @@ class SegmentDisplay {
             SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
         };
         char _dispColors[6][8] = {"", "", "", "", "", ""};
-        //int _segData[6] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
-        //int _segDataPrev[6] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
         uint8_t _dispNum = 0;
         bool _animIsRunnung = false;
 
@@ -281,10 +279,12 @@ void SegmentDisplay::_slotSwitch() {
 void SegmentDisplay::_segAnimations() {
     int segImg[6] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
     int segImgPrev[6] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE}; 
+
     _segGetData(segImg, _slot, true);
     _segGetData(segImgPrev, _prevSlot, false);
     String color = config.display_timeSlot_color(_slot, _dispNum);
     String prevColor = config.display_timeSlot_color(_prevSlot, _dispNum);
+
     _animIsRunnung = true;
     unsigned int type = config.display_animation_type(_dispNum);
 

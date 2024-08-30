@@ -27,15 +27,8 @@
 #define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
 
 #define SET_HC12_PIN          25 // HC12 wireless module set pin
-//#define AIR_HUMIDIFIER_PIN    14 /* Air humidifier pin */
-//#define AIR_DRYER_PIN         13 /* Air dryer pin */
-//#define AIR_HEATER_PIN        18 /* Air heater pin */
-//#define AIR_COOLER_PIN         5 /* Air cooler pin */
 
-#define MP3_TX_PIN            23 // MP3 module RX pin
-#define MP3_RX_PIN            19 // MP3 module TX pin
 #define MP3_BUSY_PIN          39 // Busy wire pin from mp3 player
-
 
 #define ALARMS                12 /* Number of alarms */
 
