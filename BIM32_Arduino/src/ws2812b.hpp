@@ -17,8 +17,11 @@ class WS2812b : public SegmentDisplay {
         byte pixels[6] = {0, 0, 0, 0, 0, 0};
         byte pixelsPrev[6] = {0, 0, 0, 0, 0, 0};
         uint8_t reds[6] = {0, 0, 0, 0, 0, 0};
+        uint8_t redsPrev[6] = {0, 0, 0, 0, 0, 0};
         uint8_t greens[6] = {0, 0, 0, 0, 0, 0};
+        uint8_t greensPrev[6] = {0, 0, 0, 0, 0, 0};
         uint8_t blues[6] = {0, 0, 0, 0, 0, 0};
+        uint8_t bluesPrev[6] = {0, 0, 0, 0, 0, 0};
         bool _prevDot1 = false;
         bool _prevDot2 = false;
 
@@ -70,8 +73,13 @@ void WS2812b::_print() {
         reds[i] = colors >> 16;
         greens[i] = colors >> 8 & 0xFF;
         blues[i] = colors & 0xFF;
-        if(pixelsPrev[i] != pixels[i]) {
+        if(pixelsPrev[i] != pixels[i] or redsPrev[i] != reds[i] or
+           greensPrev[i] != greens[i] or bluesPrev[i] != blues[i]
+        ) {
             pixelsPrev[i] = pixels[i];
+            redsPrev[i] = reds[i];
+            greensPrev[i] = greens[i];
+            bluesPrev[i] = blues[i];
             updated |= true;
         }
     }
@@ -95,8 +103,8 @@ void WS2812b::_sendToDisplay() {
     uint8_t lastPixel = 0;
     strip->setPixel(lastPixel++, black, false);
     lastPixel = _sendTwoDigits(black, 0, lastPixel++);
-    strip->setPixel(lastPixel++, _dot1 ? dotsColor : black, false);
-    strip->setPixel(lastPixel++, _dot2 ? dotsColor : black, false);
+    strip->setPixel(lastPixel++, _power ? _dot1 ? dotsColor : black : black, false);
+    strip->setPixel(lastPixel++, _power ? _dot2 ? dotsColor : black : black, false);
     lastPixel = _sendTwoDigits(black, 2, lastPixel++);
 
     strip->show();
@@ -114,7 +122,6 @@ uint8_t WS2812b::_sendTwoDigits(rgb_t black, uint8_t digShift, uint8_t pixelNr) 
     for(uint8_t digNr=0; digNr<2; digNr++) {
         for(uint8_t bitNr=0; bitNr<7; bitNr++) {
             for(uint8_t repeat=0; repeat<repeats; repeat++) {
-                //pixelNr += digNr * 7 + bitNr;
                 uint8_t imgNr = digNr + digShift;
                 if(bitRead(pixels[imgNr], bitNr) and _power) {
                     rgb_t color = { .r = reds[imgNr], .g = greens[imgNr], .b = blues[imgNr] };
