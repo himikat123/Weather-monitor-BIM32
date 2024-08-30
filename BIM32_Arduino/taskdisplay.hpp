@@ -39,6 +39,8 @@ void TaskDisplay1(void *pvParameters) {
                 if(config.display_type(DISPLAY_1) == NEOPIXEL) {
                     ws2812b_1.displayToggle();
                 }
+
+                vTaskDelay(500);
             }
 
             ws2812b_1.refresh();
@@ -50,9 +52,7 @@ void TaskDisplay1(void *pvParameters) {
                 if(config.display_type(DISPLAY_1) == LCD) {
                     /* LCD Display update */
                     if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.refresh();
-                    if(config.display_model(DISPLAY_1) == D_ILI9341) {
-                        ili9341.refresh();
-                    }
+                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.refresh();
                 }
 
                 /* WS2812b brightness change and display update */

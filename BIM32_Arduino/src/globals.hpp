@@ -34,7 +34,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v4.1"                    // Firmware version
+#define FW "v4.2"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0

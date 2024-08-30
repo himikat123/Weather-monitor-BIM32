@@ -140,6 +140,10 @@ void Nextion::init() {
     }
 
     nex.writeNum("thup", 1);
+    vTaskDelay(100);
+    nex.writeNum("sleep", 0);
+    vTaskDelay(100);
+    nex.writeNum("dim", _prevBright > 0 ? _prevBright : 100);
     vTaskDelay(2000);
     nex.writeStr("page Main");
 }
@@ -196,7 +200,6 @@ void Nextion::refresh() {
         _historyIn();
         _alarms();
     }
-    _forced = false;
 }
 
 /**
@@ -207,6 +210,7 @@ void Nextion::brightness(unsigned int bright) {
     if(_prevBright != br or _forced) {
         if(_power) nex.writeNum("dim", br);
         _prevBright = br;
+        _forced = false;
     }
 }
 
