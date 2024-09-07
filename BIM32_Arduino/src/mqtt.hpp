@@ -1,4 +1,4 @@
-#include <PubSubClient.h>
+#include <PubSubClient.h> // v2.8.0 https://github.com/knolleary/pubsubclient
 PubSubClient mqttClient(client);
 
 class MQTT {
