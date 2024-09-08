@@ -141,11 +141,16 @@ void WirelessSensor::receive() {
                 unsigned int ch = wsensorStr.substring(rc + 5, rc + 8).toInt();
                 if(ch != config.wsensor_channel()) {
                     Serial.println("Changing channel number");
-                    digitalWrite(SET_HC12_PIN, LOW);
+                    if(global.uart2_tx != HC12) {
+                        Serial2.setPins(HC12_RX_PIN, HC12_TX_PIN);
+                        global.uart2_tx = HC12;
+                    }
+                    digitalWrite(HC12_SET_PIN, LOW);
                     delay(50);
                     Serial2.printf("AT+C%03d\r\n", config.wsensor_channel());
+                    Serial2.flush();
                     vTaskDelay(100);
-                    digitalWrite(SET_HC12_PIN, HIGH);
+                    digitalWrite(HC12_SET_PIN, HIGH);
                 }
             }
         }

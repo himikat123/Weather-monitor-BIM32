@@ -2,12 +2,13 @@ void display1_toggle();
 void display2_toggle();
 void alarm_button();
 void mp3_busy();
-void comfortCalculate();
 void get_time();
 boolean is_summertime();
 
 void TaskSensors(void *pvParameters) {
     (void) pvParameters;
+    attachInterrupt(DISPLAY1_BUTTON_PIN, display1_toggle, FALLING);
+    attachInterrupt(DISPLAY2_BUTTON_PIN, display2_toggle, FALLING);
 
     sensors.init();
 
@@ -20,17 +21,16 @@ void TaskSensors(void *pvParameters) {
     unsigned int mqttSend = 0;
     unsigned int historyUpdate = 0;
 
-    attachInterrupt(DISPLAY1_BUTTON_PIN, display1_toggle, FALLING);
-    attachInterrupt(DISPLAY2_BUTTON_PIN, display2_toggle, FALLING);
-    attachInterrupt(ALARM_BUTTON_PIN, alarm_button, FALLING);
-    attachInterrupt(MP3_BUSY_PIN, mp3_busy, FALLING);
-
     // HC12 wireless module channel number request
-    digitalWrite(SET_HC12_PIN, LOW);
+    digitalWrite(HC12_SET_PIN, LOW);
     delay(50);
     Serial2.println("AT+RC");
+    Serial2.flush();
     delay(100);
-    digitalWrite(SET_HC12_PIN, HIGH);
+    digitalWrite(HC12_SET_PIN, HIGH);
+
+    attachInterrupt(ALARM_BUTTON_PIN, alarm_button, FALLING);
+    attachInterrupt(MP3_BUSY_PIN, mp3_busy, FALLING);
 
     sound.init();
     mqtt.init();

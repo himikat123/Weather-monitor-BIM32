@@ -37,7 +37,7 @@ void Sound::init(void) {
     if(digitalRead(MP3_BUSY_PIN)) {
         time_t mils = millis();
         _reset();
-        while(1) {
+        while(1) { 
             if(!global.mp3_busy) {
                 global.mp3_busy = true;
                 _mp3_found = true;
@@ -250,13 +250,10 @@ void Sound::_sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte) {
     uint16_t sum = _chckSum(sdata);
     sdata[7] = (uint8_t)(sum >> 8);
     sdata[8] = (uint8_t)(sum);
-    Serial.flush();
-    vTaskDelay(200);
-    Serial.updateBaudRate(9600);
-    vTaskDelay(100);
-    Serial.write(sdata, 10);
-    Serial.flush();
-    vTaskDelay(200);
-    Serial.updateBaudRate(115200);
-    delay(100);
+    if(global.uart2_tx != DFPlayer) {
+        Serial2.setPins(HC12_RX_PIN, MP3_TX_PIN);
+        global.uart2_tx = DFPlayer;
+    }
+    Serial2.write(sdata, 10);
+    Serial2.flush();
 }

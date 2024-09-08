@@ -3,11 +3,11 @@
 #define DISPLAY1_BUTTON_PIN   34 // Display 1 button pin
 #define DISPLAY2_BUTTON_PIN   35 // Display 2 button pin
 #define ALARM_BUTTON_PIN      26 // Alarm button pin
-#define MP3_BUSY_PIN          39 // MP3 player busy pin
 
 #define NEXTION_TX_PIN        32 // Nextion display RX pin
 #define NEXTION_RX_PIN        33 // Nextion display TX pin
 #define TFT_BACKLIGHT         13 // ILI9341 LED pin
+
 // #define TFT_RESET          EN // ILI9341 RESET pin
 // #define TFT_DC              5 // ILI9341 DC pin
 // #define TFT_CS             14 // ILI9341 CS pin
@@ -17,8 +17,9 @@
 // #define TFT_T_CLK          32 // ILI9341 T_CLK pin
 // #define TFT_T_CS          RXD // ILI9341 T_CS pin
 // #define TFT_T_DIN          33 // ILI9341 T_DIN pin
-// #define TFT_T_DO           18 // ILI9341 T_DO pin
+// #define TFT_T_DO           39 // ILI9341 T_DO pin
 // #define TFT_T_IRQ          NC // ILI9341 T_IRQ pin
+
 #define WS2812_1_DAT_PIN      33 // WS2812b display 1 pin
 #define WS2812_2_DAT_PIN      12 // WS2812b display 2 pin
 
@@ -26,15 +27,18 @@
 #define PHOTORESISTOR_PIN     36 // Photoresistor pin
 #define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
 
-#define SET_HC12_PIN          25 // HC12 wireless module set pin
+#define HC12_RX_PIN           16 // HC12 wireless module TX pin
+#define HC12_TX_PIN           17 // HC12 wireless module RX pin
+#define HC12_SET_PIN          25 // HC12 wireless module SET pin
 
-#define MP3_BUSY_PIN          39 // Busy wire pin from mp3 player
+#define MP3_TX_PIN            23 // DFplayer RX pin
+#define MP3_BUSY_PIN          18 // DFplayer BUSY pin
 
-#define ALARMS                12 /* Number of alarms */
+#define ALARMS                12 // Number of alarms
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v4.2"                    // Firmware version
+#define FW "v4.3"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -59,6 +63,8 @@
 #define AIR_CLEAN            1
 #define AIR_POLLUTED         2
 #define AIR_HEAVILY_POLLUTED 3
+#define HC12                 0
+#define DFPlayer             1
 
 #define RAW                  false // raw data without correction
 #define CORRECTED            true  // corrected data
@@ -87,6 +93,7 @@ static struct {
     unsigned int iaq_level = 0; // IAQ level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
     unsigned int co2_level = 0; // CO2 level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
     bool clockPoints = false; // ILI9341 clock points state
+    uint8_t uart2_tx = HC12; // What is UART2 connected to
 } global;
 
 TaskHandle_t task_display1_handle = NULL;

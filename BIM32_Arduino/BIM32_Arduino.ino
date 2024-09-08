@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v4.2
+ *  Weather Monitor BIM32 v4.3
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
@@ -93,8 +93,8 @@ Comfort comfort;
  * Arduino setup
  */
 void setup() {
-    pinMode(SET_HC12_PIN, OUTPUT);
-    digitalWrite(SET_HC12_PIN, HIGH);
+    pinMode(HC12_SET_PIN, OUTPUT);
+    digitalWrite(HC12_SET_PIN, HIGH);
     pinMode(DISPLAY1_BUTTON_PIN, INPUT);
     pinMode(DISPLAY2_BUTTON_PIN, INPUT);
     pinMode(ALARM_BUTTON_PIN, INPUT);

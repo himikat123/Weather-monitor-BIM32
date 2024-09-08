@@ -41,7 +41,7 @@ You can use the extended version of the **Nextion** display **NX4832K035**, or t
 
 Alternatively, you can use the ILI9341 display. In this case, the display touchscreen (for now) does not work at all, so there are no graphs, large clocks, or alarm control on this display.
 
-<p align="center"><img src="img/displayILI9341.png" alt="weather monitor BIM32 base wiring diagramm"></p>
+<p align="center"><img src="img/displayILI9341_v4.3.png" alt="weather monitor BIM32 base wiring diagramm"></p>
 
 If anyone need to have a display on/off button at hand, it can be connected according to the following scheme.
 
@@ -76,7 +76,7 @@ To control the weather in the house, you can connect a humidifier and dehumidifi
 ## Sound module connection diagram
 To enable the alarm clock and the talking clock to produce sounds, the **DF-Player mini** mp3 player module is used, the connection diagram for which is shown below. You will need to copy the entire contents of the **SDcard** folder to the **micro-sd card**, having previously formatted it in the FAT32 file system. If you do not need sound, just connect the GPIO39 ESP32 pin to ground.
 
-<p align="center"><img src="img/mp3player.png" alt="weather monitor BIM32 MP3-player"></p>
+<p align="center"><img src="img/mp3player_v4.3.png" alt="weather monitor BIM32 MP3-player"></p>
 
 Having used this device, an unpleasant moment was discovered: this mp3 player module produces a constant low noise. To get rid of the noise, you need to re-solder the resistor from position A to position B, shown in the photo below. This manipulation switches the MUTE input of the amplifier to the BUSY output, on which a log. signal appears only during sound playback.
 
@@ -92,7 +92,7 @@ Well, as promised, a normal general schematic diagramm for general development.
 - the pull-up resistors of these buttons still need to be installed.
 ```
 
-<p align="center"><img src="schematic/bim32.png" alt="weather monitor BIM32 schematic diagramm"></p>
+<p align="center"><img src="schematic/bim32_v4.3.png" alt="weather monitor BIM32 schematic diagramm"></p>
 
 ## Weather monitor flashing
 To flash the weather monitor, you will need a **micro-sd** card, a **micro-USB** cable and a computer.
@@ -104,6 +104,8 @@ To flash **ESP32**:
 2. Run it, select ESP32 DownloadTool
 3. Select the firmware binaries (located in the bin folder) and the addresses as in the screenshot. And the COM port number
 4. Press the Start button in the flashing program and the Settings button on the device (the BOOT button on the ESP32 module)
+
+<p align="center"><img src="img/flash_download_tool.png" alt="weather monitor BIM32 flashing"></p>
 
 After the flashing **the weather monitor** needs to be configured. An unconfigured device turns on the access point (creates a WiFi network) **BIM32** with the default network password **1234567890**. And in the future, to turn it on again, you need to press and hold the **Settings** button until the access point symbol appears on the screen instead of the antenna symbol. After connecting a laptop or smartphone to the **BIM32** network, open a browser and navigate to **http://192.168.4.1**. Enter login **admin** and password **1111** to open the settings page. In the future, for security reasons, it is recommended to change the default password.
 
