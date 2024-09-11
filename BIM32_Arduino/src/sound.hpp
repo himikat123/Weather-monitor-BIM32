@@ -125,21 +125,14 @@ bool Sound::_isAllowed() {
 }
 
 bool Sound::_hourlyCheck() {
-    TimeElements timeElm;
-    timeElm.Year = year() - 1970; 
-    timeElm.Month = month(); 
-    timeElm.Day = day(); 
-    timeElm.Hour = config.sound_hour_from(); 
-    timeElm.Minute = 0; 
-    timeElm.Second = 0;
-    unsigned int timestampFrom = makeTime(timeElm);
-    if(hour() < config.sound_hour_from()) timestampFrom -= 86400;
-
-    timeElm.Hour = config.sound_hour_to();
-    unsigned int timestampTo = makeTime(timeElm);
-
-    if(timestampFrom > timestampTo) timestampTo += 86400;
-    if(timestampFrom <= now() && now() <= timestampTo) return true;
+    uint8_t fromH = config.sound_hour_from();
+    uint8_t toH = config.sound_hour_to();
+    if(fromH < toH) {
+        if(fromH <= hour() && hour() < toH) return true;
+    }
+    else {
+        if(hour() >= fromH || hour() < toH) return true;
+    }
     return false;
 }
 
