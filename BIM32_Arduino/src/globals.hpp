@@ -6,8 +6,8 @@
 
 #define NEXTION_TX_PIN        32 // Nextion display RX pin
 #define NEXTION_RX_PIN        33 // Nextion display TX pin
-#define TFT_BACKLIGHT         13 // ILI9341 LED pin
 
+#define TFT_BACKLIGHT         13 // ILI9341 LED pin
 // #define TFT_RESET          EN // ILI9341 RESET pin
 // #define TFT_DC              5 // ILI9341 DC pin
 // #define TFT_CS             14 // ILI9341 CS pin
@@ -79,7 +79,7 @@ static struct {
     bool clockSynchronized = false; // Is the time synchronized with the ntp server?
     bool clockSynchronize = false; // Should the display RTC be updated?
     bool net_connected = false; // Is the device connected to the network?
-    unsigned int disp_autoOff[2] = {0, 0}; // Displays auto off interval counter
+    uint32_t disp_autoOff[2] = {0, 0}; // Displays auto off interval counter
     bool reduc[2] = {false, false};
     char ssids[30][33]; // List of available networks
     unsigned int rssis[30]; // List of signal strengths of available networks
@@ -94,6 +94,8 @@ static struct {
     unsigned int co2_level = 0; // CO2 level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
     bool clockPoints = false; // ILI9341 clock points state
     uint8_t uart2_tx = HC12; // What is UART2 connected to
+    int8_t disp_night_state[2] = {-1, -1}; // state of displays night off: -1-undefined, 0-off, 1-on
+    unsigned int btnMillis[2] = {0, 0}; // contact debounce time variable
 } global;
 
 TaskHandle_t task_display1_handle = NULL;

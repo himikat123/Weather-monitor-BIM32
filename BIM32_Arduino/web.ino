@@ -315,8 +315,8 @@ void web_changeLang(AsyncWebServerRequest *request) {
 void web_dispToggle(AsyncWebServerRequest *request) {
     if(web_isLogged(request, true)) {
         if(request->hasArg("num")) {
-            unsigned int disp = (request->arg("num")).toInt();
-            global.display_but_pressed[disp ? 1 : 0] = true;
+            uint8_t dispNum = (request->arg("num")).toInt();
+            global.display_but_pressed[dispNum] = true;
             request->send(200, "text/plain", "OK");
         }
         else request->send(200, "text/plain", "ERROR");

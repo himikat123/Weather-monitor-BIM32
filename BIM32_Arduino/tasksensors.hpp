@@ -184,14 +184,20 @@ void TaskSensors(void *pvParameters) {
  * Interrupt from display 1 button
  */
 void display1_toggle() {
-    global.display_but_pressed[0] = true;
+    if(millis() - global.btnMillis[0] > 500) {
+        global.btnMillis[0] = millis();
+        global.display_but_pressed[0] = true;
+    }
 }
 
 /**
  * Interrupt from display 2 button
  */
 void display2_toggle() {
-    global.display_but_pressed[1] = true;
+    if(millis() - global.btnMillis[1] > 500) {
+        global.btnMillis[1] = millis();
+        global.display_but_pressed[1] = true;
+    }
 }
 
 /**

@@ -4,13 +4,13 @@
 #define DISPLAY_2 1
 
 unsigned int get_brightness(unsigned int display_num);
-bool isOffTime(unsigned int dispNum, bool buttonWasPressed);
+bool isTimeoutOffTime(unsigned int dispNum);
+bool isNightOffTime(unsigned int dispNum);
 
 void TaskDisplay1(void *pvParameters) {
     (void) pvParameters;
 
     unsigned int millis_05s = 0;
-    bool buttonWasPressed = false;
 
     if(config.display_type(DISPLAY_1) == LCD) {
         /* Initialize display */
@@ -27,7 +27,6 @@ void TaskDisplay1(void *pvParameters) {
         if(config.display_type(DISPLAY_1)) {
             /* Display 1 toogle if display button was pressed */
             if(global.display_but_pressed[DISPLAY_1]) {
-                buttonWasPressed = !buttonWasPressed;
                 global.display_but_pressed[DISPLAY_1] = false;
                 global.disp_autoOff[DISPLAY_1] = millis();
 
@@ -43,8 +42,6 @@ void TaskDisplay1(void *pvParameters) {
                 vTaskDelay(500);
             }
 
-            ws2812b_1.refresh();
-
             /* Once in 0.5 second */
             if(millis() - millis_05s >= 500) {
                 millis_05s = millis();
@@ -55,6 +52,9 @@ void TaskDisplay1(void *pvParameters) {
                     if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.refresh();
                 }
 
+                /* WS2812b display slow down points blinking frequency if the device isn't connected to the network */
+                ws2812b_1.setDotFreq(global.net_connected ? 500 : 1000);
+
                 /* WS2812b brightness change and display update */
                 if(config.display_type(DISPLAY_1) == NEOPIXEL) {
                     ws2812b_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
@@ -64,19 +64,26 @@ void TaskDisplay1(void *pvParameters) {
                 nextion.brightness(get_brightness(DISPLAY_1));
                 ili9341.brightness(get_brightness(DISPLAY_1));
 
-                /* WS2812b display slow down points blinking frequency if the device isn't connected to the network */
-                ws2812b_1.setDotFreq(global.net_connected ? 500 : 1000);
-
                 /* Check if need and it's time to turn off the display */
-                if(isOffTime(DISPLAY_1, buttonWasPressed)) { 
+                if(isTimeoutOffTime(DISPLAY_1)) {
                     if(nextion.isDisplayOn()) nextion.displayOff();
                     if(ili9341.isDisplayOn()) ili9341.displayOff();
                     if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
                 }
-                else if(!buttonWasPressed && config.display_nightOff(DISPLAY_1)) {
-                    nextion.displayOn(false);
-                    ili9341.displayOn();
-                    ws2812b_1.displayOn();
+
+                uint8_t itsNightOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
+                if(global.disp_night_state[DISPLAY_1] != itsNightOffTime) {
+                    global.disp_night_state[DISPLAY_1] = itsNightOffTime;
+                    if(itsNightOffTime) {
+                        if(nextion.isDisplayOn()) nextion.displayOff();
+                        if(ili9341.isDisplayOn()) ili9341.displayOff();
+                        if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
+                    }
+                    else {
+                        if(!nextion.isDisplayOn()) nextion.displayOn(false);
+                        if(!ili9341.isDisplayOn()) ili9341.displayOn();
+                        if(!ws2812b_1.isDisplayOn()) ws2812b_1.displayOn();
+                    }
                 }
             }
 
@@ -111,7 +118,6 @@ void TaskDisplay2(void *pvParameters) {
 
     unsigned int bright_update = 0;
     unsigned int disp_millis = 0;
-    bool buttonWasPressed = false;
 
     /* Initialize WS2812b display 2 */
     if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
@@ -128,10 +134,12 @@ void TaskDisplay2(void *pvParameters) {
                 if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
                     ws2812b_2.displayToggle();
                 }
-                buttonWasPressed = !buttonWasPressed;
             }
 
             /* WS2812b display update */
+            if(config.display_type(DISPLAY_1) == D_NEOPIXEL) {
+                ws2812b_1.refresh();
+            }
             if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
                 ws2812b_2.refresh();
             }
@@ -145,11 +153,19 @@ void TaskDisplay2(void *pvParameters) {
                 ws2812b_2.setDotFreq(global.net_connected ? 500 : 1000);
 
                 /* Check if need and it's time to turn off the display */
-                if(isOffTime(DISPLAY_2, buttonWasPressed)) { 
+                if(isTimeoutOffTime(DISPLAY_2)) { 
                     if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
                 }
-                else if(!buttonWasPressed && config.display_nightOff(DISPLAY_2)) {
-                    ws2812b_2.displayOn();
+
+                uint8_t itsNightOffTime = isNightOffTime(DISPLAY_2) ? 1 : 0;
+                if(global.disp_night_state[DISPLAY_2] != itsNightOffTime) {
+                    global.disp_night_state[DISPLAY_2] = itsNightOffTime;
+                    if(itsNightOffTime) {
+                        if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
+                    }
+                    else {
+                        if(!ws2812b_2.isDisplayOn()) ws2812b_2.displayOn();
+                    }
                 }
             }
         }
@@ -199,10 +215,13 @@ unsigned int get_brightness(unsigned int display_num) {
             unsigned int morning = config.display_dayTime(display_num, HOUR) * 60 + config.display_dayTime(display_num, MINUTE);
             unsigned int evening = config.display_nightTime(display_num, HOUR) * 60 + config.display_nightTime(display_num, MINUTE);
             unsigned int cur_time = int(hour()) * 60 + minute();
-            unsigned int bright = (cur_time >= morning and cur_time < evening) 
-                ? config.display_brightness_day(display_num) 
-                : config.display_brightness_night(display_num);
-            return bright;
+            if(morning < evening) {
+                if(morning <= cur_time && cur_time < evening) return config.display_brightness_day(display_num);
+            }
+            else {
+                if(cur_time >= morning || cur_time < evening) return config.display_brightness_day(display_num);
+            }
+            return config.display_brightness_night(display_num);
         };
 
         /* Constant brightness */
@@ -215,29 +234,28 @@ unsigned int get_brightness(unsigned int display_num) {
 /**
  * Check if need be and it's time to turn off display
  */
-bool isOffTime(unsigned int dispNum, bool buttonWasPressed) {
+bool isTimeoutOffTime(unsigned int dispNum) {
     if(config.display_autoOff(dispNum) > 0 and ((millis() - global.disp_autoOff[dispNum]) > (config.display_autoOff(dispNum) * 60000))) {
         global.reduc[dispNum] = true;
         if((millis() - global.disp_autoOff[dispNum]) > ((config.display_autoOff(dispNum) * 60000) + 5000)) return true;
     }
     else global.reduc[dispNum] = false;
+    return false;
+}
 
-    if(config.display_nightOff(dispNum) && !buttonWasPressed) {
-        TimeElements timeElm;
-        timeElm.Year = year() - 1970; 
-        timeElm.Month = month(); 
-        timeElm.Day = day(); 
-        timeElm.Hour = config.display_nightOff_from(dispNum); 
-        timeElm.Minute = 0; 
-        timeElm.Second = 0;
-        unsigned int timestampFrom = makeTime(timeElm);
-        if(hour() < config.display_nightOff_from(dispNum)) timestampFrom -= 86400;
-
-        timeElm.Hour = config.display_nightOff_to(dispNum);
-        unsigned int timestampTo = makeTime(timeElm);
-
-        if(timestampFrom > timestampTo) timestampTo += 86400;
-        if(timestampFrom <= now() && now() < timestampTo) return true;
+/**
+ * Check if need be and it's time to turn off display
+ */
+bool isNightOffTime(unsigned int dispNum) {
+    if(config.display_nightOff(dispNum)) {
+        uint8_t fromH = config.display_nightOff_from(dispNum);
+        uint8_t toH = config.display_nightOff_to(dispNum);
+        if(fromH < toH) {
+            if(fromH <= hour() && hour() < toH) return true;
+        }
+        else {
+            if(hour() >= fromH || hour() < toH) return true;
+        }
     }
 
     return false;
