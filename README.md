@@ -23,7 +23,7 @@
 * Support wired Temperature/Pressure/Humidity/Index of Air Quality/Ambient light sensors
 * Auto-adjust the brightness of the screen backlight (by ambient light sensor, by time or by the fact of sunrise and sunset)
 * 3.5 or 3.2 inch color touch display
-* Support 5 languages: English, German, Russian, Polish, Ukrainian
+* Support 6 languages: English, German, Russian, Polish, Ukrainian, Bulgarian
 * Optional 7-segment color display of large and even huge clocks
 * Talking clock
 * Alarm clock playing mp3 files
