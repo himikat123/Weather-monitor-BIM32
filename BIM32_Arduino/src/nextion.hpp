@@ -86,57 +86,22 @@ void Nextion::init() {
         nex.writeNum("Main.weather.val", config.weather_provider());
 
         // texts
-        nex.writeStr("Texts.JANUARY.txt", lang.january());
-        nex.writeStr("Texts.FEBRUARY.txt", lang.february());
-        nex.writeStr("Texts.MARCH.txt", lang.march());
-        nex.writeStr("Texts.APRIL.txt", lang.april());
-        nex.writeStr("Texts.MAY.txt", lang.may());
-        nex.writeStr("Texts.JUNE.txt", lang.june());
-        nex.writeStr("Texts.JULY.txt", lang.july());
-        nex.writeStr("Texts.AUGUST.txt", lang.august());
-        nex.writeStr("Texts.SEPTEMBER.txt", lang.september());
-        nex.writeStr("Texts.OCTOBER.txt", lang.october());
-        nex.writeStr("Texts.NOVEMBER.txt", lang.november());
-        nex.writeStr("Texts.DECEMBER.txt", lang.december());
-        nex.writeStr("Texts.JAN_.txt", lang.january_());
-        nex.writeStr("Texts.FEB_.txt", lang.february_());
-        nex.writeStr("Texts.MAR_.txt", lang.march_());
-        nex.writeStr("Texts.APR_.txt", lang.april_());
-        nex.writeStr("Texts.MAY_.txt", lang.may_());
-        nex.writeStr("Texts.JUN_.txt", lang.june_());
-        nex.writeStr("Texts.JUL_.txt", lang.july_());
-        nex.writeStr("Texts.AUG_.txt", lang.august_());
-        nex.writeStr("Texts.SEP_.txt", lang.september_());
-        nex.writeStr("Texts.OCT_.txt", lang.october_());
-        nex.writeStr("Texts.NOV_.txt", lang.november_());
-        nex.writeStr("Texts.DEC_.txt", lang.december_());
-        nex.writeStr("Texts.JAN.txt", lang.jan());
-        nex.writeStr("Texts.FEB.txt", lang.feb());
-        nex.writeStr("Texts.MAR.txt", lang.mar());
-        nex.writeStr("Texts.APR.txt", lang.apr());
-        nex.writeStr("Texts.MAI.txt", lang.mai());
-        nex.writeStr("Texts.JUN.txt", lang.jun());
-        nex.writeStr("Texts.JUL.txt", lang.jul());
-        nex.writeStr("Texts.AUG.txt", lang.aug());
-        nex.writeStr("Texts.SEP.txt", lang.sep());
-        nex.writeStr("Texts.OCT.txt", lang.oct());
-        nex.writeStr("Texts.NOV.txt", lang.nov());
-        nex.writeStr("Texts.DEC.txt", lang.dec());
+        String monthFullName[12] = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
+        String monthDay[12] = {"JAN_", "FEB_", "MAR_", "APR_", "MAY_", "JUN_", "JUL_", "AUG_", "SEP_", "OCT_", "NOV_", "DEC_"};
+        String monthShortName[12] = {"JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+        String weekdayFullName[7] = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
+        String weekdayShortName[7] = {"MO", "TU", "WE", "TH", "FR", "SA", "SU"};
 
-        nex.writeStr("Texts.MONDAY.txt", lang.monday());
-        nex.writeStr("Texts.TUESDAY.txt", lang.tuesday());
-        nex.writeStr("Texts.WEDNESDAY.txt", lang.wednesday());
-        nex.writeStr("Texts.THURSDAY.txt", lang.thursday());
-        nex.writeStr("Texts.FRIDAY.txt", lang.friday());
-        nex.writeStr("Texts.SATURDAY.txt", lang.saturday());
-        nex.writeStr("Texts.SUNDAY.txt", lang.sunday());
-        nex.writeStr("Texts.MO.txt", lang.mo());
-        nex.writeStr("Texts.TU.txt", lang.tu());
-        nex.writeStr("Texts.WE.txt", lang.we());
-        nex.writeStr("Texts.TH.txt", lang.th());
-        nex.writeStr("Texts.FR.txt", lang.fr());
-        nex.writeStr("Texts.SA.txt", lang.sa());
-        nex.writeStr("Texts.SU.txt", lang.su());
+        for(uint8_t i=0; i<12; i++) {
+            nex.writeStr("Texts." + monthFullName[i] + ".txt", lang.monthFullName(i + 1));
+            nex.writeStr("Texts." + monthDay[i] + ".txt", lang.monthDay(i + 1));
+            nex.writeStr("Texts." + monthShortName[i] + ".txt", lang.monthShortName(i + 1));
+        }
+
+        for(uint8_t i=0; i<7; i++) {
+            nex.writeStr("Texts." + weekdayFullName[i] + ".txt", lang.weekdayFullName(i + 1));
+            nex.writeStr("Texts." + weekdayShortName[i] + ".txt", lang.weekdayShortName(i + 1));
+        }
     }
 
     nex.writeNum("thup", 1);
@@ -282,7 +247,7 @@ void Nextion::_NX4832T035_timeDate() {
         _prevTMinute = _tMinute;
     }
     if(_prevTDay != _tDay or _prevTMonth != _tMonth or _prevTYear != _tYear or _forced) {
-        nex.writeStr("BigClock.date.txt", String(_tDay) + " " + lang.monthName(_tMonth) + " " + String(_tYear));
+        nex.writeStr("BigClock.date.txt", String(_tDay) + " " + lang.monthDay(_tMonth) + " " + String(_tYear));
         _prevTDay = _tDay;
         _prevTMonth = _tMonth;
         _prevTYear = _tYear;

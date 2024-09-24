@@ -94,22 +94,22 @@ unsigned int Weather::_convertIcon(int code) {
 
 String Weather::_openMeteoCode2Description(uint8_t code) {
     switch(code) {
-        case 0: return lang.clearSky();
-        case 1: return lang.mainlyClear();
-        case 2: return lang.partlyCloudy();
-        case 3:	return lang.overcast();
-        case 45: return lang.fog();
-        case 48: return lang.deposRimeFog();
-        case 51: case 53: case 55: return lang.drizzle();
-        case 56: case 57: return lang.freezingDrizzle();
-        case 61: case 63: case 65: return lang.rain();
-        case 66: case 67: return lang.freezingRain();
-        case 71: case 73: case 75: return lang.snowFall();
-        case 77: return lang.snowGrains();
-        case 80: case 81: case 82: return lang.rainShowers();
-        case 85: case 86: return lang.snowShowers();
-        case 95: return lang.thunderstorm();
-        case 96: case 99: return lang.thunderstormWithHail();
+        case 0: return lang.weatherDescription(0);
+        case 1: return lang.weatherDescription(1);
+        case 2: return lang.weatherDescription(2);
+        case 3:	return lang.weatherDescription(3);
+        case 45: return lang.weatherDescription(4);
+        case 48: return lang.weatherDescription(5);
+        case 51: case 53: case 55: return lang.weatherDescription(6);
+        case 56: case 57: return lang.weatherDescription(7);
+        case 61: case 63: case 65: return lang.weatherDescription(8);
+        case 66: case 67: return lang.weatherDescription(9);
+        case 71: case 73: case 75: return lang.weatherDescription(10);
+        case 77: return lang.weatherDescription(11);
+        case 80: case 81: case 82: return lang.weatherDescription(12);
+        case 85: case 86: return lang.weatherDescription(13);
+        case 95: return lang.weatherDescription(14);
+        case 96: case 99: return lang.weatherDescription(15);
         default: return "---";
     }
 }
