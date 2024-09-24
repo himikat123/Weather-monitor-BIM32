@@ -168,6 +168,7 @@ void TaskDisplay2(void *pvParameters) {
             }
         }
 
+        server.handleClient();
         vTaskDelay(10);
     }
 }

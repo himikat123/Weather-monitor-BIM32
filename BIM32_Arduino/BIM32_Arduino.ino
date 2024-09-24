@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v4.3
+ *  Weather Monitor BIM32 v4.4
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
@@ -21,16 +21,15 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 WiFiClient client;
+#include <WebServer.h>
+WebServer server(80);
 #include <ESPmDNS.h>
 #include <time.h>
 
 /* External Libraries */
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include <AsyncTCP.h> // v1.1.4 https://github.com/dvarrel/AsyncTCP
-#include <ESPAsyncWebServer.h> // v1.2.3 https://github.com/me-no-dev/ESPAsyncWebServer
-AsyncWebServer server(80);
-#include "ESP32SSDP.h" // v1.2.0 https://github.com/luc-github/ESP32SSDP
+#include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
 
 /* Own classes */
 #include "src/validate.hpp"
@@ -65,6 +64,7 @@ Nextion nextion;
 ILI9341 ili9341;
 #include "src/agregateSegmentData.hpp"
 AgregateSegmentData agregateSegmentData;
+#include "src/segmentAnimationsShifts.hpp"
 #include "src/segmentDisplay.hpp"
 #include "src/ws2812b.hpp"
 WS2812b ws2812b_1;
@@ -78,16 +78,6 @@ Comfort comfort;
 
 #include "taskdisplay.hpp"
 #include "tasksensors.hpp"
-
-
-/* FreeRTOS running cores */
-#if CONFIG_FREERTOS_UNICORE
-    #define ARDUINO_RUNNING_CORE 0
-#else
-    #define ARDUINO_RUNNING_CORE 1
-#endif
-#define FS_NO_GLOBALS
-
 
 /**
  * Arduino setup
@@ -129,14 +119,14 @@ void setup() {
         }
     }
 
-    xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, ARDUINO_RUNNING_CORE);
-    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, 1);
+    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, 1);
 
     network.connect();
 
     webInterface_init();
 
-    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, ARDUINO_RUNNING_CORE);
+    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, 1);
 }
 
 void loop() {
