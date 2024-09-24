@@ -19,7 +19,7 @@ void TaskDisplay1(void *pvParameters) {
     }
 
     /* Initialize WS2812b display 1 */
-    if(config.display_type(DISPLAY_1) == NEOPIXEL) {
+    if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY1) {
         ws2812b_1.init(DISPLAY_1, WS2812_1_DAT_PIN);
     }
 
@@ -35,7 +35,7 @@ void TaskDisplay1(void *pvParameters) {
                     if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.displayToggle();
                 }
 
-                if(config.display_type(DISPLAY_1) == NEOPIXEL) {
+                if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY1) {
                     ws2812b_1.displayToggle();
                 }
 
@@ -56,7 +56,7 @@ void TaskDisplay1(void *pvParameters) {
                 ws2812b_1.setDotFreq(global.net_connected ? 500 : 1000);
 
                 /* WS2812b brightness change and display update */
-                if(config.display_type(DISPLAY_1) == NEOPIXEL) {
+                if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY1) {
                     ws2812b_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
                 }
 
@@ -114,13 +114,11 @@ void TaskDisplay1(void *pvParameters) {
 void TaskDisplay2(void *pvParameters) {
     (void) pvParameters;
 
-    const uint8_t D_NEOPIXEL = 1;
-
     unsigned int bright_update = 0;
     unsigned int disp_millis = 0;
 
     /* Initialize WS2812b display 2 */
-    if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
+    if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY2) {
         ws2812b_2.init(DISPLAY_2, WS2812_2_DAT_PIN);
     }
 
@@ -131,16 +129,16 @@ void TaskDisplay2(void *pvParameters) {
             if(global.display_but_pressed[DISPLAY_2]) {
                 global.display_but_pressed[DISPLAY_2] = false;
                 global.disp_autoOff[DISPLAY_2] = millis();
-                if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
+                if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY2) {
                     ws2812b_2.displayToggle();
                 }
             }
 
             /* WS2812b display update */
-            if(config.display_type(DISPLAY_1) == D_NEOPIXEL) {
+            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY1) {
                 ws2812b_1.refresh();
             }
-            if(config.display_type(DISPLAY_2) == D_NEOPIXEL) {
+            if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY2) {
                 ws2812b_2.refresh();
             }
 

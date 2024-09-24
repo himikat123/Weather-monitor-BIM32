@@ -38,7 +38,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v4.3"                    // Firmware version
+#define FW "v4.4"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -70,7 +70,8 @@
 #define CORRECTED            true  // corrected data
 
 #define LCD                  1
-#define NEOPIXEL             2
+#define NEOPIXEL_DISPLAY1    2
+#define NEOPIXEL_DISPLAY2    1
 #define D_NX4832K035         0
 #define D_NX4832T035         1
 #define D_ILI9341            2

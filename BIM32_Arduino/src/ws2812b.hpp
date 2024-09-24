@@ -24,6 +24,8 @@ class WS2812b : public SegmentDisplay {
         uint8_t bluesPrev[6] = {0, 0, 0, 0, 0, 0};
         bool _prevDot1 = false;
         bool _prevDot2 = false;
+        bool _prevDot3 = false;
+        bool _prevDot4 = false;
 
         void _print();
         void _sendToDisplay();
@@ -51,6 +53,7 @@ void WS2812b::init(uint8_t dispNum, uint8_t pin) {
     strip = _dispNum == 0 ? &strip_1 : &strip_2;
     strip->begin(pin, _pixelCount);
     strip->clear(true);
+    _setModel(config.display_model(dispNum));
 }
 
 /**
@@ -83,9 +86,11 @@ void WS2812b::_print() {
             updated |= true;
         }
     }
-    if(_prevDot1 != _dot1 or _prevDot2 != _dot2) {
+    if(_prevDot1 != _dot1 or _prevDot2 != _dot2 or _prevDot3 != _dot3 or _prevDot4 != _dot4) {
         _prevDot1 = _dot1;
         _prevDot2 = _dot2;
+        _prevDot3 = _dot3;
+        _prevDot4 = _dot4;
         updated |= true;
     }
     if(updated) _sendToDisplay();
@@ -95,17 +100,24 @@ void WS2812b::_print() {
  * Send data to display
  */
 void WS2812b::_sendToDisplay() {
-    strip->brightness(_brightness, false);
+    uint8_t bright = _brightness;
+    if(bright < config.display_brightness_min(_dispNum)) bright = config.display_brightness_min(_dispNum);
+    if(bright > config.display_brightness_max(_dispNum)) bright = config.display_brightness_max(_dispNum);  
+    strip->brightness(bright, false);
 
     rgb_t black = { .r = 0, .g = 0, .b = 0 };
     rgb_t dotsColor = { .r = reds[0], .g = greens[0], .b = blues[0] };
-
     uint8_t lastPixel = 0;
     strip->setPixel(lastPixel++, black, false);
     lastPixel = _sendTwoDigits(black, 0, lastPixel++);
     strip->setPixel(lastPixel++, _power ? _dot1 ? dotsColor : black : black, false);
     strip->setPixel(lastPixel++, _power ? _dot2 ? dotsColor : black : black, false);
     lastPixel = _sendTwoDigits(black, 2, lastPixel++);
+    if(config.display_model(_dispNum) > 2) {
+        strip->setPixel(lastPixel++, _power ? _dot3 ? dotsColor : black : black, false);
+        strip->setPixel(lastPixel++, _power ? _dot4 ? dotsColor : black : black, false);
+        lastPixel = _sendTwoDigits(black, 4, lastPixel++);
+    }
 
     strip->show();
 }
