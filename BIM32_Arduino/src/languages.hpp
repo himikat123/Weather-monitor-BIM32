@@ -111,7 +111,7 @@ class Lang {
         String _esp32Temp[6] = {"ESP32 Temperature", "ESP32 Temperatur", "Температура ESP32", "Temperatura ESP32", "Температура ESP32", "Температура ESP32"};
         String _firmware[6] = {"Firmware", "Firmware", "Прошивка", "Oprogramowanie", "Прошивка", "Фърмуер"};
         String _mm[6] = {"mm", "mm", "мм", "mm", "мм", "мм"};
-        String _ms[6] = {"m/s", "m/s", "м/с", "m/s" "м/с", "м/с"};
+        String _ms[6] = {"m/s", "m/s", "м/с", "m/s", "м/с", "м/с"};
         String _v[6] = {"V", "V", " В", "V", " В", " В"};
         String _historyIn[6] = {"Weather indoor history", "Hauswettergeschichte", "История погоды в доме", "Historia pomiarów w pomieszczeniach", "Історія погоди у будинку", "История на времето в дома"};
         String _historyOut[6] = {"Weather outdoor history", "Außenwettergeschichte", "История погоды на улице", "Historia pogody na zewnątrz", "Історія погоди на вулиці", "История на времето навън"};

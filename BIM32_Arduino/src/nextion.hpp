@@ -82,15 +82,16 @@ void Nextion::init() {
         if(config.lang() == "ru") langCode = 2;
         if(config.lang() == "pl") langCode = 3;
         if(config.lang() == "ua") langCode = 4;
+        if(config.lang() == "bg") langCode = 5;
         nex.writeNum("Main.lang.val", langCode);
         nex.writeNum("Main.weather.val", config.weather_provider());
 
         // texts
-        String monthFullName[12] = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
-        String monthDay[12] = {"JAN_", "FEB_", "MAR_", "APR_", "MAY_", "JUN_", "JUL_", "AUG_", "SEP_", "OCT_", "NOV_", "DEC_"};
+        String monthFullName[12] = {"JAN_", "FEB_", "MAR_", "APR_", "MAY_", "JUN_", "JUL_", "AUG_", "SEP_", "OCT_", "NOV_", "DEC_"};
+        String monthDay[12] = {"JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"};
         String monthShortName[12] = {"JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
-        String weekdayFullName[7] = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
-        String weekdayShortName[7] = {"MO", "TU", "WE", "TH", "FR", "SA", "SU"};
+        String weekdayFullName[7] = {"SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"};
+        String weekdayShortName[7] = {"SU", "MO", "TU", "WE", "TH", "FR", "SA"};
 
         for(uint8_t i=0; i<12; i++) {
             nex.writeStr("Texts." + monthFullName[i] + ".txt", lang.monthFullName(i + 1));
