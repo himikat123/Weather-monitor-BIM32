@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v4.4
+ *  Weather Monitor BIM32 v4.5
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
@@ -30,6 +30,16 @@ WebServer server(80);
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 #include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
+
+/* Pictures */
+#include "src/picturesAnts.hpp"
+#include "src/picturesBats.hpp"
+#include "src/picturesIconsBig.hpp"
+#include "src/picturesIconsSmall.hpp"
+#include "src/picturesLogo.hpp"
+#include "src/picturesNumbers.hpp"
+#include "src/picturesSymbols.hpp"
+#include "src/picturesWind.hpp"
 
 /* Own classes */
 #include "src/validate.hpp"

@@ -1,12 +1,9 @@
 #include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
 TFT_eSPI tft = TFT_eSPI();
-#include <TJpg_Decoder.h> // v1.0.8 https://github.com/Bodmer/TJpg_Decoder
+#include <JPEGDecoder.h> // v2.0.0 https://github.com/Bodmer/JPEGDecoder
 
-bool tft_output(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t* bitmap) {
-    if(y >= tft.height()) return 0;
-    tft.pushImage(x, y, w, h, bitmap);
-    return 1;
-}
+#define minimum(a,b)     (((a) < (b)) ? (a) : (b))
+
 
 class ILI9341 : LcdDisplay {
     #define LEFT 0
@@ -49,7 +46,9 @@ class ILI9341 : LcdDisplay {
 
         void _sequenceSlotSkip();
         void _sequenceSlotNext();
-        void _showImg(uint16_t x, uint16_t y, String img);
+        void _showImg(uint16_t x, uint16_t y, const byte img[], uint16_t size);
+        const byte* _number_picture(uint8_t num);
+        uint16_t _number_picture_size(uint8_t num);
         void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color);
         void _showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color);
         void _showHumidity(int hum, uint16_t x, uint16_t y);
@@ -84,17 +83,14 @@ class ILI9341 : LcdDisplay {
 void ILI9341::init(void) {
     tft.begin();
     tft.setRotation(3);
-
     tft.setSwapBytes(true);
-    TJpgDec.setJpgScale(1);
-    TJpgDec.setCallback(tft_output);
 
     pinMode(TFT_BACKLIGHT, OUTPUT);
     brightness(1023);
 }
 
 void ILI9341::showLogo() {
-    _showImg(0, 0, "/img/logo.jpg");
+    _showImg(0, 0, logo, sizeof(logo));
     vTaskDelay(2000);
 }
 
@@ -176,8 +172,46 @@ void ILI9341::brightness(unsigned int bright) {
     else analogWrite(TFT_BACKLIGHT, 0);
 }
 
-void ILI9341::_showImg(uint16_t x, uint16_t y, String img) {
-    TJpgDec.drawFsJpg(x, y, img, LittleFS);
+void ILI9341::_showImg(uint16_t x, uint16_t y, const byte img[], uint16_t size) {
+    JpegDec.decodeArray(img, size);
+    uint16_t *pImg;
+    uint16_t mcu_w = JpegDec.MCUWidth;
+    uint16_t mcu_h = JpegDec.MCUHeight;
+    uint32_t max_x = JpegDec.width;
+    uint32_t max_y = JpegDec.height;
+    uint32_t min_w = minimum(mcu_w, max_x % mcu_w);
+    uint32_t min_h = minimum(mcu_h, max_y % mcu_h);
+    uint32_t win_w = mcu_w;
+    uint32_t win_h = mcu_h;
+    max_x += x;
+    max_y += y;
+
+    while(JpegDec.readSwappedBytes()) {
+        pImg = JpegDec.pImage;
+        int mcu_x = JpegDec.MCUx * mcu_w + x;
+        int mcu_y = JpegDec.MCUy * mcu_h + y;
+        if(mcu_x + mcu_w <= max_x) win_w = mcu_w;
+        else win_w = min_w;
+        if(mcu_y + mcu_h <= max_y) win_h = mcu_h;
+        else win_h = min_h;
+        if(win_w != mcu_w) {
+            uint16_t *cImg;
+            int p = 0;
+            cImg = pImg + win_w;
+            for(int h=1; h<win_h; h++) {
+                p += mcu_w;
+                for(int w=0; w<win_w; w++) {
+                    *cImg = *(pImg + w + p);
+                    cImg++;
+                }
+            }
+        }
+
+        if((mcu_x + win_w) <= tft.width() && (mcu_y + win_h) <= tft.height()) {
+            tft.pushRect(mcu_x, mcu_y, win_w, win_h, pImg);
+        }
+        else if((mcu_y + win_h) >= tft.height()) JpegDec.abort();
+    }
 }
 
 void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color) {
@@ -220,32 +254,57 @@ void ILI9341::_drawSkeleton() {
     tft.drawSmoothRoundRect(0, 165, 10, 10, 106, 74, FRAME_COLOR, BG_COLOR);
     tft.drawSmoothRoundRect(106, 165, 10, 10, 106, 74, FRAME_COLOR, BG_COLOR);
     tft.drawSmoothRoundRect(212, 165, 10, 10, 107, 74, FRAME_COLOR, BG_COLOR);
-    _showImg(145, 48, "/img/symb/home.jpg");
-    _showImg(243, 48, "/img/symb/hum.jpg");
-    _showImg(62, 104, "/img/symb/temp+.jpg");
-    _showImg(143, 109, "/img/symb/hum.jpg");
-    _showImg(222, 109, "/img/symb/pres.jpg");
-    _showImg(61, 146, "/img/symb/wind.jpg");
-    _showImg(33, 0, "/img/digits/0.jpg");
-    _showImg(77, 0, "/img/digits/0.jpg");
-    _showImg(109, 0, "/img/digits/0.jpg");
+    _showImg(145, 48, home, sizeof(home));
+    _showImg(243, 48, hum, sizeof(hum));
+    _showImg(62, 104, temp_plus, sizeof(temp_plus));
+    _showImg(143, 109, hum, sizeof(hum));
+    _showImg(222, 109, pres, sizeof(pres));
+    _showImg(61, 146, wind, sizeof(wind));
+    _showImg(33, 0, number_0, sizeof(number_0));
+    _showImg(77, 0, number_0, sizeof(number_0));
+    _showImg(109, 0, number_0, sizeof(number_0));
+}
+
+const byte* ILI9341::_number_picture(uint8_t num) {
+    switch (num) {
+        case 1: return number_1;
+        case 2: return number_2;
+        case 3: return number_3;
+        case 4: return number_4;
+        case 5: return number_5;
+        case 6: return number_6;
+        case 7: return number_7;
+        case 8: return number_8;
+        case 9: return number_9;
+        default: return number_0;
+    }
+}
+
+uint16_t ILI9341::_number_picture_size(uint8_t num) {
+    switch (num) {
+        case 1: return sizeof(number_1);
+        case 2: return sizeof(number_2);
+        case 3: return sizeof(number_3);
+        case 4: return sizeof(number_4);
+        case 5: return sizeof(number_5);
+        case 6: return sizeof(number_6);
+        case 7: return sizeof(number_7);
+        case 8: return sizeof(number_8);
+        case 9: return sizeof(number_9);
+        default: return sizeof(number_0);
+    }
 }
 
 void ILI9341::_showTime() {
-    char buf[20] = "";
     if(_prevTHour != _tHour) {
-        sprintf(buf, "/img/digits/%d.jpg", _tHour / 10);
         if(_tHour < 10) tft.fillRect(0, 0, 32, 78, BG_COLOR);
-        else _showImg(0, 0, buf);
-        sprintf(buf, "/img/digits/%d.jpg", _tHour % 10);
-        _showImg(33, 0, buf);
+        else _showImg(0, 0, _number_picture(_tHour / 10), _number_picture_size(_tHour / 10));
+        _showImg(33, 0, _number_picture(_tHour % 10), _number_picture_size(_tHour % 10));
         _prevTHour = _tHour;
     }
     if(_prevTMinute != _tMinute) {
-        sprintf(buf, "/img/digits/%d.jpg", _tMinute / 10);
-        _showImg(77, 0, buf);
-        sprintf(buf, "/img/digits/%d.jpg", _tMinute % 10);
-        _showImg(109, 0, buf);
+        _showImg(77, 0, _number_picture(_tMinute / 10), _number_picture_size(_tMinute / 10));
+        _showImg(109, 0, _number_picture(_tMinute % 10), _number_picture_size(_tMinute % 10));
         _prevTMinute = _tMinute;
     }
 }
@@ -282,16 +341,14 @@ void ILI9341::_clockPoints() {
  */
 void ILI9341::_showAntenna() {
     if(_prevRssi != _rssi or _prevIsApMode != _isApMode) {
-        String ant = "";
-        if(_isApMode) ant = "acpoint";
+        if(_isApMode) _showImg(292, 1, ant_acpoint, sizeof(ant_acpoint));
         else {
-            if(_rssi > -51) ant = "ant_4";
-            if(_rssi < -50 && _rssi > -76) ant = "ant_3";
-            if(_rssi <- 75 && _rssi > -96) ant = "ant_2";
-            if(_rssi < -95) ant = "ant_1";
-            if(_rssi >= 0) ant = "ant_0";
+            if(_rssi > -51) _showImg(292, 1, ant4, sizeof(ant4));
+            if(_rssi < -50 && _rssi > -76) _showImg(292, 1, ant3, sizeof(ant3));
+            if(_rssi <- 75 && _rssi > -96) _showImg(292, 1, ant2, sizeof(ant2));
+            if(_rssi < -95) _showImg(292, 1, ant1, sizeof(ant1));
+            if(_rssi >= 0) _showImg(292, 1, ant0, sizeof(ant0));
         }
-        _showImg(292, 1, "/img/ant/" + ant + ".jpg");
         _prevRssi = _rssi;
         _prevIsApMode = _isApMode;
     }
@@ -341,8 +398,8 @@ void ILI9341::_showTemperatureOutside() {
  * Display thermometer icon (red or blue)
  */
 void ILI9341::_showThermometer() {
-    if(_tempOut < 0.0) _showImg(62, 104, "/img/symb/temp-.jpg");
-    else _showImg(62, 104, "/img/symb/temp+.jpg");
+    if(_tempOut < 0.0) _showImg(62, 104, temp_minus, sizeof(temp_minus));
+    else _showImg(62, 104, temp_plus, sizeof(temp_plus));
 }
 
 /**
@@ -383,9 +440,13 @@ void ILI9341::_showComfort() {
 void ILI9341::_showBatteryLevel() {
     if(_prevBatLevel != _batLevel) {
         if(validate.batLvl(_batLevel)) {
-            char buf[20] = "";
-            sprintf(buf, "/img/bat/bat%d.jpg", _batLevel);
-            _showImg(258, 2, buf);
+            switch(_batLevel) {
+                case 1: _showImg(258, 2, bat1, sizeof(bat1)); break;
+                case 2: _showImg(258, 2, bat2, sizeof(bat2)); break;
+                case 3: _showImg(258, 2, bat3, sizeof(bat3)); break;
+                case 4: _showImg(258, 2, bat4, sizeof(bat4)); break;
+                default: tft.fillRect(258, 2, 32, 21, BG_COLOR); break;
+            }
         }
         else tft.fillRect(258, 2, 32, 21, BG_COLOR);
         _prevBatLevel = _batLevel;
@@ -408,20 +469,17 @@ void ILI9341::_showVoltageOrPercentage() {
  */
 void ILI9341::_showWeatherIcon() {
     if(_prevCurrIcon != _currIcon or _prevIsDay != _isDay) {
-        String path = "/img/icons/big/";
         switch(_currIcon) {
-            case 1: path += _isDay ? "01_d" : "01_n"; break;
-            case 2: path += _isDay ? "02_d" : "02_n"; break;
-            case 3: path += "04"; break;
-            case 4: path += "09"; break;
-            case 5: path += "10"; break;
-            case 6: path += _isDay ? "11_d" : "11_n"; break;
-            case 7: path += "13"; break;
-            case 8: path += "50"; break;
-            default: path += "loading"; break;
+            case 1: _showImg(0, 104, _isDay ? icon_big_01_d : icon_big_01_n, _isDay ? sizeof(icon_big_01_d) : sizeof(icon_big_01_n)); break;
+            case 2: _showImg(0, 104, _isDay ? icon_big_02_d : icon_big_02_n, _isDay ? sizeof(icon_big_02_d) : sizeof(icon_big_02_n)); break;
+            case 3: _showImg(0, 104, icon_big_04, sizeof(icon_big_04)); break;
+            case 4: _showImg(0, 104, icon_big_09, sizeof(icon_big_09)); break;
+            case 5: _showImg(0, 104, icon_big_10, sizeof(icon_big_10)); break;
+            case 6: _showImg(0, 104, _isDay ? icon_big_11_d : icon_big_11_n, _isDay ? sizeof(icon_big_11_d) : sizeof(icon_big_11_n)); break;
+            case 7: _showImg(0, 104, icon_big_13, sizeof(icon_big_13)); break;
+            case 8: _showImg(0, 104, icon_big_50, sizeof(icon_big_50)); break;
+            default: _showImg(0, 104, icon_big_loading, sizeof(icon_big_loading)); break;
         }
-        path += ".jpg";
-        _showImg(0, 104, path);
         _prevCurrIcon = _currIcon;
         _prevIsDay = _isDay;
     }
@@ -468,18 +526,16 @@ void ILI9341::_showWindSpeed() {
  */
 void ILI9341::_showWindDirection() {
     if(_prevWindDir != _windDir) {
-        String dir;
         switch(_windDir) {
-            case 1: dir = "ne"; break;
-            case 2: dir = "e"; break;
-            case 3: dir = "se"; break;
-            case 4: dir = "s"; break;
-            case 5: dir = "sw"; break;
-            case 6: dir = "w"; break;
-            case 7: dir = "nw"; break;
-            default: dir = "n"; break;
+            case 1: _showImg(133, 143, wind_north_east, sizeof(wind_north_east)); break;
+            case 2: _showImg(133, 143, wind_east, sizeof(wind_east)); break;
+            case 3: _showImg(133, 143, wind_south_east, sizeof(wind_south_east)); break;
+            case 4: _showImg(133, 143, wind_south, sizeof(wind_south)); break;
+            case 5: _showImg(133, 143, wind_south_west, sizeof(wind_south_west)); break;
+            case 6: _showImg(133, 143, wind_west, sizeof(wind_west)); break;
+            case 7: _showImg(133, 143, wind_north_west, sizeof(wind_north_west)); break;
+            default: _showImg(133, 143, wind_north, sizeof(wind_north)); break;
         }
-        _showImg(133, 143, "/img/wind/" + dir + ".jpg");
         _prevWindDir = _windDir;
     }
 }
@@ -507,20 +563,17 @@ void ILI9341::_showUpdTime() {
 void ILI9341::_showForecastIcons() {
     for(uint8_t i=0; i<3; i++) {
         if(_prevIcons[i] != _icons[i]) {
-            String path = "/img/icons/small/";
             switch(_icons[i]) {
-                case 1: path += "01"; break;
-                case 2: path += "02"; break;
-                case 3: path += "04"; break;
-                case 4: path += "09"; break;
-                case 5: path += "10"; break;
-                case 6: path += "11"; break;
-                case 7: path += "13"; break;
-                case 8: path += "50"; break;
-                default: path += "loading"; break;
+                case 1: _showImg(i * 106 + 2, 183, icon_small_01, sizeof(icon_small_01)); break;
+                case 2: _showImg(i * 106 + 2, 183, icon_small_02, sizeof(icon_small_02)); break;
+                case 3: _showImg(i * 106 + 2, 183, icon_small_04, sizeof(icon_small_04)); break;
+                case 4: _showImg(i * 106 + 2, 183, icon_small_09, sizeof(icon_small_09)); break;
+                case 5: _showImg(i * 106 + 2, 183, icon_small_10, sizeof(icon_small_10)); break;
+                case 6: _showImg(i * 106 + 2, 183, icon_small_11, sizeof(icon_small_11)); break;
+                case 7: _showImg(i * 106 + 2, 183, icon_small_13, sizeof(icon_small_13)); break;
+                case 8: _showImg(i * 106 + 2, 183, icon_small_50, sizeof(icon_small_50)); break;
+                default: _showImg(i * 106 + 2, 183, icon_small_loading, sizeof(icon_small_loading)); break;
             }
-            path += ".jpg";
-            _showImg(i * 106 + 2, 183, path);
             _prevIcons[i] = _icons[i];
         }
     }
