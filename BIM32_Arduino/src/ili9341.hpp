@@ -72,6 +72,7 @@ class ILI9341 : LcdDisplay {
         void _showWindSpeed();
         void _showWindDirection();
         void _showUpdTime();
+        void _showAlarmIcon();
         void _showForecastIcons();
         void _showForecastTemps();
         void _showForecastWinds();
@@ -155,6 +156,7 @@ void ILI9341::refresh() {
         _showAntenna();
         _showWeatherIcon();
         _showWindDirection();
+        _showAlarmIcon();
         _showForecastIcons();
 
         _sequenceSlotNext();
@@ -254,12 +256,12 @@ void ILI9341::_drawSkeleton() {
     tft.drawSmoothRoundRect(0, 165, 10, 10, 106, 74, FRAME_COLOR, BG_COLOR);
     tft.drawSmoothRoundRect(106, 165, 10, 10, 106, 74, FRAME_COLOR, BG_COLOR);
     tft.drawSmoothRoundRect(212, 165, 10, 10, 107, 74, FRAME_COLOR, BG_COLOR);
-    _showImg(145, 48, home, sizeof(home));
-    _showImg(243, 48, hum, sizeof(hum));
-    _showImg(62, 104, temp_plus, sizeof(temp_plus));
-    _showImg(143, 109, hum, sizeof(hum));
-    _showImg(222, 109, pres, sizeof(pres));
-    _showImg(61, 146, wind, sizeof(wind));
+    _showImg(145, 48, symb_home, sizeof(symb_home));
+    _showImg(243, 48, symb_hum, sizeof(symb_hum));
+    _showImg(62, 104, symb_temp_plus, sizeof(symb_temp_plus));
+    _showImg(143, 109, symb_hum, sizeof(symb_hum));
+    _showImg(222, 109, symb_pres, sizeof(symb_pres));
+    _showImg(61, 146, symb_wind, sizeof(symb_wind));
     _showImg(33, 0, number_0, sizeof(number_0));
     _showImg(77, 0, number_0, sizeof(number_0));
     _showImg(109, 0, number_0, sizeof(number_0));
@@ -398,8 +400,8 @@ void ILI9341::_showTemperatureOutside() {
  * Display thermometer icon (red or blue)
  */
 void ILI9341::_showThermometer() {
-    if(_tempOut < 0.0) _showImg(62, 104, temp_minus, sizeof(temp_minus));
-    else _showImg(62, 104, temp_plus, sizeof(temp_plus));
+    if(_tempOut < 0.0) _showImg(62, 104, symb_temp_minus, sizeof(symb_temp_minus));
+    else _showImg(62, 104, symb_temp_plus, sizeof(symb_temp_plus));
 }
 
 /**
@@ -547,14 +549,28 @@ void ILI9341::_showUpdTime() {
     if(_prevWeatherUpdated != _weatherUpdated) {
         time_t t = _weatherUpdated;
         char buf[32] = "";
-        sprintf(buf, "%02d.%02d.%d %02d:%02d:%02d", day(t), month(t), year(t), hour(t), minute(t), second(t));
-        _printText(186, 148, 133, 16, t > 0 ? buf : "--", FONT1, RIGHT, TEXT_COLOR);
-        tft.drawCircle(177, 153, 5, TEXT_COLOR);
-        tft.drawFastHLine(176, 148, 4, BG_COLOR);
-        tft.drawFastHLine(172, 148, 3, TEXT_COLOR);
-        tft.drawFastVLine(175, 149, 3, TEXT_COLOR);
+        sprintf(buf, "%02d.%02d.%d %02d:%02d", day(t), month(t), year(t), hour(t), minute(t));
+        _printText(176, 148, 133, 16, t > 0 ? buf : " ", FONT1, LEFT, TEXT_COLOR);
+        if(t > 0) {
+            tft.drawCircle(167, 153, 5, TEXT_COLOR);
+            tft.drawFastHLine(166, 148, 4, BG_COLOR);
+            tft.drawFastHLine(162, 148, 3, TEXT_COLOR);
+            tft.drawFastVLine(165, 149, 3, TEXT_COLOR);
+        }
         _prevWeatherUpdated = _weatherUpdated;
     }
+}
+
+/**
+ * Display Alarm icon
+ */
+void ILI9341::_showAlarmIcon() {
+    uint8_t alarmOn = 0;
+    for(uint8_t i=0; i<12; i++) {
+        alarmOn |= config.alarm_state(i);
+    }
+    if(alarmOn) _showImg(294, 140, symb_alarm, sizeof(symb_alarm));
+    else _showImg(294, 140, symb_alarm_off, sizeof(symb_alarm_off));
 }
 
 /**
