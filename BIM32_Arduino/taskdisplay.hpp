@@ -88,9 +88,13 @@ void TaskDisplay1(void *pvParameters) {
             }
 
             if(config.display_type(DISPLAY_1) == LCD) {
+                /* Receive data from Nextion */
                 if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
-                    /* Receive data from Nextion */
                     nextion.dataReceive();
+                }
+
+                if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                    ili9341.getTouch();
                 }
             }
 

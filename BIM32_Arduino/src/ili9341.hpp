@@ -36,6 +36,7 @@ class ILI9341 : LcdDisplay {
         void displayOn();
         void displayOff();
         bool isDisplayOn();
+        void getTouch();
 
     private:
         uint8_t _prevFont = 5;
@@ -43,6 +44,8 @@ class ILI9341 : LcdDisplay {
         uint16_t _air_color[4] = { BATTERY_COLOR, 0xFFE0, 0xFD20, 0xF800 };
         uint32_t _sequenceMillis = 0;
         uint8_t _sequenceSlot = 0;
+        uint16_t _touchX = 0; 
+        uint16_t _touchY = 0;
 
         void _sequenceSlotSkip();
         void _sequenceSlotNext();
@@ -76,6 +79,7 @@ class ILI9341 : LcdDisplay {
         void _showForecastIcons();
         void _showForecastTemps();
         void _showForecastWinds();
+        void _touch_calibrate();
 };
 
 /**
@@ -88,6 +92,14 @@ void ILI9341::init(void) {
 
     pinMode(TFT_BACKLIGHT, OUTPUT);
     brightness(1023);
+
+    uint16_t calData[5];
+    bool calDataValid = false;
+    for(uint8_t i=0; i<5; i++) {
+        calData[i] = config.calData(i);
+        if(calData[i]) calDataValid = true;
+    }
+    if(calDataValid) tft.setTouch(calData);
 }
 
 void ILI9341::showLogo() {
@@ -623,4 +635,50 @@ void ILI9341::_showForecastWinds() {
             _prevWinds[i] = _winds[i];
         }
     }
+}
+
+void ILI9341::getTouch() {
+    bool pressed = tft.getTouch(&_touchX, &_touchY);
+    if(pressed) {
+        if(digitalRead(SETTINGS_BUTTON_PIN) == 0) _touch_calibrate();
+        else {
+            Serial.print("x,y = ");
+            Serial.print(_touchX);
+            Serial.print(",");
+            Serial.println(_touchY);
+
+            if(_touchX < 143 && _touchY < 80) Serial.println("Clock clicked");
+            if(_touchX > 143 && _touchX < 190 && _touchY < 30) Serial.println("Weekday clicked");
+            if(_touchX > 290 && _touchY < 30) Serial.println("Antenna clicked");
+            if(_touchX > 190 && _touchX < 290 && _touchY > 30 && _touchY < 80) Serial.println("History in clicked");
+            if(_touchX < 290 && _touchY > 80 && _touchY < 165) Serial.println("History out clicked");
+            if(_touchX > 290 && _touchY > 80 && _touchY < 165) Serial.println("Alarm clicked");
+            if(_touchX < 106 && _touchY > 165) Serial.println("Forecast1 clicked");
+            if(_touchX > 106 && _touchX < 212 && _touchY > 165) Serial.println("Forecast2 clicked");
+            if(_touchX > 212 && _touchY > 165) Serial.println("Forecast3 clicked");
+        }
+    }
+}
+
+void ILI9341::_touch_calibrate() {
+    uint16_t calData[5];
+
+    tft.fillScreen(TFT_BLACK);
+    _printText(0, 110, 319, 22, lang.touchCalibrate(), FONT1, CENTER, TEXT_COLOR);
+    tft.calibrateTouch(calData, TFT_MAGENTA, TFT_BLACK, 15);
+
+    String json = "{\"calData\":[";
+    json += String(calData[0]) + ",";
+    json += String(calData[1]) + ",";
+    json += String(calData[2]) + ",";
+    json += String(calData[3]) + ",";
+    json += String(calData[4]);
+    json += "]}";
+    File file = LittleFS.open("/touch.json", FILE_WRITE);
+    file.print(json);
+    file.close();
+
+    _printText(0, 110, 319, 22, lang.calibrationDone(), FONT1, CENTER, TEXT_COLOR);
+    vTaskDelay(1000);
+    ESP.restart();
 }

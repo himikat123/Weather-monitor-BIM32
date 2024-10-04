@@ -116,6 +116,8 @@ class Configuration {
     #define MQTT_TOPICS 12
 
     private:
+    // Touch calibration data
+    uint16_t _calData[5] = { 0, 0, 0, 0, 0 };
 
     // Comfort
     unsigned int _comfort_temp_source = 0; // Comfort temperature source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-SHT21, 7-DHT22, 8-DS18B20, 9-BME680
@@ -677,11 +679,38 @@ class Configuration {
             }
         }
         else Serial.println(" No user file found");
+
+        /* Read touch calibration file */
+        if(_display_type[0] == LCD && _display_model[0] == D_ILI9341) {
+            Serial.println(SEPARATOR);
+            Serial.print("Read touch calibration file... ");
+            file = LittleFS.open("/touch.json");
+            if(file) {
+                while(file.available()) {
+                    String json = file.readString();
+                    JsonDocument conf;
+                    DeserializationError error = deserializeJson(conf, json);
+                    if(!error) {
+                        for(uint8_t i=0; i<5; i++) {
+                            COPYNUM(conf["calData"][i], _calData[i]);
+                        }
+                        Serial.println("done");
+                    }
+                    else Serial.println(" Touch calibration file corrupted");
+                }
+            }
+            else Serial.println(" No touch calibration file found");
+        }
     }
   
     /**
      * Getters
      */
+
+    uint16_t calData(uint8_t num) {
+        if(num > 4) return 0;
+        return _calData[num];
+    }
 
     char* network_ssid(unsigned int num) {
         if(num >= NETWORKS) return (char*) "";
