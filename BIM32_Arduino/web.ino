@@ -173,6 +173,8 @@ String web_getContentType(String filename) {
   else if(filename.endsWith(".json")) return "text/json";
   else if(filename.endsWith(".jpg"))  return "image/jpeg";
   else if(filename.endsWith(".png"))  return "image/png";
+  else if(filename.endsWith(".css"))  return "text/css";
+  else if(filename.endsWith(".js"))  return "application/javascript";
   else if(filename.endsWith(".gz"))   return "application/x-gzip";
   return "text/plain";
 }
@@ -198,7 +200,7 @@ bool web_fileRead(String path) {
  * Check if the user is logged in and sends the requested file, otherwise sends the login page
  */
 bool web_getFile(String path) {
-    if(path.endsWith(".json") or path.endsWith(".jpg") or path.endsWith(".png") or path.endsWith(".vlw")) {
+    if(path.endsWith(".json") or path.endsWith(".jpg") or path.endsWith(".png")) {
         if(!web_isLogged(false)) {
             if(path.endsWith(".json")) {
                 server.send(200, "application/json", "{\"lang\": \"" + config.lang() + "\", \"state\": \"LOGIN\"}");
@@ -206,7 +208,9 @@ bool web_getFile(String path) {
             }
         }
     }
-    else path = "/index.html";
+    else {
+        if(!path.endsWith(".css") && !path.endsWith(".js")) path = "/index.html";
+    }
     return web_fileRead(path);
 }
 
