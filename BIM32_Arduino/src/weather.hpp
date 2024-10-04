@@ -435,32 +435,50 @@ void Weather::_updateOpenMeteoHourly() {
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientHourly.getString();
         //Serial.println(httpData);
-        JsonDocument forecast;
-        DeserializationError errorForecast = deserializeJson(forecast, httpData);
-        if(errorForecast) {
-            Serial.println("Open-meteo.com: hourly forecast deserialization error");
-            return;
-        }
-        uint8_t n = 0;
-        for(unsigned int i=0; i<144; i++) {
-            time_t time = forecast["hourly"]["time"][i] | 0;
-            time_t utc = forecast["utc_offset_seconds"] | 0;
-            uint8_t hr = hour(time + utc);
-            if(hr == 0 or hr == 3 or hr == 6 or hr == 9 or hr == 12 or hr == 15 or hr == 18 or hr == 21) {
-                if((time + utc) >= now()) {
-                    _hourlyDate[n] = forecast["hourly"]["time"][i] | 0;
-                    _hourlyDate[n] += utc;
-                    _hourlyTemp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
-                    _hourlyPres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
-                    _hourlyWindSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
-                    _hourlyWindDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
-                    _hourlyPrec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
-                    _hourlyIcon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
+        JsonDocument filter[7];
+        filter[0]["utc_offset_seconds"] = true;
+        filter[0]["hourly"]["time"] = true;
+        filter[1]["hourly"]["temperature_2m"] = true;
+        filter[2]["hourly"]["precipitation_probability"] = true;
+        filter[3]["hourly"]["weather_code"] = true;
+        filter[4]["hourly"]["surface_pressure"] = true;
+        filter[5]["hourly"]["wind_speed_10m"] = true;
+        filter[6]["hourly"]["wind_direction_10m"] = true;
+        uint8_t timePoint[48];
+        for(uint8_t f=0; f<7; f++) {
+            JsonDocument forecast;
+            DeserializationError errorForecast = deserializeJson(forecast, httpData, DeserializationOption::Filter(filter[f]));
+            if(errorForecast) {
+                Serial.print("Open-meteo.com: hourly forecast " + String(f) + " deserialization error: ");
+                return;
+            }
+            uint8_t n = 0;
+            for(uint8_t i=0; i<144; i++) {
+                if(f == 0) {
+                    time_t time = forecast["hourly"]["time"][i] | 0;
+                    time_t utc = forecast["utc_offset_seconds"] | 0;
+                    uint8_t hr = hour(time + utc);
+                    if(hr % 3 == 0 && (time + utc) >= now()) {
+                        _hourlyDate[n] = forecast["hourly"]["time"][i] | 0;
+                        _hourlyDate[n] += utc;
+                        timePoint[n] = i;
+                        if(n<39) n++;
+                        else break;
+                    }
+                }
+                else if(timePoint[n] == i) {
+                    if(f == 1) _hourlyTemp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
+                    if(f == 4) _hourlyPres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
+                    if(f == 5) _hourlyWindSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
+                    if(f == 6) _hourlyWindDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
+                    if(f == 2) _hourlyPrec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
+                    if(f == 3) _hourlyIcon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
                     if(n<39) n++;
                     else break;
-                }
+                }  
             }
         }
+        
         httpData = "";
         _hourlyUpdated = now();
         Serial.print("Open-meteo.com: hourly forecast updated successfully at: ");
