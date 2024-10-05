@@ -54,6 +54,7 @@ class LcdDisplay {
         uint8_t _prevBright = 0;
         uint8_t _prevTHour = 0;
         uint8_t _prevTMinute = 0;
+        uint8_t _prevTSecond = 0;
         uint8_t _prevTWeekday = 0;
         uint8_t _prevTDay = 0;
         uint8_t _prevTMonth = 0;
@@ -94,6 +95,7 @@ class LcdDisplay {
         uint32_t _prevHistoryOutChecksum = 1;
         uint32_t _prevHistoryInChecksum = 1;
         uint32_t _prevAlarmChecksum = 1;
+        uint8_t _prevAlarmOn = 2;
 };
 
 void LcdDisplay::_getData() {

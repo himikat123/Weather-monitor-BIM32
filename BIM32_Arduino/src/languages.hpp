@@ -116,7 +116,7 @@ class Lang {
         String _historyIn[6] = {"Weather indoor history", "Hauswettergeschichte", "История погоды в доме", "Historia pomiarów w pomieszczeniach", "Історія погоди у будинку", "История на времето в дома"};
         String _historyOut[6] = {"Weather outdoor history", "Außenwettergeschichte", "История погоды на улице", "Historia pogody na zewnątrz", "Історія погоди на вулиці", "История на времето навън"};
         String _touchCalibrate[6] = {"Touch corners as indicated", "Berühren Sie die Ecken wie angegeben", "Прикоснитесь к углам, как указано", "Dotknij narożników zgodnie ze wskazaniem", "Торкніться кутів, як зазначено", "Докоснете ъглите, както е показано"};
-        String _calibrationDone[6] = {"Calibration complete. Rebooting...", "Die Kalibrierung ist abgeschlossen. Neustart...", "Калибровка окончена. Перезагрузка...", "Kalibracja została zakończona. Ponowne uruchomienie...", "Калібрування закінчено. Перезавантаження...", "Калибрирането е завършено. Рестартиране..."};
+        String _calibrationDone[6] = {"Calibration complete", "Die Kalibrierung ist abgeschlossen", "Калибровка завершена", "Kalibracja została zakończona", "Калібрування закінчено", "Калибрирането е завършено"};
 
         uint8_t _lang() {
             if(config.lang() == "de") return 1;
