@@ -27,6 +27,11 @@ class ILI9341 : LcdDisplay {
     #define BATTERY_COLOR     0x07E0 // green
     #define BATTERY_LOW_COLOR 0xF800 // red
     #define ANTENNA_COLOR     0x03EF // dark cyan
+    #define WEEKDAY_COLOR     0xFFE0 // yellow
+    #define WEEKEND_COLOR     0xF800 // red
+    #define MONTH_COLOR       0xF400 // orange
+    #define TODAY_COLOR       0x001E // blue
+    #define TODAY_BG_COLOR    0x07DE // light blue
 
     #define PAGE_MAIN         0
     #define PAGE_BIG_CLOCK    1
@@ -62,6 +67,10 @@ class ILI9341 : LcdDisplay {
         time_t _pageSwitchedTime = 0;
         bool _bigClockSkeleton = false;
         bool _smallClockSkeleton = false;
+        bool _calendarSkeleton = false;
+        int _calendarShiftSeconds = 0;
+        int8_t _calendarShiftDirection = 0;
+
 
         void _sequenceSlotSkip();
         void _sequenceSlotNext();
@@ -69,6 +78,8 @@ class ILI9341 : LcdDisplay {
         const byte* _number_picture(uint8_t num);
         uint16_t _number_picture_size(uint8_t num);
         void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color);
+        void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor);
+        void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor, bool valign);
         void _showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color);
         void _showHumidity(int hum, uint16_t x, uint16_t y);
         void _showTime();
@@ -96,9 +107,14 @@ class ILI9341 : LcdDisplay {
         void _showForecastTemps();
         void _showForecastWinds();
         void _closeButton();
+        void _leftButton();
+        void _rightButton();
         void _dateWeekday();
         void _bigClockPage();
         void _smallClockPage();
+        bool _isLeapYear(unsigned int year);
+        uint8_t _numberOfDaysInMonth(uint8_t month, uint16_t year);
+        void _calendarPage();
         void _touch_calibrate();
 };
 
@@ -195,6 +211,7 @@ void ILI9341::refresh() {
         }
         if(_page == PAGE_BIG_CLOCK) _bigClockPage();
         if(_page == PAGE_SMALL_CLOCK) _smallClockPage();
+        if(_page == PAGE_CALENDAR) _calendarPage();
     }
 }
 
@@ -252,6 +269,14 @@ void ILI9341::_showImg(uint16_t x, uint16_t y, const byte img[], uint16_t size) 
 }
 
 void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color) {
+    _printText(x, y, width, height, text, font, align, color, BG_COLOR, false);
+}
+
+void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor) {
+    _printText(x, y, width,  height, text, font, align, color, bgColor, false);
+}
+
+void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor, bool valign) {
     if(_prevFont != font) {
         if(font == FONT1) tft.loadFont(Ubuntu_14);
         else if(font == FONT2) tft.loadFont(Ubuntu_21);
@@ -260,14 +285,15 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
         else if(font == FONT_SEGMENTS_BIG) tft.loadFont(segment_140);
         _prevFont = font;
     }
-    tft.fillRect(x, y, width, height, BG_COLOR);
-    tft.setTextColor(color, BG_COLOR);
+    tft.fillRect(x, y, width, height, bgColor);
+    tft.setTextColor(color, bgColor);
     if(align == CENTER or align == RIGHT) {
         uint16_t w = tft.textWidth(text);
         if(align == RIGHT) x += width - w - 4;
         else x += (width / 2) - (w / 2);
     }
-    tft.setCursor(x, y);
+    uint16_t h = tft.fontHeight();
+    tft.setCursor(x, valign ? (y + height / 2 - h / 2) : y);
     tft.print(text);
 }
 
@@ -671,6 +697,20 @@ void ILI9341::_closeButton() {
     _showImg(289, 0, symb_close, sizeof(symb_close));
 }
 
+/**
+ * Left button
+ */
+void ILI9341::_leftButton() {
+    _showImg(0, 106, symb_left, sizeof(symb_left));
+}
+
+/**
+ * Right button
+ */
+void ILI9341::_rightButton() {
+    _showImg(295, 106, symb_right, sizeof(symb_right));
+}
+
 void ILI9341::_dateWeekday() {
     if(_prevTWeekday != weekday() || _forced) {
         tft.fillRect(29, 0, 261, 36, BG_COLOR);
@@ -758,6 +798,79 @@ void ILI9341::_smallClockPage() {
     _forced = false;
 }
 
+bool ILI9341::_isLeapYear(unsigned int year) {
+	return ((!(year % 4) && (year % 100)) || !(year % 400));
+}
+
+uint8_t ILI9341::_numberOfDaysInMonth(uint8_t month, uint16_t year) {
+    uint8_t daysInMonth = 0;
+    const uint8_t months[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	daysInMonth = month == 2 && _isLeapYear(year) ? 29 : months[month];
+    return daysInMonth;
+}
+
+void ILI9341::_calendarPage() {
+    if(!_calendarSkeleton) {
+        tft.fillScreen(TFT_BLACK);
+        for(uint8_t i=1; i<=7; i++) {
+            String wd = i == 7 ? lang.weekdayShortName(1) : lang.weekdayShortName(i + 1);
+            _printText(i * 36, 40, 36, 26, wd, FONT2, CENTER, i < 7 ? WEEKDAY_COLOR : WEEKEND_COLOR);
+        }
+        _closeButton();
+        _leftButton();
+        _rightButton();
+        _calendarSkeleton = true;
+        _prevCalendarShiftSeconds = -1;
+    }
+
+    time_t shiftSeconds = now() + _calendarShiftSeconds;
+    if(_calendarShiftDirection > 0) {
+        uint8_t daysInMonth = _numberOfDaysInMonth(month(shiftSeconds), year(shiftSeconds)); 
+        time_t secondsUntilNextMonth = (daysInMonth - day(shiftSeconds)) * SECS_PER_DAY + SECS_PER_DAY;
+        _calendarShiftSeconds += secondsUntilNextMonth;
+    }
+    if(_calendarShiftDirection < 0) { 
+        time_t secondsUntilPrevMonth =  day(shiftSeconds) * SECS_PER_DAY + SECS_PER_DAY;
+        _calendarShiftSeconds -= secondsUntilPrevMonth;
+    }
+    shiftSeconds = now() + _calendarShiftSeconds;
+
+    int8_t firstWeekday = 0;
+    for(uint8_t i=0; i<31; i++) {
+        if(day(shiftSeconds - (i * SECS_PER_DAY)) == 1) {
+            firstWeekday = weekday(shiftSeconds - (i * SECS_PER_DAY)) - 1;
+            break;
+        }
+    }
+    firstWeekday -= 1;
+    if(firstWeekday < 0) firstWeekday = 6;
+    uint8_t daysInMonth = _numberOfDaysInMonth(month(shiftSeconds), year(shiftSeconds));
+
+    if(_prevCalendarShiftSeconds != _calendarShiftSeconds || _prevTDay != day()) {
+        String mon = lang.monthFullName(month(shiftSeconds)) + " " + String(year(shiftSeconds));
+        _printText(30, 8, 260, 20, mon, FONT2, CENTER, MONTH_COLOR, BG_COLOR);
+        uint8_t cday = 1;
+        bool clndRun = false;
+        for(uint8_t w=0; w<6; w++) {
+            for(uint8_t d=0; d<7; d++) {
+                bool today = day() == cday && month() == month(shiftSeconds) && year() == year(shiftSeconds);
+                uint16_t tdColor = today ? TODAY_COLOR : (d == 6 ? WEEKEND_COLOR : TEXT_COLOR);
+                uint16_t bgColor = today ? TODAY_BG_COLOR : BG_COLOR;
+                if(firstWeekday == d) clndRun = true;
+                if(cday > daysInMonth) clndRun = false;
+                if(clndRun) {
+                    _printText(d * 36 + 36, w * 28 + 64, 32, 28, String(cday), FONT2, CENTER, tdColor, bgColor, true);
+                    cday++;
+                }
+                else _printText(d * 36 + 36, w * 28 + 64, 32, 28, "  ", FONT2, CENTER, TEXT_COLOR);
+            }
+        }
+    }
+    _prevCalendarShiftSeconds = _calendarShiftSeconds;
+    _prevTDay = day();
+    _calendarShiftDirection = 0;
+}
+
 void ILI9341::getTouch() {
     bool pressed = tft.getTouch(&_touchX, &_touchY);
     if(pressed) {
@@ -771,15 +884,25 @@ void ILI9341::getTouch() {
 
             if(_touchX > 284 && _touchY < 30) {
                 if(_page == PAGE_MAIN) page = PAGE_NETWORK;
-                else page = PAGE_MAIN;
+                else {
+                    page = PAGE_MAIN;
+                    _calendarShiftSeconds = 0;
+                }
             }
+
+            // Main page
             if(_page == PAGE_MAIN) {
                 // Big clock
                 if(_touchX < 140 && _touchY < 80) {
                     page = PAGE_BIG_CLOCK;
                     _bigClockSkeleton = false;
                 }
-                if(_touchX > 145 && _touchX < 180 && _touchY < 33) page = PAGE_CALENDAR;
+                // Calendar
+                if(_touchX > 145 && _touchX < 180 && _touchY < 33) {
+                    page = PAGE_CALENDAR;
+                    _calendarSkeleton = false;
+                }
+                //
                 if(_touchX > 145 && _touchY > 33 && _touchY < 80) page = PAGE_HISTORY_IN;
                 if(_touchX < 284 && _touchY > 81 && _touchY < 160) page = PAGE_HISTORY_OUT;
                 if(_touchX > 284 && _touchY > 130 && _touchY < 162) page = PAGE_ALARM;
@@ -788,6 +911,8 @@ void ILI9341::getTouch() {
                 if(_touchX > 208 && _touchY > 162) Serial.println("Forecast3 clicked");
                 if(_touchY > 162) page = PAGE_HOURLY;
             }
+
+            // Clock page
             if(_page == PAGE_BIG_CLOCK || _page == PAGE_SMALL_CLOCK) {
                 // Big/Small clock switch 
                 if(_touchY > 55 && _touchY < 185) {
@@ -797,6 +922,19 @@ void ILI9341::getTouch() {
                         _smallClockSkeleton = false;
                     }
                 }
+                // Switch to calendar
+                if((_touchX > 40 && _touchX < 250 && _touchY < 36) || _touchY > 188) {
+                    page = PAGE_CALENDAR;
+                    _calendarSkeleton = false;
+                }
+            }
+
+            // Calendar page
+            if(_page == PAGE_CALENDAR) {
+                /* left button */
+                if(_touchX < 32 && _touchY > 100 && _touchY < 136) _calendarShiftDirection = -1;
+                /* right button */
+                if(_touchX > 286 && _touchY > 100 && _touchY < 136) _calendarShiftDirection = 1;
             }
 
             if(_page != page) {
