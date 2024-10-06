@@ -97,8 +97,8 @@ class ILI9341 : LcdDisplay {
         void _showForecastWinds();
         void _closeButton();
         void _dateWeekday();
-        void _showBigClock();
-        void _showSmallClock();
+        void _bigClockPage();
+        void _smallClockPage();
         void _touch_calibrate();
 };
 
@@ -193,8 +193,8 @@ void ILI9341::refresh() {
             _showForecastIcons();
             _sequenceSlotNext();
         }
-        if(_page == PAGE_BIG_CLOCK) _showBigClock();
-        if(_page == PAGE_SMALL_CLOCK) _showSmallClock();
+        if(_page == PAGE_BIG_CLOCK) _bigClockPage();
+        if(_page == PAGE_SMALL_CLOCK) _smallClockPage();
     }
 }
 
@@ -256,8 +256,8 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
         if(font == FONT1) tft.loadFont(Ubuntu_14);
         else if(font == FONT2) tft.loadFont(Ubuntu_21);
         else if(font == FONT3) tft.loadFont(Ubuntu_29);
-        else if(font == FONT_SEGMENTS_SML) tft.loadFont(segment_100);
-        else if(font == FONT_SEGMENTS_BIG) tft.loadFont(segment_150);
+        else if(font == FONT_SEGMENTS_SML) tft.loadFont(segment_96);
+        else if(font == FONT_SEGMENTS_BIG) tft.loadFont(segment_140);
         _prevFont = font;
     }
     tft.fillRect(x, y, width, height, BG_COLOR);
@@ -276,7 +276,7 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
  */
 void ILI9341::_showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
     String buf = validate.temp(temp) ? (String(temp) + "°C") : "--";
-    _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, font == FONT3 ? CENTER : RIGHT, color);
+    _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, CENTER, color);
 }
 
 /**
@@ -369,8 +369,8 @@ void ILI9341::_showWeekdays() {
  */
 void ILI9341::_clockPoints() {
     boolean points = millis() % 1000 > 500;
-    tft.fillCircle(70, 24, 3, points ? CLOCK_COLOR : BG_COLOR);
-    tft.fillCircle(70, 52, 3, points ? CLOCK_COLOR : BG_COLOR);
+    tft.fillSmoothCircle(70, 24, 3, points ? CLOCK_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 52, 3, points ? CLOCK_COLOR : BG_COLOR, BG_COLOR);
 }
 
 /**
@@ -531,7 +531,7 @@ void ILI9341::_showDescription() {
         uint16_t w = tft.textWidth(_description);
         tft.unloadFont();
         _prevFont = 5;
-        _printText(0, 84, 319, 20, _description, w > 316 ? FONT1 : FONT2, CENTER, TEXT_COLOR);
+        _printText(0, 84, 319, 20, _description, w > 319 ? FONT1 : FONT2, CENTER, TEXT_COLOR);
         _prevDescription = _description;
     }
 }
@@ -668,13 +668,13 @@ void ILI9341::_showForecastWinds() {
  * Close button
  */
 void ILI9341::_closeButton() {
-    _showImg(292, 1, symb_close, sizeof(symb_close));
+    _showImg(289, 0, symb_close, sizeof(symb_close));
 }
 
 void ILI9341::_dateWeekday() {
     if(_prevTWeekday != weekday() || _forced) {
         tft.fillRect(29, 0, 261, 36, BG_COLOR);
-        _printText(30, 4, 260, 30, lang.weekdayFullName(weekday()), FONT3, CENTER, TEMPERATURE_COLOR);
+        _printText(30, 8, 259, 30, lang.weekdayFullName(weekday()), FONT3, CENTER, TEMPERATURE_COLOR);
         _prevTWeekday = weekday();
     }
     if(_prevTDay != day() || _prevTMonth != month() || _prevTYear != year() || _forced) {
@@ -682,8 +682,8 @@ void ILI9341::_dateWeekday() {
         if(config.lang() == "en") buf = lang.monthDay(month()) + ", " + String(day()) + " " +  String(year());
         else if(config.lang() == "de") buf = String(day()) + ". " + lang.monthDay(month()) + " " + String(year());
         else buf = String(day()) + " " + lang.monthDay(month()) + " " + String(year());
-        tft.fillRect(0, 200, 319, 36, BG_COLOR);
-        _printText(0, 204, 319, 30, buf, FONT3, CENTER, TEMP_MIN_COLOR);
+        tft.fillRect(0, 198, 319, 40, BG_COLOR);
+        _printText(0, 200, 319, 30, buf, FONT3, CENTER, TEMP_MIN_COLOR);
         _prevTDay = day();
         _prevTMonth = month();
         _prevTYear = year();
@@ -693,7 +693,7 @@ void ILI9341::_dateWeekday() {
 /**
  * Display Big Clock page
  */
-void ILI9341::_showBigClock() {
+void ILI9341::_bigClockPage() {
     if(!_bigClockSkeleton) {
         tft.fillScreen(TFT_BLACK);
         _closeButton();
@@ -701,30 +701,30 @@ void ILI9341::_showBigClock() {
         _forced = true;
     }
     if(_prevTHour != hour() || _forced) {
-        tft.fillRect(0, 56, 152, 122, BG_COLOR);
-        _printText(1, 60, 150, 120, String(hour()), FONT_SEGMENTS_BIG, RIGHT, CLOCK_COLOR);
+        tft.fillRect(0, 66, 160, 124, BG_COLOR);
+        _printText(0, 68, 155, 120, String(hour()), FONT_SEGMENTS_BIG, RIGHT, CLOCK_COLOR);
         _prevTHour = hour();
     }
+
+    boolean points = millis() % 1000 > 500;
+    tft.fillSmoothCircle(164, 98, points ? 6 : 7, points ? CLOCK_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(162, 144, points ? 6 : 7, points ? CLOCK_COLOR : BG_COLOR, BG_COLOR);
+
     if(_prevTMinute != minute() || _forced) {
         char buf[3];
         sprintf(buf, "%02d", minute());
-        tft.fillRect(169, 56, 151, 122, BG_COLOR);
-        _printText(170, 60, 149, 120, String(buf), FONT_SEGMENTS_BIG, LEFT, CLOCK_COLOR);
+        tft.fillRect(172, 66, 143, 122, BG_COLOR);
+        _printText(174, 68, 141, 120, String(buf), FONT_SEGMENTS_BIG, LEFT, CLOCK_COLOR);
         _prevTMinute = minute();
     }
     _dateWeekday();
-
-    boolean points = millis() % 1000 > 500;
-    tft.fillCircle(162, 93, 5, points ? CLOCK_COLOR : BG_COLOR);
-    tft.fillCircle(158, 141, 5, points ? CLOCK_COLOR : BG_COLOR);
-
     _forced = false;
 }
 
 /**
- * Display Big Clock page
+ * Display Small Clock page
  */
-void ILI9341::_showSmallClock() {
+void ILI9341::_smallClockPage() {
     if(!_smallClockSkeleton) {
         tft.fillScreen(TFT_BLACK);
         _closeButton();
@@ -732,26 +732,26 @@ void ILI9341::_showSmallClock() {
         _forced = true;
     }
     if(_prevTHour != hour() || _forced) {
-        tft.fillRect(0, 56, 102, 122, BG_COLOR);
-        _printText(0, 80, 100, 96, String(hour()), FONT_SEGMENTS_SML, RIGHT, CLOCK_COLOR);
-        tft.fillCircle(103, 104, 3, CLOCK_COLOR);
-        tft.fillCircle(101, 132, 3, CLOCK_COLOR);
+        tft.fillRect(1, 80, 106, 2, BG_COLOR);
+        _printText(1, 82, 106, 96, String(hour()), FONT_SEGMENTS_SML, RIGHT, CLOCK_COLOR);
         _prevTHour = hour();
     }
     if(_prevTMinute != minute() || _forced) {
         char buf[3];
         sprintf(buf, "%02d", minute());
-        tft.fillRect(108, 56, 102, 122, BG_COLOR);
-        _printText(109, 80, 100, 96, String(buf), FONT_SEGMENTS_SML, CENTER, CLOCK_COLOR);
-        tft.fillCircle(214, 104, 3, CLOCK_COLOR);
-        tft.fillCircle(212, 132, 3, CLOCK_COLOR);
+        tft.fillRect(108, 80, 106, 2, BG_COLOR);
+        _printText(108, 82, 106, 96, String(buf), FONT_SEGMENTS_SML, CENTER, CLOCK_COLOR);
         _prevTMinute = minute();
     }
     if(_prevTSecond != second() || _forced) {
         char buf[3];
         sprintf(buf, "%02d", second());
-        tft.fillRect(218, 56, 101, 122, BG_COLOR);
-        _printText(219, 80, 100, 96, String(buf), FONT_SEGMENTS_SML, LEFT, CLOCK_COLOR);
+        tft.fillRect(219, 80, 106, 2, BG_COLOR);
+        _printText(219, 82, 106, 96, String(buf), FONT_SEGMENTS_SML, LEFT, CLOCK_COLOR);
+        tft.fillSmoothCircle(112, 100, 3, CLOCK_COLOR, BG_COLOR);
+        tft.fillSmoothCircle(110, 134, 3, CLOCK_COLOR, BG_COLOR);
+        tft.fillSmoothCircle(215, 100, 3, CLOCK_COLOR, BG_COLOR);
+        tft.fillSmoothCircle(213, 134, 3, CLOCK_COLOR, BG_COLOR);
         _prevTSecond = second();
     }
     _dateWeekday();
@@ -769,28 +769,28 @@ void ILI9341::getTouch() {
             Serial.println(_touchY);
             uint8_t page = 100;
 
-            if(_touchX > 290 && _touchY < 30) {
+            if(_touchX > 284 && _touchY < 30) {
                 if(_page == PAGE_MAIN) page = PAGE_NETWORK;
                 else page = PAGE_MAIN;
             }
             if(_page == PAGE_MAIN) {
                 // Big clock
-                if(_touchX < 143 && _touchY < 80) {
+                if(_touchX < 140 && _touchY < 80) {
                     page = PAGE_BIG_CLOCK;
                     _bigClockSkeleton = false;
                 }
-                if(_touchX > 143 && _touchX < 190 && _touchY < 30) page = PAGE_CALENDAR;
-                if(_touchX > 190 && _touchX < 290 && _touchY > 30 && _touchY < 80) page = PAGE_HISTORY_IN;
-                if(_touchX < 290 && _touchY > 80 && _touchY < 165) page = PAGE_HISTORY_OUT;
-                if(_touchX > 290 && _touchY > 80 && _touchY < 165) page = PAGE_ALARM;
-                if(_touchX < 106 && _touchY > 165) Serial.println("Forecast1 clicked");
-                if(_touchX > 106 && _touchX < 212 && _touchY > 165) Serial.println("Forecast2 clicked");
-                if(_touchX > 212 && _touchY > 165) Serial.println("Forecast3 clicked");
-                if(_touchY > 165) page = PAGE_HOURLY;
+                if(_touchX > 145 && _touchX < 180 && _touchY < 33) page = PAGE_CALENDAR;
+                if(_touchX > 145 && _touchY > 33 && _touchY < 80) page = PAGE_HISTORY_IN;
+                if(_touchX < 284 && _touchY > 81 && _touchY < 160) page = PAGE_HISTORY_OUT;
+                if(_touchX > 284 && _touchY > 130 && _touchY < 162) page = PAGE_ALARM;
+                if(_touchX < 106 && _touchY > 162) Serial.println("Forecast1 clicked");
+                if(_touchX > 106 && _touchX < 208 && _touchY > 162) Serial.println("Forecast2 clicked");
+                if(_touchX > 208 && _touchY > 162) Serial.println("Forecast3 clicked");
+                if(_touchY > 162) page = PAGE_HOURLY;
             }
             if(_page == PAGE_BIG_CLOCK || _page == PAGE_SMALL_CLOCK) {
                 // Big/Small clock switch 
-                if(_touchY > 60 && _touchY < 120) {
+                if(_touchY > 55 && _touchY < 185) {
                     if(millis() - _pageSwitchedTime > 1000) {
                         page = _page == PAGE_BIG_CLOCK ? PAGE_SMALL_CLOCK : PAGE_BIG_CLOCK;
                         _bigClockSkeleton = false;
