@@ -32,6 +32,8 @@ class ILI9341 : LcdDisplay {
     #define MONTH_COLOR       0xF400 // orange
     #define TODAY_COLOR       0x001E // blue
     #define TODAY_BG_COLOR    0x07DE // light blue
+    #define FRAME1_COLOR      0x73AE // light gray
+    #define GROUND_COLOR      0x31A6 // dark gray
 
     #define PAGE_MAIN         0
     #define PAGE_BIG_CLOCK    1
@@ -65,6 +67,7 @@ class ILI9341 : LcdDisplay {
         uint16_t _touchY = 0;
         uint8_t _page = PAGE_MAIN;
         time_t _pageSwitchedTime = 0;
+        bool _networkSkeleton = false;
         bool _bigClockSkeleton = false;
         bool _smallClockSkeleton = false;
         bool _calendarSkeleton = false;
@@ -110,6 +113,7 @@ class ILI9341 : LcdDisplay {
         void _leftButton();
         void _rightButton();
         void _dateWeekday();
+        void _networkPage();
         void _bigClockPage();
         void _smallClockPage();
         bool _isLeapYear(unsigned int year);
@@ -125,6 +129,7 @@ void ILI9341::init(void) {
     tft.begin();
     tft.setRotation(3);
     tft.setSwapBytes(true);
+    tft.setTextWrap(false, false);
 
     pinMode(TFT_BACKLIGHT, OUTPUT);
     brightness(1023);
@@ -209,6 +214,7 @@ void ILI9341::refresh() {
             _showForecastIcons();
             _sequenceSlotNext();
         }
+        if(_page == PAGE_NETWORK) _networkPage();
         if(_page == PAGE_BIG_CLOCK) _bigClockPage();
         if(_page == PAGE_SMALL_CLOCK) _smallClockPage();
         if(_page == PAGE_CALENDAR) _calendarPage();
@@ -731,6 +737,65 @@ void ILI9341::_dateWeekday() {
 }
 
 /**
+ * Display Netoerk page
+ */
+void ILI9341::_networkPage() {
+    const uint8_t x = 160, y = 2, sl = 6, w = 150;
+    const uint8_t sr = x + sl;
+
+    if(!_networkSkeleton) {
+        tft.fillScreen(TFT_BLACK);
+        _closeButton();
+        _networkSkeleton = true;
+        _forced = true;
+        tft.fillRect(48, 10, 226, 39, FRAME1_COLOR);
+        tft.fillRect(50, 12, 222, 35, GROUND_COLOR);
+        _printText(50, 17, 222, 28, "WiFi", FONT3, CENTER, TEXT_COLOR, GROUND_COLOR);
+
+        for(uint8_t i=0; i<2; i++) {
+            for(uint8_t k=0; k<6; k++) {
+                tft.fillRect(i * x + 4, k * 30 + 60, 154, 24, FRAME1_COLOR);
+                tft.fillRect(i * x + sl, k * 30 + 62, w, 20, GROUND_COLOR);
+            }
+        }
+        _printText(sl, 64 + y, w, 12, lang.network(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+        _printText(sl, 94 + y, w, 12, lang.signalLevel(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+        _printText(sl, 124 + y, w, 12, lang.ipAddr(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+        _printText(sl, 154 + y, w, 12, lang.macAddr(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+        _printText(sl, 185 + y, w, 12, lang.esp32Temp(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+        _printText(sl, 214 + y, w, 12, lang.firmware(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    }
+
+    String ssid = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();;
+    String rssi = global.apMode ? "100%" : String(_rssi) + "dBm";
+    String ip = global.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();;
+    String mac = global.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
+    float esp32Temp = sensors.get_esp32_temp(RAW);
+    String fw = FW;
+
+    if(_prevNetSsid != ssid || _forced) 
+        _printText(sr, 64 + y, w, 12, ssid, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    if(_prevNetRssi != rssi || _forced) 
+        _printText(sr, 94 + y, w, 12, rssi, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    if(_prevNetIp != ip || _forced) 
+        _printText(sr, 124 + y, w, 12, ip, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    if(_prevNetMac != mac || _forced) 
+        _printText(sr, 154 + y, w, 12, mac, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    if(_prevNetTemp != esp32Temp || _forced) 
+        _printText(sr, 184 + y, w, 12, String((int)round(esp32Temp)) + "°C", FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    if(_prevNetFw != fw || _forced) 
+        _printText(sr, 214 + y, w, 12, fw, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+
+    _prevNetSsid = ssid;
+    _prevNetRssi = rssi;
+    _prevNetIp = ip;
+    _prevNetMac = mac;
+    _prevNetTemp = esp32Temp;
+    _prevNetFw = fw;
+    _forced = false;
+}
+
+/**
  * Display Big Clock page
  */
 void ILI9341::_bigClockPage() {
@@ -883,21 +948,28 @@ void ILI9341::getTouch() {
             uint8_t page = 100;
 
             if(_touchX > 284 && _touchY < 30) {
-                if(_page == PAGE_MAIN) page = PAGE_NETWORK;
-                else {
+                // Switch to Network page
+                if(_page == PAGE_MAIN) {
+                    if(millis() - _pageSwitchedTime > 1000) {
+                        page = PAGE_NETWORK;
+                        _networkSkeleton = false;
+                    }
+                }
+                // Switch to Main page
+                else if(millis() - _pageSwitchedTime > 1000) {
                     page = PAGE_MAIN;
                     _calendarShiftSeconds = 0;
                 }
             }
 
-            // Main page
+            // On the Main page
             if(_page == PAGE_MAIN) {
-                // Big clock
+                // Switch to Big clock page
                 if(_touchX < 140 && _touchY < 80) {
                     page = PAGE_BIG_CLOCK;
                     _bigClockSkeleton = false;
                 }
-                // Calendar
+                // Switch to Calendar page
                 if(_touchX > 145 && _touchX < 180 && _touchY < 33) {
                     page = PAGE_CALENDAR;
                     _calendarSkeleton = false;
@@ -912,7 +984,7 @@ void ILI9341::getTouch() {
                 if(_touchY > 162) page = PAGE_HOURLY;
             }
 
-            // Clock page
+            // On the Clock page
             if(_page == PAGE_BIG_CLOCK || _page == PAGE_SMALL_CLOCK) {
                 // Big/Small clock switch 
                 if(_touchY > 55 && _touchY < 185) {
@@ -922,14 +994,14 @@ void ILI9341::getTouch() {
                         _smallClockSkeleton = false;
                     }
                 }
-                // Switch to calendar
+                // Switch to calendar page
                 if((_touchX > 40 && _touchX < 250 && _touchY < 36) || _touchY > 188) {
                     page = PAGE_CALENDAR;
                     _calendarSkeleton = false;
                 }
             }
 
-            // Calendar page
+            // On the Calendar page
             if(_page == PAGE_CALENDAR) {
                 /* left button */
                 if(_touchX < 32 && _touchY > 100 && _touchY < 136) _calendarShiftDirection = -1;
