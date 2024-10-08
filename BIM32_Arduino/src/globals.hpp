@@ -385,10 +385,10 @@ class Configuration {
         File file = LittleFS.open("/config.json");
         if(file) {
             while(file.available()) {
-                String json = file.readString();
+                //String json = file.readString();
                 JsonDocument conf;
 
-                DeserializationError error = deserializeJson(conf, json);
+                DeserializationError error = deserializeJson(conf, /*json*/ file);
                 if(!error) {
                     //WiFi network
                     for(unsigned int i=0; i<NETWORKS; i++) {
@@ -637,7 +637,6 @@ class Configuration {
         else Serial.println(" No configuration file found");
 
         /* Read alarm file */
-        Serial.println(SEPARATOR);
         Serial.print("Read alarm file... ");
         file = LittleFS.open("/alarm.json");
         if(file) {
@@ -663,7 +662,6 @@ class Configuration {
         else Serial.println(" No alarm file found");
 
         /* Read user file */
-        Serial.println(SEPARATOR);
         Serial.print("Read user file... ");
         file = LittleFS.open("/user.us");
         if(file) {
@@ -682,7 +680,6 @@ class Configuration {
 
         /* Read touch calibration file */
         if(_display_type[0] == LCD && _display_model[0] == D_ILI9341) {
-            Serial.println(SEPARATOR);
             Serial.print("Read touch calibration file... ");
             file = LittleFS.open("/touch.json");
             if(file) {

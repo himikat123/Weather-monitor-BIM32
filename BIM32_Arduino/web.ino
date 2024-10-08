@@ -40,115 +40,6 @@ void web_listAllFilesInDir(String dirname) {
 }
 
 /**
- * Prepare sensors data
- */
-String web_sensorsPrepare(bool logged) {
-    JsonDocument json;
-    json["state"] = logged ? "OK" : "LOGIN";
-    json["fw"] = FW;
-    json["runtime"] = round(millis() / 1000);
-    json["heap"] = ESP.getFreeHeap();
-    json["time"] = now();
-
-    for(unsigned int i=0; i<global.nets; i++) {
-        json["ssids"][i][0] = global.ssids[i];
-        json["ssids"][i][1] = global.rssis[i];  
-    }
-    json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
-    json["network"]["ch"] = WiFi.channel();
-    json["network"]["sig"] = WiFi.RSSI();
-    json["network"]["mac"] = WiFi.macAddress();
-    json["network"]["ip"] = WiFi.localIP().toString();
-    json["network"]["mask"] = WiFi.subnetMask().toString();
-    json["network"]["gw"] = WiFi.gatewayIP().toString();
-    json["network"]["dns1"] = WiFi.dnsIP().toString();
-    json["network"]["dns2"] = WiFi.dnsIP().toString();
-
-    json["bme280"]["temp"] = sensors.get_bme280_temp(RAW);
-    json["bme280"]["hum"] = sensors.get_bme280_hum(RAW);
-    json["bme280"]["pres"] = sensors.get_bme280_pres(RAW);
-    json["bmp180"]["temp"] = sensors.get_bmp180_temp(RAW);
-    json["bmp180"]["pres"] = sensors.get_bmp180_pres(RAW);
-    json["sht21"]["temp"] = sensors.get_sht21_temp(RAW);
-    json["sht21"]["hum"] = sensors.get_sht21_hum(RAW);
-    json["dht22"]["temp"] = sensors.get_dht22_temp(RAW);
-    json["dht22"]["hum"] = sensors.get_dht22_hum(RAW);
-    json["esp32"]["temp"] = sensors.get_esp32_temp(RAW);
-    json["ds18b20"]["temp"] = sensors.get_ds18b20_temp(RAW);
-    json["max44009"]["light"] = sensors.get_max44009_light(RAW);
-    json["bh1750"]["light"] = sensors.get_bh1750_light(RAW);
-    json["analog"]["volt"] = sensors.get_analog_voltage(RAW);
-    json["bme680"]["temp"] = sensors.get_bme680_temp(RAW);
-    json["bme680"]["hum"] = sensors.get_bme680_hum(RAW);
-    json["bme680"]["pres"] = sensors.get_bme680_pres(RAW);
-    json["bme680"]["iaq"] = sensors.get_bme680_iaq(RAW);
-    json["bme680"]["iaqAccr"] = sensors.get_bme680_iaq_accuracy();
-
-    json["thing"]["time"] = thingspeak.get_updated();
-    for(unsigned int i=0; i<THNG_FIELDS; i++) {
-        json["thing"]["data"][i] = thingspeak.get_field(i);
-    }
-
-    json["weather"]["temp"] = weather.get_currentTemp();
-    json["weather"]["hum"] = weather.get_currentHum();
-    json["weather"]["pres"] = weather.get_currentPres();
-    json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
-    json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
-    json["weather"]["descript"] = weather.get_description();
-    json["weather"]["time"] = weather.get_currentUpdated();
-    json["weather"]["icon"] = weather.get_currentIcon();
-    json["weather"]["isDay"] = weather.get_isDay();
-    for(uint8_t i=0; i<4; i++) {
-        json["weather"]["daily"]["tMax"][i] = weather.get_dailyDayTemp(i);
-        json["weather"]["daily"]["tMin"][i] = weather.get_dailyNightTemp(i);
-        json["weather"]["daily"]["wind"][i] = weather.get_dailyWindSpeed(i);
-        json["weather"]["daily"]["icon"][i] = weather.get_dailyIcon(i);
-    }
-
-    for(unsigned int i=0; i<WSENSORS; i++) {
-        json["wsensor"]["time"][i] = wsensor.get_updated(i);
-        for(unsigned int n=0; n<5; n++) {
-            json["wsensor"]["temp"]["data"][n][i] = wsensor.get_temperature(i, n, RAW);
-            json["wsensor"]["temp"]["name"][n][i] = wsensor.get_sensorType(i, n);
-        }
-        json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, RAW);
-        json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, 0);
-        json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, RAW);
-        json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, 0);
-        json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, RAW);
-        json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
-        json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, RAW);
-        json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType();
-        json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, RAW);
-        json["wsensor"]["current"]["name"][i] = wsensor.get_energyType();
-        json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, RAW);
-        json["wsensor"]["power"]["name"][i] = wsensor.get_energyType();
-        json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, RAW);
-        json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType();
-        json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, RAW);
-        json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType();
-        json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, RAW);
-        json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type();
-        json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
-    }
-
-    if(global.fsInfoUpdate) {
-        web_filelist = String();
-        web_listAllFilesInDir("/");
-        fsTotal = LittleFS.totalBytes();
-        fsUsed = fsTotal - LittleFS.usedBytes();
-        global.fsInfoUpdate = false;
-    }
-    json["fs"]["list"] = web_filelist;
-    json["fs"]["total"] = fsTotal;
-    json["fs"]["free"] = fsUsed;
-
-    String data = "";
-    serializeJson(json, data);
-    return data;
-}
-
-/**
  * Check if the user is logged in
  */
 bool web_isLogged(bool answer) {
@@ -287,7 +178,110 @@ void web_save_alarm() {
  * Send sensors data via AJAX
  */
 void web_sens() {
-    server.send(200, "application/json", web_sensorsPrepare(web_isLogged(false)));
+    JsonDocument json;
+    json["state"] = web_isLogged(false) ? "OK" : "LOGIN";
+    json["fw"] = FW;
+    json["runtime"] = round(millis() / 1000);
+    json["heap"] = ESP.getFreeHeap();
+    json["time"] = now();
+
+    for(unsigned int i=0; i<global.nets; i++) {
+        json["ssids"][i][0] = global.ssids[i];
+        json["ssids"][i][1] = global.rssis[i];  
+    }
+    json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
+    json["network"]["ch"] = WiFi.channel();
+    json["network"]["sig"] = WiFi.RSSI();
+    json["network"]["mac"] = WiFi.macAddress();
+    json["network"]["ip"] = WiFi.localIP().toString();
+    json["network"]["mask"] = WiFi.subnetMask().toString();
+    json["network"]["gw"] = WiFi.gatewayIP().toString();
+    json["network"]["dns1"] = WiFi.dnsIP().toString();
+    json["network"]["dns2"] = WiFi.dnsIP().toString();
+
+    json["bme280"]["temp"] = sensors.get_bme280_temp(RAW);
+    json["bme280"]["hum"] = sensors.get_bme280_hum(RAW);
+    json["bme280"]["pres"] = sensors.get_bme280_pres(RAW);
+    json["bmp180"]["temp"] = sensors.get_bmp180_temp(RAW);
+    json["bmp180"]["pres"] = sensors.get_bmp180_pres(RAW);
+    json["sht21"]["temp"] = sensors.get_sht21_temp(RAW);
+    json["sht21"]["hum"] = sensors.get_sht21_hum(RAW);
+    json["dht22"]["temp"] = sensors.get_dht22_temp(RAW);
+    json["dht22"]["hum"] = sensors.get_dht22_hum(RAW);
+    json["esp32"]["temp"] = sensors.get_esp32_temp(RAW);
+    json["ds18b20"]["temp"] = sensors.get_ds18b20_temp(RAW);
+    json["max44009"]["light"] = sensors.get_max44009_light(RAW);
+    json["bh1750"]["light"] = sensors.get_bh1750_light(RAW);
+    json["analog"]["volt"] = sensors.get_analog_voltage(RAW);
+    json["bme680"]["temp"] = sensors.get_bme680_temp(RAW);
+    json["bme680"]["hum"] = sensors.get_bme680_hum(RAW);
+    json["bme680"]["pres"] = sensors.get_bme680_pres(RAW);
+    json["bme680"]["iaq"] = sensors.get_bme680_iaq(RAW);
+    json["bme680"]["iaqAccr"] = sensors.get_bme680_iaq_accuracy();
+
+    json["thing"]["time"] = thingspeak.get_updated();
+    for(unsigned int i=0; i<THNG_FIELDS; i++) {
+        json["thing"]["data"][i] = thingspeak.get_field(i);
+    }
+
+    json["weather"]["temp"] = weather.get_currentTemp();
+    json["weather"]["hum"] = weather.get_currentHum();
+    json["weather"]["pres"] = weather.get_currentPres();
+    json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
+    json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
+    json["weather"]["descript"] = weather.get_description();
+    json["weather"]["time"] = weather.get_currentUpdated();
+    json["weather"]["icon"] = weather.get_currentIcon();
+    json["weather"]["isDay"] = weather.get_isDay();
+    for(uint8_t i=0; i<4; i++) {
+        json["weather"]["daily"]["tMax"][i] = weather.get_dailyDayTemp(i);
+        json["weather"]["daily"]["tMin"][i] = weather.get_dailyNightTemp(i);
+        json["weather"]["daily"]["wind"][i] = weather.get_dailyWindSpeed(i);
+        json["weather"]["daily"]["icon"][i] = weather.get_dailyIcon(i);
+    }
+
+    for(unsigned int i=0; i<WSENSORS; i++) {
+        json["wsensor"]["time"][i] = wsensor.get_updated(i);
+        for(unsigned int n=0; n<5; n++) {
+            json["wsensor"]["temp"]["data"][n][i] = wsensor.get_temperature(i, n, RAW);
+            json["wsensor"]["temp"]["name"][n][i] = wsensor.get_sensorType(i, n);
+        }
+        json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, RAW);
+        json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, 0);
+        json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, RAW);
+        json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, 0);
+        json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, RAW);
+        json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
+        json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, RAW);
+        json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType();
+        json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, RAW);
+        json["wsensor"]["current"]["name"][i] = wsensor.get_energyType();
+        json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, RAW);
+        json["wsensor"]["power"]["name"][i] = wsensor.get_energyType();
+        json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, RAW);
+        json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType();
+        json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, RAW);
+        json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType();
+        json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, RAW);
+        json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type();
+        json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
+    }
+
+    if(global.fsInfoUpdate) {
+        web_filelist = String();
+        web_listAllFilesInDir("/");
+        fsTotal = LittleFS.totalBytes();
+        fsUsed = fsTotal - LittleFS.usedBytes();
+        global.fsInfoUpdate = false;
+    }
+    json["fs"]["list"] = web_filelist;
+    json["fs"]["total"] = fsTotal;
+    json["fs"]["free"] = fsUsed;
+
+    String data = "";
+    serializeJson(json, data);
+
+    server.send(200, "application/json", data);
 }
 
 /**
