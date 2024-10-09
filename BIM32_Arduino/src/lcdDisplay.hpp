@@ -48,6 +48,7 @@ class LcdDisplay {
         uint32_t _historyOutChecksum = 0;
         uint32_t _historyInChecksum = 0;
         uint32_t _alarmChecksum = 0;
+        int _hourlyShift = 0;
 
         bool _prevPower = false;
         time_t _prevForced = 0;
@@ -96,6 +97,7 @@ class LcdDisplay {
         uint32_t _prevHistoryInChecksum = 1;
         uint32_t _prevAlarmChecksum = 1;
         uint8_t _prevAlarmOn = 2;
+        int _prevHourlyShift = -1;
         int _prevCalendarShiftSeconds = -1;
 };
 

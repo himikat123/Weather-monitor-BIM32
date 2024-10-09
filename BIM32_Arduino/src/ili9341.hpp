@@ -15,6 +15,8 @@ class ILI9341 : LcdDisplay {
     #define FONT3             2
     #define FONT_SEGMENTS_BIG 3
     #define FONT_SEGMENTS_SML 4
+    #define FONT_SMALL        5
+    #define FONT_TINY         6
 
     #define BG_COLOR          0x0000 // black
     #define FRAME_COLOR       0x001F // blue
@@ -34,6 +36,7 @@ class ILI9341 : LcdDisplay {
     #define TODAY_BG_COLOR    0x07DE // light blue
     #define FRAME1_COLOR      0x73AE // light gray
     #define GROUND_COLOR      0x31A6 // dark gray
+    #define GRID_COLOR        0x4a69 // gray
 
     #define PAGE_MAIN         0
     #define PAGE_BIG_CLOCK    1
@@ -44,6 +47,10 @@ class ILI9341 : LcdDisplay {
     #define PAGE_HISTORY_OUT  6
     #define PAGE_HISTORY_IN   7
     #define PAGE_ALARM        8
+
+    #define HOURLY      0
+    #define HISTORY_OUT 1
+    #define HISTORY_IN  2
 
     public:
         void init();
@@ -71,8 +78,14 @@ class ILI9341 : LcdDisplay {
         bool _bigClockSkeleton = false;
         bool _smallClockSkeleton = false;
         bool _calendarSkeleton = false;
+        bool _hourlySkeleton = false;
         int _calendarShiftSeconds = 0;
         int8_t _calendarShiftDirection = 0;
+        float _hrTemp[8]; 
+        float _hrHum[8]; 
+        float _hrPres[8];
+        float _hrPrec[8];
+        time_t _hrDate[8];
 
 
         void _sequenceSlotSkip();
@@ -110,8 +123,8 @@ class ILI9341 : LcdDisplay {
         void _showForecastTemps();
         void _showForecastWinds();
         void _closeButton();
-        void _leftButton();
-        void _rightButton();
+        void _leftButton(bool show);
+        void _rightButton(bool show);
         void _dateWeekday();
         void _networkPage();
         void _bigClockPage();
@@ -119,6 +132,9 @@ class ILI9341 : LcdDisplay {
         bool _isLeapYear(unsigned int year);
         uint8_t _numberOfDaysInMonth(uint8_t month, uint16_t year);
         void _calendarPage();
+        void _hourlyPage();
+        void _hHourlyColumn(uint8_t num, uint8_t type);
+        void _displayLcdHourlyCharts(uint8_t type);
         void _touch_calibrate();
 };
 
@@ -218,6 +234,7 @@ void ILI9341::refresh() {
         if(_page == PAGE_BIG_CLOCK) _bigClockPage();
         if(_page == PAGE_SMALL_CLOCK) _smallClockPage();
         if(_page == PAGE_CALENDAR) _calendarPage();
+        if(_page == PAGE_HOURLY) _hourlyPage();
     }
 }
 
@@ -284,7 +301,9 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
 
 void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor, bool valign) {
     if(_prevFont != font) {
-        if(font == FONT1) tft.loadFont(Ubuntu_14);
+        if(font == FONT_TINY) tft.loadFont(Ubuntu_9);
+        else if(font == FONT_SMALL) tft.loadFont(Ubuntu_11);
+        else if(font == FONT1) tft.loadFont(Ubuntu_14);
         else if(font == FONT2) tft.loadFont(Ubuntu_21);
         else if(font == FONT3) tft.loadFont(Ubuntu_29);
         else if(font == FONT_SEGMENTS_SML) tft.loadFont(segment_96);
@@ -706,15 +725,17 @@ void ILI9341::_closeButton() {
 /**
  * Left button
  */
-void ILI9341::_leftButton() {
-    _showImg(0, 106, symb_left, sizeof(symb_left));
+void ILI9341::_leftButton(bool show) {
+    if(show) _showImg(0, 106, symb_left, sizeof(symb_left));
+    else tft.fillRect(0, 106, 24, 24, BG_COLOR);
 }
 
 /**
  * Right button
  */
-void ILI9341::_rightButton() {
-    _showImg(295, 106, symb_right, sizeof(symb_right));
+void ILI9341::_rightButton(bool show) {
+    if(show) _showImg(295, 106, symb_right, sizeof(symb_right));
+    else tft.fillRect(295, 106, 24, 24, BG_COLOR);
 }
 
 void ILI9341::_dateWeekday() {
@@ -882,8 +903,8 @@ void ILI9341::_calendarPage() {
             _printText(i * 36, 40, 36, 26, wd, FONT2, CENTER, i < 7 ? WEEKDAY_COLOR : WEEKEND_COLOR);
         }
         _closeButton();
-        _leftButton();
-        _rightButton();
+        _leftButton(true);
+        _rightButton(true);
         _calendarSkeleton = true;
         _prevCalendarShiftSeconds = -1;
     }
@@ -936,6 +957,163 @@ void ILI9341::_calendarPage() {
     _calendarShiftDirection = 0;
 }
 
+void ILI9341::_hourlyPage() {
+    if(!_hourlySkeleton) {
+        tft.fillScreen(TFT_BLACK);
+        _closeButton();
+        _hourlySkeleton = true;
+        _forced = true;
+    }
+
+    if(_prevHourlyChecksum != _hourlyChecksum || _prevHourlyShift != _hourlyShift || _forced) {
+        for(uint8_t i=0; i<8; i++) {
+            _hrTemp[i] = weather.get_hourlyTemp(i + _hourlyShift);
+            _hrHum[i] = 0;
+            _hrPres[i] = weather.get_hourlyPres(i + _hourlyShift);
+            _hrPrec[i] = weather.get_hourlyPrec(i + _hourlyShift);
+            _hrDate[i] = weather.get_hourlyDate(i + _hourlyShift);
+            _hHourlyColumn(i, HOURLY);
+        }
+        _displayLcdHourlyCharts(HOURLY);
+        _rightButton(_hourlyShift < 32);
+        _leftButton(_hourlyShift > 0);
+        _prevHourlyChecksum = _hourlyChecksum;
+        _prevHourlyShift = _hourlyShift;
+    }
+
+    _forced = false;
+}
+
+void ILI9341::_hHourlyColumn(uint8_t num, uint8_t type) {
+    uint16_t x = num * 32 + 30, y = 86;
+    uint16_t s = num + _hourlyShift;
+    char buf[10];
+    tft.fillRect(x, y, 32, 239 - y, BG_COLOR);
+
+    if(validate.temp(_hrTemp[num])) sprintf(buf, "%.1f°", _hrTemp[num]);
+    else sprintf(buf, "--°");
+    _printText(x, y, 32, 12, String(buf), FONT_SMALL, CENTER, TEMPERATURE_COLOR);
+    y += 16;
+
+    if(type == HISTORY_IN || type == HISTORY_OUT) {
+        String h = validate.hum(_hrHum[num]) ? String((int)round(_hrHum[num])) : "--";
+        _printText(x, y, 32, 12, h + "%", FONT_SMALL, CENTER, HUMIDITY_COLOR);
+        y += 14;
+    }
+
+    if(type == HOURLY || type == HISTORY_OUT) {
+        String p = validate.pres(_hrPres[num]) ? String((int)round(_hrPres[num] * 0.75)) : "--";
+        _printText(x, y, 32, 12, p + lang.mm(), FONT_TINY, CENTER, PRESSURE_COLOR);
+        y += 14;
+    }
+
+    if(type == HOURLY) {
+        y -= 4;
+        switch(weather.get_hourlyIcon(s)) {
+            case 1: _showImg(x, y + 4, icon_tiny_01, sizeof(icon_tiny_01)); break;
+            case 2: _showImg(x, y + 4, icon_tiny_02, sizeof(icon_tiny_02)); break;
+            case 3: _showImg(x, y + 4, icon_tiny_02, sizeof(icon_tiny_02)); break;
+            case 4: _showImg(x, y + 4, icon_tiny_04, sizeof(icon_tiny_04)); break;
+            case 9: _showImg(x, y + 4, icon_tiny_09, sizeof(icon_tiny_09)); break;
+            case 10: _showImg(x, y + 4, icon_tiny_10, sizeof(icon_tiny_10)); break;
+            case 11: _showImg(x, y + 4, icon_tiny_11, sizeof(icon_tiny_11)); break;
+            case 13: _showImg(x, y + 4, icon_tiny_13, sizeof(icon_tiny_13)); break;
+            case 50: _showImg(x, y + 4, icon_tiny_50, sizeof(icon_tiny_50)); break;
+            default: _showImg(x, y + 4, icon_tiny_loading, sizeof(icon_tiny_loading)); break;
+        }
+        y += 40;
+
+        //String wd = lang.weekdayShortName(weekday(weather.get_hourlyDate(s)));
+        String wd = lang.weekdayShortName(weekday(_hrDate[num]));
+        _printText(x, y, 32, 18, wd, FONT1, CENTER, TEXT_COLOR);
+        y += 20;
+    }
+
+    uint8_t dt = day(_hrDate[num]);
+    String mo = lang.monthShortName(month(_hrDate[num]));
+    _printText(x, y, 32, 12, String(dt) + mo, FONT_TINY, CENTER, TEXT_COLOR);
+    y += 14;
+
+    sprintf(buf, "%d:%02d", hour(_hrDate[num]), minute(_hrDate[num]));
+    _printText(x, y, 32, 12, String(buf), FONT_TINY, CENTER, TEXT_COLOR);
+    y += 14;
+
+    if(type == HOURLY) {
+        float wind = weather.get_hourlyWindSpeed(s);
+        String ws = validate.wind(wind) ? String((int)round(wind)) : "--";
+        _printText(x, y, 32, 12, ws + lang.ms(), FONT_TINY, CENTER, TEXT_COLOR);
+        y += 12;
+
+        int dir = weather.get_hourlyWindDir(s);
+        if(dir >= 0 && dir <= 360) {
+            if((dir >= 338 && dir <= 360) || (dir >= 0 && dir < 22)) _showImg(x + 10, y, wind_north_tiny, sizeof(wind_north_tiny));
+            else if(dir >= 22 && dir < 67) _showImg(x + 10, y, wind_north_east_tiny, sizeof(wind_north_east_tiny));
+            else if(dir >= 67 && dir < 112) _showImg(x + 10, y, wind_east_tiny, sizeof(wind_east_tiny));
+            else if(dir >= 112 && dir < 157) _showImg(x + 10, y, wind_south_east_tiny, sizeof(wind_south_east_tiny));
+            else if(dir >= 157 && dir < 202) _showImg(x + 10, y, wind_south_tiny, sizeof(wind_south_tiny));
+            else if(dir >= 202 && dir < 247) _showImg(x + 10, y, wind_south_west_tiny, sizeof(wind_south_west_tiny));
+            else if(dir >= 247 && dir < 292) _showImg(x + 10, y, wind_west_tiny, sizeof(wind_west_tiny));
+            else if(dir >= 292 && dir < 338) _showImg(x + 10, y, wind_north_west_tiny, sizeof(wind_north_west_tiny));
+        }
+        else tft.fillRect(x + 12, y, 12, 12, BG_COLOR);
+        y += 14;
+
+        _showImg(x + 4, y, symb_drop, sizeof(symb_drop));
+        float prec = _hrPrec[num];
+        String pr = "--";
+        if(config.weather_provider() == 0) pr = prec ? String(prec) : "0" + lang.mm();
+        if(config.weather_provider() == 2) pr = String((int)round(prec)) + '%';
+        _printText(x + 12, y + 2, 28, 12, pr, FONT_TINY, LEFT, TEXT_COLOR);
+    }
+}
+
+void ILI9341::_displayLcdHourlyCharts(uint8_t type) {
+    uint8_t step = 32, grid = 31;
+
+    tft.fillRect(42, 0, grid * 8, 72, BG_COLOR);
+    for(uint8_t i=0; i<10; i++) tft.drawFastHLine(42, i * 8, grid * 8 - 8, GRID_COLOR);
+    for(uint8_t i=0; i<grid; i++) tft.drawFastVLine(i * 8 + 42, 0, 72, GRID_COLOR);
+
+    for(uint8_t cht=0; cht<4; cht++) {
+        float chartMin = 10000.0, chartMax = -10000.0, ch[8];
+
+        for(uint8_t i=0; i<8; i++) {
+            if(cht == 0) ch[i] = _hrTemp[i]; //weather.get_hourlyTemp(i + _hourlyShift);
+            if(cht == 1) ch[i] = _hrPres[i]; //weather.get_hourlyPres(i + _hourlyShift);
+            if(cht == 2) ch[i] = _hrPrec[i]; //weather.get_hourlyPrec(i + _hourlyShift);
+            if(cht == 3) ch[i] = _hrHum[i]; //weather.get_hourlyHum(i + _hourlyShift);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            if(ch[i] < chartMin) chartMin = ch[i];
+            if(ch[i] > chartMax) chartMax = ch[i];
+        }
+
+        float m = chartMax - chartMin;
+        float k = m ? (64 / m) : 0;
+        for(uint8_t i=0; i<8; i++) {
+            ch[i] -= chartMin;
+            if(k > 0) ch[i] *= k;
+            else ch[i] /= 2;
+            if(ch[i] > 72) ch[i] = 72;
+        }
+
+        for(uint8_t i=0; i<7; i++) {
+            if(cht == 0) { // temperature
+                tft.drawLine(i * step + 50, 67 - ch[i], i * step + step + 50, 67 - ch[i + 1], TEMPERATURE_COLOR);
+            }
+            if(cht == 1 && (type == HOURLY || type == HISTORY_OUT)) { // pressure
+                tft.drawLine(i * step + 50, 69 - ch[i], i * step + step + 50, 69 - ch[i + 1], PRESSURE_COLOR);
+            }
+            if(cht == 2 && type == HOURLY) { // precipitation
+                tft.drawLine(i * step + 50, 71 - ch[i], i * step + step + 50, 71 - ch[i + 1], HUMIDITY_COLOR);
+            }
+            if(cht == 3 && (type == HISTORY_OUT || type == HISTORY_IN)) { // humidity
+                tft.drawLine(i * step + 50, 71 - ch[i], i * step + step + 50, 71 - ch[i + 1], HUMIDITY_COLOR);
+            }
+        }
+    }    
+}
+
 void ILI9341::getTouch() {
     bool pressed = tft.getTouch(&_touchX, &_touchY);
     if(pressed) {
@@ -978,10 +1156,22 @@ void ILI9341::getTouch() {
                 if(_touchX > 145 && _touchY > 33 && _touchY < 80) page = PAGE_HISTORY_IN;
                 if(_touchX < 284 && _touchY > 81 && _touchY < 160) page = PAGE_HISTORY_OUT;
                 if(_touchX > 284 && _touchY > 130 && _touchY < 162) page = PAGE_ALARM;
-                if(_touchX < 106 && _touchY > 162) Serial.println("Forecast1 clicked");
-                if(_touchX > 106 && _touchX < 208 && _touchY > 162) Serial.println("Forecast2 clicked");
-                if(_touchX > 208 && _touchY > 162) Serial.println("Forecast3 clicked");
-                if(_touchY > 162) page = PAGE_HOURLY;
+                
+                // Switch to Hourly weather forecast page
+                if(_touchY > 162) {
+                    uint8_t dayLinks[6];
+                    uint8_t dayLink = 0;
+                    for(uint8_t i=0; i<40; i++) {
+                        if(hour(weather.get_hourlyDate(i)) == 0 && i != 0) dayLinks[dayLink++] = i;
+                        if(dayLink > 1) break;
+                    }
+                    if(_touchX < 106) _hourlyShift = 0;
+                    if(_touchX > 106 && _touchX < 208) _hourlyShift = dayLinks[0];
+                    if(_touchX > 208) _hourlyShift = dayLinks[1];
+
+                    page = PAGE_HOURLY;
+                    _hourlySkeleton = false;
+                }
             }
 
             // On the Clock page
@@ -1009,6 +1199,20 @@ void ILI9341::getTouch() {
                 if(_touchX > 286 && _touchY > 100 && _touchY < 136) _calendarShiftDirection = 1;
             }
 
+            // On the Hourly weather forecast page
+            if(_page == PAGE_HOURLY) {
+                /* left button */
+                if(_touchX < 32 && _touchY > 100 && _touchY < 136) {
+                    if(_hourlyShift >= 4) _hourlyShift -= 4; 
+                    else _hourlyShift = 0;
+                }
+                /* right button */
+                if(_touchX > 286 && _touchY > 100 && _touchY < 136) {
+                    if(_hourlyShift <= 28) _hourlyShift += 4;
+                    else _hourlyShift = 32;
+                }
+            }
+
             if(_page != page) {
                 _forced = true;
                 if(page != 100) {
@@ -1017,6 +1221,7 @@ void ILI9341::getTouch() {
                 }
                 if(page == PAGE_MAIN) showHomeScreen();
             }
+
             Serial.print("page: "); 
             switch (_page) {
                 case PAGE_MAIN: Serial.println("MAIN"); break;

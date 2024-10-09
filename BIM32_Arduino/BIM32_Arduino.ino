@@ -36,10 +36,12 @@ WebServer server(80);
 #include "src/picturesBats.hpp"
 #include "src/picturesIconsBig.hpp"
 #include "src/picturesIconsSmall.hpp"
+#include "src/picturesIconsTiny.hpp"
 #include "src/picturesLogo.hpp"
 #include "src/picturesNumbers.hpp"
 #include "src/picturesSymbols.hpp"
 #include "src/picturesWind.hpp"
+#include "src/picturesWindTiny.hpp"
 
 /* Own classes */
 #include "src/validate.hpp"
