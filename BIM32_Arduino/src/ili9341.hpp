@@ -79,6 +79,9 @@ class ILI9341 : LcdDisplay {
         bool _smallClockSkeleton = false;
         bool _calendarSkeleton = false;
         bool _hourlySkeleton = false;
+        bool _historyInSkeleton = false;
+        bool _historyOutSkeleton = false;
+        bool _alarmSkeleton = false;
         int _calendarShiftSeconds = 0;
         int8_t _calendarShiftDirection = 0;
         float _hrTemp[8]; 
@@ -132,9 +135,13 @@ class ILI9341 : LcdDisplay {
         bool _isLeapYear(unsigned int year);
         uint8_t _numberOfDaysInMonth(uint8_t month, uint16_t year);
         void _calendarPage();
+        void _historyInPage();
+        void _historyOutPage();
+        void _alarmPage();
         void _hourlyPage();
         void _hHourlyColumn(uint8_t num, uint8_t type);
         void _displayLcdHourlyCharts(uint8_t type);
+        void _displayLcdHistoryTitle(String title);
         void _touch_calibrate();
 };
 
@@ -235,6 +242,9 @@ void ILI9341::refresh() {
         if(_page == PAGE_SMALL_CLOCK) _smallClockPage();
         if(_page == PAGE_CALENDAR) _calendarPage();
         if(_page == PAGE_HOURLY) _hourlyPage();
+        if(_page == PAGE_HISTORY_IN) _historyInPage();
+        if(_page == PAGE_HISTORY_OUT) _historyOutPage();
+        if(_page == PAGE_ALARM) _alarmPage();
     }
 }
 
@@ -420,8 +430,8 @@ void ILI9341::_showWeekdays() {
  */
 void ILI9341::_clockPoints() {
     boolean points = millis() % 1000 > 500;
-    tft.fillSmoothCircle(70, 24, 3, points ? CLOCK_COLOR : BG_COLOR, BG_COLOR);
-    tft.fillSmoothCircle(70, 52, 3, points ? CLOCK_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 24, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 52, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
 }
 
 /**
@@ -988,7 +998,7 @@ void ILI9341::_hHourlyColumn(uint8_t num, uint8_t type) {
     uint16_t x = num * 32 + 30, y = 86;
     uint16_t s = num + _hourlyShift;
     char buf[10];
-    tft.fillRect(x, y, 32, 239 - y, BG_COLOR);
+    tft.fillRect(x, y, 33, type == HOURLY ? (239 - y) : (189 - y) , BG_COLOR);
 
     if(validate.temp(_hrTemp[num])) sprintf(buf, "%.1f°", _hrTemp[num]);
     else sprintf(buf, "--°");
@@ -997,7 +1007,7 @@ void ILI9341::_hHourlyColumn(uint8_t num, uint8_t type) {
 
     if(type == HISTORY_IN || type == HISTORY_OUT) {
         String h = validate.hum(_hrHum[num]) ? String((int)round(_hrHum[num])) : "--";
-        _printText(x, y, 32, 12, h + "%", FONT_SMALL, CENTER, HUMIDITY_COLOR);
+        _printText(x, y, 32, 12, h + "%", FONT_TINY, CENTER, HUMIDITY_COLOR);
         y += 14;
     }
 
@@ -1008,22 +1018,20 @@ void ILI9341::_hHourlyColumn(uint8_t num, uint8_t type) {
     }
 
     if(type == HOURLY) {
-        y -= 4;
         switch(weather.get_hourlyIcon(s)) {
-            case 1: _showImg(x, y + 4, icon_tiny_01, sizeof(icon_tiny_01)); break;
-            case 2: _showImg(x, y + 4, icon_tiny_02, sizeof(icon_tiny_02)); break;
-            case 3: _showImg(x, y + 4, icon_tiny_02, sizeof(icon_tiny_02)); break;
-            case 4: _showImg(x, y + 4, icon_tiny_04, sizeof(icon_tiny_04)); break;
-            case 9: _showImg(x, y + 4, icon_tiny_09, sizeof(icon_tiny_09)); break;
-            case 10: _showImg(x, y + 4, icon_tiny_10, sizeof(icon_tiny_10)); break;
-            case 11: _showImg(x, y + 4, icon_tiny_11, sizeof(icon_tiny_11)); break;
-            case 13: _showImg(x, y + 4, icon_tiny_13, sizeof(icon_tiny_13)); break;
-            case 50: _showImg(x, y + 4, icon_tiny_50, sizeof(icon_tiny_50)); break;
-            default: _showImg(x, y + 4, icon_tiny_loading, sizeof(icon_tiny_loading)); break;
+            case 1: _showImg(x, y, icon_tiny_01, sizeof(icon_tiny_01)); break;
+            case 2: _showImg(x, y, icon_tiny_02, sizeof(icon_tiny_02)); break;
+            case 3: _showImg(x, y, icon_tiny_02, sizeof(icon_tiny_02)); break;
+            case 4: _showImg(x, y, icon_tiny_04, sizeof(icon_tiny_04)); break;
+            case 9: _showImg(x, y, icon_tiny_09, sizeof(icon_tiny_09)); break;
+            case 10: _showImg(x, y, icon_tiny_10, sizeof(icon_tiny_10)); break;
+            case 11: _showImg(x, y, icon_tiny_11, sizeof(icon_tiny_11)); break;
+            case 13: _showImg(x, y, icon_tiny_13, sizeof(icon_tiny_13)); break;
+            case 50: _showImg(x, y, icon_tiny_50, sizeof(icon_tiny_50)); break;
+            default: _showImg(x, y, icon_tiny_loading, sizeof(icon_tiny_loading)); break;
         }
         y += 40;
 
-        //String wd = lang.weekdayShortName(weekday(weather.get_hourlyDate(s)));
         String wd = lang.weekdayShortName(weekday(_hrDate[num]));
         _printText(x, y, 32, 18, wd, FONT1, CENTER, TEXT_COLOR);
         y += 20;
@@ -1058,12 +1066,12 @@ void ILI9341::_hHourlyColumn(uint8_t num, uint8_t type) {
         else tft.fillRect(x + 12, y, 12, 12, BG_COLOR);
         y += 14;
 
-        _showImg(x + 4, y, symb_drop, sizeof(symb_drop));
+        _showImg(x + 2, y, symb_drop, sizeof(symb_drop));
         float prec = _hrPrec[num];
         String pr = "--";
         if(config.weather_provider() == 0) pr = prec ? String(prec) : "0" + lang.mm();
         if(config.weather_provider() == 2) pr = String((int)round(prec)) + '%';
-        _printText(x + 12, y + 2, 28, 12, pr, FONT_TINY, LEFT, TEXT_COLOR);
+        _printText(x + 11, y + 2, 21, 12, pr, FONT_TINY, CENTER, TEXT_COLOR);
     }
 }
 
@@ -1078,10 +1086,10 @@ void ILI9341::_displayLcdHourlyCharts(uint8_t type) {
         float chartMin = 10000.0, chartMax = -10000.0, ch[8];
 
         for(uint8_t i=0; i<8; i++) {
-            if(cht == 0) ch[i] = _hrTemp[i]; //weather.get_hourlyTemp(i + _hourlyShift);
-            if(cht == 1) ch[i] = _hrPres[i]; //weather.get_hourlyPres(i + _hourlyShift);
-            if(cht == 2) ch[i] = _hrPrec[i]; //weather.get_hourlyPrec(i + _hourlyShift);
-            if(cht == 3) ch[i] = _hrHum[i]; //weather.get_hourlyHum(i + _hourlyShift);
+            if(cht == 0) ch[i] = _hrTemp[i];
+            if(cht == 1) ch[i] = _hrPres[i];
+            if(cht == 2) ch[i] = _hrPrec[i];
+            if(cht == 3) ch[i] = _hrHum[i];
         }
         for(uint8_t i=0; i<8; i++) {
             if(ch[i] < chartMin) chartMin = ch[i];
@@ -1112,6 +1120,74 @@ void ILI9341::_displayLcdHourlyCharts(uint8_t type) {
             }
         }
     }    
+}
+
+void ILI9341::_displayLcdHistoryTitle(String title) {
+    tft.drawFastHLine(38, 190, 247, FRAME1_COLOR);
+    tft.drawFastVLine(38, 190, 26, FRAME1_COLOR);
+    tft.drawFastHLine(39, 215, 246, TEXT_COLOR);
+    tft.drawFastVLine(285, 190, 26, TEXT_COLOR);
+    _printText(39, 196, 246, 16, title, FONT1, CENTER, TEXT_COLOR);
+}
+
+void ILI9341::_historyInPage() {
+    if(!_historyInSkeleton) {
+        tft.fillScreen(TFT_BLACK);
+        _closeButton();
+        _displayLcdHistoryTitle(lang.historyIn());
+        _historyInSkeleton = true;
+        _forced = true;
+    }
+
+    if(_prevHistoryInChecksum != _historyInChecksum || _prevHistoryInShift != _historyInShift || _forced) {
+        for(uint8_t i=0; i<8; i++) {
+            _hrTemp[i] = thingspeak.get_historyField(3, i + _historyInShift);
+            _hrHum[i] = thingspeak.get_historyField(1, i + _historyInShift);
+            _hrPres[i] = 0;
+            _hrPrec[i] = 0;
+            _hrDate[i] = thingspeak.get_historyUpdated(i + _historyInShift);
+            _hHourlyColumn(i, HISTORY_IN);
+        }
+        _displayLcdHourlyCharts(HISTORY_IN);
+        _rightButton(_historyInShift < 16);
+        _leftButton(_historyInShift > 0);
+        _prevHistoryInChecksum = _historyInChecksum;
+        _prevHistoryInShift = _historyInShift;
+    }
+
+    _forced = false;
+}
+
+void ILI9341::_historyOutPage() {
+    if(!_historyOutSkeleton) {
+        tft.fillScreen(TFT_BLACK);
+        _closeButton();
+        _displayLcdHistoryTitle(lang.historyOut());
+        _historyOutSkeleton = true;
+        _forced = true;
+    }
+
+    if(_prevHistoryOutChecksum != _historyOutChecksum || _prevHistoryOutShift != _historyOutShift || _forced) {
+        for(uint8_t i=0; i<8; i++) {
+            _hrTemp[i] = thingspeak.get_historyField(0, i + _historyOutShift);
+            _hrHum[i] = thingspeak.get_historyField(1, i + _historyOutShift);
+            _hrPres[i] = thingspeak.get_historyField(2, i + _historyOutShift);
+            _hrPrec[i] = 0;
+            _hrDate[i] = thingspeak.get_historyUpdated(i + _historyOutShift);
+            _hHourlyColumn(i, HISTORY_OUT);
+        }
+        _displayLcdHourlyCharts(HISTORY_OUT);
+        _rightButton(_historyOutShift < 16);
+        _leftButton(_historyOutShift > 0);
+        _prevHistoryOutChecksum = _historyOutChecksum;
+        _prevHistoryOutShift = _historyOutShift;
+    }
+
+    _forced = false;
+}
+
+void ILI9341::_alarmPage() {
+
 }
 
 void ILI9341::getTouch() {
@@ -1147,15 +1223,30 @@ void ILI9341::getTouch() {
                     page = PAGE_BIG_CLOCK;
                     _bigClockSkeleton = false;
                 }
+
                 // Switch to Calendar page
                 if(_touchX > 145 && _touchX < 180 && _touchY < 33) {
                     page = PAGE_CALENDAR;
                     _calendarSkeleton = false;
                 }
-                //
-                if(_touchX > 145 && _touchY > 33 && _touchY < 80) page = PAGE_HISTORY_IN;
-                if(_touchX < 284 && _touchY > 81 && _touchY < 160) page = PAGE_HISTORY_OUT;
-                if(_touchX > 284 && _touchY > 130 && _touchY < 162) page = PAGE_ALARM;
+
+                // Switch to History inside page
+                if(_touchX > 145 && _touchY > 33 && _touchY < 80) {
+                    page = PAGE_HISTORY_IN;
+                    _historyInSkeleton = false;
+                }
+
+                // Switch to History outside page
+                if(_touchX < 284 && _touchY > 81 && _touchY < 160) {
+                    page = PAGE_HISTORY_OUT;
+                    _historyOutSkeleton = false;
+                }
+
+                // Switch to alarm page
+                if(_touchX > 284 && _touchY > 130 && _touchY < 162) {
+                    page = PAGE_ALARM;
+                    _alarmSkeleton = false;
+                }
                 
                 // Switch to Hourly weather forecast page
                 if(_touchY > 162) {
@@ -1191,25 +1282,44 @@ void ILI9341::getTouch() {
                 }
             }
 
-            // On the Calendar page
-            if(_page == PAGE_CALENDAR) {
-                /* left button */
-                if(_touchX < 32 && _touchY > 100 && _touchY < 136) _calendarShiftDirection = -1;
-                /* right button */
-                if(_touchX > 286 && _touchY > 100 && _touchY < 136) _calendarShiftDirection = 1;
-            }
-
-            // On the Hourly weather forecast page
-            if(_page == PAGE_HOURLY) {
-                /* left button */
-                if(_touchX < 32 && _touchY > 100 && _touchY < 136) {
+            // Left button
+            if(_touchX < 32 && _touchY > 100 && _touchY < 136) {
+                // Calendar page
+                if(_page == PAGE_CALENDAR) _calendarShiftDirection = -1;
+                // Hourly weather forecast page
+                if(_page == PAGE_HOURLY) {
                     if(_hourlyShift >= 4) _hourlyShift -= 4; 
                     else _hourlyShift = 0;
                 }
-                /* right button */
-                if(_touchX > 286 && _touchY > 100 && _touchY < 136) {
+                /* History outside page */
+                if(_page == PAGE_HISTORY_OUT) {
+                    if(_historyOutShift >= 4) _historyOutShift -= 4; 
+                    else _historyOutShift = 0;
+                }
+                /* History inside page */
+                if(_page == PAGE_HISTORY_IN) {
+                    if(_historyInShift >= 4) _historyInShift -= 4; 
+                    else _historyInShift = 0;
+                }
+            }
+            /* Right button */
+            if(_touchX > 286 && _touchY > 100 && _touchY < 136) {
+                // Calendar page
+                if(_page == PAGE_CALENDAR) _calendarShiftDirection = 1;
+                /* Hourly weather forecast page */
+                if(_page == PAGE_HOURLY) {
                     if(_hourlyShift <= 28) _hourlyShift += 4;
                     else _hourlyShift = 32;
+                }
+                /* History outside page */
+                if(_page == PAGE_HISTORY_OUT) {
+                    if(_historyOutShift <= 12) _historyOutShift += 4;
+                    else _historyOutShift = 16;
+                }
+                /* History inside page */
+                if(_page == PAGE_HISTORY_IN) {
+                    if(_historyInShift <= 12) _historyInShift += 4;
+                    else _historyInShift = 16;
                 }
             }
 
@@ -1220,20 +1330,6 @@ void ILI9341::getTouch() {
                     _pageSwitchedTime = millis();
                 }
                 if(page == PAGE_MAIN) showHomeScreen();
-            }
-
-            Serial.print("page: "); 
-            switch (_page) {
-                case PAGE_MAIN: Serial.println("MAIN"); break;
-                case PAGE_BIG_CLOCK: Serial.println("BIG CLOCK"); break;
-                case PAGE_SMALL_CLOCK: Serial.println("SMALL CLOCK"); break;
-                case PAGE_NETWORK: Serial.println("NETWORK"); break;
-                case PAGE_CALENDAR: Serial.println("CALENDAR"); break;
-                case PAGE_HOURLY: Serial.println("HOURLY"); break;
-                case PAGE_HISTORY_OUT: Serial.println("HISTORY OUT"); break;
-                case PAGE_HISTORY_IN: Serial.println("HISTORY IN"); break;
-                case PAGE_ALARM: Serial.println("ALARM"); break;
-                default: ; break;
             }
         }
     }
