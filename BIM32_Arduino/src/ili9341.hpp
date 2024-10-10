@@ -139,7 +139,16 @@ class ILI9341 : LcdDisplay {
         void _historyOutPage();
         void _alarmPage();
         void _hourlyPage();
-        void _hHourlyColumn(uint8_t num, uint8_t type);
+        void _hourlyTemp(uint8_t num, uint16_t y);
+        void _hourlyHum(uint8_t num, uint16_t y);
+        void _hourlyPres(uint8_t num, uint16_t y);
+        void _hourlyIcon(uint8_t num, uint16_t y);
+        void _hourlyWeekday(uint8_t num, uint16_t y);
+        void _hourlyDate(uint8_t num, uint16_t y);
+        void _hourlyTime(uint8_t num, uint16_t y);
+        void _hourlyWindSpeed(uint8_t num, uint16_t y);
+        void _hourlyWindDir(uint8_t num, uint16_t y);
+        void _hourlyPrec(uint8_t num, uint16_t y);
         void _displayLcdHourlyCharts(uint8_t type);
         void _displayLcdHistoryTitle(String title);
         void _touch_calibrate();
@@ -430,8 +439,8 @@ void ILI9341::_showWeekdays() {
  */
 void ILI9341::_clockPoints() {
     boolean points = millis() % 1000 > 500;
-    tft.fillSmoothCircle(70, 24, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
-    tft.fillSmoothCircle(70, 52, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 24, 2, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 52, 2, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
 }
 
 /**
@@ -978,12 +987,24 @@ void ILI9341::_hourlyPage() {
     if(_prevHourlyChecksum != _hourlyChecksum || _prevHourlyShift != _hourlyShift || _forced) {
         for(uint8_t i=0; i<8; i++) {
             _hrTemp[i] = weather.get_hourlyTemp(i + _hourlyShift);
-            _hrHum[i] = 0;
-            _hrPres[i] = weather.get_hourlyPres(i + _hourlyShift);
-            _hrPrec[i] = weather.get_hourlyPrec(i + _hourlyShift);
-            _hrDate[i] = weather.get_hourlyDate(i + _hourlyShift);
-            _hHourlyColumn(i, HOURLY);
+            _hourlyTemp(i, 86);
         }
+        for(uint8_t i=0; i<8; i++) _hourlyIcon(i, 116);
+        for(uint8_t i=0; i<8; i++) {
+            _hrDate[i] = weather.get_hourlyDate(i + _hourlyShift);
+            _hourlyWeekday(i, 156);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            _hrPres[i] = weather.get_hourlyPres(i + _hourlyShift);
+            _hourlyPres(i, 102);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            _hourlyDate(i, 176);
+            _hourlyTime(i, 190);
+        }
+        for(uint8_t i=0; i<8; i++) _hourlyWindSpeed(i, 204);
+        for(uint8_t i=0; i<8; i++) _hourlyWindDir(i, 216);
+        for(uint8_t i=0; i<8; i++) _hourlyPrec(i, 230);
         _displayLcdHourlyCharts(HOURLY);
         _rightButton(_hourlyShift < 32);
         _leftButton(_hourlyShift > 0);
@@ -994,85 +1015,95 @@ void ILI9341::_hourlyPage() {
     _forced = false;
 }
 
-void ILI9341::_hHourlyColumn(uint8_t num, uint8_t type) {
-    uint16_t x = num * 32 + 30, y = 86;
-    uint16_t s = num + _hourlyShift;
+void ILI9341::_hourlyTemp(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 16, BG_COLOR);
     char buf[10];
-    tft.fillRect(x, y, 33, type == HOURLY ? (239 - y) : (189 - y) , BG_COLOR);
-
     if(validate.temp(_hrTemp[num])) sprintf(buf, "%.1f°", _hrTemp[num]);
     else sprintf(buf, "--°");
-    _printText(x, y, 32, 12, String(buf), FONT_SMALL, CENTER, TEMPERATURE_COLOR);
-    y += 16;
+    _printText(num * 32 + 30, y, 32, 12, String(buf), FONT_SMALL, CENTER, TEMPERATURE_COLOR);
+}
 
-    if(type == HISTORY_IN || type == HISTORY_OUT) {
-        String h = validate.hum(_hrHum[num]) ? String((int)round(_hrHum[num])) : "--";
-        _printText(x, y, 32, 12, h + "%", FONT_TINY, CENTER, HUMIDITY_COLOR);
-        y += 14;
+void ILI9341::_hourlyHum(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
+    String h = validate.hum(_hrHum[num]) ? String((int)round(_hrHum[num])) : "--";
+    _printText(num * 32 + 30, y, 32, 12, h + "%", FONT_TINY, CENTER, HUMIDITY_COLOR);
+}
+
+void ILI9341::_hourlyPres(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
+    String p = validate.pres(_hrPres[num]) ? String((int)round(_hrPres[num] * 0.75)) : "--";
+    _printText(num * 32 + 30, y, 32, 12, p + lang.mm(), FONT_TINY, CENTER, PRESSURE_COLOR);
+}
+
+void ILI9341::_hourlyIcon(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 32, BG_COLOR);
+    uint16_t x = num * 32 + 30;
+    switch(weather.get_hourlyIcon(num + _hourlyShift)) {
+        case 1: _showImg(x, y, icon_tiny_01, sizeof(icon_tiny_01)); break;
+        case 2: _showImg(x, y, icon_tiny_02, sizeof(icon_tiny_02)); break;
+        case 3: _showImg(x, y, icon_tiny_02, sizeof(icon_tiny_02)); break;
+        case 4: _showImg(x, y, icon_tiny_04, sizeof(icon_tiny_04)); break;
+        case 9: _showImg(x, y, icon_tiny_09, sizeof(icon_tiny_09)); break;
+        case 10: _showImg(x, y, icon_tiny_10, sizeof(icon_tiny_10)); break;
+        case 11: _showImg(x, y, icon_tiny_11, sizeof(icon_tiny_11)); break;
+        case 13: _showImg(x, y, icon_tiny_13, sizeof(icon_tiny_13)); break;
+        case 50: _showImg(x, y, icon_tiny_50, sizeof(icon_tiny_50)); break;
+        default: _showImg(x, y, icon_tiny_loading, sizeof(icon_tiny_loading)); break;
     }
+}
 
-    if(type == HOURLY || type == HISTORY_OUT) {
-        String p = validate.pres(_hrPres[num]) ? String((int)round(_hrPres[num] * 0.75)) : "--";
-        _printText(x, y, 32, 12, p + lang.mm(), FONT_TINY, CENTER, PRESSURE_COLOR);
-        y += 14;
-    }
+void ILI9341::_hourlyWeekday(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 20, BG_COLOR);
+    String wd = lang.weekdayShortName(weekday(_hrDate[num]));
+    _printText(num * 32 + 30, y, 32, 18, wd, FONT1, CENTER, TEXT_COLOR);
+}
 
-    if(type == HOURLY) {
-        switch(weather.get_hourlyIcon(s)) {
-            case 1: _showImg(x, y, icon_tiny_01, sizeof(icon_tiny_01)); break;
-            case 2: _showImg(x, y, icon_tiny_02, sizeof(icon_tiny_02)); break;
-            case 3: _showImg(x, y, icon_tiny_02, sizeof(icon_tiny_02)); break;
-            case 4: _showImg(x, y, icon_tiny_04, sizeof(icon_tiny_04)); break;
-            case 9: _showImg(x, y, icon_tiny_09, sizeof(icon_tiny_09)); break;
-            case 10: _showImg(x, y, icon_tiny_10, sizeof(icon_tiny_10)); break;
-            case 11: _showImg(x, y, icon_tiny_11, sizeof(icon_tiny_11)); break;
-            case 13: _showImg(x, y, icon_tiny_13, sizeof(icon_tiny_13)); break;
-            case 50: _showImg(x, y, icon_tiny_50, sizeof(icon_tiny_50)); break;
-            default: _showImg(x, y, icon_tiny_loading, sizeof(icon_tiny_loading)); break;
-        }
-        y += 40;
-
-        String wd = lang.weekdayShortName(weekday(_hrDate[num]));
-        _printText(x, y, 32, 18, wd, FONT1, CENTER, TEXT_COLOR);
-        y += 20;
-    }
-
+void ILI9341::_hourlyDate(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
     uint8_t dt = day(_hrDate[num]);
     String mo = lang.monthShortName(month(_hrDate[num]));
-    _printText(x, y, 32, 12, String(dt) + mo, FONT_TINY, CENTER, TEXT_COLOR);
-    y += 14;
+    _printText(num * 32 + 30, y, 32, 12, String(dt) + mo, FONT_TINY, CENTER, TEXT_COLOR);
+}
 
+void ILI9341::_hourlyTime(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
+    char buf[10];
     sprintf(buf, "%d:%02d", hour(_hrDate[num]), minute(_hrDate[num]));
-    _printText(x, y, 32, 12, String(buf), FONT_TINY, CENTER, TEXT_COLOR);
-    y += 14;
+    _printText(num * 32 + 30, y, 32, 12, String(buf), FONT_TINY, CENTER, TEXT_COLOR);
+}
 
-    if(type == HOURLY) {
-        float wind = weather.get_hourlyWindSpeed(s);
-        String ws = validate.wind(wind) ? String((int)round(wind)) : "--";
-        _printText(x, y, 32, 12, ws + lang.ms(), FONT_TINY, CENTER, TEXT_COLOR);
-        y += 12;
+void ILI9341::_hourlyWindSpeed(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
+    float wind = weather.get_hourlyWindSpeed(num + _hourlyShift);
+    String ws = validate.wind(wind) ? String((int)round(wind)) : "--";
+    _printText(num * 32 + 30, y, 32, 12, ws + lang.ms(), FONT_TINY, CENTER, TEXT_COLOR);
+}
 
-        int dir = weather.get_hourlyWindDir(s);
-        if(dir >= 0 && dir <= 360) {
-            if((dir >= 338 && dir <= 360) || (dir >= 0 && dir < 22)) _showImg(x + 10, y, wind_north_tiny, sizeof(wind_north_tiny));
-            else if(dir >= 22 && dir < 67) _showImg(x + 10, y, wind_north_east_tiny, sizeof(wind_north_east_tiny));
-            else if(dir >= 67 && dir < 112) _showImg(x + 10, y, wind_east_tiny, sizeof(wind_east_tiny));
-            else if(dir >= 112 && dir < 157) _showImg(x + 10, y, wind_south_east_tiny, sizeof(wind_south_east_tiny));
-            else if(dir >= 157 && dir < 202) _showImg(x + 10, y, wind_south_tiny, sizeof(wind_south_tiny));
-            else if(dir >= 202 && dir < 247) _showImg(x + 10, y, wind_south_west_tiny, sizeof(wind_south_west_tiny));
-            else if(dir >= 247 && dir < 292) _showImg(x + 10, y, wind_west_tiny, sizeof(wind_west_tiny));
-            else if(dir >= 292 && dir < 338) _showImg(x + 10, y, wind_north_west_tiny, sizeof(wind_north_west_tiny));
-        }
-        else tft.fillRect(x + 12, y, 12, 12, BG_COLOR);
-        y += 14;
-
-        _showImg(x + 2, y, symb_drop, sizeof(symb_drop));
-        float prec = _hrPrec[num];
-        String pr = "--";
-        if(config.weather_provider() == 0) pr = prec ? String(prec) : "0" + lang.mm();
-        if(config.weather_provider() == 2) pr = String((int)round(prec)) + '%';
-        _printText(x + 11, y + 2, 21, 12, pr, FONT_TINY, CENTER, TEXT_COLOR);
+void ILI9341::_hourlyWindDir(uint8_t num, uint16_t y) {
+    tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
+    uint16_t x = num * 32 + 30;
+    int dir = weather.get_hourlyWindDir(num + _hourlyShift);
+    if(dir >= 0 && dir <= 360) {
+        if((dir >= 338 && dir <= 360) || (dir >= 0 && dir < 22)) _showImg(x + 10, y, wind_north_tiny, sizeof(wind_north_tiny));
+        else if(dir >= 22 && dir < 67) _showImg(x + 10, y, wind_north_east_tiny, sizeof(wind_north_east_tiny));
+        else if(dir >= 67 && dir < 112) _showImg(x + 10, y, wind_east_tiny, sizeof(wind_east_tiny));
+        else if(dir >= 112 && dir < 157) _showImg(x + 10, y, wind_south_east_tiny, sizeof(wind_south_east_tiny));
+        else if(dir >= 157 && dir < 202) _showImg(x + 10, y, wind_south_tiny, sizeof(wind_south_tiny));
+        else if(dir >= 202 && dir < 247) _showImg(x + 10, y, wind_south_west_tiny, sizeof(wind_south_west_tiny));
+        else if(dir >= 247 && dir < 292) _showImg(x + 10, y, wind_west_tiny, sizeof(wind_west_tiny));
+        else if(dir >= 292 && dir < 338) _showImg(x + 10, y, wind_north_west_tiny, sizeof(wind_north_west_tiny));
     }
+    else tft.fillRect(x + 12, y, 12, 12, BG_COLOR);
+}
+
+void ILI9341::_hourlyPrec(uint8_t num, uint16_t y) {
+    uint16_t x = num * 32 + 30;
+    _showImg(x + 2, y, symb_drop, sizeof(symb_drop));
+    float prec = _hrPrec[num];
+    String pr = "--";
+    if(config.weather_provider() == 0) pr = prec ? String(prec) : "0" + lang.mm();
+    if(config.weather_provider() == 2) pr = String((int)round(prec)) + '%';
+    _printText(x + 11, y + 2, 21, 12, pr, FONT_TINY, CENTER, TEXT_COLOR);
 }
 
 void ILI9341::_displayLcdHourlyCharts(uint8_t type) {
@@ -1142,11 +1173,19 @@ void ILI9341::_historyInPage() {
     if(_prevHistoryInChecksum != _historyInChecksum || _prevHistoryInShift != _historyInShift || _forced) {
         for(uint8_t i=0; i<8; i++) {
             _hrTemp[i] = thingspeak.get_historyField(3, i + _historyInShift);
-            _hrHum[i] = thingspeak.get_historyField(1, i + _historyInShift);
-            _hrPres[i] = 0;
-            _hrPrec[i] = 0;
+            _hourlyTemp(i, 86);
+        }
+        for(uint8_t i=0; i<8; i++) {
             _hrDate[i] = thingspeak.get_historyUpdated(i + _historyInShift);
-            _hHourlyColumn(i, HISTORY_IN);
+            _hourlyWeekday(i, 116);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            _hrHum[i] = thingspeak.get_historyField(1, i + _historyInShift);
+            _hourlyHum(i, 102);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            _hourlyDate(i, 136);
+            _hourlyTime(i, 150);
         }
         _displayLcdHourlyCharts(HISTORY_IN);
         _rightButton(_historyInShift < 16);
@@ -1170,11 +1209,23 @@ void ILI9341::_historyOutPage() {
     if(_prevHistoryOutChecksum != _historyOutChecksum || _prevHistoryOutShift != _historyOutShift || _forced) {
         for(uint8_t i=0; i<8; i++) {
             _hrTemp[i] = thingspeak.get_historyField(0, i + _historyOutShift);
+            _hourlyTemp(i, 86);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            _hrDate[i] = thingspeak.get_historyUpdated(i + _historyInShift);
+            _hourlyWeekday(i, 130);
+        }
+        for(uint8_t i=0; i<8; i++) {
             _hrHum[i] = thingspeak.get_historyField(1, i + _historyOutShift);
+            _hourlyHum(i, 102);
+        }
+        for(uint8_t i=0; i<8; i++) {
             _hrPres[i] = thingspeak.get_historyField(2, i + _historyOutShift);
-            _hrPrec[i] = 0;
-            _hrDate[i] = thingspeak.get_historyUpdated(i + _historyOutShift);
-            _hHourlyColumn(i, HISTORY_OUT);
+            _hourlyPres(i, 116);
+        }
+        for(uint8_t i=0; i<8; i++) {
+            _hourlyDate(i, 150);
+            _hourlyTime(i, 164);
         }
         _displayLcdHourlyCharts(HISTORY_OUT);
         _rightButton(_historyOutShift < 16);
