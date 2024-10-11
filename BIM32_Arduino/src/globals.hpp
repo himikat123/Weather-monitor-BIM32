@@ -1678,4 +1678,51 @@ class Configuration {
     void set_lang(String lng) {
         lng.toCharArray(_lang, 3);
     }
+
+    void set_alarm_state(uint8_t alarm_num, uint8_t state) {
+        if(alarm_num > ALARMS) return;
+        _alarm_states[alarm_num] = state ? 1 : 0;
+    }
+
+    void set_alarm_time(uint8_t alarm_num, uint8_t level, uint8_t val) {
+        if(alarm_num > ALARMS || level > 1 || val > (level == 0 ? 23 : 59)) return;
+        _alarm_time[alarm_num][level] = val;
+    }
+  
+    void set_alarm_weekday(uint8_t alarm_num, uint8_t week_day, uint8_t val) {
+        if(alarm_num > ALARMS or week_day > 6) return;
+        _alarm_weekdays[alarm_num][week_day] = val ? 1 : 0;
+    };
+
+    void save_alarm_file() {
+        String json = "{\"alarm\":{\"time\":[";
+        for(uint8_t i=0; i<ALARMS; i++) {
+            json += "[" + String(_alarm_time[i][0]) + "," + String(_alarm_time[i][1]) + "]";
+            if(i < ALARMS - 1) json += ",";
+        }
+        json += "],\"weekdays\":[";
+        for(uint8_t i=0; i<ALARMS; i++) {
+            json += "[";
+            for(uint8_t n=0; n<7; n++) {
+                json += String(_alarm_weekdays[i][n]);
+                if(n < 6) json += ",";
+            }
+            json += "]";
+            if(i < ALARMS - 1) json += ","; 
+        }
+        json += "],\"states\":[";
+        for(uint8_t i=0; i<ALARMS; i++) {
+            json += String(_alarm_states[i]);
+            if(i < ALARMS - 1) json += ",";
+        }
+        json += "],\"melodies\":[";
+        for(uint8_t i=0; i<ALARMS; i++) {
+            json += String(_alarm_melodies[i]);
+            if(i < ALARMS - 1) json += ",";
+        }
+        json += "]}}";
+        File file = LittleFS.open("/alarm.json", "w");
+        if(file) file.print(json);
+        file.close();
+    }
 };

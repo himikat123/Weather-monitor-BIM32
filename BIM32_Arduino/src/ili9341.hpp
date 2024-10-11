@@ -439,8 +439,8 @@ void ILI9341::_showWeekdays() {
  */
 void ILI9341::_clockPoints() {
     boolean points = millis() % 1000 > 500;
-    tft.fillSmoothCircle(70, 24, 2, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
-    tft.fillSmoothCircle(70, 52, 2, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 24, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 52, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
 }
 
 /**
@@ -1238,7 +1238,61 @@ void ILI9341::_historyOutPage() {
 }
 
 void ILI9341::_alarmPage() {
+    if(!_alarmSkeleton) {
+        tft.fillScreen(TFT_BLACK);
+        _closeButton();
+        for(uint8_t i=0; i<4; i++) tft.drawFastHLine(0, i * 79 + 1, 288, TEXT_COLOR);
+        for(uint8_t i=0; i<5; i++) tft.drawFastVLine(i * 72, 1, 238, TEXT_COLOR);
+        _alarmSkeleton = true;
+        _forced = true;
+    }
 
+    if(_prevAlarmChecksum != _alarmChecksum || _forced) {
+        uint8_t alarmNr = 0;
+        for(uint8_t v=0; v<3; v++) {
+            for(uint8_t h=0; h<4; h++) {
+                uint16_t x = h * 72, y = v * 79 + 1;
+                // time
+                char buf[6];
+                sprintf(buf, "%d:%02d", config.alarm_time(alarmNr, 0), config.alarm_time(alarmNr, 1));
+                _printText(x + 1, y + 27, 46, 16, String(buf), FONT1, CENTER, TEXT_COLOR);
+                // checkbox
+                uint16_t xc = x + 48;
+                tft.drawFastHLine(xc, y + 24, 18, GRID_COLOR);
+                tft.drawFastVLine(xc, y + 24, 18, GRID_COLOR);
+                tft.drawFastHLine(xc, y + 42, 18, FRAME1_COLOR);
+                tft.drawFastVLine(xc + 18, y + 24, 19, FRAME1_COLOR);
+                if(config.alarm_state(alarmNr)) tft.fillRect(xc + 2, y + 26, 15, 15, FRAME_COLOR);
+                else tft.fillRect(xc + 2, y + 26, 15, 15, BG_COLOR);
+                alarmNr++;
+            }
+        }
+        alarmNr = 0;
+        for(uint8_t v=0; v<3; v++) {
+            for(uint8_t h=0; h<4; h++) {
+                uint16_t x = h * 72, y = v * 79 + 1;
+                // alarm number
+                String alarmNum = lang.alarm() + " " + String(alarmNr + 1);
+                _printText(x + 1, y + 5, 70, 11, alarmNum, FONT_TINY, CENTER, TEXT_COLOR);
+                // weekdays
+                _printText(x + 1, y + 48, 19, 11, lang.weekdayShortName(2), FONT_TINY, RIGHT, TEXT_COLOR);
+                _printText(x + 16, y + 48, 40, 11, ". . . . . . . . .", FONT_TINY, CENTER, TEXT_COLOR);
+                _printText(x + 57, y + 48, 15, 11, lang.weekdayShortName(1), FONT_TINY, LEFT, WEEKEND_COLOR);
+                for(uint8_t i=0; i<7; i++) {
+                    uint16_t xw = x + i * 9 + 5;
+                    tft.drawFastHLine(xw, y + 62, 7, GRID_COLOR);
+                    tft.drawFastVLine(xw, y + 62, 7, GRID_COLOR);
+                    tft.drawFastHLine(xw, y + 69, 7, FRAME1_COLOR);
+                    tft.drawFastVLine(xw + 7, y + 62, 8, FRAME1_COLOR);
+                    if(config.alarm_weekday(alarmNr, i)) tft.fillRect(xw + 1, y + 63, 6, 6, i < 6 ? FRAME_COLOR : WEEKEND_COLOR);
+                    else tft.fillRect(xw + 1, y + 63, 6, 6, BG_COLOR);
+                }
+                alarmNr++;
+            }
+        }
+        _prevAlarmChecksum = _alarmChecksum;
+        _forced = false;
+    }
 }
 
 void ILI9341::getTouch() {
@@ -1246,10 +1300,6 @@ void ILI9341::getTouch() {
     if(pressed) {
         if(digitalRead(SETTINGS_BUTTON_PIN) == 0) _touch_calibrate();
         else {
-            Serial.print("x,y = ");
-            Serial.print(_touchX);
-            Serial.print(",");
-            Serial.println(_touchY);
             uint8_t page = 100;
 
             if(_touchX > 284 && _touchY < 30) {
@@ -1285,12 +1335,14 @@ void ILI9341::getTouch() {
                 if(_touchX > 145 && _touchY > 33 && _touchY < 80) {
                     page = PAGE_HISTORY_IN;
                     _historyInSkeleton = false;
+                    _historyInShift = 16;
                 }
 
                 // Switch to History outside page
                 if(_touchX < 284 && _touchY > 81 && _touchY < 160) {
                     page = PAGE_HISTORY_OUT;
                     _historyOutSkeleton = false;
+                    _historyOutShift = 16;
                 }
 
                 // Switch to alarm page
@@ -1330,6 +1382,24 @@ void ILI9341::getTouch() {
                 if((_touchX > 40 && _touchX < 250 && _touchY < 36) || _touchY > 188) {
                     page = PAGE_CALENDAR;
                     _calendarSkeleton = false;
+                }
+            }
+
+            // On the Alarm page
+            if(_page == PAGE_ALARM) {
+                uint8_t alarmNr = 0;
+                for(uint8_t v=0; v<3; v++) {
+                    for(uint8_t h=0; h<4; h++) {
+                        uint16_t x = h * 72 + 48, y = v * 79 + 25;
+                        if(_touchX >= x && _touchX <= x + 18 && _touchY >= y && _touchY <= y + 18) {
+                            if(millis() - _pageSwitchedTime > 1000) {
+                                config.set_alarm_state(alarmNr, config.alarm_state(alarmNr) ? 0 : 1);
+                                _forced = true;
+                                config.save_alarm_file();
+                            }
+                        }
+                        alarmNr++;
+                    }
                 }
             }
 

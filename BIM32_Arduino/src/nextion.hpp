@@ -792,44 +792,14 @@ void Nextion::dataReceive() {
                     for(uint8_t i=0; i<ALARMS; i++) {
                         for(uint8_t n=0; n<10; n++) {
                             uint8_t val = root["alarms"][i][n].as<int>();
-                            if(n == 0) states[i] = val;
-                            if(n == 1) times[i][0] = val;
-                            if(n == 2) times[i][1] = val;
-                            if(n >= 3) weekdays[i][n - 3] = val;
+                            if(n == 0) config.set_alarm_state(i, val);
+                            if(n == 1) config.set_alarm_time(i, 0, val);
+                            if(n == 2) config.set_alarm_time(i, 1, val);
+                            if(n >= 3) config.set_alarm_weekday(i, n - 3, val);
                         }
                     }
-                    String json = "{\"alarm\":{\"time\":[";
-                    for(uint8_t i=0; i<ALARMS; i++) {
-                        json += "[" + String(times[i][0]) + "," + String(times[i][1]) + "]";
-                        if(i < ALARMS - 1) json += ",";
-                    }
-                    json += "],\"weekdays\":[";
-                    for(uint8_t i=0; i<ALARMS; i++) {
-                        json += "[";
-                        for(uint8_t n=0; n<7; n++) {
-                            json += String(weekdays[i][n]);
-                            if(n < 6) json += ",";
-                        }
-                        json += "]";
-                        if(i < ALARMS - 1) json += ","; 
-                    }
-                    json += "],\"states\":[";
-                    for(uint8_t i=0; i<ALARMS; i++) {
-                        json += String(states[i]);
-                        if(i < ALARMS - 1) json += ",";
-                    }
-                    json += "],\"melodies\":[";
-                    for(uint8_t i=0; i<ALARMS; i++) {
-                        json += config.alarm_melodie(i);
-                        if(i < ALARMS - 1) json += ",";
-                    }
-                    json += "]}}";
-                    File file = LittleFS.open("/alarm.json", "w");
-                    if(file) file.print(json);
-                    file.close();
-
-                    delay(300);
-                    config.readConfig();
+                    _forced = true;
+                    config.save_alarm_file();
                 }
             }
             _receivedData = "";
