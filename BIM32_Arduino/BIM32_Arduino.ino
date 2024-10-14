@@ -90,6 +90,7 @@ Comfort comfort;
 
 #include "taskdisplay.hpp"
 #include "tasksensors.hpp"
+#include "taskserver.hpp"
 
 /**
  * Arduino setup
@@ -132,12 +133,13 @@ void setup() {
     }
 
     xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, 1);
-    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 32768, NULL, 1, &task_display2_handle, 1);
+    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, 1, &task_display2_handle, 1);
 
     network.connect();
 
     webInterface_init();
 
+    xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, 1);
     xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, 1);
 }
 

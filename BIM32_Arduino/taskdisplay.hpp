@@ -87,6 +87,11 @@ void TaskDisplay1(void *pvParameters) {
                 }
             }
 
+            /* WS2812b display 1 update */
+            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY1) {
+                ws2812b_1.refresh();
+            }
+
             if(config.display_type(DISPLAY_1) == LCD) {
                 /* Receive data from Nextion */
                 if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
@@ -97,18 +102,6 @@ void TaskDisplay1(void *pvParameters) {
                     ili9341.getTouch();
                 }
             }
-
-            /**
-             * BME680 sensor update
-             * try as often as possible, the sensor will update when it decides
-             */
-            sensors.BME680Read();
-
-            /**
-             * Automatic daily restart of the device at the specified time.
-             * Uncomment this line and specify the time if you need autorestart. 
-             */
-            // if(hour() == 12 and minute() == 0 and second() == 0) ESP.restart();
         }
 
         vTaskDelay(10);
@@ -138,10 +131,7 @@ void TaskDisplay2(void *pvParameters) {
                 }
             }
 
-            /* WS2812b display update */
-            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY1) {
-                ws2812b_1.refresh();
-            }
+            /* WS2812b display 2 update */
             if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY2) {
                 ws2812b_2.refresh();
             }
@@ -172,7 +162,6 @@ void TaskDisplay2(void *pvParameters) {
             }
         }
 
-        server.handleClient();
         vTaskDelay(10);
     }
 }
