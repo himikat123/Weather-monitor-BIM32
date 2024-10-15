@@ -39,6 +39,8 @@ class SegmentDisplay {
         uint8_t _animSlot = 0;
         uint32_t _animMillis = 0;
         uint32_t _prevSlotMillis = 0;
+        uint16_t _millisShift = 0;
+        uint8_t _prevSecond = 60;
 
         void _segGetData(int* segImg, uint8_t slot, bool dots);
         void _clock(int* segImg);
@@ -262,7 +264,11 @@ void SegmentDisplay::_slotSwitch() {
         }
         _prevSlotMillis = millis();
     }
-    _dots = millis() % (_dotfreq * 2) > _dotfreq;
+    if(_prevSecond != second()) {
+        _millisShift = millis() % 1000;
+        _prevSecond = second();
+    }
+    _dots = !((millis() - _millisShift) % (_dotfreq * 2) > _dotfreq);
 }
 
 void SegmentDisplay::_segAnimations() {
