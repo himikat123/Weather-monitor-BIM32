@@ -1,12 +1,18 @@
 void TaskServer(void *pvParameters) {
     (void) pvParameters;
+    sensorsSemaphore = xSemaphoreCreateMutex();
 
     while(1) {
         /**
          * BME680 sensor update
          * try as often as possible, the sensor will update when it decides
          */
-        sensors.BME680Read();
+        if(sensorsSemaphore != NULL) {
+            if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
+                sensors.BME680Read();
+                xSemaphoreGive(sensorsSemaphore);
+            }
+        }
 
         /**
          * Handle server

@@ -46,7 +46,12 @@ void TaskSensors(void *pvParameters) {
          */
         if(millis() - sensors_update > 5000) {
             sensors_update = millis();
-            sensors.read();
+            if(sensorsSemaphore != NULL) {
+                if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
+                    sensors.read();
+                    xSemaphoreGive(sensorsSemaphore);
+                }
+            }
             comfort.calculate();
             comfort.devicesControl();
         }

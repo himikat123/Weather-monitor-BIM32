@@ -103,6 +103,7 @@ TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_server_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
+SemaphoreHandle_t sensorsSemaphore = NULL;
 
 class Configuration {
     #define NETWORKS 3
