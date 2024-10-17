@@ -257,11 +257,13 @@ void Weather::update() {
     else Serial.println("Current weather update error");
     clientWeather.end();
 
-    if(config.weather_provider() == WEATHERBIT) _updateWeatherbitDaily();
-    if(config.weather_provider() == OPENWEATHERMAP) _updateOpenweathermapHourly();
-    if(config.weather_provider() == OPEN_METEO) {
-        _updateOpenMeteoDaily();
-        _updateOpenMeteoHourly();
+    if(config.display_type(0) == 1) {
+        if(config.weather_provider() == WEATHERBIT) _updateWeatherbitDaily();
+        if(config.weather_provider() == OPENWEATHERMAP) _updateOpenweathermapHourly();
+        if(config.weather_provider() == OPEN_METEO) {
+            _updateOpenMeteoDaily();
+            if(config.display_model(0) == 0 || config.display_model(0) == 2) _updateOpenMeteoHourly();
+        }
     }
 }
 
