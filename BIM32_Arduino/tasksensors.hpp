@@ -148,9 +148,10 @@ void TaskSensors(void *pvParameters) {
     
             /**
              * Weather update
-             * every 20 minutes
+             * every 20 minutes, or every hour for weatherbit.io
              */
-            if(now() - weather.get_currentUpdated() > 1200) {
+            uint32_t weatherUpd = config.weather_provider() == 1 ? 3600 : 1200;
+            if(now() - weather.get_currentUpdated() > weatherUpd) {
                 Serial.println(SEPARATOR);
                 Serial.println("Current weather update... ");
                 if(network.isConnected()) weather.update();
