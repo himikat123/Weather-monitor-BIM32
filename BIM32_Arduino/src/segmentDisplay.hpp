@@ -43,8 +43,8 @@ class SegmentDisplay {
         uint8_t _prevSecond = 60;
 
         void _segGetData(int* segImg, uint8_t slot, bool dots);
-        void _clock(int* segImg);
-        void _date(int* segImg);
+        void _clock(int* segImg, uint8_t slot);
+        void _date(int* segImg, uint8_t slot);
         void _temp(float t, int* segImg);
         void _hum(float h, int* segImg);
         void _pres(float p, int* segImg);
@@ -109,14 +109,14 @@ void SegmentDisplay::brightness(uint8_t intensity, bool reduc) {
 /**
  * Preparing data for displaying the clock
  */
-void SegmentDisplay::_clock(int* segImg) {
+void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
     uint8_t hrH = hour() < 10 ? SYMB_SPACE : floor(hour() / 10);
     uint8_t hrL = hour() % 10;
     uint8_t mnH = floor(minute() / 10);
     uint8_t mnL = minute() % 10;
     uint8_t scH = floor(second() / 10);
     uint8_t scL = second() % 10;
-    uint8_t sens = config.display_timeSlot_data(_slot, _dispNum);
+    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
 
     segImg[0] = _model == DISP4 ? hrH : sens == 0 ? SYMB_SPACE : hrH;
     segImg[1] = _model == DISP4 ? hrL : sens == 0 ? SYMB_SPACE : hrL;
@@ -129,14 +129,14 @@ void SegmentDisplay::_clock(int* segImg) {
 /**
  * Preparing data for displaying the date
  */
-void SegmentDisplay::_date(int* segImg) {
+void SegmentDisplay::_date(int* segImg, uint8_t slot) {
     uint8_t dtH = floor(day() / 10);
     uint8_t dtL = day() % 10;
     uint8_t mtH = floor(month() / 10);
     uint8_t mtL = month() % 10;
     uint8_t yrH = floor(year() % 100 / 10);
     uint8_t yrL = year() % 10;
-    uint8_t sens = config.display_timeSlot_data(_slot, _dispNum);
+    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
 
     segImg[0] = _model == DISP4 ? dtH : sens == 0 ? SYMB_SPACE : dtH;
     segImg[1] = _model == DISP4 ? dtL : sens == 0 ? SYMB_SPACE : dtL;
@@ -333,8 +333,8 @@ void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
         );
 
         switch(dType) {
-            case CLOCK: _clock(segImg); break;
-            case DATE: _date(segImg); break;
+            case CLOCK: _clock(segImg, slot); break;
+            case DATE: _date(segImg, slot); break;
             case TEMP: _temp(data, segImg); break;
             case HUM: _hum(data, segImg); break;
             case PRES: _pres(data, segImg); break;
