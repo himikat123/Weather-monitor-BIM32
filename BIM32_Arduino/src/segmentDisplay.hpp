@@ -50,6 +50,7 @@ class SegmentDisplay {
         void _pres(float p, int* segImg);
         void _iaq(float i, int* segImg);
         void _co2(float c, int* segImg);
+        void _apMode(int* segImg);
         void _pointsTogether(bool dots);
         void _pointsInTurn();
 };
@@ -242,6 +243,18 @@ void SegmentDisplay::_co2(float c, int* segImg) {
     segImg[5] = c1;
 }
 
+/**
+ * Preparing data for displaying AP mode
+ */
+void SegmentDisplay::_apMode(int* segImg) {
+    segImg[0] = SYMB_SPACE;
+    segImg[1] = _model == DISP4 ? SYMB_A : SYMB_SPACE;
+    segImg[2] = _model == DISP4 ? SYMB_P : SYMB_A;
+    segImg[3] = _model == DISP4 ? SYMB_SPACE : SYMB_P;
+    segImg[4] = SYMB_SPACE;
+    segImg[5] = SYMB_SPACE;
+}
+
 void SegmentDisplay::_slotSwitch() {
     unsigned int period = config.display_timeSlot_period(_slot, _dispNum);
     if((millis() - _prevSlotMillis) > (period * 1000) or period == 0) {
@@ -279,6 +292,10 @@ void SegmentDisplay::_segAnimations() {
     _segGetData(segImg, _slot, true);
     String color = config.display_timeSlot_color(_slot, _dispNum);
     String prevColor = config.display_timeSlot_color(_prevSlot, _dispNum);
+    if(global.apMode) {
+        color = "#FFFFFF";
+        prevColor = "#FFFFFF";
+    }
 
     _animIsRunnung = true;
     unsigned int type = config.display_animation_type(_dispNum);
@@ -303,11 +320,14 @@ void SegmentDisplay::_segAnimations() {
     if(_animSlot >= FRAMES[_model][type] - 1) _animIsRunnung = false;
 
     /* clock points */
-    switch(config.display_animation_points(_dispNum)) {
-        case 0: _pointsTogether(_dots); break;
-        case 1: _pointsInTurn(); break;
-        case 2: _pointsTogether(true); break;
-        default: _pointsTogether(false); break;
+    if(global.apMode) _pointsTogether(false);
+    else {
+        switch(config.display_animation_points(_dispNum)) {
+            case 0: _pointsTogether(_dots); break;
+            case 1: _pointsInTurn(); break;
+            case 2: _pointsTogether(true); break;
+            default: _pointsTogether(false); break;
+        }
     }
 
     /* power on bottom points for date */
@@ -324,7 +344,10 @@ void SegmentDisplay::_segAnimations() {
 }
 
 void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
-    if(config.display_timeSlot_period(slot, _dispNum) > 0) {
+    if(global.apMode) {
+        _apMode(segImg);
+    }
+    else if(config.display_timeSlot_period(slot, _dispNum) > 0) {
         uint8_t dType = 0;
         float data = agregateSegmentData.slotData(
             config.display_timeSlot_sensor(slot, _dispNum),
