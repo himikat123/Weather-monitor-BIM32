@@ -10,6 +10,7 @@ class Validate {
         bool batVolt(float v);
         bool batLvl(int l);
         bool batPercent(int p);
+        bool thingVolt(float v);
         bool hVolt(float v);
         bool current(float c);
         bool power(float p);
@@ -86,6 +87,13 @@ bool Validate::batLvl(int l) {
  */
 bool Validate::batPercent(int p) {
     return (p >= 0 and p <= 100);
+}
+
+/**
+ * Validate if voltage from thingspeak is within the normal range
+ */
+bool Validate::thingVolt(float v) {
+    return (v >= 0.0 and v <= 260.0);
 }
 
 /**

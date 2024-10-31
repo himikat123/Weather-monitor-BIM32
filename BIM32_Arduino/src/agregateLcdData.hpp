@@ -237,7 +237,7 @@ String AgregateLcdData::_voltageThingspeak() {
         switch(config.display_source_volt_thingType()) {
             case 0: { /* battery voltage */
                 float volt = thingspeak.get_field(config.display_source_volt_thing());
-                if(validate.batVolt(volt)) value = String(round(volt * 100) / 100) + lang.v();
+                if(validate.thingVolt(volt)) value = String(round(volt * 100) / 100) + lang.v();
             }; break;
             case 1: { /* battery percentage */
                 float prc = thingspeak.get_field(config.display_source_volt_thing());
