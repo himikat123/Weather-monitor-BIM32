@@ -8,16 +8,14 @@
 
 class AgregateSegmentData {
     public:
-        float slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType, bool* clockDots);
+        float slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType);
 };
 
-float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType, bool* clockDots) {
+float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType) {
     float data = -40400.0;
-    *clockDots = false;
 
     switch(sensor) {
-        case 0: { // Clock 
-            *clockDots = true;
+        case 0: { // Clock
             *dType = CLOCK;
         }; break;
         case 1: { // Date

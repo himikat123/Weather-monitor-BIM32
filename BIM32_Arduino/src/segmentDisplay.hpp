@@ -1,5 +1,7 @@
 #define DISP4 0
 #define DISP6 1
+#define DISP8 2
+#define DOT 100
 
 class SegmentDisplay {
     public:
@@ -12,23 +14,17 @@ class SegmentDisplay {
 
     protected:
         uint8_t _slot = 0;
-        bool _dots = false;                                     // time points
-        bool _clockdots = false;                                // need for time points
-        bool _dummy = false;
-        bool _dot1 = false;
-        bool _dot2 = false;
-        bool _dot3 = false;
-        bool _dot4 = false;
-        unsigned int _dotfreq = 500;                            // time points period
-        bool _power = true;                                     // display on/off flag
-        uint8_t _brightness = 40;                               // display brightness
-        int _dispImg[6] = {                                     // display digits
-            SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+        bool _points[8] = {false, false, false, false, false, false, false, false};
+        bool _prevPoints[8] = {false, false, false, false, false, false, false, false};
+        unsigned int _dotfreq = 500;    // time points period
+        bool _power = true;             // display on/off flag
+        uint8_t _brightness = 40;       // display brightness
+        int _dispImg[8] = {             // display digits
+            SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
         };
-        char _dispColors[6][8] = {"", "", "", "", "", ""};
+        char _dispColors[8][8] = {"", "", "", "", "", "", "", ""};
         uint8_t _dispNum = 0;
         bool _animIsRunnung = false;
-        uint8_t _model = DISP4;
 
         void _slotSwitch();
         void _segAnimations();
@@ -41,6 +37,8 @@ class SegmentDisplay {
         uint32_t _prevSlotMillis = 0;
         uint16_t _millisShift = 0;
         uint8_t _prevSecond = 60;
+        bool _pointsState = false;
+        uint8_t _dispLength = DISP4;
 
         void _segGetData(int* segImg, uint8_t slot, bool dots);
         void _clock(int* segImg, uint8_t slot);
@@ -51,15 +49,21 @@ class SegmentDisplay {
         void _iaq(float i, int* segImg);
         void _co2(float c, int* segImg);
         void _apMode(int* segImg);
-        void _pointsTogether(bool dots);
-        void _pointsInTurn();
 };
 
 /**
  * Set display model
  */
 void SegmentDisplay::_setModel(uint8_t model) {
-    _model = model < 3 ? DISP4 : DISP6;
+    _dispLength = config.display_type(_dispNum) == 2
+        ? model < 3
+            ? DISP4
+            : DISP6
+        : (model == 0 || model == 1 || model == 3)
+            ? DISP4
+            : (model == 2 || model == 4)
+                ? DISP6
+                : DISP8;
 }
 
 /**
@@ -111,40 +115,78 @@ void SegmentDisplay::brightness(uint8_t intensity, bool reduc) {
  * Preparing data for displaying the clock
  */
 void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
-    uint8_t hrH = hour() < 10 ? SYMB_SPACE : floor(hour() / 10);
-    uint8_t hrL = hour() % 10;
-    uint8_t mnH = floor(minute() / 10);
-    uint8_t mnL = minute() % 10;
-    uint8_t scH = floor(second() / 10);
-    uint8_t scL = second() % 10;
-    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
+    uint8_t hr = config.clock_format() ? hour() : hourFormat12();
+    uint8_t hrH = floor(hr < 10 ? SYMB_SPACE : hr / 10);
+    uint8_t hrL = hr % 10;
+    uint8_t mnH = floor(minute() / 10), mnL = minute() % 10;
+    uint8_t scH = floor(second() / 10), scL = second() % 10;
+    int32_t ml = millis() - _millisShift;
+    uint8_t msH = floor(ml / 100), msL = floor(ml % 100 / 10);
+    bool point1 = false, point2 = false;
 
-    segImg[0] = _model == DISP4 ? hrH : sens == 0 ? SYMB_SPACE : hrH;
-    segImg[1] = _model == DISP4 ? hrL : sens == 0 ? SYMB_SPACE : hrL;
-    segImg[2] = _model == DISP4 ? mnH : sens == 0 ? hrH : mnH;
-    segImg[3] = _model == DISP4 ? mnL : sens == 0 ? hrL : mnL;
-    segImg[4] = _model == DISP4 ? scH : sens == 0 ? mnH : scH;
-    segImg[5] = _model == DISP4 ? scL : sens == 0 ? mnL : scL;
+    switch(config.display_animation_points(_dispNum)) {
+        case 0: point1 = point2 = _pointsState; break;
+        case 1: point1 = _pointsState; point2 = !point1; break;
+        case 2: point1 = point2 = true; break;
+        case 3: point1 = point2 = false; break;
+        default: ; break;
+    }
+
+    int disp4Img[8] = {
+        (config.display_type(_dispNum) == 2 || config.display_model(_dispNum) < 2) && point1 ? (hrH + DOT) : hrH, 
+        point2 ? (hrL + DOT) : hrL, 
+        mnH, mnL, 
+        SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    };
+    int disp6Img[3][8] = {
+        {
+            SYMB_SPACE, SYMB_SPACE, config.display_type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
+            point2 ? (hrL + DOT) : hrL, mnH, mnL, SYMB_SPACE, SYMB_SPACE
+        },
+        {
+            config.display_type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, point2 ? (hrL + DOT) : hrL, 
+            config.display_type(_dispNum) == 2 && point1 ? (mnH + DOT) : mnH, point2 ? (mnL + DOT) : mnL, 
+            scH, scL, SYMB_SPACE, SYMB_SPACE
+        },
+        {SYMB_SPACE, hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL}
+    };
+    int disp8Img[5][8] = {
+        {SYMB_SPACE, SYMB_SPACE, hrH, point1 ? hrL + DOT : hrL, mnH, mnL, SYMB_SPACE, SYMB_SPACE},
+        {SYMB_SPACE, hrH, point1 ? hrL + DOT : hrL, mnH, point1 ? mnL + DOT : mnL, scH, scL, SYMB_SPACE},
+        {SYMB_SPACE, SYMB_SPACE, hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL, SYMB_SPACE},
+        {hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL, point1 ? SYMB_MINUS : SYMB_SPACE, scH, scL},
+        {hrH, point1 ? hrL + DOT : hrL, mnH, point1 ? mnL + DOT : mnL, scH, point1 ? scL + DOT : scL, msH, msL}
+    };
+
+    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[sens][i] : disp8Img[sens][i];
+    }
 }
 
 /**
  * Preparing data for displaying the date
  */
 void SegmentDisplay::_date(int* segImg, uint8_t slot) {
-    uint8_t dtH = floor(day() / 10);
-    uint8_t dtL = day() % 10;
-    uint8_t mtH = floor(month() / 10);
-    uint8_t mtL = month() % 10;
-    uint8_t yrH = floor(year() % 100 / 10);
-    uint8_t yrL = year() % 10;
-    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
+    uint8_t dtH = floor(day() / 10), dtL = day() % 10;
+    uint8_t mtH = floor(month() / 10), mtL = month() % 10;
+    uint8_t yr1 = floor(year() / 1000), yr2 = floor(year() % 1000 / 100), yr3 = floor(year() % 100 / 10), yr4 = floor(year() % 10);
 
-    segImg[0] = _model == DISP4 ? dtH : sens == 0 ? SYMB_SPACE : dtH;
-    segImg[1] = _model == DISP4 ? dtL : sens == 0 ? SYMB_SPACE : dtL;
-    segImg[2] = _model == DISP4 ? mtH : sens == 0 ? dtH : mtH;
-    segImg[3] = _model == DISP4 ? mtL : sens == 0 ? dtL : mtL;
-    segImg[4] = _model == DISP4 ? SYMB_SPACE : sens == 0 ? mtH : yrH;
-    segImg[5] = _model == DISP4 ? SYMB_SPACE : sens == 0 ? mtL : yrL;
+    int disp4Img[8] = {dtH, dtL + DOT, mtH, mtL, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+    int disp6Img[2][8] = {
+        {SYMB_SPACE, SYMB_SPACE, dtH, dtL + DOT, mtH, mtL, SYMB_SPACE, SYMB_SPACE},
+        {dtH, dtL + DOT, mtH, mtL + DOT, yr3, yr4, SYMB_SPACE, SYMB_SPACE}
+    };
+    int disp8Img[3][8] = {
+        {SYMB_SPACE, SYMB_SPACE, dtH, dtL + DOT, mtH, mtL, SYMB_SPACE, SYMB_SPACE},
+        {SYMB_SPACE, dtH, dtL + DOT, mtH, mtL + DOT, yr3, yr4, SYMB_SPACE},
+        {dtH, dtL + DOT, mtH, mtL + DOT, yr1, yr2, yr3, yr4}
+    };
+
+    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[sens][i] : disp8Img[sens][i];
+    }
 }
 
 /**
@@ -154,16 +196,38 @@ void SegmentDisplay::_date(int* segImg, uint8_t slot) {
 void SegmentDisplay::_temp(float t, int* segImg) {
     bool valid = validate.temp(t);
     int tmp = round(t);
-    unsigned int th = floor(abs(tmp) / 10);
-    unsigned int tl = abs(tmp) % 10;
+    uint8_t th = floor(abs(tmp) / 10), tl = abs(tmp) % 10;
     if(th == 0) th = SYMB_SPACE;
 
-    segImg[0] = _model == DISP4 ? valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS : SYMB_SPACE;
-    segImg[1] = _model == DISP4 ? valid ? tmp < -9 ? th : tl : SYMB_MINUS : valid ? tmp < -9 ? SYMB_MINUS : SYMB_SPACE : SYMB_SPACE;
-    segImg[2] = _model == DISP4 ? valid ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE : valid ? th : SYMB_MINUS;
-    segImg[3] = _model == DISP4 ? valid ? tmp < -9 ? SYMB_DEGREE : SYMB_C : SYMB_C : valid ? tl : SYMB_MINUS;
-    segImg[4] = SYMB_DEGREE;
-    segImg[5] = SYMB_C;
+    int disp4Img[8] = {
+        valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (tmp < 0 ? tmp < -9 ? th : tl : tl) : SYMB_MINUS,
+        valid ? (tmp < 0 ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE) : SYMB_DEGREE,
+        valid ? (tmp < 0 ? tmp < -9 ? SYMB_DEGREE : SYMB_C : SYMB_C) : SYMB_C,
+        SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    };
+    int disp6Img[8] = {
+        SYMB_SPACE,
+        valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (tmp < 0 ? tmp < -9 ? th : tl : tl) : SYMB_MINUS,
+        valid ? (tmp < 0 ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE) : SYMB_DEGREE,
+        valid ? (tmp <-9 ? SYMB_DEGREE : SYMB_C) : SYMB_C,
+        valid ? (tmp <-9 ? SYMB_C : SYMB_SPACE) : SYMB_SPACE,
+        SYMB_SPACE, SYMB_SPACE
+    };
+    int disp8Img[8] = {
+        SYMB_SPACE, SYMB_SPACE,
+        valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (tmp < 0 ? tmp < -9 ? th : tl : tl) : SYMB_MINUS,
+        valid ? (tmp < 0 ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE) : SYMB_DEGREE,
+        valid ? (tmp <-9 ? SYMB_DEGREE : SYMB_C) : SYMB_C,
+        valid ? (tmp <-9 ? SYMB_C : SYMB_SPACE) : SYMB_SPACE,
+        SYMB_SPACE
+    };
+
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+    }
 }
 
 /**
@@ -173,16 +237,28 @@ void SegmentDisplay::_temp(float t, int* segImg) {
 void SegmentDisplay::_hum(float h, int* segImg) {
     bool valid = validate.hum(h);
     int hm = round(h);
-    unsigned int hh = floor(hm / 10);
-    unsigned int hl = hm % 10;
+    uint8_t hh = floor(hm / 10), hl = hm % 10;
     if(hh == 0) hh = SYMB_SPACE;
 
-    segImg[0] = _model == DISP4 ? valid ? (hm > 99 ? 1 : hh) : SYMB_MINUS : SYMB_SPACE;
-    segImg[1] = _model == DISP4 ? valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS : (valid && hm > 99) ? 1 : SYMB_SPACE;
-    segImg[2] = _model == DISP4 ? valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE : valid ? (hm > 99 ? 0 : hh) : SYMB_MINUS;
-    segImg[3] = _model == DISP4 ? SYMB_H : valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS;
-    segImg[4] = SYMB_SPACE;
-    segImg[5] = SYMB_H;
+    int disp4Img[8] = {
+        valid ? (hm > 99 ? 1 : hh) : SYMB_MINUS, valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS,
+        valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE, SYMB_H, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    };
+    int disp6Img[8] = {
+        SYMB_SPACE, valid ? (hm > 9 ? hm > 99 ? 1 : hh : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS, valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE,
+        valid ? (hm > 99 ? SYMB_SPACE : SYMB_H) : SYMB_H, valid ? (hm > 99 ? SYMB_H : SYMB_SPACE) : SYMB_SPACE, 
+        SYMB_SPACE, SYMB_SPACE
+    };
+    int disp8Img[8] = {
+        SYMB_SPACE, SYMB_SPACE, valid ? (hm > 9 ? hm > 99 ? 1 : hh : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS, valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE,
+        valid ? (hm > 99 ? SYMB_SPACE : SYMB_H) : SYMB_H, valid ? (hm > 99 ? SYMB_H : SYMB_SPACE) : SYMB_SPACE, SYMB_SPACE
+    };
+
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+    }
 }
 
 /**
@@ -192,16 +268,17 @@ void SegmentDisplay::_hum(float h, int* segImg) {
 void SegmentDisplay::_pres(float p, int* segImg) {
     bool valid = validate.pres(p);
     int prs = round(p * 0.75);
-    unsigned int p100 = floor(prs / 100);
-    unsigned int p10 = floor(prs % 100 / 10);
-    unsigned int p1 = prs % 10;
+    uint8_t p100 = valid ? floor(prs / 100) : SYMB_MINUS;
+    uint8_t p10 = valid ? floor(prs % 100 / 10) : SYMB_MINUS;
+    uint8_t p1 = valid ? prs % 10 : SYMB_MINUS;
 
-    segImg[0] = _model == DISP4 ? valid ? p100 : SYMB_MINUS : SYMB_SPACE;
-    segImg[1] = _model == DISP4 ? valid ? p10 : SYMB_MINUS : valid ? p100 : SYMB_MINUS;
-    segImg[2] = _model == DISP4 ? valid ? p1 : SYMB_MINUS : valid ? p10 : SYMB_MINUS;
-    segImg[3] = _model == DISP4 ? SYMB_P : valid ? p1 : SYMB_MINUS;
-    segImg[4] = SYMB_SPACE;
-    segImg[5] = SYMB_P;
+    int disp4Img[8] = {p100, p10, p1, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+    int disp6Img[8] = {SYMB_SPACE, p100, p10, p1, SYMB_SPACE, SYMB_P, SYMB_SPACE, SYMB_SPACE};
+    int disp8Img[8] = {SYMB_SPACE, SYMB_SPACE, p100, p10, p1, SYMB_SPACE, SYMB_P, SYMB_SPACE};
+
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+    }
 }
 
 /**
@@ -211,16 +288,28 @@ void SegmentDisplay::_pres(float p, int* segImg) {
 void SegmentDisplay::_iaq(float i, int* segImg) {
     bool valid = validate.iaq(i);
     int iaq = round(i);
-    unsigned int i100 = iaq < 100 ? SYMB_SPACE : floor(iaq / 100);
-    unsigned int i10 = iaq < 10 ? SYMB_SPACE : floor(iaq % 100 / 10);
-    unsigned int i1 = iaq % 10;
+    uint8_t i100 = valid ? iaq < 100 ? SYMB_SPACE : floor(iaq / 100) : SYMB_MINUS;
+    uint8_t i10 = valid ? iaq < 10 ? SYMB_SPACE : floor(iaq % 100 / 10) : SYMB_MINUS;
+    uint8_t i1 = valid ? iaq % 10 : SYMB_MINUS;
 
-    segImg[0] = _model == DISP4 ? SYMB_A : SYMB_SPACE;
-    segImg[1] = _model == DISP4 ? valid ? i100 : SYMB_MINUS : (valid && iaq < 100) ? SYMB_SPACE : SYMB_A;
-    segImg[2] = _model == DISP4 ? valid ? i10 : SYMB_MINUS : (valid && iaq < 100) ? SYMB_A : SYMB_SPACE;
-    segImg[3] = _model == DISP4 ? valid ? i1 : SYMB_MINUS : valid ? i100 : SYMB_MINUS;
-    segImg[4] = valid ? i10 : SYMB_MINUS;
-    segImg[5] = valid ? i1 : SYMB_MINUS;
+    int disp4Img[8] = {
+        iaq < 10 ? SYMB_SPACE : SYMB_A, iaq < 100 ? iaq < 10 ? SYMB_A : SYMB_SPACE : i100, 
+        iaq < 10 ? SYMB_SPACE : i10, i1, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    };
+    int disp6Img[8] = {
+        SYMB_SPACE, iaq < 10 ? SYMB_SPACE : SYMB_A, 
+        iaq < 10 ? SYMB_A : SYMB_SPACE, iaq < 100 ? iaq < 10 ? SYMB_SPACE : i10 : i100,
+        iaq < 100 ? i1 : i10, iaq < 100 ? SYMB_SPACE : i1, SYMB_SPACE, SYMB_SPACE
+    };
+    int disp8Img[8] = {
+        SYMB_SPACE, SYMB_SPACE, iaq < 10 ? SYMB_SPACE : SYMB_A, 
+        iaq < 10 ? SYMB_A : SYMB_SPACE, iaq < 100 ? iaq < 10 ? SYMB_SPACE : i10 : i100, 
+        iaq < 100 ? i1 : i10, iaq < 100 ? SYMB_SPACE : i1, SYMB_SPACE
+    };
+
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+    }
 }
 
 /**
@@ -230,29 +319,50 @@ void SegmentDisplay::_iaq(float i, int* segImg) {
 void SegmentDisplay::_co2(float c, int* segImg) {
     bool valid = validate.co2(c);
     int co2 = round(c);
-    unsigned int c1000 = valid ? (co2 < 1000 ? SYMB_SPACE : floor(co2 / 1000)) : SYMB_MINUS;
-    unsigned int c100 = valid ? (co2 < 100 ? SYMB_SPACE : floor(co2 % 1000 / 100)) : SYMB_MINUS;
-    unsigned int c10 = valid ? (co2 < 10 ? SYMB_SPACE : floor(co2 % 100 / 10)) : SYMB_MINUS;
-    unsigned int c1 = valid ? co2 % 10 : SYMB_MINUS;
+    uint8_t c1000 = co2 < 1000 ? SYMB_SPACE : floor(co2 / 1000);
+    uint8_t c100 = co2 < 100 ? SYMB_SPACE : floor(co2 % 1000 / 100);
+    uint8_t c10 = co2 < 10 ? SYMB_SPACE : floor(co2 % 100 / 10);
+    uint8_t c1 = co2 % 10;
 
-    segImg[0] = _model == DISP4 ? c1000 : SYMB_C;
-    segImg[1] = _model == DISP4 ? c100 : SYMB_o;
-    segImg[2] = _model == DISP4 ? c10 : c1000;
-    segImg[3] = _model == DISP4 ? c1 : c100;
-    segImg[4] = c10;
-    segImg[5] = c1;
+    int disp4Img[8] = {
+        valid ? co2 < 1000 ? SYMB_C : c1000 : SYMB_C, valid ? co2 < 100 ? 0 : c100 : 0, 
+        valid ? co2 < 10 ? SYMB_SPACE : c10 : 2, valid ? c1 : SYMB_MINUS, 
+        SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    };
+    int disp6Img[8] = {
+        co2 < 10 ? SYMB_SPACE : SYMB_C, co2 < 10 ? SYMB_C : 0, 
+        valid ? co2 < 1000 ? co2 < 100 ? co2 < 10 ? 0 : 2 : SYMB_SPACE : c1000 : 2, 
+        valid ? co2 < 100 ? co2 < 10 ? 2 : SYMB_SPACE : c100 : SYMB_SPACE, 
+        valid ? co2 < 10 ? SYMB_SPACE : c10 : SYMB_MINUS, valid ? c1 : SYMB_MINUS, 
+        SYMB_SPACE, SYMB_SPACE
+    };
+    int disp8Img[8] = {
+        valid ? co2 < 1000 ? SYMB_SPACE : SYMB_C : SYMB_C,
+        valid ? co2 < 1000 ? co2 < 10 ? SYMB_SPACE : SYMB_C : 0 : 0,
+        valid ? co2 < 1000 ? co2 < 10 ? SYMB_C : 0 : 2 : 2,
+        valid ? co2 < 1000 ? co2 < 10 ? 0 : 2 : SYMB_SPACE : SYMB_SPACE,
+        valid ? co2 < 1000 ? co2 < 10 ? 2 : SYMB_SPACE : c1000 : SYMB_MINUS,
+        valid ? co2 < 100 ? co2 < 10 ? SYMB_SPACE : c10 : c100 : SYMB_MINUS,
+        valid ? co2 < 100 ? c1 : c10 : SYMB_MINUS,
+        valid ? co2 < 100 ? SYMB_SPACE : c1 : SYMB_MINUS
+    };
+
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+    }
 }
 
 /**
  * Preparing data for displaying AP mode
  */
 void SegmentDisplay::_apMode(int* segImg) {
-    segImg[0] = SYMB_SPACE;
-    segImg[1] = _model == DISP4 ? SYMB_A : SYMB_SPACE;
-    segImg[2] = _model == DISP4 ? SYMB_P : SYMB_A;
-    segImg[3] = _model == DISP4 ? SYMB_SPACE : SYMB_P;
-    segImg[4] = SYMB_SPACE;
-    segImg[5] = SYMB_SPACE;
+    int disp4Img[8] = {SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+    int disp6Img[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+    int disp8Img[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+
+    for(uint8_t i=0; i<8; i++) {
+        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+    }
 }
 
 void SegmentDisplay::_slotSwitch() {
@@ -281,12 +391,12 @@ void SegmentDisplay::_slotSwitch() {
         _millisShift = millis() % 1000;
         _prevSecond = second();
     }
-    _dots = !((millis() - _millisShift) % (_dotfreq * 2) > _dotfreq);
+    _pointsState = !((millis() - _millisShift) % (_dotfreq * 2) > _dotfreq);
 }
 
 void SegmentDisplay::_segAnimations() {
-    int segImg[6] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
-    int segImgPrev[6] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE}; 
+    int segImg[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+    int segImgPrev[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE}; 
 
     _segGetData(segImgPrev, _prevSlot, false);
     _segGetData(segImg, _slot, true);
@@ -300,47 +410,24 @@ void SegmentDisplay::_segAnimations() {
     _animIsRunnung = true;
     unsigned int type = config.display_animation_type(_dispNum);
 
-    for(uint8_t i=0; i<(_model == DISP4 ? 4 : 6); i++) {
-        uint8_t shf = abs(SHIFTS[_model][type][_animSlot][i]) - 1;
-        if(SHIFTS[_model][type][_animSlot][i] == 0) _dispImg[i] = SYMB_SPACE;
+    for(uint8_t i=0; i<(_dispLength == DISP4 ? 4 : _dispLength == DISP6 ? 6 : 8); i++) {
+        uint8_t shf = abs(SHIFTS[_dispLength][type][_animSlot][i]) - 1;
+        if(SHIFTS[_dispLength][type][_animSlot][i] == 0) _dispImg[i] = SYMB_SPACE;
         else {
-            if(SHIFTS[_model][type][_animSlot][i] < 0) _dispImg[i] = segImgPrev[shf]; 
+            if(SHIFTS[_dispLength][type][_animSlot][i] < 0) _dispImg[i] = segImgPrev[shf]; 
             else _dispImg[i] = segImg[shf];
         }
         
-        if(SHIFTS[_model][type][_animSlot][i] < 0) prevColor.toCharArray(_dispColors[i], 8);
+        if(SHIFTS[_dispLength][type][_animSlot][i] < 0) prevColor.toCharArray(_dispColors[i], 8);
         else color.toCharArray(_dispColors[i], 8);
     }
 
     if(millis() - _animMillis > 1000 / config.display_animation_speed(_dispNum)) {
         _animMillis = millis();
-        if(_animSlot < FRAMES[_model][type] - 1) _animSlot++;
+        if(_animSlot < FRAMES[_dispLength][type] - 1) _animSlot++;
     }
 
-    if(_animSlot >= FRAMES[_model][type] - 1) _animIsRunnung = false;
-
-    /* clock points */
-    if(global.apMode) _pointsTogether(false);
-    else {
-        switch(config.display_animation_points(_dispNum)) {
-            case 0: _pointsTogether(_dots); break;
-            case 1: _pointsInTurn(); break;
-            case 2: _pointsTogether(true); break;
-            default: _pointsTogether(false); break;
-        }
-    }
-
-    /* power on bottom points for date */
-    if(config.display_timeSlot_sensor(_slot, _dispNum) == 1) {
-        _dot1 = false;
-        _dot2 = config.display_model(_dispNum) < 3 
-            ? true 
-            : config.display_timeSlot_data(_slot, _dispNum) > 0 
-                ? true 
-                : false;
-        _dot3 = false;
-        _dot4 = true;
-    }
+    if(_animSlot >= FRAMES[_dispLength][type] - 1) _animIsRunnung = false;
 }
 
 void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
@@ -352,7 +439,7 @@ void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
         float data = agregateSegmentData.slotData(
             config.display_timeSlot_sensor(slot, _dispNum),
             config.display_timeSlot_data(slot, _dispNum),
-            slot, _dispNum, &dType, dots ? &_clockdots : &_dummy
+            slot, _dispNum, &dType
         );
 
         switch(dType) {
@@ -366,32 +453,4 @@ void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
             default: ; break;
         }
     }
-}
-
-void SegmentDisplay::_pointsTogether(bool dots) {
-    _dot3 = _dot4 = _clockdots and !_animIsRunnung and dots;
-    if(_model == DISP4) _dot1 = _dot2 = _dot3;
-    else {
-        if(config.display_timeSlot_data(_slot, _dispNum) > 0) _dot1 = _dot2 = _dot3;
-        else _dot1 = _dot2 = false;
-    }
-}
-
-void SegmentDisplay::_pointsInTurn() {
-    if(_clockdots and !_animIsRunnung) {
-        _dot3 = _dots;
-        _dot4 = !_dots;
-        if(config.display_model(_dispNum) < 3) {
-            _dot1 = _dot3;
-            _dot2 = _dot4;
-        }
-        else {
-            if(config.display_timeSlot_data(_slot, _dispNum) > 0) {
-                _dot1 = _dot3;
-                _dot2 = _dot4;
-            }
-            else _dot1 = _dot2 = false;
-        }
-    }
-    else _dot1 = _dot2 = _dot3 = _dot4 = false;
 }
