@@ -38,7 +38,6 @@ void Network::setNeedToPing() {
  * Connect to WiFi network
  */
 void Network::connect() {
-    WiFi.disconnect();
     Serial.println(SEPARATOR);
     Serial.println("Connecting to WiFi...");
     Serial.println("Known networks:");
@@ -47,13 +46,13 @@ void Network::connect() {
             Serial.printf("\tNet%d: %s\r\n", i, config.network_ssid(i));
         }
     }
-    WiFi.mode(WIFI_STA);
-    WiFi.hostname("BIM32");
     bool anySSID = false;
     for(unsigned int i=0; i<NETWORKS; i++) {
         if(String(config.network_ssid(i)) != "") anySSID = true;
     }
     if(anySSID) {
+        if(!global.apMode) WiFi.disconnect();
+        WiFi.hostname("BIM32");
         if(WiFi.status() != WL_CONNECTED) {
             unsigned int numberOfNetworks = WiFi.scanNetworks();
             int knownNetwork = -1;
@@ -127,7 +126,7 @@ void Network::runAccessPoint() {
         Serial.print("Password: "); Serial.println(config.accessPoint_pass());
         Serial.println("IP address: 192.168.4.1");
         WiFi.disconnect();
-        WiFi.mode(WIFI_STA);
+        WiFi.mode(WIFI_MODE_APSTA);
         WiFi.softAP(config.accessPoint_ssid(), config.accessPoint_pass());
         Serial.println(SEPARATOR);
         Serial.println();
