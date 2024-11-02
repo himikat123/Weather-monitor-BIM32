@@ -56,14 +56,8 @@ class SegmentDisplay {
  */
 void SegmentDisplay::_setModel(uint8_t model) {
     _dispLength = config.display_type(_dispNum) == 2
-        ? model < 3
-            ? DISP4
-            : DISP6
-        : (model == 0 || model == 1 || model == 3)
-            ? DISP4
-            : (model == 2 || model == 4)
-                ? DISP6
-                : DISP8;
+        ? (model < 3 ? DISP4 : DISP6)
+        : ((model == 0 || model == 2) ? DISP4 : (model == 1 || model == 3) ? DISP6 : DISP8);
 }
 
 /**

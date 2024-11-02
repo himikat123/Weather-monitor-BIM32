@@ -23,6 +23,11 @@
 #define WS2812_1_DAT_PIN      33 // WS2812b display 1 pin
 #define WS2812_2_DAT_PIN      12 // WS2812b display 2 pin
 
+#define TM1637_1_CLK_PIN      32 // TM1637 display 1 CLK pin
+#define TM1637_1_DAT_PIN      14 // TM1637 display 1 DAT pin
+#define TM1637_2_CLK_PIN      19 // TM1637 display 2 CLK pin
+#define TM1637_2_DAT_PIN      15 // TM1637 display 2 DAT pin
+
 #define DHT22_PIN              4 // DHT22 sensor pin
 #define PHOTORESISTOR_PIN     36 // Photoresistor pin
 #define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
@@ -38,7 +43,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v4.8"                    // Firmware version
+#define FW "v5.0"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -70,8 +75,8 @@
 #define CORRECTED            true  // corrected data
 
 #define LCD                  1
-#define NEOPIXEL_DISPLAY1    2
-#define NEOPIXEL_DISPLAY2    1
+#define NEOPIXEL_DISPLAY     2
+#define SEGMENT_DISPLAY      3
 #define D_NX4832K035         0
 #define D_NX4832T035         1
 #define D_ILI9341            2
@@ -184,6 +189,7 @@ class Configuration {
     // Display
     unsigned int _display_type[DISPLAYS] = {0, 0}; // Display type
     unsigned int _display_model[DISPLAYS] = {0, 0}; // Display model
+    unsigned int _display_order[DISPLAYS][8] = { {1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 5, 6, 7, 8} }; // Digits order
     unsigned int _display_animation_type[DISPLAYS] = {0, 0}; // Display animation number 0...9
     unsigned int _display_animation_speed[DISPLAYS] = {10, 10}; // Display animation speed 1...30
     unsigned int _display_animation_points[DISPLAYS] = {0, 0}; // Display animation clock points 0...4
@@ -434,6 +440,9 @@ class Configuration {
                     for(unsigned int i=0; i<DISPLAYS; i++) {
                         COPYNUM(conf["display"]["type"][i], _display_type[i]);
                         COPYNUM(conf["display"]["model"][i], _display_model[i]);
+                        for(unsigned int o=0; o<8; o++) {
+                            COPYNUM(conf["display"]["order"][i][o], _display_order[i][o]);
+                        }
                         COPYSTR(conf["display"]["dayTime"][i], _display_dayTime[i]);
                         COPYSTR(conf["display"]["nightTime"][i], _display_nightTime[i]);
                         COPYNUM(conf["display"]["brightMethod"][i], _display_brightMethod[i]);
@@ -834,6 +843,11 @@ class Configuration {
     unsigned int display_model(unsigned int num) {
         if(num >= DISPLAYS) return 0;
         return _display_model[num];
+    }
+
+    unsigned int display_order(unsigned int num, unsigned int dig) {
+        if(num >= DISPLAYS || dig > 7) return 0;
+        return _display_order[num][dig];
     }
 
     unsigned int display_animation_type(unsigned int num) {
