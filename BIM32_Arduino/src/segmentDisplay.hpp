@@ -115,7 +115,7 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
     uint8_t mnH = floor(minute() / 10), mnL = minute() % 10;
     uint8_t scH = floor(second() / 10), scL = second() % 10;
     int32_t ml = millis() - _millisShift;
-    uint8_t msH = floor(ml / 100), msL = floor(ml % 100 / 10);
+    uint8_t msH = floor(ml % 1000 / 100), msL = floor(ml % 100 / 10);
     bool point1 = false, point2 = false;
 
     switch(config.display_animation_points(_dispNum)) {

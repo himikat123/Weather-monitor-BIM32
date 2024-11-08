@@ -1,5 +1,8 @@
-#define DISP4 0
-#define DISP6 1
+#define DISP4    0
+#define DISP6    1
+#define DOT    100
+#define SYMBOLS  0
+#define WITH_DOT 1
 
 class TM1637 : public SegmentDisplay {
     public:
@@ -54,8 +57,8 @@ void TM1637::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<6; i++) {
-        if(_dispImg[i] >= 100) _pixels[i] = font_tm1637[1][_dispImg[i] - 100];
-        else _pixels[i] = font_tm1637[0][_dispImg[i]];
+        if(_dispImg[i] >= DOT) _pixels[i] = font_tm1637[WITH_DOT][_dispImg[i] - DOT];
+        else _pixels[i] = font_tm1637[SYMBOLS][_dispImg[i]];
 
         if(_pixelsPrev[i] != _pixels[i]) {
             _pixelsPrev[i] = _pixels[i];
@@ -103,34 +106,24 @@ void TM1637::_clearDisplay() {
 void TM1637::_writeByte(byte data) {
     if(_clk > 0 && _dat > 0) {
         for(uint8_t i=0; i<8; i++) {
-            //pinMode(_clk, OUTPUT);
             digitalWrite(_clk, LOW);
             delayMicroseconds(50);
-            //if(data & 0x01) pinMode(_dat, INPUT);
             if(data & 0x01) digitalWrite(_dat, HIGH);
-            //else pinMode(_dat, OUTPUT);
             else digitalWrite(_dat, LOW);
             data >>= 1;
             delayMicroseconds(50);
-            //pinMode(_clk, INPUT);
             digitalWrite(_clk, HIGH);
             delayMicroseconds(50);
         }
-        //pinMode(_clk, OUTPUT);
         digitalWrite(_clk, LOW);
         delayMicroseconds(50);
-        //pinMode(_dat, INPUT);
         digitalWrite(_dat, HIGH);
         delayMicroseconds(50);
-        //pinMode(_clk, INPUT);
         digitalWrite(_clk, HIGH);
         pinMode(_dat, INPUT);
         delayMicroseconds(50);
         uint8_t ack = digitalRead(_dat);
-        if(ack == 0) {
-            //pinMode(_dat, OUTPUT);
-            digitalWrite(_dat, LOW);
-        }
+        if(ack == 0) digitalWrite(_dat, LOW);
         delayMicroseconds(50);
         pinMode(_dat, OUTPUT);
         delayMicroseconds(50);
@@ -142,16 +135,12 @@ void TM1637::_writeByte(byte data) {
  */
 void TM1637::_start() {
     if(_clk > 0 && _dat > 0) {
-        //pinMode(_clk, INPUT);
         digitalWrite(_clk, HIGH);
         delayMicroseconds(50);
-        //pinMode(_dat, INPUT);
         digitalWrite(_dat, HIGH);
         delayMicroseconds(50);
-        //pinMode(_dat, OUTPUT);
         digitalWrite(_dat, LOW);
         delayMicroseconds(50);
-        //pinMode(_clk, OUTPUT);
         digitalWrite(_clk, LOW);
         delayMicroseconds(50);
     }
@@ -162,16 +151,12 @@ void TM1637::_start() {
  */
 void TM1637::_stop(void) {
     if(_clk > 0 && _dat > 0) {
-        //pinMode(_clk, OUTPUT);
         digitalWrite(_clk, LOW);
         delayMicroseconds(50);
-        //pinMode(_dat, OUTPUT);
         digitalWrite(_dat, LOW);
         delayMicroseconds(50);
-        //pinMode(_clk, INPUT);
         digitalWrite(_clk, HIGH);
         delayMicroseconds(50);
-        //pinMode(_dat, INPUT);
         digitalWrite(_dat, HIGH);
         delayMicroseconds(50);
     }

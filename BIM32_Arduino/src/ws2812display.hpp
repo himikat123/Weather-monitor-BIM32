@@ -5,6 +5,7 @@ LiteLED strip_2(LED_STRIP_WS2812, false, RMT_CHANNEL_3);
 
 #define DISP4 0
 #define DISP6 1
+#define DOT 100
 
 class WS2812b : public SegmentDisplay {
     public:
@@ -68,8 +69,8 @@ void WS2812b::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<6; i++) {
-        _points[i] = _dispImg[i] >= 100;
-        _pixels[i] = font_ws2812[_dispImg[i] >= 100 ? _dispImg[i] - 100 : _dispImg[i]];
+        _points[i] = _dispImg[i] >= DOT;
+        _pixels[i] = font_ws2812[_dispImg[i] >= DOT ? _dispImg[i] - DOT : _dispImg[i]];
         unsigned int colors = strtol(&_dispColors[i][1], NULL, 16);
         _reds[i] = colors >> 16;
         _greens[i] = colors >> 8 & 0xFF;

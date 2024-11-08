@@ -28,6 +28,13 @@
 #define TM1637_2_CLK_PIN      19 // TM1637 display 2 CLK pin
 #define TM1637_2_DAT_PIN      15 // TM1637 display 2 DAT pin
 
+#define MAX7219_1_CLK_PIN      32 // MAX7219 display 1 CLK pin
+#define MAX7219_1_DAT_PIN      14 // MAX7219 display 1 DAT pin
+#define MAX7219_1_LOAD_PIN      5 // MAX7219 display 1 LOAD pin
+#define MAX7219_2_CLK_PIN      19 // MAX7219 display 2 CLK pin
+#define MAX7219_2_DAT_PIN      15 // MAX7219 display 2 DAT pin
+#define MAX7219_2_LOAD_PIN      2 // MAX7219 display 2 LOAD pin
+
 #define DHT22_PIN              4 // DHT22 sensor pin
 #define PHOTORESISTOR_PIN     36 // Photoresistor pin
 #define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
@@ -1131,7 +1138,7 @@ class Configuration {
     unsigned int display_timeSlot_data(unsigned int slot, unsigned int displayNum) {
         if(slot >= TIMESLOTS) return 0;
         if(displayNum >= DISPLAYS) return 0;
-        if(_display_timeSlot_data[slot][displayNum] > 3) return 0;
+        if(_display_timeSlot_data[slot][displayNum] > 4) return 0;
         return _display_timeSlot_data[slot][displayNum];
     }
 

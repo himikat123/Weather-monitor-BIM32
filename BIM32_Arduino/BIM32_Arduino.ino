@@ -84,6 +84,9 @@ WS2812b ws2812b_2;
 #include "src/tm1637display.hpp"
 TM1637 tm1637_1;
 TM1637 tm1637_2;
+#include "src/max7219segmentDisplay.hpp"
+MAX7219_S max7219_1;
+MAX7219_S max7219_2;
 #include "src/network.hpp"
 Network network;
 #include "src/agregateComfortData.hpp"
