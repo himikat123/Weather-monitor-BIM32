@@ -35,6 +35,11 @@
 #define MAX7219_2_DAT_PIN      15 // MAX7219 display 2 DAT pin
 #define MAX7219_2_LOAD_PIN      2 // MAX7219 display 2 LOAD pin
 
+#define PCF8575_1_SCL_PIN      32 // PCF8575 display 1 SCL pin
+#define PCF8575_1_SDA_PIN      14 // PCF8575 display 1 SDA pin
+#define PCF8575_2_SCL_PIN      19 // PCF8575 display 2 SCL pin
+#define PCF8575_2_SDA_PIN      15 // PCF8575 display 2 SDA pin
+
 #define DHT22_PIN              4 // DHT22 sensor pin
 #define PHOTORESISTOR_PIN     36 // Photoresistor pin
 #define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
@@ -81,9 +86,10 @@
 #define RAW                  false // raw data without correction
 #define CORRECTED            true  // corrected data
 
-#define LCD                  1
+#define LCD_DISPLAY          1
 #define NEOPIXEL_DISPLAY     2
 #define SEGMENT_DISPLAY      3
+#define NUMITRON_DISPLAY     4
 #define D_NX4832K035         0
 #define D_NX4832T035         1
 #define D_ILI9341            2
@@ -115,7 +121,9 @@ TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_server_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
+
 SemaphoreHandle_t sensorsSemaphore = NULL;
+SemaphoreHandle_t numitronSemaphore = NULL;
 
 class Configuration {
     #define NETWORKS 3
@@ -697,7 +705,7 @@ class Configuration {
         else Serial.println(" No user file found");
 
         /* Read touch calibration file */
-        if(_display_type[0] == LCD && _display_model[0] == D_ILI9341) {
+        if(_display_type[0] == LCD_DISPLAY && _display_model[0] == D_ILI9341) {
             Serial.print("Read touch calibration file... ");
             file = LittleFS.open("/touch.json");
             if(file) {

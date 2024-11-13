@@ -127,7 +127,7 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
     }
 
     int disp4Img[8] = {
-        (config.display_type(_dispNum) == 2 || config.display_model(_dispNum) < 2) && point1 ? (hrH + DOT) : hrH, 
+        config.display_type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
         point2 ? (hrL + DOT) : hrL, 
         mnH, mnL, 
         SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
