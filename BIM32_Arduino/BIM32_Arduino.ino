@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v4.7
+ *  Weather Monitor BIM32 v5.0
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
@@ -78,9 +78,15 @@ ILI9341 ili9341;
 AgregateSegmentData agregateSegmentData;
 #include "src/segmentAnimationsShifts.hpp"
 #include "src/segmentDisplay.hpp"
-#include "src/ws2812b.hpp"
+#include "src/ws2812display.hpp"
 WS2812b ws2812b_1;
 WS2812b ws2812b_2;
+#include "src/tm1637display.hpp"
+TM1637 tm1637_1;
+TM1637 tm1637_2;
+#include "src/max7219segmentDisplay.hpp"
+MAX7219_S max7219_1;
+MAX7219_S max7219_2;
 #include "src/network.hpp"
 Network network;
 #include "src/agregateComfortData.hpp"
@@ -135,6 +141,7 @@ void setup() {
     xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, 1);
     xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, 1, &task_display2_handle, 1);
 
+    WiFi.mode(WIFI_STA);
     network.connect();
 
     webInterface_init();

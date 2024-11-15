@@ -67,17 +67,17 @@ void TaskSensors(void *pvParameters) {
 
         wsensor.receive(); /* Receive from wireless sensor */
 
+        /**
+         * Network connection if not connected and if not Access point mode
+         */
+        if(WiFi.localIP().toString() == "0.0.0.0" or !network.isConnected()) {
+            global.net_connected = false;
+            network.connect();
+            vTaskDelay(1000);
+        }
+        else global.net_connected = true;
+        
         if(!global.apMode) {
-            /**
-             * Network connection if not connected and if not Access point mode
-             */
-            if(WiFi.localIP().toString() == "0.0.0.0" or !network.isConnected()) {
-                global.net_connected = false;
-                network.connect();
-                vTaskDelay(1000);
-            }
-            else global.net_connected = true;
-
             /**
              * Time synchronization with NTP server
              */
