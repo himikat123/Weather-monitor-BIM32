@@ -84,6 +84,7 @@ void Comfort::calculate() {
     if(_iaqLevel > AIR_CLEAN or _co2Level > AIR_CLEAN) _purifier = true;
     else _purifier = false;
 
+    global.comfort = COMFORTABLE;
     if(_tempLevel == TEMP_UNDEFINED && _humLevel == HUM_UNDEFINED) global.comfort = UNDEFINED;
     if(_tempLevel == TEMP_TOO_HOT && _humLevel < HUM_TOO_HUMID) global.comfort = HOT;
     if(_tempLevel == TEMP_TOO_COLD && _humLevel < HUM_TOO_HUMID) global.comfort = COLD;
