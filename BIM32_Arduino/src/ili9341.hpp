@@ -89,7 +89,8 @@ class ILI9341 : LcdDisplay {
         float _hrPres[8];
         float _hrPrec[8];
         time_t _hrDate[8];
-
+        bool _cmfType = false;
+        time_t _prevCmfTime = 0;
 
         void _sequenceSlotSkip();
         void _sequenceSlotNext();
@@ -329,16 +330,35 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
         else if(font == FONT_SEGMENTS_BIG) tft.loadFont(segment_140);
         _prevFont = font;
     }
+
     tft.fillRect(x, y, width, height, bgColor);
     tft.setTextColor(color, bgColor);
-    if(align == CENTER or align == RIGHT) {
-        uint16_t w = tft.textWidth(text);
+
+    String croppedText = "";
+    for(size_t i = 0; i < text.length(); ) {
+        uint8_t c = text[i];
+        uint8_t charLength = 1;
+        if((c & 0x80) == 0x00) charLength = 1;
+        else if((c & 0xE0) == 0xC0) charLength = 2;
+        //else if((c & 0xF0) == 0xE0) charLength = 3;
+        //else if((c & 0xF8) == 0xF0) charLength = 4;
+        String currentChar = text.substring(i, i + charLength);
+        String testText = croppedText + currentChar;
+        uint16_t textWidth = tft.textWidth(testText);
+        if(textWidth > width) break;
+        croppedText = testText;
+        i += charLength;
+    }
+
+    if(align == CENTER || align == RIGHT) {
+        uint16_t w = tft.textWidth(croppedText);
         if(align == RIGHT) x += width - w - 4;
         else x += (width / 2) - (w / 2);
     }
+
     uint16_t h = tft.fontHeight();
     tft.setCursor(x, valign ? (y + height / 2 - h / 2) : y);
-    tft.print(text);
+    tft.print(croppedText);
 }
 
 /**
@@ -535,9 +555,23 @@ void ILI9341::_showHumidityOutside() {
  */
 void ILI9341::_showComfort() {
     if(config.display_source_descr() == 2) _comfort = _nameSequence[_sequenceSlot];
-    if(_prevComfort != _comfort || _forced) {
-        _printText(145, 28, 175, 16, _comfort, FONT1, CENTER, TEXT_COLOR);
-        _prevComfort = _comfort;
+    else {
+        if(_comfort.indexOf(".") > 0) {
+            char buf[255];
+            _comfort.toCharArray(buf, 255);
+            char* cmf0 = strtok(buf, ".");
+            char* cmf1 = strtok(NULL, ".");
+            if(millis() - _prevCmfTime >= 2000) {
+                _prevCmfTime = millis();
+                _cmfType = !_cmfType;
+                for(size_t i = 0; cmf1[i] != '\0'; i++) cmf1[i] = cmf1[i + 1]; // remove first space character
+                _printText(145, 28, 174, 16, String(_cmfType ? cmf1 : cmf0), FONT1, CENTER, TEXT_COLOR);
+            }
+        }
+        if(_prevComfort != _comfort || _forced) {
+            _printText(145, 28, 174, 16, _comfort, FONT1, CENTER, TEXT_COLOR);
+            _prevComfort = _comfort;
+        }
     }
 }
 
@@ -565,7 +599,7 @@ void ILI9341::_showBatteryLevel() {
  */
 void ILI9341::_showVoltageOrPercentage() {
     if(_prevVolt != _volt || _prevVoltColor != _voltColor || _forced) {
-        _printText(198, 10, 58, 16, _volt, FONT1, RIGHT, _air_color[_voltColor]);
+        _printText(178, 10, 78, 16, _volt, FONT1, RIGHT, _air_color[_voltColor]);
         _prevVolt = _volt;
         _prevVoltColor = _voltColor;
     }
