@@ -59,13 +59,13 @@ bool web_isLogged(bool answer) {
 }
 
 String web_getContentType(String filename) {
-  if(server.hasArg("download"))    return "application/octet-stream";
+  if(server.hasArg("download"))       return "application/octet-stream";
   else if(filename.endsWith(".html")) return "text/html";
   else if(filename.endsWith(".json")) return "text/json";
   else if(filename.endsWith(".jpg"))  return "image/jpeg";
   else if(filename.endsWith(".png"))  return "image/png";
   else if(filename.endsWith(".css"))  return "text/css";
-  else if(filename.endsWith(".js"))  return "application/javascript";
+  else if(filename.endsWith(".js"))   return "application/javascript";
   else if(filename.endsWith(".gz"))   return "application/x-gzip";
   return "text/plain";
 }
@@ -80,6 +80,9 @@ bool web_fileRead(String path) {
     if(LittleFS.exists(pathWithGz) || LittleFS.exists(path)) {
         if(LittleFS.exists(pathWithGz)) path += ".gz";
         File file = LittleFS.open(path, "r");
+        if(path.endsWith(".js.gz") || path.endsWith(".css.gz")) {
+            server.sendHeader("Cache-Control", "max-age=31536000");
+        }
         server.streamFile(file, contentType);
         file.close();
         return true;

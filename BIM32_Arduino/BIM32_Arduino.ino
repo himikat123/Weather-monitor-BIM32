@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v5.1
+ *  Weather Monitor BIM32 v5.2
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
@@ -87,6 +87,9 @@ TM1637 tm1637_2;
 #include "src/max7219segmentDisplay.hpp"
 MAX7219_S max7219_1;
 MAX7219_S max7219_2;
+#include "src/pcf8575SegmentDisplay.hpp"
+PCF8575_S pcf8575_1;
+PCF8575_S pcf8575_2;
 #include "src/network.hpp"
 Network network;
 #include "src/agregateComfortData.hpp"
@@ -127,7 +130,7 @@ void setup() {
     }
     config.readConfig();
 
-    if(config.display_type(0) == LCD) {
+    if(config.display_type(0) == LCD_DISPLAY) {
         if(config.display_model(0) == D_NX4832K035 or config.display_model(0) == D_NX4832T035) {
             Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
             nextion.showLogo();

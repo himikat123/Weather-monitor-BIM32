@@ -102,6 +102,7 @@ void WS2812b::_print() {
  */
 void WS2812b::_sendToDisplay() {
     uint8_t bright = (uint8_t)map(_brightness, 0, 100, 0, 255);
+    bright = constrain(bright, 0, 255);
     if(bright < config.display_brightness_min(_dispNum)) bright = config.display_brightness_min(_dispNum);
     if(bright > config.display_brightness_max(_dispNum)) bright = config.display_brightness_max(_dispNum);  
     _strip->brightness(bright, false);

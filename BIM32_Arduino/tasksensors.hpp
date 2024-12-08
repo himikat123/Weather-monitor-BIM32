@@ -87,7 +87,10 @@ void TaskSensors(void *pvParameters) {
                     Serial.println(SEPARATOR);
                     Serial.print("NTP synchronization... ");
                     if(network.isConnected()) get_time();
-                    else Serial.println("No internet connection");
+                    else {
+                        global.clockSynchronized = false;
+                        Serial.println("No internet connection");
+                    }
                     vTaskDelay(100);
                 }
             }
@@ -101,7 +104,10 @@ void TaskSensors(void *pvParameters) {
                     Serial.println(SEPARATOR);
                     Serial.println("Receive data from thingspeak.com... ");
                     if(network.isConnected()) thingspeak.receive();
-                    else Serial.println("No internet connection");
+                    else {
+                        thingspeakReceive = 0;
+                        Serial.println("No internet connection");
+                    }
                 }
             }
 
@@ -114,7 +120,10 @@ void TaskSensors(void *pvParameters) {
                     Serial.println(SEPARATOR);
                     Serial.println("Send data to thingspeak.com... ");
                     if(network.isConnected()) thingspeak.send();
-                    else Serial.println("No internet connection");
+                    else {
+                        thingspeakSend = 0;
+                        Serial.println("No internet connection");
+                    }
                 }
             }
 
@@ -127,7 +136,10 @@ void TaskSensors(void *pvParameters) {
                     Serial.println(SEPARATOR);
                     Serial.println("Send data to narodmon.ru... ");
                     if(network.isConnected()) narodmon.send();
-                    else Serial.println("No internet connection");
+                    else {
+                        narodmonSend = 0;
+                        Serial.println("No internet connection");
+                    }
                 }
             }
 
@@ -141,7 +153,10 @@ void TaskSensors(void *pvParameters) {
                         Serial.println(SEPARATOR);
                         Serial.println("Send data via MQTT...");
                         if(network.isConnected()) mqtt.send();
-                        else Serial.println("No internet connection");
+                        else {
+                            mqttSend = 0;
+                            Serial.println("No internet connection");
+                        }
                     }
                 }
             }

@@ -74,6 +74,7 @@ void TM1637::_print() {
  */
 void TM1637::_sendToDisplay() {
     uint8_t bright = map(_brightness, 0, 100, 0, 7);
+    bright = constrain(bright, 0, 7);
     byte seg[6] = { 0, 0, 0, 0, 0, 0 };
     if(_power) {
         for(uint8_t i=0; i<6; i++) seg[i] = _pixels[config.display_order(_dispNum, i) - 1];
