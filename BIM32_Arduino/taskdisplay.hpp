@@ -12,7 +12,6 @@ void TaskDisplay1(void *pvParameters) {
     numitronSemaphore = xSemaphoreCreateMutex();
 
     unsigned int millis_05s = 0;
-    uint8_t delay_ms_1 = 10;
 
     if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
         /* Initialize LCD display */
@@ -35,7 +34,7 @@ void TaskDisplay1(void *pvParameters) {
 
     /* Initialize numitron display */
     if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-        pcf8575_1.init(DISPLAY_1, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN);
+        pcf8575_1.init(DISPLAY_1, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN, NUMITRON_1_PWM_PIN, WS2812_1_DAT_PIN);
     }
 
     while(1) {
@@ -149,7 +148,7 @@ void TaskDisplay1(void *pvParameters) {
 
             /* Numitron display 1 update */
             if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                delay_ms_1 = pcf8575_1.refresh();
+                pcf8575_1.refresh();
             }
 
             if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
@@ -164,7 +163,7 @@ void TaskDisplay1(void *pvParameters) {
             }
         }
 
-        vTaskDelay(delay_ms_1);
+        vTaskDelay(10);
     }
 }
 
@@ -172,7 +171,6 @@ void TaskDisplay2(void *pvParameters) {
     (void) pvParameters;
 
     unsigned int bright_update = 0;
-    uint8_t delay_ms_2 = 10;
 
     /* Initialize WS2812b display 2 */
     if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
@@ -189,9 +187,9 @@ void TaskDisplay2(void *pvParameters) {
     /* Initialize Numitron display 2 */
     if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
         if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-            pcf8575_2.init(DISPLAY_2, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN);
+            pcf8575_2.init(DISPLAY_2, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN, NUMITRON_2_PWM_PIN, WS2812_2_DAT_PIN);
         }
-        else pcf8575_2.init(DISPLAY_2, PCF8575_2_SCL_PIN, PCF8575_2_SDA_PIN);
+        else pcf8575_2.init(DISPLAY_2, PCF8575_2_SCL_PIN, PCF8575_2_SDA_PIN, NUMITRON_2_PWM_PIN, WS2812_2_DAT_PIN);
     }
 
     while(1) {

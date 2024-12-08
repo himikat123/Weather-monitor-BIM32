@@ -9,19 +9,23 @@
 
 class PCF8575_S : public SegmentDisplay {
     public:
-        void init(uint8_t dispNum, int8_t scl, int8_t sda);
-        uint8_t refresh();
+        void init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws);
+        void brightness(uint8_t intensity, bool reduc);
+        void refresh();
 
     private:
         Adafruit_PCF8575 _PCF1, _PCF2, _PCF3, _PCF4;
         Adafruit_PCF8575 _PCF[4] = { _PCF1, _PCF2, _PCF3, _PCF4 };
         int8_t _scl = -1;
         int8_t _sda = -1;
+        int8_t _pwm = -1;
+        int8_t _ws = -1;
         byte _pixels[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         byte _pixelsPrev[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        LiteLED* _strip;
 
-        uint8_t _print();
-        void _sendToDisplay(uint8_t bright);
+        void _print();
+        void _sendToDisplay();
         void _clearDisplay();
 };
 
@@ -30,11 +34,18 @@ class PCF8575_S : public SegmentDisplay {
  * @param dispNum display number
  * @param scl display SCL pin number
  * @param sda display SDA pin number
+ * @param pwm display PWM pin number
+ * @param ws display Backlight pin number
  */
-void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda) {
+void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws) {
     _dispNum = dispNum;
     _scl = scl;
     _sda = sda;
+    _pwm = pwm;
+    _ws = ws;
+    pinMode(pwm, OUTPUT);
+    brightness(100, false);
+
     _setModel(config.display_model(dispNum));
 
     if(sda > 0 && scl > 0) {
@@ -46,23 +57,37 @@ void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda) {
 
         _clearDisplay();
     }
+
+    _strip = _dispNum == 0 ? &strip_1 : &strip_2;
+    _strip->begin(ws, 8);
+    _strip->clear(true);
+}
+
+/**
+ * Set display brightness
+ * @param intensity brightness
+ * @param reduc brightness is reduced or not
+ */
+void PCF8575_S::brightness(uint8_t intensity, bool reduc) {
+    _brightness = reduc ? round(intensity / 2) : intensity;
+    uint16_t bright = map(_brightness, 0, 100, 200, 0);
+    bright = constrain(bright, 0, 200);
+    analogWrite(_pwm, bright);
 }
 
 /**
  * Displays the next display slot
  */
-uint8_t PCF8575_S::refresh() {
+void PCF8575_S::refresh() {
     _slotSwitch();
     _segAnimations();
-    return _print();
+    _print();
 }
 
 /**
  * Display data on the display
  */
-uint8_t PCF8575_S::_print() {
-    uint8_t bright = map(_brightness, 0, 100, 1, 10);
-    bright = constrain(bright, 1, 10);
+void PCF8575_S::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<8; i++) {
@@ -75,19 +100,13 @@ uint8_t PCF8575_S::_print() {
         }
     }
 
-    if(bright < 10) {
-        _sendToDisplay(bright);
-        return 10 - bright;
-    }        
-    if(updated) _sendToDisplay(bright);
- 
-    return bright;
+    if(updated) _sendToDisplay();
 }
 
 /**
  * Send data to display
  */
-void PCF8575_S::_sendToDisplay(uint8_t bright) {
+void PCF8575_S::_sendToDisplay() {
     if(_sda > 0 && _scl > 0) {
         byte seg[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
         if(_power) {
@@ -98,26 +117,31 @@ void PCF8575_S::_sendToDisplay(uint8_t bright) {
             uint16_t buf = (uint16_t)seg[i * 2];
             buf = buf << 8;
             buf += (uint16_t)seg[i * 2 + 1];
-            if(sensorsSemaphore != NULL) {
-                if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
+            if(numitronSemaphore != NULL) {
+                if(xSemaphoreTake(numitronSemaphore, (TickType_t)100) == pdTRUE) {
                     _PCF[i].digitalWriteWord(buf);
-                    xSemaphoreGive(sensorsSemaphore);
-                }
-            }
-        }
-
-        if(bright < 10) {
-            vTaskDelay(bright);
-            for(int i=0; i<4; i++) {
-                if(sensorsSemaphore != NULL) {
-                    if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
-                        _PCF[i].digitalWriteWord(0xFFFF);
-                        xSemaphoreGive(sensorsSemaphore);
-                    }
+                    xSemaphoreGive(numitronSemaphore);
                 }
             }
         }
     }
+
+    /* Backlight */
+    uint8_t bright = (uint8_t)map(_brightness, 0, 100, 1, 180);
+    bright = constrain(bright, 1, 180);
+    _strip->brightness(bright, false);
+
+    for(uint8_t i=0; i<8; i++) {
+        unsigned int colors = strtol(&_dispColors[i][1], NULL, 16);
+        rgb_t pixelColor = { 
+            .r = uint8_t(colors >> 16), 
+            .g = uint8_t(colors >> 8 & 0x00FF), 
+            .b = uint8_t(colors & 0x00FF) 
+        };
+        _strip->setPixel(i, pixelColor, false);
+    }
+
+    _strip->show();
 }
 
 /**

@@ -37,25 +37,27 @@
 
 #define PCF8575_1_SCL_PIN      32 // PCF8575 display 1 SCL pin
 #define PCF8575_1_SDA_PIN      14 // PCF8575 display 1 SDA pin
+#define NUMITRON_1_PWM_PIN      5 // NUMITRON display 1 PWM pin
 #define PCF8575_2_SCL_PIN      19 // PCF8575 display 2 SCL pin
 #define PCF8575_2_SDA_PIN      15 // PCF8575 display 2 SDA pin
+#define NUMITRON_2_PWM_PIN      2 // NUMITRON display 2 PWM pin
 
-#define DHT22_PIN              4 // DHT22 sensor pin
-#define PHOTORESISTOR_PIN     36 // Photoresistor pin
-#define ONE_WIRE_BUS_PIN      27 // DS18B20 one-wire bus pin
+#define DHT22_PIN               4 // DHT22 sensor pin
+#define PHOTORESISTOR_PIN      36 // Photoresistor pin
+#define ONE_WIRE_BUS_PIN       27 // DS18B20 one-wire bus pin
 
-#define HC12_RX_PIN           16 // HC12 wireless module TX pin
-#define HC12_TX_PIN           17 // HC12 wireless module RX pin
-#define HC12_SET_PIN          25 // HC12 wireless module SET pin
+#define HC12_RX_PIN            16 // HC12 wireless module TX pin
+#define HC12_TX_PIN            17 // HC12 wireless module RX pin
+#define HC12_SET_PIN           25 // HC12 wireless module SET pin
 
-#define MP3_TX_PIN            23 // DFplayer RX pin
-#define MP3_BUSY_PIN          18 // DFplayer BUSY pin
+#define MP3_TX_PIN             23 // DFplayer RX pin
+#define MP3_BUSY_PIN           18 // DFplayer BUSY pin
 
-#define ALARMS                12 // Number of alarms
+#define ALARMS                 12 // Number of alarms
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v5.1"                    // Firmware version
+#define FW "v5.2"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
