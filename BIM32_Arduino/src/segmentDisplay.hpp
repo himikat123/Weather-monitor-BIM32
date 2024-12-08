@@ -1,6 +1,3 @@
-#define DISP4 0
-#define DISP6 1
-#define DISP8 2
 #define DOT 100
 
 class SegmentDisplay {
@@ -38,9 +35,10 @@ class SegmentDisplay {
         uint16_t _millisShift = 0;
         uint8_t _prevSecond = 60;
         bool _pointsState = false;
-        uint8_t _dispLength = DISP4;
+        uint8_t _dispLength = 4;
 
         void _segGetData(int* segImg, uint8_t slot, bool dots);
+        int _pendulumPattern(uint32_t ml, uint8_t max);
         void _clock(int* segImg, uint8_t slot);
         void _date(int* segImg, uint8_t slot);
         void _temp(float t, int* segImg);
@@ -55,9 +53,12 @@ class SegmentDisplay {
  * Set display model
  */
 void SegmentDisplay::_setModel(uint8_t model) {
-    _dispLength = config.display_type(_dispNum) == 2
-        ? (model < 3 ? DISP4 : DISP6)
-        : ((model == 0 || model == 2) ? DISP4 : (model == 1 || model == 3) ? DISP6 : DISP8);
+    switch(config.display_type(_dispNum)) {
+        case 2: _dispLength = model < 3 ? 4 : 6; break;
+        case 3: _dispLength = (model == 0 || model == 2) ? 4 : (model == 1 || model == 3) ? 6 : 8; break;
+        case 4: _dispLength = model == 0 ? 4 : model == 1 ? 6 : 8; break;
+        default: _dispLength = 4;
+    }
 }
 
 /**
@@ -105,6 +106,11 @@ void SegmentDisplay::brightness(uint8_t intensity, bool reduc) {
     _brightness = reduc ? round(intensity / 2) : intensity;
 }
 
+int SegmentDisplay::_pendulumPattern(uint32_t ml, uint8_t max) {
+    float phase = (ml % 2000) / (2000 / (2 * max));
+    return phase <= max ? round(phase) : round(2 * max - phase);
+}
+
 /**
  * Preparing data for displaying the clock
  */
@@ -114,13 +120,17 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
     uint8_t hrL = hr % 10;
     uint8_t mnH = floor(minute() / 10), mnL = minute() % 10;
     uint8_t scH = floor(second() / 10), scL = second() % 10;
-    int32_t ml = millis() - _millisShift;
+    int64_t ml = millis() - _millisShift;
     uint8_t msH = floor(ml % 1000 / 100), msL = floor(ml % 100 / 10);
+    int pendulum = _pendulumPattern(second() * 1000 + (ml % 1000), _dispLength - 1);
     bool point1 = false, point2 = false;
 
     switch(config.display_animation_points(_dispNum)) {
         case 0: point1 = point2 = _pointsState; break;
-        case 1: point1 = _pointsState; point2 = !point1; break;
+        case 1: {
+            point1 = config.display_type(_dispNum) == 2 ? _pointsState : false; 
+            point2 = config.display_type(_dispNum) == 2 ? !point1 : false; 
+        } break;
         case 2: point1 = point2 = true; break;
         case 3: point1 = point2 = false; break;
         default: ; break;
@@ -154,7 +164,13 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
 
     uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[sens][i] : disp8Img[sens][i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[sens][i] : disp8Img[sens][i];
+    }
+
+    if(config.display_animation_points(_dispNum) == 1 && config.display_type(_dispNum) != 2) {
+        for(uint8_t i=0; i<_dispLength; i++) {
+            segImg[i] = pendulum == i ? segImg[i] + DOT : segImg[i];
+        }
     }
 }
 
@@ -166,7 +182,9 @@ void SegmentDisplay::_date(int* segImg, uint8_t slot) {
     uint8_t mtH = floor(month() / 10), mtL = month() % 10;
     uint8_t yr1 = floor(year() / 1000), yr2 = floor(year() % 1000 / 100), yr3 = floor(year() % 100 / 10), yr4 = floor(year() % 10);
 
-    int disp4Img[8] = {dtH, dtL + DOT, mtH, mtL, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
+    int disp4Img[8] = {
+        dtH, dtL + DOT, mtH, mtL, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    };
     int disp6Img[2][8] = {
         {SYMB_SPACE, SYMB_SPACE, dtH, dtL + DOT, mtH, mtL, SYMB_SPACE, SYMB_SPACE},
         {dtH, dtL + DOT, mtH, mtL + DOT, yr3, yr4, SYMB_SPACE, SYMB_SPACE}
@@ -179,7 +197,7 @@ void SegmentDisplay::_date(int* segImg, uint8_t slot) {
 
     uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[sens][i] : disp8Img[sens][i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[sens][i] : disp8Img[sens][i];
     }
 }
 
@@ -220,7 +238,7 @@ void SegmentDisplay::_temp(float t, int* segImg) {
     };
 
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
     }
 }
 
@@ -251,7 +269,7 @@ void SegmentDisplay::_hum(float h, int* segImg) {
     };
 
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
     }
 }
 
@@ -271,7 +289,7 @@ void SegmentDisplay::_pres(float p, int* segImg) {
     int disp8Img[8] = {SYMB_SPACE, SYMB_SPACE, p100, p10, p1, SYMB_SPACE, SYMB_P, SYMB_SPACE};
 
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
     }
 }
 
@@ -302,7 +320,7 @@ void SegmentDisplay::_iaq(float i, int* segImg) {
     };
 
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
     }
 }
 
@@ -342,7 +360,7 @@ void SegmentDisplay::_co2(float c, int* segImg) {
     };
 
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
     }
 }
 
@@ -355,7 +373,7 @@ void SegmentDisplay::_apMode(int* segImg) {
     int disp8Img[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
 
     for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == DISP4 ? disp4Img[i] : _dispLength == DISP6 ? disp6Img[i] : disp8Img[i];
+        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
     }
 }
 
@@ -403,25 +421,26 @@ void SegmentDisplay::_segAnimations() {
 
     _animIsRunnung = true;
     unsigned int type = config.display_animation_type(_dispNum);
+    uint8_t dl = _dispLength == 4 ? 0 : _dispLength == 6 ? 1 : 2;
 
-    for(uint8_t i=0; i<(_dispLength == DISP4 ? 4 : _dispLength == DISP6 ? 6 : 8); i++) {
-        uint8_t shf = abs(SHIFTS[_dispLength][type][_animSlot][i]) - 1;
-        if(SHIFTS[_dispLength][type][_animSlot][i] == 0) _dispImg[i] = SYMB_SPACE;
+    for(uint8_t i=0; i<(_dispLength); i++) {
+        uint8_t shf = abs(SHIFTS[dl][type][_animSlot][i]) - 1;
+        if(SHIFTS[dl][type][_animSlot][i] == 0) _dispImg[i] = SYMB_SPACE;
         else {
-            if(SHIFTS[_dispLength][type][_animSlot][i] < 0) _dispImg[i] = segImgPrev[shf]; 
+            if(SHIFTS[dl][type][_animSlot][i] < 0) _dispImg[i] = segImgPrev[shf]; 
             else _dispImg[i] = segImg[shf];
         }
         
-        if(SHIFTS[_dispLength][type][_animSlot][i] < 0) prevColor.toCharArray(_dispColors[i], 8);
+        if(SHIFTS[dl][type][_animSlot][i] < 0) prevColor.toCharArray(_dispColors[i], 8);
         else color.toCharArray(_dispColors[i], 8);
     }
 
     if(millis() - _animMillis > 1000 / config.display_animation_speed(_dispNum)) {
         _animMillis = millis();
-        if(_animSlot < FRAMES[_dispLength][type] - 1) _animSlot++;
+        if(_animSlot < FRAMES[dl][type] - 1) _animSlot++;
     }
 
-    if(_animSlot >= FRAMES[_dispLength][type] - 1) _animIsRunnung = false;
+    if(_animSlot >= FRAMES[dl][type] - 1) _animIsRunnung = false;
 }
 
 void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
