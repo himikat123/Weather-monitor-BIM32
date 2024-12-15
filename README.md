@@ -66,7 +66,7 @@ You can connect any one, several, or all sensors from this list at once. If your
 ## Wiring diagram of the radio channel module for communication with wireless sensors
 Also, **[wireless sensors](https://github.com/himikat123/Radio-sensor)** can be connected to the **weather monitor**, for this you need to add the radio channel module **HC-12** according to the diagram below.
 
-<p align="center"><img src="img/radio.png" width="300" alt="weather monitor BIM32 radio channel"></p>
+<p align="center"><img src="img/radio_v5.2.png" width="300" alt="weather monitor BIM32 radio channel"></p>
 
 ## Wiring diagram for weather control devices in the house
 To control the weather in the house, you can connect a humidifier and dehumidifier, as well as a heater, cooler (fan or air conditioner) and air purifier. I cannot provide a connection diagram for these devices, since everything depends on how the control is implemented in each specific device (remote control, buttons, voltage). Therefore, I will simply indicate on which pins of **PCF8574** logical signals will appear when need to turn on this or that device.
@@ -76,7 +76,7 @@ To control the weather in the house, you can connect a humidifier and dehumidifi
 ## Sound module connection diagram
 To enable the alarm clock and the talking clock to produce sounds, the **DF-Player mini** mp3 player module is used, the connection diagram for which is shown below. You will need to copy the entire contents of the **SDcard** folder to the **micro-sd card**, having previously formatted it in the FAT32 file system. If you do not need sound, just connect the GPIO18 ESP32 pin to ground.
 
-<p align="center"><img src="img/mp3player_v4.3.png" width="400" alt="weather monitor BIM32 MP3-player"></p>
+<p align="center"><img src="img/mp3player_v5.2.png" width="400" alt="weather monitor BIM32 MP3-player"></p>
 
 Having used this device, an unpleasant moment was discovered: this mp3 player module produces a constant low noise. To get rid of the noise, you need to re-solder the resistor from position A to position B, shown in the photo below. This manipulation switches the MUTE input of the amplifier to the BUSY output, on which a log. signal appears only during sound playback.
 
