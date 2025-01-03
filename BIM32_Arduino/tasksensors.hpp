@@ -14,7 +14,6 @@ void TaskSensors(void *pvParameters) {
 
     unsigned int ntp_update = 0;
     unsigned int sensors_update = 0;
-    unsigned int networks_update = 0;
     unsigned int thingspeakReceive = 0;
     unsigned int thingspeakSend = 0;
     unsigned int narodmonSend = 0;
@@ -35,6 +34,8 @@ void TaskSensors(void *pvParameters) {
     sound.init();
     mqtt.init();
 
+    network.scanNetworks();
+
     while(1) {
         // Enter access point mode if "Settings" button is pressed
         if(digitalRead(SETTINGS_BUTTON_PIN) == 0) network.runAccessPoint();
@@ -54,15 +55,6 @@ void TaskSensors(void *pvParameters) {
             }
             comfort.calculate();
             comfort.devicesControl();
-        }
-
-        /**
-         * List of available networks update
-         * every 20 seconds
-         */
-        if(millis() - networks_update > 20000) {
-            networks_update = millis();
-            network.scanNetworks();
         }
 
         wsensor.receive(); /* Receive from wireless sensor */

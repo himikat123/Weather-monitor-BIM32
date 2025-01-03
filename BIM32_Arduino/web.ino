@@ -297,6 +297,14 @@ void web_restart() {
     }
 }
 
+/* Scan available networks */
+void web_netlist() {
+    if(web_isLogged(true)) {
+        network.scanNetworks();
+        server.send(200, "text/plain", "OK");
+    }
+}
+
 /**
  * Change language
  */
@@ -536,21 +544,19 @@ void web_changePass() {
  * Upload a file
  */
 void web_fileUpload() {
-    if(web_isLogged(true)) {
-        HTTPUpload& upload = server.upload();
-        if(upload.status == UPLOAD_FILE_START) {
-            String filename = upload.filename;
-            if(!filename.startsWith("/")) filename = "/" + filename;
-            fsUploadFile = LittleFS.open(filename, "w");
-            filename = String();
-        }
-        else if(upload.status == UPLOAD_FILE_WRITE) {
-            if(fsUploadFile) fsUploadFile.write(upload.buf, upload.currentSize);
-        }
-        else if(upload.status == UPLOAD_FILE_END) {
-            global.fsInfoUpdate = true;
-            if(fsUploadFile) fsUploadFile.close();
-        }
+    HTTPUpload& upload = server.upload();
+    if(upload.status == UPLOAD_FILE_START) {
+        String filename = upload.filename;
+        if(!filename.startsWith("/")) filename = "/" + filename;
+        fsUploadFile = LittleFS.open(filename, "w");
+        filename = String();
+    }
+    else if(upload.status == UPLOAD_FILE_WRITE) {
+        if(fsUploadFile) fsUploadFile.write(upload.buf, upload.currentSize);
+    }
+    else if(upload.status == UPLOAD_FILE_END) {
+        global.fsInfoUpdate = true;
+        if(fsUploadFile) fsUploadFile.close();
     }
 }
 
@@ -595,6 +601,7 @@ void webInterface_init(void) {
     server.on("/esp/saveConfig",    HTTP_POST, web_save);
     server.on("/esp/saveAlarm",     HTTP_POST, web_save_alarm);
     server.on("/esp/restart",       HTTP_GET,  web_restart);
+    server.on("/esp/netlist",       HTTP_GET,  web_netlist);
     server.on("/esp/changelang",    HTTP_GET,  web_changeLang);
     server.on("/esp/dispToggle",    HTTP_GET,  web_dispToggle);
     server.on("/esp/brightLimit",   HTTP_GET,  web_brightLimit);
