@@ -424,7 +424,7 @@ uint16_t ILI9341::_number_picture_size(uint8_t num) {
 
 void ILI9341::_showTime() {
     if(_prevTHour != _tHour || _forced) {
-        if(_tHour < 10) tft.fillRect(0, 0, 32, 78, BG_COLOR);
+        if(config.clock_format() % 2 == 0 && _tHour < 10) tft.fillRect(0, 0, 32, 78, BG_COLOR);
         else _showImg(0, 0, _number_picture(_tHour / 10), _number_picture_size(_tHour / 10));
         _showImg(33, 0, _number_picture(_tHour % 10), _number_picture_size(_tHour % 10));
         _prevTHour = _tHour;
@@ -688,7 +688,9 @@ void ILI9341::_showUpdTime() {
     if(_prevWeatherUpdated != _weatherUpdated || _forced) {
         time_t t = _weatherUpdated;
         char buf[32] = "";
-        sprintf(buf, "%02d.%02d.%d %02d:%02d", day(t), month(t), year(t), hour(t), minute(t));
+        unsigned int hr = config.clock_format() > 1 ? hour(t) : hourFormat12(t);
+        if(config.clock_format() % 2 == 0) sprintf(buf, "%02d.%02d.%d %d:%02d", day(t), month(t), year(t), hr, minute(t));
+        else sprintf(buf, "%02d.%02d.%d %02d:%02d", day(t), month(t), year(t), hr, minute(t));
         _printText(176, 148, 117, 16, t > 0 ? buf : " ", FONT1, LEFT, TEXT_COLOR);
         if(t > 0) {
             tft.drawCircle(167, 153, 5, TEXT_COLOR);
@@ -881,7 +883,11 @@ void ILI9341::_bigClockPage() {
     }
     if(_prevTHour != hour() || _forced) {
         tft.fillRect(0, 66, 160, 124, BG_COLOR);
-        _printText(0, 68, 155, 120, String(hour()), FONT_SEGMENTS_BIG, RIGHT, CLOCK_COLOR);
+        unsigned int hr = config.clock_format() > 1 ? hour() : hourFormat12();
+        char buf[3];
+        if(config.clock_format() % 2 == 0) sprintf(buf, "%02d", hr);
+        else sprintf(buf, "%d", hr);
+        _printText(0, 68, 155, 120, String(buf), FONT_SEGMENTS_BIG, RIGHT, CLOCK_COLOR);
         _prevTHour = hour();
     }
 
@@ -912,7 +918,11 @@ void ILI9341::_smallClockPage() {
     }
     if(_prevTHour != hour() || _forced) {
         tft.fillRect(1, 80, 106, 2, BG_COLOR);
-        _printText(1, 82, 106, 96, String(hour()), FONT_SEGMENTS_SML, RIGHT, CLOCK_COLOR);
+        unsigned int hr = config.clock_format() > 1 ? hour() : hourFormat12();
+        char buf[3];
+        if(config.clock_format() % 2 == 0) sprintf(buf, "%02d", hr);
+        else sprintf(buf, "%d", hr);
+        _printText(1, 82, 106, 96, String(buf), FONT_SEGMENTS_SML, RIGHT, CLOCK_COLOR);
         _prevTHour = hour();
     }
     if(_prevTMinute != minute() || _forced) {

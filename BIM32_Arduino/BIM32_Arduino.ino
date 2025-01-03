@@ -1,8 +1,8 @@
 /**
- *  Weather Monitor BIM32 v5.2
+ *  Weather Monitor BIM32 v5.3
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
- *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2024
+ *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2025
  *
  *  Board: ESP32 Dev Module
  *  Partition sheme: No OTA (2MB APP/2MB SPIFFS)
