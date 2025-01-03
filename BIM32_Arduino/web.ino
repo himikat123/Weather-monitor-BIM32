@@ -227,9 +227,9 @@ void web_sens() {
         json["thing"]["data"][i] = thingspeak.get_field(i);
     }
 
-    json["weather"]["temp"] = weather.get_currentTemp();
-    json["weather"]["hum"] = weather.get_currentHum();
-    json["weather"]["pres"] = weather.get_currentPres();
+    json["weather"]["temp"] = weather.get_currentTemp(RAW);
+    json["weather"]["hum"] = weather.get_currentHum(RAW);
+    json["weather"]["pres"] = weather.get_currentPres(RAW);
     json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
     json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
     json["weather"]["descript"] = weather.get_description();

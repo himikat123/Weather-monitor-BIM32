@@ -9,9 +9,9 @@ class Weather {
 
     public:
         void update();
-        float get_currentTemp();
-        float get_currentHum();
-        float get_currentPres();
+        float get_currentTemp(bool corr);
+        float get_currentHum(bool corr);
+        float get_currentPres(bool corr);
         float get_currentWindSpeed();
         int get_currentWindDir();
         unsigned int get_currentIcon();
@@ -525,16 +525,16 @@ void Weather::_calculateDaily(void) {
 /**
  * Getters 
  */
-float Weather::get_currentTemp() {
-    return _currentTemp;
+float Weather::get_currentTemp(bool corr) {
+    return _currentTemp + (corr ? config.weather_temp_corr() : 0.0);
 }
 
-float Weather::get_currentHum() {
-    return _currentHum;
+float Weather::get_currentHum(bool corr) {
+    return _currentHum + (corr ? config.weather_hum_corr() : 0.0);
 }
 
-float Weather::get_currentPres() {
-    return _currentPres;
+float Weather::get_currentPres(bool corr) {
+    return _currentPres + (corr ? config.weather_pres_corr() : 0.0);
 }
 
 float Weather::get_currentWindSpeed() {

@@ -192,6 +192,9 @@ class Configuration {
     char _weather_city[41] = ""; // City name
     unsigned int _weather_cityid = 0; // City ID
     unsigned int _weather_citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
+    float _weather_temp_corr = 0; // Weather temperature correction
+    float _weather_hum_corr = 0; // Weather humidity correction
+    float _weather_pres_corr = 0; // Weather pressure correction
 
     // Language
     char _lang[3] = "en";
@@ -442,6 +445,9 @@ class Configuration {
                     COPYNUM(conf["weather"]["lat"], _weather_lat);
                     COPYNUM(conf["weather"]["provider"], _weather_provider);
                     COPYNUM(conf["weather"]["citysearch"], _weather_citysearch);
+                    COPYNUM(conf["weather"]["corr"]["t"], _weather_temp_corr);
+                    COPYNUM(conf["weather"]["corr"]["h"], _weather_hum_corr);
+                    COPYNUM(conf["weather"]["corr"]["p"], _weather_pres_corr);
 
                     // Language
                     COPYSTR(conf["lang"], _lang);
@@ -822,6 +828,18 @@ class Configuration {
     unsigned int weather_citysearch() {
         if(_weather_citysearch > 2) return 0;
         return _weather_citysearch;
+    }
+
+    float weather_temp_corr() {
+        return _weather_temp_corr;
+    }
+
+    float weather_hum_corr() {
+        return _weather_hum_corr;
+    }
+
+    float weather_pres_corr() {
+        return _weather_pres_corr;
     }
 
     String lang() {

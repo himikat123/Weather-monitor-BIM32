@@ -8,14 +8,14 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
     switch(field) {
         case 1: { // Weather
             // Temperature
-            if(type == 0 and validate.temp(weather.get_currentTemp()))
-                data = weather.get_currentTemp();
+            if(type == 0 and validate.temp(weather.get_currentTemp(CORRECTED)))
+                data = weather.get_currentTemp(CORRECTED);
              // Humidity
-            if(type == 1 and validate.hum(weather.get_currentHum()))
-                data = weather.get_currentHum();
+            if(type == 1 and validate.hum(weather.get_currentHum(CORRECTED)))
+                data = weather.get_currentHum(CORRECTED);
             // Pressure
-            if(type == 2 and validate.pres(weather.get_currentPres())) 
-                data = weather.get_currentPres();
+            if(type == 2 and validate.pres(weather.get_currentPres(CORRECTED))) 
+                data = weather.get_currentPres(CORRECTED);
         }; break;
         case 2: { // Wireless sensor
             if(wsensor.dataRelevance(wsensNum)) {

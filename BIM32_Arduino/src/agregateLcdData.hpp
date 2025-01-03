@@ -22,7 +22,7 @@ class AgregateLcdData {
 float AgregateLcdData::tempIn(float* tempSequence) {
     float temp = 40400.0;
     switch(config.display_source_tempIn_sens()) {
-        case 1: temp = weather.get_currentTemp(); break; /* temperature from weather forecast */
+        case 1: temp = weather.get_currentTemp(CORRECTED); break; /* temperature from weather forecast */
         case 2: { /* temperature from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_tempIn_wsensNum())) 
                 temp = wsensor.get_temperature(
@@ -50,7 +50,7 @@ float AgregateLcdData::tempIn(float* tempSequence) {
 void AgregateLcdData::_tempSequence(float* tempSequence) {
     for(uint8_t i=0; i<4; i++) {
         switch(config.display_source_sequence_temp(i)) {
-            case 1: tempSequence[i] = weather.get_currentTemp(); break; /* Forecast */
+            case 1: tempSequence[i] = weather.get_currentTemp(CORRECTED); break; /* Forecast */
             case 2: { /* wireless sensor */
                 if(wsensor.dataRelevance(config.display_source_sequence_wsenstemp(i, 0)))
                     tempSequence[i] = wsensor.get_temperature(
@@ -83,7 +83,7 @@ void AgregateLcdData::sequenceNames(String* nameSequence) {
 float AgregateLcdData::tempOut() {
     float temp = 40400.0;;
     switch(config.display_source_tempOut_sens()) {
-        case 1: temp = weather.get_currentTemp(); break; /* temperature from weather forecast */
+        case 1: temp = weather.get_currentTemp(CORRECTED); break; /* temperature from weather forecast */
         case 2: { /* temperature from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_tempOut_wsensNum())) 
                 temp = wsensor.get_temperature(
@@ -110,7 +110,7 @@ float AgregateLcdData::tempOut() {
 float AgregateLcdData::humIn(float* humSequence) {
     float hum = 40400.0;
     switch(config.display_source_humIn_sens()) {
-        case 1: hum = weather.get_currentHum(); break; /* humudity from weather forecast */
+        case 1: hum = weather.get_currentHum(CORRECTED); break; /* humudity from weather forecast */
         case 2: { /* humidity from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_humIn_wsensNum()))
                 hum = wsensor.get_humidity(config.display_source_humIn_wsensNum(), CORRECTED);
@@ -132,7 +132,7 @@ float AgregateLcdData::humIn(float* humSequence) {
 void AgregateLcdData::_humSequence(float* humSequence) {
     for(uint8_t i=0; i<4; i++) {
         switch(config.display_source_sequence_hum(i)) {
-            case 1: humSequence[i] = weather.get_currentHum(); break; /* Forecast */
+            case 1: humSequence[i] = weather.get_currentHum(CORRECTED); break; /* Forecast */
             case 2: { /* wireless sensor */
                 if(wsensor.dataRelevance(config.display_source_sequence_wsenshum(i)))
                     humSequence[i] = wsensor.get_humidity(config.display_source_sequence_wsenshum(i), CORRECTED);
@@ -153,7 +153,7 @@ void AgregateLcdData::_humSequence(float* humSequence) {
 float AgregateLcdData::humOut() {
     float hum = 40400.0;
     switch(config.display_source_humOut_sens()) {
-        case 1: hum = weather.get_currentHum(); break; /* humudity from weather forecast */
+        case 1: hum = weather.get_currentHum(CORRECTED); break; /* humudity from weather forecast */
         case 2: { /* humidity from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_humOut_wsensNum()))
                 hum = wsensor.get_humidity(config.display_source_humOut_wsensNum(), CORRECTED);
@@ -174,7 +174,7 @@ float AgregateLcdData::humOut() {
 float AgregateLcdData::presOut() {
     float pres = 40400.0;
     switch(config.display_source_presOut_sens()) {
-        case 1: pres = weather.get_currentPres(); break; // pressure outside from weather forecast
+        case 1: pres = weather.get_currentPres(CORRECTED); break; // pressure outside from weather forecast
         case 2: { // presure outside from wireless sensor
             if(wsensor.dataRelevance(config.display_source_presOut_wsensNum()))
                 pres = wsensor.get_pressure(config.display_source_presOut_wsensNum(), CORRECTED);
