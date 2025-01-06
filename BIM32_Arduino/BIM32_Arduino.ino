@@ -141,8 +141,8 @@ void setup() {
         }
     }
 
-    xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, 1, &task_display1_handle, 1);
-    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, 1, &task_display2_handle, 1);
+    xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, -1, &task_display1_handle, 1);
+    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, -1, &task_display2_handle, 1);
 
     WiFi.mode(WIFI_STA);
     network.connect();
