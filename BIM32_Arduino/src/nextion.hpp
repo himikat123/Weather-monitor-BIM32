@@ -64,6 +64,7 @@ void Nextion::init() {
     nex.writeStr("Network.MACADDRESS.txt", lang.macAddr());
     nex.writeStr("Network.ESP32TEMP.txt", lang.esp32Temp());
     nex.writeStr("Network.FIRMWARE.txt", lang.firmware());
+    nex.writeNum("BigClock.clockFormat.val", config.clock_format());
 
     for(unsigned int i=0; i<4; i++) {
         nex.writeStr("Main.nameSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
@@ -76,7 +77,6 @@ void Nextion::init() {
     /* Initialize NX4832K035 display  */
     if(config.display_model(0) == NX4832K035) {
         // config
-        nex.writeNum("BigClock.clockFormat.val", config.clock_format());
         unsigned int langCode = 0;
         if(config.lang() == "de") langCode = 1;
         if(config.lang() == "ru") langCode = 2;
@@ -124,6 +124,7 @@ void Nextion::refresh() {
     if(millis() - _prevForced > 10000) {
         _forced = true;
         _prevForced = millis();
+        nex.writeNum("BigClock.clockFormat.val", config.clock_format());
     }
 
     if(_prevPower != _power or _forced) {
