@@ -31,8 +31,8 @@ float AgregateComfortData::temp() {
 
 float AgregateComfortData::hum() {
     float hum = 40400.0;
-    switch(config.comfort_hum_source(CORRECTED)) {
-        case 1: hum = weather.get_currentHum(); break; // humidity from weather forecast
+    switch(config.comfort_hum_source()) {
+        case 1: hum = weather.get_currentHum(CORRECTED); break; // humidity from weather forecast
         case 2: // humidity from wireless sensor
             if(wsensor.dataRelevance(config.comfort_hum_wsensNum()))
                 hum = wsensor.get_humidity(config.comfort_hum_wsensNum(), CORRECTED);
