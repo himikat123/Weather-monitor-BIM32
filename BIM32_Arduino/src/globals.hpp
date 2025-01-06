@@ -57,7 +57,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v5.2"                    // Firmware version
+#define FW "v5.3"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -192,12 +192,15 @@ class Configuration {
     char _weather_city[41] = ""; // City name
     unsigned int _weather_cityid = 0; // City ID
     unsigned int _weather_citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
+    float _weather_temp_corr = 0; // Weather temperature correction
+    float _weather_hum_corr = 0; // Weather humidity correction
+    float _weather_pres_corr = 0; // Weather pressure correction
 
     // Language
     char _lang[3] = "en";
 
     // Clock
-    bool _clock_format = false; // Clock format: false = 12 hour, true = 24 hour 
+    unsigned int _clock_format = 0; // Clock format: 0 = 12 hour wo leading zero, 1 = 12 hour with leading zero, 2 = 24 hour wo leading zero, 3 = 24 hour with leading zero
     char _clock_ntp[65] = "time.nist.gov"; // NTP server address
     int _clock_utc = 0; // Timezone -12...13
     bool _clock_dlst = false; // Auto daylight saving time
@@ -442,12 +445,15 @@ class Configuration {
                     COPYNUM(conf["weather"]["lat"], _weather_lat);
                     COPYNUM(conf["weather"]["provider"], _weather_provider);
                     COPYNUM(conf["weather"]["citysearch"], _weather_citysearch);
+                    COPYNUM(conf["weather"]["corr"]["t"], _weather_temp_corr);
+                    COPYNUM(conf["weather"]["corr"]["h"], _weather_hum_corr);
+                    COPYNUM(conf["weather"]["corr"]["p"], _weather_pres_corr);
 
                     // Language
                     COPYSTR(conf["lang"], _lang);
 
                     // Clock
-                    COPYBOOL(conf["clock"]["format"], _clock_format);
+                    COPYNUM(conf["clock"]["format"], _clock_format);
                     COPYSTR(conf["clock"]["ntp"], _clock_ntp);
                     COPYNUM(conf["clock"]["utc"], _clock_utc);
                     COPYBOOL(conf["clock"]["dlst"], _clock_dlst);
@@ -824,12 +830,25 @@ class Configuration {
         return _weather_citysearch;
     }
 
+    float weather_temp_corr() {
+        return _weather_temp_corr;
+    }
+
+    float weather_hum_corr() {
+        return _weather_hum_corr;
+    }
+
+    float weather_pres_corr() {
+        return _weather_pres_corr;
+    }
+
     String lang() {
         if(String(_lang) == "") return "en";
         return String(_lang);
     }
 
-    bool clock_format() {
+    unsigned int clock_format() {
+        if(_clock_format > 3) return 0;
         return _clock_format;
     }
 

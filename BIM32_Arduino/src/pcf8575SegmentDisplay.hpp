@@ -11,6 +11,9 @@ class PCF8575_S : public SegmentDisplay {
     public:
         void init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws);
         void brightness(uint8_t intensity, bool reduc);
+        void displayToggle();
+        void displayOn();
+        void displayOff();
         void refresh();
 
     private:
@@ -70,9 +73,37 @@ void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t
  */
 void PCF8575_S::brightness(uint8_t intensity, bool reduc) {
     _brightness = reduc ? round(intensity / 2) : intensity;
-    uint16_t bright = map(_brightness, 0, 100, 200, 0);
-    bright = constrain(bright, 0, 200);
+    uint8_t bright = (uint8_t)map(_brightness, 1, 100, 180, 0);
+    bright = constrain(bright, 1, 180);
     analogWrite(_pwm, bright);
+
+    bright = (uint8_t)map(_brightness, 1, 100, 1, 60);
+    bright = constrain(bright, 1, 60);
+    _strip->brightness(bright, true);
+}
+
+/**
+ * Toggle display (on/off)
+ */
+void PCF8575_S::displayToggle() {
+    _power = !_power;
+    _sendToDisplay();
+}
+
+/**
+ * Turn display on
+ */
+void PCF8575_S::displayOn() {
+    _power = true;
+    _sendToDisplay();
+}
+
+/*
+ * Turn display off
+ */
+void PCF8575_S::displayOff() {
+    _power = false;
+    _sendToDisplay();
 }
 
 /**
@@ -127,9 +158,7 @@ void PCF8575_S::_sendToDisplay() {
     }
 
     /* Backlight */
-    uint8_t bright = (uint8_t)map(_brightness, 0, 100, 1, 180);
-    bright = constrain(bright, 1, 180);
-    _strip->brightness(bright, false);
+    rgb_t black = { .r = 0, .g = 0, .b = 0 };
 
     for(uint8_t i=0; i<8; i++) {
         unsigned int colors = strtol(&_dispColors[i][1], NULL, 16);
@@ -138,7 +167,7 @@ void PCF8575_S::_sendToDisplay() {
             .g = uint8_t(colors >> 8 & 0x00FF), 
             .b = uint8_t(colors & 0x00FF) 
         };
-        _strip->setPixel(i, pixelColor, false);
+        _strip->setPixel(i, _power ? pixelColor : black, false);
     }
 
     _strip->show();

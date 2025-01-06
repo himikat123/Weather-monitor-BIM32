@@ -227,9 +227,9 @@ void web_sens() {
         json["thing"]["data"][i] = thingspeak.get_field(i);
     }
 
-    json["weather"]["temp"] = weather.get_currentTemp();
-    json["weather"]["hum"] = weather.get_currentHum();
-    json["weather"]["pres"] = weather.get_currentPres();
+    json["weather"]["temp"] = weather.get_currentTemp(RAW);
+    json["weather"]["hum"] = weather.get_currentHum(RAW);
+    json["weather"]["pres"] = weather.get_currentPres(RAW);
     json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
     json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
     json["weather"]["descript"] = weather.get_description();
@@ -294,6 +294,14 @@ void web_restart() {
     if(web_isLogged(true)) {
         server.send(200, "text/plain", "OK");
         ESP.restart();
+    }
+}
+
+/* Scan available networks */
+void web_netlist() {
+    if(web_isLogged(true)) {
+        network.scanNetworks();
+        server.send(200, "text/plain", "OK");
     }
 }
 
@@ -536,21 +544,19 @@ void web_changePass() {
  * Upload a file
  */
 void web_fileUpload() {
-    if(web_isLogged(true)) {
-        HTTPUpload& upload = server.upload();
-        if(upload.status == UPLOAD_FILE_START) {
-            String filename = upload.filename;
-            if(!filename.startsWith("/")) filename = "/" + filename;
-            fsUploadFile = LittleFS.open(filename, "w");
-            filename = String();
-        }
-        else if(upload.status == UPLOAD_FILE_WRITE) {
-            if(fsUploadFile) fsUploadFile.write(upload.buf, upload.currentSize);
-        }
-        else if(upload.status == UPLOAD_FILE_END) {
-            global.fsInfoUpdate = true;
-            if(fsUploadFile) fsUploadFile.close();
-        }
+    HTTPUpload& upload = server.upload();
+    if(upload.status == UPLOAD_FILE_START) {
+        String filename = upload.filename;
+        if(!filename.startsWith("/")) filename = "/" + filename;
+        fsUploadFile = LittleFS.open(filename, "w");
+        filename = String();
+    }
+    else if(upload.status == UPLOAD_FILE_WRITE) {
+        if(fsUploadFile) fsUploadFile.write(upload.buf, upload.currentSize);
+    }
+    else if(upload.status == UPLOAD_FILE_END) {
+        global.fsInfoUpdate = true;
+        if(fsUploadFile) fsUploadFile.close();
     }
 }
 
@@ -595,6 +601,7 @@ void webInterface_init(void) {
     server.on("/esp/saveConfig",    HTTP_POST, web_save);
     server.on("/esp/saveAlarm",     HTTP_POST, web_save_alarm);
     server.on("/esp/restart",       HTTP_GET,  web_restart);
+    server.on("/esp/netlist",       HTTP_GET,  web_netlist);
     server.on("/esp/changelang",    HTTP_GET,  web_changeLang);
     server.on("/esp/dispToggle",    HTTP_GET,  web_dispToggle);
     server.on("/esp/brightLimit",   HTTP_GET,  web_brightLimit);

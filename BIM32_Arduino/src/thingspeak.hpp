@@ -275,16 +275,16 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
     String field = "&field" + String(fieldNum + 1) + "=";
 
     if(config.history_fields(fieldNum) == 1 and (fieldNum == 0 or fieldNum == 3)) { // Weather Temperature
-        if(validate.temp(weather.get_currentTemp()))
-            fields = field + String(weather.get_currentTemp());
+        if(validate.temp(weather.get_currentTemp(CORRECTED)))
+            fields = field + String(weather.get_currentTemp(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 1 and (fieldNum == 1 or fieldNum == 4)) { // Weather Humidity
-        if(validate.hum(weather.get_currentHum()))
-            fields = field + String(weather.get_currentHum());
+        if(validate.hum(weather.get_currentHum(CORRECTED)))
+            fields = field + String(weather.get_currentHum(CORRECTED));
     }
     if(config.history_fields(fieldNum) == 1 and fieldNum == 2) {                    // Weather Pressure
-        if(validate.pres(weather.get_currentPres())) 
-            fields = field + String(weather.get_currentPres());
+        if(validate.pres(weather.get_currentPres(CORRECTED))) 
+            fields = field + String(weather.get_currentPres(CORRECTED));
     }
                                                                                     // Wireless sensor
     if((config.history_fields(fieldNum) == 2 and fieldNum <= 4) or (config.history_fields(fieldNum) == 1 and fieldNum == 6)) {

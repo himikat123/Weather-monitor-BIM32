@@ -115,8 +115,8 @@ int SegmentDisplay::_pendulumPattern(uint32_t ml, uint8_t max) {
  * Preparing data for displaying the clock
  */
 void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
-    uint8_t hr = config.clock_format() ? hour() : hourFormat12();
-    uint8_t hrH = floor(hr < 10 ? SYMB_SPACE : hr / 10);
+    uint8_t hr = config.clock_format() > 1 ? hour() : hourFormat12();
+    uint8_t hrH = floor(config.clock_format() % 2 == 0 && hr < 10 ? SYMB_SPACE : hr / 10);
     uint8_t hrL = hr % 10;
     uint8_t mnH = floor(minute() / 10), mnL = minute() % 10;
     uint8_t scH = floor(second() / 10), scL = second() % 10;

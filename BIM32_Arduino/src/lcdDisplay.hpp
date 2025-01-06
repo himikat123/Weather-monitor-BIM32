@@ -106,7 +106,7 @@ class LcdDisplay {
 };
 
 void LcdDisplay::_getData() {
-    _tHour = config.clock_format() ? hour() : hourFormat12();
+    _tHour = config.clock_format() > 1 ? hour() : hourFormat12();
     _tMinute = minute();
     _tWeekday = weekday();
     _tDay = day();

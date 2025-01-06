@@ -122,6 +122,7 @@ void WS2812b::_sendToDisplay() {
     }
 
     _strip->show();
+    vTaskDelay(1);
 }
 
 uint8_t WS2812b::_sendTwoDigits(rgb_t black, uint8_t digShift, uint8_t pixelNr) {

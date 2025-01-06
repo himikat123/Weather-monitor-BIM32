@@ -84,15 +84,15 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
         case 9: { // Weather
             bool dataRelevant = (now() - weather.get_currentUpdated() < 1200);
             if(type == 0) {
-                data = dataRelevant ? weather.get_currentTemp() : 40400.0;
+                data = dataRelevant ? weather.get_currentTemp(CORRECTED) : 40400.0;
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = dataRelevant ? weather.get_currentHum() : 40400.0;
+                data = dataRelevant ? weather.get_currentHum(CORRECTED) : 40400.0;
                 *dType = HUM;
             }
             if(type == 2) {
-                data = dataRelevant ? weather.get_currentPres() : 40400.0;
+                data = dataRelevant ? weather.get_currentPres(CORRECTED) : 40400.0;
                 *dType = PRES;
             }
         }; break;
