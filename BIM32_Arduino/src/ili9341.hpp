@@ -165,7 +165,7 @@ void ILI9341::init(void) {
     tft.setTextWrap(false, false);
 
     pinMode(TFT_BACKLIGHT, OUTPUT);
-    brightness(1023);
+    digitalWrite(TFT_BACKLIGHT, HIGH);
 
     uint16_t calData[5];
     bool calDataValid = false;
@@ -1340,6 +1340,11 @@ void ILI9341::_alarmPage() {
 }
 
 void ILI9341::getTouch() {
+    if(global.touch_calibrate) {
+        _touch_calibrate();
+        global.touch_calibrate = false;
+    }
+
     bool pressed = tft.getTouch(&_touchX, &_touchY);
     if(pressed) {
         if(digitalRead(SETTINGS_BUTTON_PIN) == 0) _touch_calibrate();

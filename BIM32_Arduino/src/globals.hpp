@@ -57,7 +57,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v5.3"                    // Firmware version
+#define FW "v5.4"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -117,6 +117,7 @@ static struct {
     uint8_t uart2_tx = HC12; // What is UART2 connected to
     int8_t disp_night_state[2] = {-1, -1}; // state of displays night off: -1-undefined, 0-off, 1-on
     unsigned int btnMillis[2] = {0, 0}; // contact debounce time variable
+    bool touch_calibrate = false;
 } global;
 
 TaskHandle_t task_display1_handle = NULL;

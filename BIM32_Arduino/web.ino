@@ -376,7 +376,7 @@ void web_sensitivity() {
 }
 
 /**
- * WS2812b display timeslot color adjust
+ * Display timeslot color adjust
  */
 void web_color() {
     if(web_isLogged(true)) {
@@ -391,7 +391,7 @@ void web_color() {
 }
 
 /**
- * WS2812b display change animation
+ * Display change animation
  */
 void web_animation() {
     if(web_isLogged(true)) {
@@ -403,6 +403,16 @@ void web_animation() {
             server.send(200, "text/plain", "OK");
         }
         server.send(200, "text/plain", "ERROR");
+    }
+}
+
+/*
+ * ILI9341 display touch calibrate
+ */
+void web_touch_calibrate() {
+    if(web_isLogged(true)) {
+        global.touch_calibrate = true;
+        server.send(200, "text/plain", "OK");
     }
 }
 
@@ -609,6 +619,7 @@ void webInterface_init(void) {
     server.on("/esp/sensitivity",   HTTP_GET,  web_sensitivity);
     server.on("/esp/animation",     HTTP_GET,  web_animation);
     server.on("/esp/color",         HTTP_GET,  web_color);
+    server.on("/esp/calibrate",     HTTP_GET,  web_touch_calibrate);
     server.on("/esp/syncClock",     HTTP_GET,  web_syncClock);
     server.on("/esp/syncdialog",    HTTP_GET,  web_syncdialog);
     server.on("/esp/changePass",    HTTP_POST, web_changePass);
