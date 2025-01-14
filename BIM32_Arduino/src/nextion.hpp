@@ -595,9 +595,10 @@ void Nextion::_hourlyData() {
             sprintf(buf, "%02d", month(weather.get_hourlyDate(i)) - 1);
             for(uint8_t k=0; k<2; k++) dat[12 + k] = buf[k];
             // hour
-            unsigned int hr = config.clock_format() > 1 ? hour(weather.get_hourlyDate(i)) : hourFormat12(weather.get_hourlyDate(i));
-            if(config.clock_format() % 2 == 0) sprintf(buf, "%d", hr);
-            else sprintf(buf, "%02d", hr);
+            unsigned int hr = config.clock_format() > 1 
+                ? hour(weather.get_hourlyDate(i)) 
+                : hourFormat12(weather.get_hourlyDate(i));
+            sprintf(buf, "%02d", hr);
             for(uint8_t k=0; k<2; k++) dat[14 + k] = buf[k];
             // wind speed
             unsigned int wind = round(weather.get_hourlyWindSpeed(i));
@@ -672,8 +673,7 @@ void Nextion::_historyOut() {
             unsigned int hr = config.clock_format() > 1 
                 ? hour(thingspeak.get_historyUpdated(i)) 
                 : hourFormat12(thingspeak.get_historyUpdated(i));
-            if(config.clock_format() % 2 == 0) sprintf(buf, "%d", hr);
-            else sprintf(buf, "%02d", hr);
+            sprintf(buf, "%02d", hr);
             for(uint8_t k=0; k<2; k++) dat[14 + k] = buf[k];
             // minute
             sprintf(buf, "%02d", minute(thingspeak.get_historyUpdated(i)));
@@ -717,8 +717,7 @@ void Nextion::_historyIn() {
             unsigned int hr = config.clock_format() > 1 
                 ? hour(thingspeak.get_historyUpdated(i)) 
                 : hourFormat12(thingspeak.get_historyUpdated(i));
-            if(config.clock_format() % 2 == 0) sprintf(buf, "%d", hr);
-            else sprintf(buf, "%02d", hr);
+            sprintf(buf, "%02d", hr);
             for(uint8_t k=0; k<2; k++) dat[11 + k] = buf[k];
             // minute
             sprintf(buf, "%02d", minute(thingspeak.get_historyUpdated(i)));
