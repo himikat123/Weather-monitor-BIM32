@@ -423,13 +423,15 @@ uint16_t ILI9341::_number_picture_size(uint8_t num) {
 }
 
 void ILI9341::_showTime() {
-    if(_prevTHour != _tHour || _forced) {
-        if(config.clock_format() % 2 == 0 && _tHour < 10) tft.fillRect(0, 0, 32, 78, BG_COLOR);
-        else _showImg(0, 0, _number_picture(_tHour / 10), _number_picture_size(_tHour / 10));
+    if(_prevTHour != _tHour || _prevTMinute != _tMinute || _forced) {
+        if(_tHour > 9) _showImg(0, 0, _number_picture(_tHour / 10), _number_picture_size(_tHour / 10));
+        else {
+            if(config.clock_format() % 2 == 0) tft.fillRect(0, 0, 32, 78, BG_COLOR);
+            else _showImg(0, 0, _number_picture(0), _number_picture_size(0));
+        }
         _showImg(33, 0, _number_picture(_tHour % 10), _number_picture_size(_tHour % 10));
         _prevTHour = _tHour;
-    }
-    if(_prevTMinute != _tMinute || _forced) {
+
         _showImg(77, 0, _number_picture(_tMinute / 10), _number_picture_size(_tMinute / 10));
         _showImg(109, 0, _number_picture(_tMinute % 10), _number_picture_size(_tMinute % 10));
         _prevTMinute = _tMinute;
