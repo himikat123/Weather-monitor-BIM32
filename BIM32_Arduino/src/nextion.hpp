@@ -174,6 +174,8 @@ void Nextion::refresh() {
  */
 void Nextion::brightness(unsigned int bright) {
     uint8_t br = global.reduc[0] ? round(bright / 2) : bright;
+    if(br < config.display_brightness_min(_dispNum)) br = config.display_brightness_min(_dispNum);
+    if(br > config.display_brightness_max(_dispNum)) br = config.display_brightness_max(_dispNum); 
     if(_prevBright != br or _forced) {
         if(_power) nex.writeNum("dim", br);
         _prevBright = br;

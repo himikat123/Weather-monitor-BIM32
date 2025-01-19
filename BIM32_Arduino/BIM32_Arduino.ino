@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v5.4.1
+ *  Weather Monitor BIM32 v5.5
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2025
@@ -81,6 +81,9 @@ AgregateSegmentData agregateSegmentData;
 #include "src/ws2812display.hpp"
 WS2812b ws2812b_1;
 WS2812b ws2812b_2;
+#include "src/softi2c.hpp"
+SoftI2C Wire_1 = SoftI2C(PCF8575_1_SDA_PIN, PCF8575_1_SCL_PIN);
+SoftI2C Wire_2 = SoftI2C(PCF8575_2_SDA_PIN, PCF8575_2_SCL_PIN);
 #include "src/tm1637display.hpp"
 TM1637 tm1637_1;
 TM1637 tm1637_2;

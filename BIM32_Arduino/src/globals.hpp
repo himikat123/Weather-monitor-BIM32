@@ -57,7 +57,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v5.4.1"                    // Firmware version
+#define FW "v5.5"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -126,7 +126,6 @@ TaskHandle_t task_server_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
 
 SemaphoreHandle_t sensorsSemaphore = NULL;
-SemaphoreHandle_t numitronSemaphore = NULL;
 
 class Configuration {
     #define NETWORKS 3
