@@ -120,7 +120,17 @@ Also, when the device is already configured and connected to the network, you ca
 ## Photos of the weather monitor
 Well, and finally traditionally a few photos of the resulting device. The case is printed on a 3D printer, you will find the files for 3D printing in the **enclosure/STL/** folder.
 
-<p align="center"><img src="img/device1_RU.jpg" width="600" alt="weather monitor BIM32"></p>
+<p align="center"><img src="img/f1.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f2.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f3.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f4.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f5.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f6_en.jpg" width="600" alt="weather monitor BIM32"></p>
 
 <hr>
 

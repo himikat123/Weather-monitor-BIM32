@@ -119,9 +119,19 @@
 ## Демо страницы настроек можно посмотреть <a href="https://himikat123.github.io/Web-Interface-BIM/" target="_blank">здесь</a>
 
 ## Фотки монитора погоды
-Ну и в конце, традиционно несколько фоток получившегося устройства. Корпус напечатан на 3д принтере, файлы для 3д печати вы найдете в папке **enclosure/STL/**. 
+Ну и в конце, традиционно, несколько фоток получившегося устройства. Корпус напечатан на 3д принтере, файлы для 3д печати вы найдете в папке **enclosure/STL/** 
 
-<p align="center"><img src="img/device1_RU.jpg" width="600" alt="weather monitor BIM32"></p>
+<p align="center"><img src="img/f1.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f2.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f3.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f4.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f5.jpg" width="600" alt="weather monitor BIM32"></p>
+
+<p align="center"><img src="img/f6_ru.jpg" width="600" alt="weather monitor BIM32"></p>
 
 <hr>
 
