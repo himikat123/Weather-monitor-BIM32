@@ -261,8 +261,8 @@ void ILI9341::refresh() {
 void ILI9341::brightness(unsigned int bright) {
     if(_power) {
         uint8_t brgt = global.reduc[0] ? round(bright / 2) : bright;
-        if(brgt < config.display_brightness_min(_dispNum)) brgt = config.display_brightness_min(_dispNum);
-        if(brgh > config.display_brightness_max(_dispNum)) brgh = config.display_brightness_max(_dispNum); 
+        if(brgt < config.display_brightness_min(0)) brgt = config.display_brightness_min(0);
+        if(brgt > config.display_brightness_max(0)) brgt = config.display_brightness_max(0); 
         float r = 100 * log10(2) / log10(255);
         uint16_t br = round(pow(2, (brgt / r)));
         if(br < 1023) analogWrite(TFT_BACKLIGHT, br);
