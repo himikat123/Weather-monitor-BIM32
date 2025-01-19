@@ -13,7 +13,7 @@ class WS2812b : public SegmentDisplay {
         void refresh();
 
     private:
-        LiteLED* _strip;
+        LiteLED* _strip = nullptr;
         uint8_t _pixelCount = 1;                                // number of pixels in display
         byte _pixels[6] = {0, 0, 0, 0, 0, 0};
         byte _pixelsPrev[6] = {0, 0, 0, 0, 0, 0};
@@ -47,7 +47,7 @@ void WS2812b::init(uint8_t dispNum, uint8_t pin) {
         default: _pixelCount = 1; break;
     } 
 
-    _strip = _dispNum == 0 ? &strip_1 : &strip_2;
+    _strip = dispNum == 0 ? &strip_1 : &strip_2;
     _strip->begin(pin, _pixelCount);
     _strip->clear(true);
     _setModel(config.display_model(dispNum));

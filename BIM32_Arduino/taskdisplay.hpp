@@ -9,8 +9,6 @@ bool isNightOffTime(unsigned int dispNum);
 
 void TaskDisplay1(void *pvParameters) {
     (void) pvParameters;
-    numitronSemaphore = xSemaphoreCreateMutex();
-
     unsigned int millis_05s = 0;
 
     if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
@@ -169,7 +167,6 @@ void TaskDisplay1(void *pvParameters) {
 
 void TaskDisplay2(void *pvParameters) {
     (void) pvParameters;
-
     unsigned int bright_update = 0;
 
     /* Initialize WS2812b display 2 */
@@ -186,10 +183,7 @@ void TaskDisplay2(void *pvParameters) {
 
     /* Initialize Numitron display 2 */
     if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
-        if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-            pcf8575_2.init(DISPLAY_2, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN, NUMITRON_2_PWM_PIN, WS2812_2_DAT_PIN);
-        }
-        else pcf8575_2.init(DISPLAY_2, PCF8575_2_SCL_PIN, PCF8575_2_SDA_PIN, NUMITRON_2_PWM_PIN, WS2812_2_DAT_PIN);
+        pcf8575_2.init(DISPLAY_2, PCF8575_2_SCL_PIN, PCF8575_2_SDA_PIN, NUMITRON_2_PWM_PIN, WS2812_2_DAT_PIN);
     }
 
     while(1) {

@@ -1,6 +1,3 @@
-#include <Wire.h>
-#include <Adafruit_PCF8575.h>
-
 #define DISP4    0
 #define DISP6    1
 #define DOT    100
@@ -17,15 +14,12 @@ class PCF8575_S : public SegmentDisplay {
         void refresh();
 
     private:
-        Adafruit_PCF8575 _PCF1, _PCF2, _PCF3, _PCF4;
-        Adafruit_PCF8575 _PCF[4] = { _PCF1, _PCF2, _PCF3, _PCF4 };
-        int8_t _scl = -1;
-        int8_t _sda = -1;
+        SoftI2C* _wire = nullptr;
+        LiteLED* _strip = nullptr;
         int8_t _pwm = -1;
         int8_t _ws = -1;
         byte _pixels[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         byte _pixelsPrev[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-        LiteLED* _strip;
 
         void _print();
         void _sendToDisplay();
@@ -42,8 +36,6 @@ class PCF8575_S : public SegmentDisplay {
  */
 void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws) {
     _dispNum = dispNum;
-    _scl = scl;
-    _sda = sda;
     _pwm = pwm;
     _ws = ws;
     pinMode(pwm, OUTPUT);
@@ -51,17 +43,10 @@ void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t
 
     _setModel(config.display_model(dispNum));
 
-    if(sda > 0 && scl > 0) {
-        Wire1.begin(sda, scl, 400000);
-        for(int i=0; i<4; i++) {
-            _PCF[i].begin(0x20 + (dispNum * 4) + i, &Wire1);
-        }
-        vTaskDelay(100);
+    _wire = dispNum == 0 ? &Wire_1 : &Wire_2;
+    _clearDisplay();
 
-        _clearDisplay();
-    }
-
-    _strip = _dispNum == 0 ? &strip_1 : &strip_2;
+    _strip = dispNum == 0 ? &strip_1 : &strip_2;
     _strip->begin(ws, 8);
     _strip->clear(true);
 }
@@ -73,7 +58,7 @@ void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t
  */
 void PCF8575_S::brightness(uint8_t intensity, bool reduc) {
     _brightness = reduc ? round(intensity / 2) : intensity;
-    uint8_t bright = (uint8_t)map(_brightness, 1, 100, 180, 0);
+    uint8_t bright = (uint8_t)map(_brightness, 1, 100, 180, 1);
     bright = constrain(bright, 1, 180);
     analogWrite(_pwm, bright);
 
@@ -138,23 +123,16 @@ void PCF8575_S::_print() {
  * Send data to display
  */
 void PCF8575_S::_sendToDisplay() {
-    if(_sda > 0 && _scl > 0) {
-        byte seg[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-        if(_power) {
-            for(uint8_t i=0; i<8; i++) seg[i] = _pixels[i];
-        }
+    byte seg[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+    if(_power) {
+        for(uint8_t i=0; i<8; i++) seg[i] = _pixels[i];
+    }
 
-        for(int i=0; i<4; i++) {
-            uint16_t buf = (uint16_t)seg[i * 2];
-            buf = buf << 8;
-            buf += (uint16_t)seg[i * 2 + 1];
-            if(numitronSemaphore != NULL) {
-                if(xSemaphoreTake(numitronSemaphore, (TickType_t)100) == pdTRUE) {
-                    _PCF[i].digitalWriteWord(buf);
-                    xSemaphoreGive(numitronSemaphore);
-                }
-            }
-        }
+    for(int i = 0; i < (_dispLength / 2); i++) {
+        _wire->beginTransmission(0x20 + i);
+        _wire->write(seg[i * 2 + 1]);
+        _wire->write(seg[i * 2]);
+        _wire->endTransmission();
     }
 
     /* Backlight */

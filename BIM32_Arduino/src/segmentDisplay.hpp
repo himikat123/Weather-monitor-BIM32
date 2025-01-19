@@ -22,6 +22,7 @@ class SegmentDisplay {
         char _dispColors[8][8] = {"", "", "", "", "", "", "", ""};
         uint8_t _dispNum = 0;
         bool _animIsRunnung = false;
+        uint8_t _dispLength = 4;
 
         void _slotSwitch();
         void _segAnimations();
@@ -35,7 +36,6 @@ class SegmentDisplay {
         uint16_t _millisShift = 0;
         uint8_t _prevSecond = 60;
         bool _pointsState = false;
-        uint8_t _dispLength = 4;
 
         void _segGetData(int* segImg, uint8_t slot, bool dots);
         int _pendulumPattern(uint32_t ml, uint8_t max);
