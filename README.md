@@ -30,6 +30,13 @@
 * Sound alert when Temperature, Humidity, CO2 and Air Quality go beyond comfort limits
 * Very flexible settings via web interface
 
+```diff 
+- Attention to all who want to add support for the sensor or display you need. There are three ways to do this:
+- 1. Do it yourself, the source code is freely available
+- 2. Send me the sensor/display you need
+- 3. Pay for adding the sensor/display you need
+```
+
 ## Wiring diagram for base weather monitor modules
 To start and operate the weather monitor, just connect **display** to **ESP32**. Connecting all other modules is optional.
 
