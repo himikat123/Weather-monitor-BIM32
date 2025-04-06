@@ -1351,6 +1351,11 @@ void ILI9341::getTouch() {
 
     bool pressed = tft.getTouch(&_touchX, &_touchY);
     if(pressed) {
+        if(global.debugTouch) {
+            tft.drawPixel(_touchX, _touchY, 0xFFFF);
+            Serial.printf("X: %d, Y: %d\r\n", _touchX, _touchY);
+        }
+
         if(digitalRead(SETTINGS_BUTTON_PIN) == 0) _touch_calibrate();
         else {
             uint8_t page = 100;

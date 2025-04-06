@@ -199,7 +199,7 @@ void TaskSensors(void *pvParameters) {
 void display1_toggle() {
     if(millis() - global.btnMillis[0] > 500) {
         global.btnMillis[0] = millis();
-        global.display_but_pressed[0] = true;
+        global.display_btn_pressed[0] = true;
     }
 }
 
@@ -209,7 +209,7 @@ void display1_toggle() {
 void display2_toggle() {
     if(millis() - global.btnMillis[1] > 500) {
         global.btnMillis[1] = millis();
-        global.display_but_pressed[1] = true;
+        global.display_btn_pressed[1] = true;
     }
 }
 

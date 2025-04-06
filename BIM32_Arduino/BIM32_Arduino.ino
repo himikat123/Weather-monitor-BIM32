@@ -123,7 +123,7 @@ void setup() {
 
     Serial.println(SEPARATOR);
     Serial.println(SEPARATOR);
-    Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2024  *\r\n", FW);
+    Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2025  *\r\n", FW);
     Serial.println(SEPARATOR);
     Serial.println();
 
@@ -148,12 +148,9 @@ void setup() {
     xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, -1, &task_display2_handle, 1);
 
     WiFi.mode(WIFI_STA);
-    network.connect();
-
-    webInterface_init();
-
-    xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, 1);
     xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, 1);
+    webInterface_init();
+    xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, 1);
 }
 
 void loop() {

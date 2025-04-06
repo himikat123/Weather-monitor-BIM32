@@ -325,7 +325,7 @@ void web_dispToggle() {
     if(web_isLogged(true)) {
         if(server.hasArg("num")) {
             uint8_t dispNum = (server.arg("num")).toInt();
-            global.display_but_pressed[dispNum] = true;
+            global.display_btn_pressed[dispNum] = true;
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -384,6 +384,7 @@ void web_color() {
             char color[7];
             server.arg("hex").toCharArray(color, 7);
             config.set_color(color, (server.arg("slot")).toInt(), (server.arg("num")).toInt());
+            global.colorChanged = true;
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -602,6 +603,11 @@ void web_fileRename() {
     }
 }
 
+void web_debugTouch() {
+    global.debugTouch = true;
+    server.send(200, "text/plain", "OK");
+}
+
 /**
  * Defines the functions of the web interface
  */
@@ -628,6 +634,7 @@ void webInterface_init(void) {
     server.on("/esp/mp3play",       HTTP_GET,  web_soundPlay);
     server.on("/esp/mp3stop",       HTTP_GET,  web_soundStop);
     server.on("/esp/defaultConfig", HTTP_POST, web_default);
+    server.on("/debug/touch",       HTTP_GET,  web_debugTouch);
     server.on("/esp/fileUpload",    HTTP_POST, [] () { server.send(200, "text/plain", ""); }, web_fileUpload);
     server.on("/description.xml",   HTTP_GET,  [] () { SSDP.getSchema(); });
     server.on("/esp/delete",        HTTP_POST, web_fileDelete);

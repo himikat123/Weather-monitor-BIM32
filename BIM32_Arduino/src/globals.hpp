@@ -106,7 +106,7 @@ static struct {
     unsigned int rssis[30]; // List of signal strengths of available networks
     unsigned int nets = 0; // Number of available networks
     bool apMode = false; // Access point mode
-    bool display_but_pressed[2] = {false, false}; // display (1, 2) button pressed flag
+    bool display_btn_pressed[2] = {false, false}; // display (1, 2) button pressed flag
     bool alarm_but_pressed = false; // alarm button pressed flag
     bool mp3_busy = true; // mp3 player busy pin
     bool fsInfoUpdate = true; // FS info update flag
@@ -117,7 +117,9 @@ static struct {
     uint8_t uart2_tx = HC12; // What is UART2 connected to
     int8_t disp_night_state[2] = {-1, -1}; // state of displays night off: -1-undefined, 0-off, 1-on
     unsigned int btnMillis[2] = {0, 0}; // contact debounce time variable
-    bool touch_calibrate = false;
+    bool touch_calibrate = false; // touch calibrate modus
+    bool colorChanged = false; // timeslot color has been changed from web interface
+    bool debugTouch = false;
 } global;
 
 TaskHandle_t task_display1_handle = NULL;

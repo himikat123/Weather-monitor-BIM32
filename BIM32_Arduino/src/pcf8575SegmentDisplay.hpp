@@ -19,7 +19,7 @@ class PCF8575_S : public SegmentDisplay {
         int8_t _pwm = -1;
         int8_t _ws = -1;
         byte _pixels[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-        byte _pixelsPrev[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        byte _prevPixels[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
         void _print();
         void _sendToDisplay();
@@ -110,13 +110,16 @@ void PCF8575_S::_print() {
         if(_dispImg[i] >= DOT) _pixels[i] = font_pcf8575[WITH_DOT][_dispImg[i] - DOT];
         else _pixels[i] = font_pcf8575[SYMBOLS][_dispImg[i]];
 
-        if(_pixelsPrev[i] != _pixels[i]) {
-            _pixelsPrev[i] = _pixels[i];
+        if(_prevPixels[i] != _pixels[i]) {
+            _prevPixels[i] = _pixels[i];
             updated |= true;
         }
     }
 
-    if(updated) _sendToDisplay();
+    if(updated || global.colorChanged) {
+        _sendToDisplay();
+        global.colorChanged = false;
+    }
 }
 
 /**

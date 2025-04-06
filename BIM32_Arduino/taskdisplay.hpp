@@ -38,8 +38,8 @@ void TaskDisplay1(void *pvParameters) {
     while(1) {
         if(config.display_type(DISPLAY_1)) {
             /* Display 1 toogle if display button was pressed */
-            if(global.display_but_pressed[DISPLAY_1]) {
-                global.display_but_pressed[DISPLAY_1] = false;
+            if(global.display_btn_pressed[DISPLAY_1]) {
+                global.display_btn_pressed[DISPLAY_1] = false;
                 global.disp_autoOff[DISPLAY_1] = millis();
 
                 if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
@@ -190,8 +190,8 @@ void TaskDisplay2(void *pvParameters) {
         if(config.display_type(DISPLAY_2)) {
 
             /* Display 2 toogle if display button was pressed */
-            if(global.display_but_pressed[DISPLAY_2]) {
-                global.display_but_pressed[DISPLAY_2] = false;
+            if(global.display_btn_pressed[DISPLAY_2]) {
+                global.display_btn_pressed[DISPLAY_2] = false;
                 global.disp_autoOff[DISPLAY_2] = millis();
                 if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
                     ws2812b_2.displayToggle();

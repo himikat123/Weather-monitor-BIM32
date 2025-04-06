@@ -37,7 +37,7 @@ bool Validate::hum(float h) {
  * Validate if pressure is within the normal range
  */
 bool Validate::pres(float p) {
-    return (p >= 800.0 and p <= 1200.0);
+    return (p >= 400.0 and p <= 1200.0);
 }
 
 /**
