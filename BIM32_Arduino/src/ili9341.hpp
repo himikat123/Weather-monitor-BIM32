@@ -1,6 +1,8 @@
-#include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
 TFT_eSPI tft = TFT_eSPI();
-#include <JPEGDecoder.h> // v2.0.0 https://github.com/Bodmer/JPEGDecoder
+#if defined(BIM32_CYD)
+    SPIClass touchscreenSPI = SPIClass(VSPI);
+    XPT2046_Touchscreen touchscreen(XPT2046_CS, XPT2046_IRQ);
+#endif
 
 #define minimum(a,b)     (((a) < (b)) ? (a) : (b))
 
@@ -91,6 +93,7 @@ class ILI9341 : LcdDisplay {
         time_t _hrDate[8];
         bool _cmfType = false;
         time_t _prevCmfTime = 0;
+        uint16_t _calData[5];
 
         void _sequenceSlotSkip();
         void _sequenceSlotNext();
@@ -152,28 +155,41 @@ class ILI9341 : LcdDisplay {
         void _hourlyPrec(uint8_t num, uint16_t y);
         void _displayLcdHourlyCharts(uint8_t type);
         void _displayLcdHistoryTitle(String title);
+        TS_Point _calibrationPoint(uint8_t cornerNr);
+        int _avg(int a, int b);
         void _touch_calibrate();
 };
 
 /**
- * Display and fonts initialisation
+ * Display initialisation
  */
 void ILI9341::init(void) {
     tft.begin();
-    tft.setRotation(3);
+    #if defined(BIM32_CYD)
+        tft.setRotation(1);
+    #else
+        tft.setRotation(3);
+    #endif
     tft.setSwapBytes(true);
     tft.setTextWrap(false, false);
+    tft.fillScreen(0);
 
     pinMode(TFT_BACKLIGHT, OUTPUT);
     digitalWrite(TFT_BACKLIGHT, HIGH);
 
-    uint16_t calData[5];
     bool calDataValid = false;
     for(uint8_t i=0; i<5; i++) {
-        calData[i] = config.calData(i);
-        if(calData[i]) calDataValid = true;
+        _calData[i] = config.calData(i);
+        if(_calData[i]) calDataValid = true;
     }
-    if(calDataValid) tft.setTouch(calData);
+
+    #if defined(BIM32_CYD)
+        touchscreenSPI.begin(XPT2046_CLK, XPT2046_MISO, XPT2046_MOSI, XPT2046_CS);
+        touchscreen.begin(touchscreenSPI);
+        touchscreen.setRotation(1);
+    #else
+        if(calDataValid) tft.setTouch(_calData);
+    #endif
 }
 
 void ILI9341::showLogo() {
@@ -1349,10 +1365,23 @@ void ILI9341::getTouch() {
         global.touch_calibrate = false;
     }
 
-    bool pressed = tft.getTouch(&_touchX, &_touchY);
+    bool pressed = false;
+    #if defined(BIM32_CYD)
+        pressed = touchscreen.tirqTouched() && touchscreen.touched();
+    #else
+        pressed = tft.getTouch(&_touchX, &_touchY);
+    #endif
     if(pressed) {
+        #if defined(BIM32_CYD)
+            TS_Point p = touchscreen.getPoint();
+            _touchX = map(p.x, _calData[0], _calData[2], 0, 319);
+            _touchY = map(p.y, _calData[1], _calData[3], 0, 239);
+        #endif
         if(global.debugTouch) {
             tft.drawPixel(_touchX, _touchY, 0xFFFF);
+            #if defined(BIM32_CYD)
+                Serial.printf("raw X: %d, raw Y: %d\r\n", p.x, p.y);
+            #endif
             Serial.printf("X: %d, Y: %d\r\n", _touchX, _touchY);
         }
 
@@ -1514,25 +1543,65 @@ void ILI9341::getTouch() {
     }
 }
 
-void ILI9341::_touch_calibrate() {
-    uint16_t calData[5];
+#if defined(BIM32_CYD)
+    TS_Point ILI9341::_calibrationPoint(uint8_t cornerNr) {
+        uint16_t corner[4][8] = {
+            {0, 0, 0, 0, 0, 0, 19, 19},
+            {0, 239, 0, 219, 0, 239, 20, 219},
+            {299, 239, 319, 219, 299, 219, 319, 239},
+            {299, 0, 319, 0, 300, 19, 319, 0},
+        };
+        tft.fillRect(0, 0, 320, 22, 0);
+        tft.fillRect(0, 218, 320, 22, 0);
+        tft.drawFastHLine(corner[cornerNr][0], corner[cornerNr][1], 20, TEXT_COLOR);
+        tft.drawFastVLine(corner[cornerNr][2], corner[cornerNr][3], 20, TEXT_COLOR);
+        tft.drawLine(corner[cornerNr][4], corner[cornerNr][5], corner[cornerNr][6], corner[cornerNr][7], TEXT_COLOR);
+        while(!touchscreen.touched()) taskYIELD();
+        while(touchscreen.touched()) taskYIELD();
+        vTaskDelay(500);
+        return touchscreen.getPoint();
+    }
+#endif
 
+int ILI9341::_avg(int a, int b) {
+    return (a & b) + ((a ^ b) >> 1);
+}
+
+void ILI9341::_touch_calibrate() {
     tft.fillScreen(TFT_BLACK);
     _printText(0, 110, 319, 22, lang.touchCalibrate(), FONT1, CENTER, TEXT_COLOR);
-    tft.calibrateTouch(calData, TFT_MAGENTA, TFT_BLACK, 15);
 
-    String json = "{\"calData\":[";
-    json += String(calData[0]) + ",";
-    json += String(calData[1]) + ",";
-    json += String(calData[2]) + ",";
-    json += String(calData[3]) + ",";
-    json += String(calData[4]);
-    json += "]}";
-    File file = LittleFS.open("/touch.json", FILE_WRITE);
-    file.print(json);
-    file.close();
+    #if defined(BIM32_CYD)
+        TS_Point p = _calibrationPoint(0);
+        _calData[0] = p.x; 
+        _calData[1] = p.y;
+        p = _calibrationPoint(1);
+        _calData[0] = _avg(_calData[0], p.x); 
+        _calData[3] = p.y;
+        p = _calibrationPoint(2);
+        _calData[2] = p.x; 
+        _calData[3] = _avg(_calData[3], p.y);
+        p = _calibrationPoint(3);
+        _calData[2] = _avg(_calData[2], p.x);
+        _calData[1] = _avg(_calData[1], p.y);
+        tft.fillRect(0, 0, 320, 22, 0);
+    #else
+        tft.calibrateTouch(_calData, TFT_MAGENTA, TFT_BLACK, 15);
+    #endif
 
-    _printText(0, 110, 319, 22, lang.calibrationDone(), FONT1, CENTER, TEXT_COLOR);
+        String json = "{\"calData\":[";
+        json += String(_calData[0]) + ",";
+        json += String(_calData[1]) + ",";
+        json += String(_calData[2]) + ",";
+        json += String(_calData[3]) + ",";
+        json += String(_calData[4]);
+        json += "]}";
+        File file = LittleFS.open("/touch.json", FILE_WRITE);
+        file.print(json);
+        file.close();
+
+        _printText(0, 110, 319, 22, lang.calibrationDone(), FONT1, CENTER, TEXT_COLOR);
+
     vTaskDelay(2000);
     tft.fillScreen(TFT_BLACK);
     _forced = true;

@@ -77,7 +77,7 @@ void TaskSensors(void *pvParameters) {
                 if((millis() - ntp_update) > config.clock_ntp_period() * 60000 or !global.clockSynchronized) {
                     ntp_update = millis();
                     Serial.println(SEPARATOR);
-                    Serial.print("NTP synchronization... ");
+                    Serial.println("NTP synchronization... ");
                     if(network.isConnected()) get_time();
                     else {
                         global.clockSynchronized = false;
@@ -158,12 +158,13 @@ void TaskSensors(void *pvParameters) {
              * every 20 minutes, or every hour for weatherbit.io
              */
             uint32_t weatherUpd = config.weather_provider() == 1 ? 3600 : 1200;
-            if(now() - weather.get_currentUpdated() > weatherUpd) {
+            if(global.debugWether || (now() - weather.get_currentUpdated() > weatherUpd)) {
                 Serial.println(SEPARATOR);
                 Serial.println("Current weather update... ");
                 if(network.isConnected()) weather.update();
                 else Serial.println("No internet connection");
                 sensors.get_ds3231_timeDate();
+                global.debugWether = false;
             }
 
             /**

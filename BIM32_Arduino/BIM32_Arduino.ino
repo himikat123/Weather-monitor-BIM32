@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v5.5
+ *  Weather Monitor BIM32 v5.6
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2025
@@ -30,6 +30,9 @@ WebServer server(80);
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 #include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
+#include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
+#include <JPEGDecoder.h> // v2.0.0 https://github.com/Bodmer/JPEGDecoder
+#include <XPT2046_Touchscreen.h> // v1.4.0 https://github.com/PaulStoffregen/XPT2046_Touchscreen
 
 /* Pictures */
 #include "src/picturesAnts.hpp"
@@ -46,6 +49,7 @@ WebServer server(80);
 /* Own classes */
 #include "src/validate.hpp"
 Validate validate;
+#include "src/pinout.hpp"
 #include "src/globals.hpp"
 Configuration config;
 #include "src/sensors.hpp"
@@ -133,16 +137,22 @@ void setup() {
     }
     config.readConfig();
 
-    if(config.display_type(0) == LCD_DISPLAY) {
-        if(config.display_model(0) == D_NX4832K035 or config.display_model(0) == D_NX4832T035) {
-            Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
-            nextion.showLogo();
+    #if defined(BIM32_CYD)
+        ili9341.init();
+        ili9341.showLogo();
+    #else
+        if(config.display_type(0) == LCD_DISPLAY) {
+            if(config.display_model(0) == D_NX4832K035 or config.display_model(0) == D_NX4832T035) {
+                Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
+                nextion.showLogo();
+            }
+            if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                ili9341.init();
+                ili9341.showLogo();
+            }
         }
-        if(config.display_model(DISPLAY_1) == D_ILI9341) {
-            ili9341.init();
-            ili9341.showLogo();
-        }
-    }
+    #endif
+
 
     xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, -1, &task_display1_handle, 1);
     xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, -1, &task_display2_handle, 1);

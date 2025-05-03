@@ -11,155 +11,252 @@ void TaskDisplay1(void *pvParameters) {
     (void) pvParameters;
     unsigned int millis_05s = 0;
 
-    if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-        /* Initialize LCD display */
-        if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.init();
-        if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.showHomeScreen();
-    }
+    #if defined(BIM32_CYD)
+        ili9341.showHomeScreen();
+    #else
+        if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+            /* Initialize LCD display */
+            if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.init();
+            if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.showHomeScreen();
+        }
 
-    /* Initialize WS2812b display 1 */
-    if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
-        ws2812b_1.init(DISPLAY_1, WS2812_1_DAT_PIN);
-    }
+        /* Initialize WS2812b display 1 */
+        if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+            ws2812b_1.init(DISPLAY_1, WS2812_1_DAT_PIN);
+        }
 
-    /* Initialize 7 segment display */
-    if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-        /* Initialize TM1637 display 1 */
-        if(config.display_model(DISPLAY_1) <= 1) tm1637_1.init(DISPLAY_1, TM1637_1_CLK_PIN, TM1637_1_DAT_PIN);
-        /* Initialize MAX1637 display 1 */
-        if(config.display_model(DISPLAY_1) >= 2) max7219_1.init(DISPLAY_1, MAX7219_1_CLK_PIN, MAX7219_1_DAT_PIN, MAX7219_1_LOAD_PIN);
-    }
+        /* Initialize 7 segment display */
+        if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
+            /* Initialize TM1637 display 1 */
+            if(config.display_model(DISPLAY_1) <= 1) tm1637_1.init(DISPLAY_1, TM1637_1_CLK_PIN, TM1637_1_DAT_PIN);
+            /* Initialize MAX1637 display 1 */
+            if(config.display_model(DISPLAY_1) >= 2) max7219_1.init(DISPLAY_1, MAX7219_1_CLK_PIN, MAX7219_1_DAT_PIN, MAX7219_1_LOAD_PIN);
+        }
 
-    /* Initialize numitron display */
-    if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-        pcf8575_1.init(DISPLAY_1, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN, NUMITRON_1_PWM_PIN, WS2812_1_DAT_PIN);
-    }
+        /* Initialize numitron display */
+        if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+            pcf8575_1.init(DISPLAY_1, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN, NUMITRON_1_PWM_PIN, WS2812_1_DAT_PIN);
+        }
+    #endif
 
     while(1) {
-        if(config.display_type(DISPLAY_1)) {
-            /* Display 1 toogle if display button was pressed */
-            if(global.display_btn_pressed[DISPLAY_1]) {
-                global.display_btn_pressed[DISPLAY_1] = false;
-                global.disp_autoOff[DISPLAY_1] = millis();
-
-                if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                    if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.displayToggle();
-                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.displayToggle();
-                }
-
-                if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
-                    ws2812b_1.displayToggle();
-                }
-
-                if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                    if(config.display_model(DISPLAY_1) <= 1) tm1637_1.displayToggle();
-                    if(config.display_model(DISPLAY_1) >= 2) max7219_1.displayToggle();
-                }
-
-                if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                    pcf8575_1.displayToggle();
-                }
-
-                vTaskDelay(500);
-            }
-
-            /* Once in 0.5 second */
+        #if defined(BIM32_CYD)
             if(millis() - millis_05s >= 500) {
                 millis_05s = millis();
+                ili9341.refresh();
+                ili9341.brightness(get_brightness(DISPLAY_1));
 
-                if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                    /* LCD Display update */
-                    if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.refresh();
-                    if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.refresh();
+                if(isTimeoutOffTime(DISPLAY_1)) {
+                    if(ili9341.isDisplayOn()) ili9341.displayOff();
                 }
 
-                /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
-                uint16_t dotFreq = global.net_connected ? 500 : 1000;
-                ws2812b_1.setDotFreq(dotFreq);
-                tm1637_1.setDotFreq(dotFreq);
-                max7219_1.setDotFreq(dotFreq);
-                pcf8575_1.setDotFreq(dotFreq);
+                uint8_t itsOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
+                if(global.disp_night_state[DISPLAY_1] != itsOffTime || global.display_state[DISPLAY_1]) {
+                    global.disp_night_state[DISPLAY_1] = itsOffTime;
+                    if(global.display_state[DISPLAY_1]) {
+                        itsOffTime = global.display_state[DISPLAY_1] - 1;
+                        global.display_state[DISPLAY_1] = 0;
+                    }
+                    if(itsOffTime) {
+                        if(ili9341.isDisplayOn()) ili9341.displayOff();
+                    }
+                    else {
+                        if(!ili9341.isDisplayOn()) ili9341.displayOn();
+                    }
+                }
+            }
 
-                /* WS2812b brightness change */
+            ili9341.getTouch();
+        #else 
+            if(config.display_type(DISPLAY_1)) {
+                /* Display 1 toogle if display button was pressed */
+                if(global.display_btn_pressed[DISPLAY_1]) {
+                    global.display_btn_pressed[DISPLAY_1] = false;
+                    global.disp_autoOff[DISPLAY_1] = millis();
+
+                    if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+                        if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                            nextion.displayToggle();
+                        }
+                        if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                            ili9341.displayToggle();
+                        }
+                    }
+
+                    if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                        ws2812b_1.displayToggle();
+                    }
+
+                    if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
+                        if(config.display_model(DISPLAY_1) <= 1) tm1637_1.displayToggle();
+                        if(config.display_model(DISPLAY_1) >= 2) max7219_1.displayToggle();
+                    }
+
+                    if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+                        pcf8575_1.displayToggle();
+                    }
+
+                    vTaskDelay(500);
+                }
+
+                /* Once in 0.5 second */
+                if(millis() - millis_05s >= 500) {
+                    millis_05s = millis();
+
+                    if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+                        /* LCD Display update */
+                        if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                            nextion.refresh();
+                        }
+                        if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                            ili9341.refresh();
+                        }
+                    }
+
+                    /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
+                    uint16_t dotFreq = global.net_connected ? 500 : 1000;
+                    ws2812b_1.setDotFreq(dotFreq);
+                    tm1637_1.setDotFreq(dotFreq);
+                    max7219_1.setDotFreq(dotFreq);
+                    pcf8575_1.setDotFreq(dotFreq);
+
+                    /* WS2812b brightness change */
+                    if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                        ws2812b_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                    }
+
+                    if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
+                        /* tm1637 brightness change */
+                        if(config.display_model(DISPLAY_1) <= 1) {
+                            tm1637_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                        }
+                        /* max7219 brightness change */
+                        if(config.display_model(DISPLAY_1) >= 2) {
+                            max7219_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                        }
+                    }
+
+                    if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+                        pcf8575_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                    }
+
+                    /* LCD/TFT display brightness change */
+                    nextion.brightness(get_brightness(DISPLAY_1));
+                    ili9341.brightness(get_brightness(DISPLAY_1));
+
+                    /* Check if need and it's time to turn off the display */
+                    if(isTimeoutOffTime(DISPLAY_1)) {
+                        if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+                            if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                                if(nextion.isDisplayOn()) nextion.displayOff();
+                            }
+                            if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                                if(ili9341.isDisplayOn()) ili9341.displayOff();
+                            }
+                        }
+                        if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                            if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
+                        }
+                        if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
+                            if(config.display_model(DISPLAY_1) <= 1) {
+                                if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
+                            }
+                            if(config.display_model(DISPLAY_1) >= 2) {
+                                if(max7219_1.isDisplayOn()) max7219_1.displayOff();
+                            }
+                        }
+                        if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+                            if(pcf8575_1.isDisplayOn()) pcf8575_1.displayOff();
+                        }
+                    }
+
+                    uint8_t itsOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
+                    if((global.disp_night_state[DISPLAY_1] != itsOffTime) || (global.display_state[DISPLAY_1] > 0)) {
+                        global.disp_night_state[DISPLAY_1] = itsOffTime;
+                        if(global.display_state[DISPLAY_1] > 0) {
+                            itsOffTime = global.display_state[DISPLAY_1] - 1;
+                            global.display_state[DISPLAY_1] = 0;
+                        }
+                        if(itsOffTime) {
+                            if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+                                if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                                    if(nextion.isDisplayOn()) nextion.displayOff();
+                                }
+                                if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                                    if(ili9341.isDisplayOn()) ili9341.displayOff();
+                                }
+                            }
+                            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                                if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
+                            }
+                            if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
+                                if(config.display_model(DISPLAY_1) <= 1) {
+                                    if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
+                                }
+                                if(config.display_model(DISPLAY_1) >= 2) {
+                                    if(max7219_1.isDisplayOn()) max7219_1.displayOff();
+                                }
+                            }
+                            if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+                                if(pcf8575_1.isDisplayOn()) pcf8575_1.displayOff();
+                            }
+                        }
+                        else {
+                            if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+                                if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                                    if(!nextion.isDisplayOn()) nextion.displayOn(false);
+                                }
+                                if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                                    if(!ili9341.isDisplayOn()) ili9341.displayOn();
+                                }
+                            }
+                            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                                if(!ws2812b_1.isDisplayOn()) ws2812b_1.displayOn();
+                            }
+                            if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
+                                if(config.display_model(DISPLAY_1) <= 1) {
+                                    if(!tm1637_1.isDisplayOn()) tm1637_1.displayOn();
+                                }
+                                if(config.display_model(DISPLAY_1) >= 2) {
+                                    if(!max7219_1.isDisplayOn()) max7219_1.displayOn();
+                                }
+                            }
+                            if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+                                if(!pcf8575_1.isDisplayOn()) pcf8575_1.displayOn();
+                            }
+                        }
+                    }
+                }
+
+                /* WS2812b display 1 update */
                 if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
-                    ws2812b_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                    ws2812b_1.refresh();
                 }
 
                 if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                    /* tm1637 brightness change */
-                    if(config.display_model(DISPLAY_1) <= 1) tm1637_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
-                    /* max7219 brightness change */
-                    if(config.display_model(DISPLAY_1) >= 2) max7219_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                    /* TM1637 display 1 update */
+                    if(config.display_model(DISPLAY_1) <= 1) tm1637_1.refresh();
+                    /* MAX7219 display 1 update */
+                    if(config.display_model(DISPLAY_1) >= 2) max7219_1.refresh();
                 }
 
+                /* Numitron display 1 update */
                 if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                    pcf8575_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                    pcf8575_1.refresh();
                 }
 
-                /* LCD/TFT display brightness change */
-                nextion.brightness(get_brightness(DISPLAY_1));
-                ili9341.brightness(get_brightness(DISPLAY_1));
-
-                /* Check if need and it's time to turn off the display */
-                if(isTimeoutOffTime(DISPLAY_1)) {
-                    if(nextion.isDisplayOn()) nextion.displayOff();
-                    if(ili9341.isDisplayOn()) ili9341.displayOff();
-                    if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
-                    if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
-                    if(max7219_1.isDisplayOn()) max7219_1.displayOff();
-                    if(pcf8575_1.isDisplayOn()) pcf8575_1.displayOff();
-                }
-
-                uint8_t itsNightOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
-                if(global.disp_night_state[DISPLAY_1] != itsNightOffTime) {
-                    global.disp_night_state[DISPLAY_1] = itsNightOffTime;
-                    if(itsNightOffTime) {
-                        if(nextion.isDisplayOn()) nextion.displayOff();
-                        if(ili9341.isDisplayOn()) ili9341.displayOff();
-                        if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
-                        if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
-                        if(max7219_1.isDisplayOn()) max7219_1.displayOff();
-                        if(pcf8575_1.isDisplayOn()) pcf8575_1.displayOff();
+                if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
+                    /* Receive data from Nextion */
+                    if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                        nextion.dataReceive();
                     }
-                    else {
-                        if(!nextion.isDisplayOn()) nextion.displayOn(false);
-                        if(!ili9341.isDisplayOn()) ili9341.displayOn();
-                        if(!ws2812b_1.isDisplayOn()) ws2812b_1.displayOn();
-                        if(!tm1637_1.isDisplayOn()) tm1637_1.displayOn();
-                        if(!max7219_1.isDisplayOn()) max7219_1.displayOn();
-                        if(!pcf8575_1.isDisplayOn()) pcf8575_1.displayOn();
+
+                    if(config.display_model(DISPLAY_1) == D_ILI9341) {
+                        ili9341.getTouch();
                     }
                 }
             }
-
-            /* WS2812b display 1 update */
-            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
-                ws2812b_1.refresh();
-            }
-
-            if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                /* TM1637 display 1 update */
-                if(config.display_model(DISPLAY_1) <= 1) tm1637_1.refresh();
-                /* MAX7219 display 1 update */
-                if(config.display_model(DISPLAY_1) >= 2) max7219_1.refresh();
-            }
-
-            /* Numitron display 1 update */
-            if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                pcf8575_1.refresh();
-            }
-
-            if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                /* Receive data from Nextion */
-                if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
-                    nextion.dataReceive();
-                }
-
-                if(config.display_model(DISPLAY_1) == D_ILI9341) {
-                    ili9341.getTouch();
-                }
-            }
-        }
+        #endif
 
         vTaskDelay(10);
     }
@@ -234,27 +331,61 @@ void TaskDisplay2(void *pvParameters) {
                 pcf8575_2.setDotFreq(dotFreq);
 
                 /* Check if need and it's time to turn off the display */
-                if(isTimeoutOffTime(DISPLAY_2)) { 
-                    if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
-                    if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
-                    if(max7219_2.isDisplayOn()) max7219_2.displayOff();
-                    if(pcf8575_2.isDisplayOn()) pcf8575_2.displayOff();
-                }
-
-                uint8_t itsNightOffTime = isNightOffTime(DISPLAY_2) ? 1 : 0;
-                if(global.disp_night_state[DISPLAY_2] != itsNightOffTime) {
-                    global.disp_night_state[DISPLAY_2] = itsNightOffTime;
-                    if(itsNightOffTime) {
+                if(isTimeoutOffTime(DISPLAY_2)) {
+                    if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) { 
                         if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
-                        if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
-                        if(max7219_2.isDisplayOn()) max7219_2.displayOff();
+                    }
+                    if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
+                        if(config.display_model(DISPLAY_2) <= 1) {
+                            if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
+                        }
+                        if(config.display_model(DISPLAY_2) >= 2) {
+                            if(max7219_2.isDisplayOn()) max7219_2.displayOff();
+                        }
+                    }
+                    if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
                         if(pcf8575_2.isDisplayOn()) pcf8575_2.displayOff();
                     }
+                }
+
+                uint8_t itsOffTime = isNightOffTime(DISPLAY_2) ? 1 : 0;
+                if((global.disp_night_state[DISPLAY_2] != itsOffTime) || (global.display_state[DISPLAY_2] > 0)) {
+                    global.disp_night_state[DISPLAY_2] = itsOffTime;
+                    if(global.display_state[DISPLAY_2] > 0) {
+                        itsOffTime = global.display_state[DISPLAY_2] - 1;
+                        global.display_state[DISPLAY_2] = 0;
+                    }
+                    if(itsOffTime) {
+                        if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+                            if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
+                        }
+                        if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
+                            if(config.display_model(DISPLAY_2) <= 1) {
+                                if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
+                            }
+                            if(config.display_model(DISPLAY_2) >= 2) {
+                                if(max7219_2.isDisplayOn()) max7219_2.displayOff();
+                            }
+                        }
+                        if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
+                            if(pcf8575_2.isDisplayOn()) pcf8575_2.displayOff();
+                        }
+                    }
                     else {
-                        if(!ws2812b_2.isDisplayOn()) ws2812b_2.displayOn();
-                        if(!tm1637_2.isDisplayOn()) tm1637_2.displayOn();
-                        if(!max7219_2.isDisplayOn()) max7219_2.displayOn();
-                        if(!pcf8575_2.isDisplayOn()) pcf8575_2.displayOn();
+                        if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+                            if(!ws2812b_2.isDisplayOn()) ws2812b_2.displayOn();
+                        }
+                        if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
+                            if(config.display_model(DISPLAY_2) <= 1) {
+                                if(!tm1637_2.isDisplayOn()) tm1637_2.displayOn();
+                            }
+                            if(config.display_model(DISPLAY_2) >= 2) {
+                                if(!max7219_2.isDisplayOn()) max7219_2.displayOn();
+                            }
+                        }
+                        if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
+                            if(!pcf8575_2.isDisplayOn()) pcf8575_2.displayOn();
+                        }
                     }
                 }
             }

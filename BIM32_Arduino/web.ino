@@ -187,6 +187,9 @@ void web_sens() {
     json["runtime"] = round(millis() / 1000);
     json["heap"] = ESP.getFreeHeap();
     json["time"] = now();
+    #if defined(BIM32_CYD)
+        json["cyd"] = 1;
+    #endif
 
     for(unsigned int i=0; i<global.nets; i++) {
         json["ssids"][i][0] = global.ssids[i];
@@ -608,6 +611,11 @@ void web_debugTouch() {
     server.send(200, "text/plain", "OK");
 }
 
+void web_debugWeather() {
+    global.debugWether = true;
+    server.send(200, "text/plain", "OK");
+}
+
 /**
  * Defines the functions of the web interface
  */
@@ -635,6 +643,7 @@ void webInterface_init(void) {
     server.on("/esp/mp3stop",       HTTP_GET,  web_soundStop);
     server.on("/esp/defaultConfig", HTTP_POST, web_default);
     server.on("/debug/touch",       HTTP_GET,  web_debugTouch);
+    server.on("/debug/weather",     HTTP_GET,  web_debugWeather);
     server.on("/esp/fileUpload",    HTTP_POST, [] () { server.send(200, "text/plain", ""); }, web_fileUpload);
     server.on("/description.xml",   HTTP_GET,  [] () { SSDP.getSchema(); });
     server.on("/esp/delete",        HTTP_POST, web_fileDelete);

@@ -1,9 +1,9 @@
 class SoftI2C {
     protected:
-        uint8_t _transmitting;
-        uint8_t _error;
-        uint8_t _sda;
-        uint8_t _scl;
+        uint8_t _transmitting = 0;
+        uint8_t _error = 0;
+        uint8_t _sda = 0;
+        uint8_t _scl = 0;
 
         bool _i2c_init(void);
         bool _i2c_start(uint8_t addr);
@@ -26,12 +26,14 @@ class SoftI2C {
 };
 
 SoftI2C::SoftI2C(uint8_t sda, uint8_t scl) {
+    Serial.print("sda: "); Serial.println(sda);
+    Serial.print("scl: "); Serial.println(scl);
     setPins(sda, scl);
 }
 
 void SoftI2C::begin(void) {
     _error = 0;
-    _transmitting = false;
+    _transmitting = 0;
     _i2c_init();
 }
 
@@ -41,6 +43,8 @@ void SoftI2C::setPins(uint8_t sda, uint8_t scl) {
 }
 
 void SoftI2C::beginTransmission(uint8_t address) {
+    Serial.print("_transmitting: "); Serial.println(_transmitting);
+    Serial.print("address: "); Serial.println(address);
     if(_transmitting) _error = (_i2c_rep_start((address << 1) | 0) ? 0 : 2);
     else _error = (_i2c_start((address << 1) | 0) ? 0 : 2);
     _transmitting = 1;

@@ -545,7 +545,11 @@ void Sensors::_BH1750Read(void) {
  */
 void Sensors::_AnalogRead(void) {
     float adc = float(analogRead(PHOTORESISTOR_PIN));
-    _analog_voltage = adc / 1241.0;
+    #if defined(BIM32_CYD)
+        _analog_voltage = 3.3 - (adc / 1241.0);
+    #else
+        _analog_voltage = adc / 1241.0;
+    #endif
 }
 
 /**
