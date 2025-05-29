@@ -65,6 +65,8 @@ class Sensors {
         void get_ds3231_timeDate();
         void set_ds3231_timeDate();
         void comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier);
+        float absoluteHum(float temp, float hum);
+        float dewPoint(float temp, float hum);
 
     private:
         bool _bme280_det = false;
@@ -626,4 +628,27 @@ void Sensors::comfortDevices(bool heater, bool cooler, bool humidifier, bool deh
         pcf8574.digitalWrite(3, dehumidifier);
         pcf8574.digitalWrite(4, purifier);
     }
+}
+
+/*
+ * Calculate absolute humidity
+ */
+float Sensors::absoluteHum(float temp, float hum) {
+    float sat = 6.112 * exp((17.67 * temp) / (temp + 243.5));
+    float vap = sat * (hum / 100.0);
+    float abs = 2.1674 * vap / (273.15 + temp);
+
+    return abs;
+}
+
+/*
+ * Calculate dew point
+ */
+float Sensors::dewPoint(float temp, float hum) {
+    const float a = 17.67, b = 243.5;
+  
+    float alpha = log(hum / 100.0) + (a * temp) / (b + temp);
+    float dp = (b * alpha) / (a - alpha);
+
+    return dp;
 }

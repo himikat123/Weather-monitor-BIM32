@@ -17,6 +17,8 @@ class Validate {
         bool energy(float e);
         bool frequence(float f);
         bool co2(float c);
+        bool absoluteHum(float ah);
+        bool dewPoint(float dp, float temp);
 };
 
 /**
@@ -136,4 +138,18 @@ bool Validate::frequence(float f) {
  */
 bool Validate::co2(float c) {
     return (c >= 400.0 and c <= 2000.0);
+}
+
+/*
+ * Validate if absolute humidity is within the normal range
+ */
+bool Validate::absoluteHum(float ah) {
+    return ah >= 0.0 && ah <= 60.0;
+}
+
+/*
+ * Validate if dew point is within the normal range
+ */
+bool Validate::dewPoint(float dp, float temp) {
+    return dp >= -60.0 && dp <= 60.0 && dp <= temp;
 }
