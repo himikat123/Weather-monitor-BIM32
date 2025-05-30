@@ -3,3 +3,6 @@
 # extension settings
 /.vscode
 /.ArduinoOutput
+.DS_Store
+.DS_Store?
+System_Font_List.txt
