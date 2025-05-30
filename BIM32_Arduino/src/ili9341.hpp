@@ -823,6 +823,12 @@ void ILI9341::_dateWeekday() {
         String buf = "";
         if(config.lang() == "en") buf = lang.monthDay(month()) + ", " + String(day()) + " " +  String(year());
         else if(config.lang() == "de") buf = String(day()) + ". " + lang.monthDay(month()) + " " + String(year());
+        else if(config.lang() == "es") {
+            buf = String(day()) + " de ";
+            if(lang.monthDay(month()).length() > 7) buf += lang.monthShortName(month());
+            else buf += lang.monthDay(month());
+            buf += " de " + String(year());
+        }
         else buf = String(day()) + " " + lang.monthDay(month()) + " " + String(year());
         tft.fillRect(0, 198, 319, 40, BG_COLOR);
         _printText(0, 200, 319, 30, buf, FONT3, CENTER, TEMP_MIN_COLOR);

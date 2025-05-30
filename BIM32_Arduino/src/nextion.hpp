@@ -83,6 +83,7 @@ void Nextion::init() {
         if(config.lang() == "pl") langCode = 3;
         if(config.lang() == "ua") langCode = 4;
         if(config.lang() == "bg") langCode = 5;
+        if(config.lang() == "es") langCode = 6;
         nex.writeNum("Main.lang.val", langCode);
         nex.writeNum("Main.weather.val", config.weather_provider());
 
@@ -255,6 +256,11 @@ void Nextion::_NX4832T035_timeDate() {
     }
     if(_prevTDay != _tDay or _prevTMonth != _tMonth or _prevTYear != _tYear or _forced) {
         nex.writeStr("BigClock.date.txt", String(_tDay) + " " + lang.monthDay(_tMonth) + " " + String(_tYear));
+        String buf = "";
+        if(config.lang() == "en") buf = lang.monthDay(month()) + ", " + String(day()) + " " +  String(year());
+        else if(config.lang() == "de") buf = String(day()) + ". " + lang.monthDay(month()) + " " + String(year());
+        else if(config.lang() == "es") buf = String(day()) + " de " + lang.monthDay(month()) + " de " + String(year());
+        else buf = String(day()) + " " + lang.monthDay(month()) + " " + String(year());
         _prevTDay = _tDay;
         _prevTMonth = _tMonth;
         _prevTYear = _tYear;
