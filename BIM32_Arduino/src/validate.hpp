@@ -137,7 +137,7 @@ bool Validate::frequence(float f) {
  * Validate if Senseair S8 CO2 is within the normal range
  */
 bool Validate::co2(float c) {
-    return (c >= 400.0 and c <= 2000.0);
+    return (c >= 400.0 and c <= 10000.0);
 }
 
 /*
