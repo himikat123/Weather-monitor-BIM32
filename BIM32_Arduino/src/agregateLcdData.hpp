@@ -17,6 +17,9 @@ class AgregateLcdData {
         void _humSequence(float* humSequence);
         String _voltageWsensor();
         String _voltageThingspeak();
+        String _iaq();
+        String _absoluteHum(float temp, float hum);
+        String _dewPoint(float temp, float hum);
 };
 
 float AgregateLcdData::tempIn(float* tempSequence) {
@@ -195,18 +198,24 @@ String AgregateLcdData::voltage() {
     switch(config.display_source_volt_sens()) {
         case 1: value = _voltageWsensor(); break; /* from wireless sensor */
         case 2: value = _voltageThingspeak(); break; /* from thingspeak */
-        case 3: { // iaq from BME680
-            float iaq = sensors.get_bme680_iaq(CORRECTED);
-            if(validate.iaq(iaq)) value = "IAQ " + String((int)round(iaq));
-            else value = ""; 
-        }; break;
+        case 3: value = _iaq(); break; // iaq from BME680
+        case 4: value = _absoluteHum(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // absolute humidity from BME680
+        case 5: value = _dewPoint(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // dew point from BME680
+        case 6: value = _absoluteHum(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // absolute humidity from BME280
+        case 7: value = _dewPoint(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // dew point from BME280
+        case 8: value = _absoluteHum(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // absolute humidity from DHT22
+        case 9: value = _dewPoint(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // dew point from DHT22
+        case 10: value = _absoluteHum(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // absolute humidity from SHT21
+        case 11: value = _dewPoint(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // dew point from SHT21
+        case 12: value = _absoluteHum(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // absolute humidity from weather forecast
+        case 13: value = _dewPoint(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // dew point from weather forecast
         default: ; break;
     }
     return value;
 }
 
 String AgregateLcdData::_voltageWsensor() {
-    String value = "";
+    String value = "--";
     if(wsensor.dataRelevance(config.display_source_volt_wsensNum())) {
         switch(config.display_source_volt_volt()) {
             case 0: { /* battery voltage */
@@ -232,7 +241,7 @@ String AgregateLcdData::_voltageWsensor() {
 }
 
 String AgregateLcdData::_voltageThingspeak() {
-    String value = "";
+    String value = "--";
     if(thingspeak.dataRelevance()) {
         switch(config.display_source_volt_thingType()) {
             case 0: { /* battery voltage */
@@ -313,4 +322,22 @@ uint8_t AgregateLcdData::windDirection(int deg) {
     else if(deg >= 247 && deg < 292) wind = 6; // west
     else if(deg >= 292 && deg < 338) wind = 7; // north-west
     return wind;
+}
+
+String AgregateLcdData::_iaq() {
+    float iaq = sensors.get_bme680_iaq(CORRECTED);
+    if(validate.iaq(iaq)) return ("IAQ " + String((int)round(iaq)));
+    else return "--";
+}
+
+String AgregateLcdData::_absoluteHum(float temp, float hum) {
+    float ah = sensors.absoluteHum(temp, hum);
+    if(validate.absoluteHum(ah)) return (String((int)round(ah)) + lang.gpm());
+    else return "--";
+}
+
+String AgregateLcdData::_dewPoint(float temp, float hum) {
+    float dp = sensors.dewPoint(temp, hum);
+    if(validate.dewPoint(dp, temp)) return (String((int)round(dp)) + "°C");
+    else return "--";
 }
