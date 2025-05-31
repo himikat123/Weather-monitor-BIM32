@@ -134,10 +134,10 @@ String fontType = ".ttf";
 
 
 // Define the font size in points for the TFT_eSPI font file
-int  fontSize = 29;
+int  fontSize = 9;
 
 // Font size to use in the Processing sketch display window that pops up (can be different to above)
-int displayFontSize = 29;
+int displayFontSize = 9;
 
 // Create a C header (.h file) ready to be used or copied in your sketch folder
 boolean createHeaderFile = true;
@@ -343,13 +343,16 @@ static final int[] specificUnicodes = {
  //*/
     //0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, // 0 1 2 3 4 5 6 7
     //0x0038, 0x0039, 0x002D, 0x002E, 0x00B0, 0x0043                  // 8 9 - . ° C
+    //0x0038, 0x0039, 0x002D,                                         // 8 9 -
+    //0x0068, 0x0050, 0x0061, 0x0433, 0x041F, 0x0430                  // h P a г П а
      // !эти!
     0x0401, 0x0451, 0x00B0, 0x00C4, 0x00D6, 0x00DC, 0x00DF, 0x00E4, // Ё ё ° Ä Ö Ü ß ä
     0x00F6, 0x00FC, 0x0105, 0x0104, 0x0107, 0x0106, 0x0119, 0x0118, // ö ü ą Ą ć Ć ę Ę
     0x0142, 0x0141, 0x0144, 0x0143, 0x00f3, 0x00d3, 0x015b, 0x015a, // ł Ł ń Ń ó Ó ś Ś
     0x017a, 0x0179, 0x017c, 0x017b, 0x0490, 0x0491, 0x0404, 0x0454, // ź Ź ż Ż Ґ ґ Є є
     0x0406, 0x0456, 0x0407, 0x0457, 0x00A1, 0x00BF, 0x00E1, 0x00ED, // І і Ї ї ¡ ¿ á í
-    0x00E9, 0x00FA, 0x00F1, 0x00C1, 0x00C9, 0x00DA, 0x00D1, 0x00CD  // é ú ñ Á É Ú Ñ Í
+    0x00E9, 0x00FA, 0x00F1, 0x00C1, 0x00C9, 0x00DA, 0x00D1, 0x00CD, // é ú ñ Á É Ú Ñ Í
+    0x00B3                                                          // ³
 
   // More characters for TFT_eSPI test sketches, change next line to //* to use
   /*
