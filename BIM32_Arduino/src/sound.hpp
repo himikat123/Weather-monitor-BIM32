@@ -75,14 +75,17 @@ void Sound::play(unsigned int folder, unsigned int track) {
     vTaskDelay(100);
 
     if(folder==2 and track<=20) {
-        folder = 6;
+        folder = 1;
         track++;
     }
     if(folder==1 and track<=33) {
-        if(String(config.lang()) == "de") folder = 2;
-        else if(String(config.lang()) == "ru") folder = 3;
-        else if(String(config.lang()) == "pl") folder = 4;
-        else if(String(config.lang()) == "ua") folder = 5;
+        if(String(config.lang()) == "de") folder = 3;
+        else if(String(config.lang()) == "ru") folder = 4;
+        else if(String(config.lang()) == "pl") folder = 5;
+        else if(String(config.lang()) == "ua") folder = 6;
+        else if(String(config.lang()) == "bg") folder = 7;
+        else if(String(config.lang()) == "es") folder = 8;
+        else folder = 2;
         if(track == 0) track = 24;
     }
     for(uint8_t i=0; i<5; i++) {
