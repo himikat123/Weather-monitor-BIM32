@@ -52,7 +52,7 @@ static struct {
     unsigned int nets = 0; // Number of available networks
     bool apMode = false; // Access point mode
     bool display_btn_pressed[2] = {false, false}; // display (1, 2) button pressed flag
-    uint8_t display_state[2] = {0, 0}; // display on/off: 0: nothing do, 1: turn on, 2: turn off
+    uint8_t display_state[2] = {1, 1}; // display on/off: 0: nothing do, 1: turn on, 2: turn off
     bool alarm_but_pressed = false; // alarm button pressed flag
     bool mp3_busy = true; // mp3 player busy pin
     bool fsInfoUpdate = true; // FS info update flag
@@ -146,8 +146,10 @@ class Configuration {
     float _weather_hum_corr = 0; // Weather humidity correction
     float _weather_pres_corr = 0; // Weather pressure correction
 
-    // Language
+    // Localization
     char _lang[3] = "en";
+    uint8_t _units_temp = 0;
+    uint8_t _units_pres = 0;
 
     // Clock
     unsigned int _clock_format = 0; // Clock format: 0 = 12 hour wo leading zero, 1 = 12 hour with leading zero, 2 = 24 hour wo leading zero, 3 = 24 hour with leading zero
@@ -399,8 +401,10 @@ class Configuration {
                     COPYNUM(conf["weather"]["corr"]["h"], _weather_hum_corr);
                     COPYNUM(conf["weather"]["corr"]["p"], _weather_pres_corr);
 
-                    // Language
+                    // Localization 
                     COPYSTR(conf["lang"], _lang);
+                    COPYNUM(conf["units"]["temp"], _units_temp);
+                    COPYNUM(conf["units"]["pres"], _units_pres);
 
                     // Clock
                     COPYNUM(conf["clock"]["format"], _clock_format);
@@ -795,6 +799,14 @@ class Configuration {
         return String(_lang);
     }
 
+    uint8_t units_temp() {
+        return _units_temp ? 1 : 0;
+    }
+
+    uint8_t units_pres() {
+        return _units_pres ? 1 : 0;
+    }
+
     unsigned int clock_format() {
         if(_clock_format > 3) return 0;
         return _clock_format;
@@ -1008,7 +1020,7 @@ class Configuration {
     }
 
     unsigned int display_source_volt_sens() {
-        if(_display_source_volt_sens > 3) return 0;
+        if(_display_source_volt_sens > 13) return 0;
         return _display_source_volt_sens; 
     }
 
@@ -1371,7 +1383,7 @@ class Configuration {
 
     unsigned int thingspeakSend_types(unsigned int num) {
         if(num >= THNG_FIELDS) return 0;
-        if(_thingspeakSend_types[num] > 3) return 0;
+        if(_thingspeakSend_types[num] > 5) return 0;
         return _thingspeakSend_types[num];
     }
 
@@ -1383,7 +1395,7 @@ class Configuration {
 
     unsigned int thingspeakSend_wtypes(unsigned int num) {
         if(num >= THNG_FIELDS) return 0;
-        if(_thingspeakSend_wtypes[num] > 16) return 0;
+        if(_thingspeakSend_wtypes[num] > 18) return 0;
         return _thingspeakSend_wtypes[num];
     }
 
@@ -1434,7 +1446,7 @@ class Configuration {
 
     unsigned int narodmonSend_types(unsigned int num) {
         if(num >= NAROD_FIELDS) return 0;
-        if(_narodmonSend_types[num] > 3) return 0;
+        if(_narodmonSend_types[num] > 13) return 0;
         return _narodmonSend_types[num];
     }
 
@@ -1446,7 +1458,7 @@ class Configuration {
 
     unsigned int narodmonSend_wtypes(unsigned int num) {
         if(num >= NAROD_FIELDS) return 0;
-        if(_narodmonSend_wtypes[num] > 16) return 0;
+        if(_narodmonSend_wtypes[num] > 18) return 0;
         return _narodmonSend_wtypes[num];
     }
 
@@ -1480,7 +1492,7 @@ class Configuration {
 
     unsigned int mqttSend_types(unsigned int num) {
         if(num >= MQTT_TOPICS) return 0;
-        if(_mqttSend_types[num] > 3) return 0;
+        if(_mqttSend_types[num] > 13) return 0;
         return _mqttSend_types[num];
     }
 
@@ -1492,7 +1504,7 @@ class Configuration {
 
     unsigned int mqttSend_wtypes(unsigned int num) {
         if(num >= MQTT_TOPICS) return 0;
-        if(_mqttSend_wtypes[num] > 16) return 0;
+        if(_mqttSend_wtypes[num] > 18) return 0;
         return _mqttSend_wtypes[num];
     }
 

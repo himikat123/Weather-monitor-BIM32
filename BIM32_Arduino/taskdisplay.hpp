@@ -141,8 +141,9 @@ void TaskDisplay1(void *pvParameters) {
                     }
 
                     /* LCD/TFT display brightness change */
-                    nextion.brightness(get_brightness(DISPLAY_1));
-                    ili9341.brightness(get_brightness(DISPLAY_1));
+                    unsigned int br = get_brightness(DISPLAY_1);
+                    nextion.brightness(br);
+                    ili9341.brightness(br);
 
                     /* Check if need and it's time to turn off the display */
                     if(isTimeoutOffTime(DISPLAY_1)) {

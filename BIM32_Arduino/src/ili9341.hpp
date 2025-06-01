@@ -19,6 +19,7 @@ class ILI9341 : LcdDisplay {
     #define FONT_SEGMENTS_SML 4
     #define FONT_SMALL        5
     #define FONT_TINY         6
+    #define FONTPR            7
 
     #define BG_COLOR          0x0000 // black
     #define FRAME_COLOR       0x001F // blue
@@ -103,7 +104,7 @@ class ILI9341 : LcdDisplay {
         void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color);
         void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor);
         void _printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor, bool valign);
-        void _showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color);
+        void _showTemperature(float temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color);
         void _showHumidity(int hum, uint16_t x, uint16_t y);
         void _showTime();
         void _clockPoints();
@@ -344,6 +345,7 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
         else if(font == FONT1) tft.loadFont(Ubuntu_14);
         else if(font == FONT2) tft.loadFont(Ubuntu_21);
         else if(font == FONT3) tft.loadFont(Ubuntu_29);
+        else if(font == FONTPR) tft.loadFont(Ubuntu_18);
         else if(font == FONT_SEGMENTS_SML) tft.loadFont(segment_96);
         else if(font == FONT_SEGMENTS_BIG) tft.loadFont(segment_140);
         _prevFont = font;
@@ -382,8 +384,9 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
 /**
  * Display temperature
  */
-void ILI9341::_showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
-    String buf = validate.temp(temp) ? (String(temp) + "°C") : "--";
+void ILI9341::_showTemperature(float temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
+    String buf = validate.temp(temp) ? String((int)round(config.units_temp() ? sensors.fahrenheit(temp) : temp)) : "--";
+    buf += config.units_temp() ? "°F" : "°C";
     _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, CENTER, color);
 }
 
@@ -391,7 +394,8 @@ void ILI9341::_showTemperature(int temp, uint16_t x, uint16_t y, uint8_t font, u
  * Display humidity
  */
 void ILI9341::_showHumidity(int hum, uint16_t x, uint16_t y) {
-    String buf = validate.hum(hum) ? (String(hum) + "%") : "--";
+    String buf = validate.hum(hum) ? (String(hum)) : "--";
+    buf += "%";
     _printText(x, y, 58, 20, buf, FONT2, CENTER, HUMIDITY_COLOR);
 }
 
@@ -525,7 +529,7 @@ void ILI9341::_sequenceSlotNext() {
 void ILI9341::_showTemperatureInside() {
     if(config.display_source_tempIn_sens() == 4) _tempIn = _tempSequence[_sequenceSlot];
     if(_prevTempIn != _tempIn || _forced) {
-        _showTemperature(int(round(_tempIn)), 173, 53, FONT3, TEMPERATURE_COLOR);
+        _showTemperature(_tempIn, 173, 53, FONT3, TEMPERATURE_COLOR);
         _prevTempIn = _tempIn;
     }
 }
@@ -536,7 +540,7 @@ void ILI9341::_showTemperatureInside() {
 void ILI9341::_showTemperatureOutside() {
     if(_prevTempOut != _tempOut || _forced) {
         _showThermometer();
-        _showTemperature(int(round(_tempOut)), 71, 113, FONT3, TEMPERATURE_COLOR);
+        _showTemperature(_tempOut, 71, 113, FONT3, TEMPERATURE_COLOR);
         _prevTempOut = _tempOut;
     }
 }
@@ -665,8 +669,9 @@ void ILI9341::_showDescription() {
  */
 void ILI9341::_showPressure() {
     if(_prevPresOut != _presOut || _forced) {
-        String buf = validate.pres(_presOut) ? (String(int(round(_presOut * 0.75))) + lang.mm()) : "--";
-        _printText(250, 119, 70, 20, buf, FONT2, CENTER, PRESSURE_COLOR);
+        String buf = validate.pres(_presOut) ? String(int(round(config.units_pres() ? _presOut : sensors.mmHg(_presOut)))) : "--";
+        buf += config.units_pres() ? lang.hpa() : lang.mm();
+        _printText(250, (config.units_pres() ? 122 : 119), 70, (config.units_pres() ? 16 : 20), buf, FONTPR, CENTER, PRESSURE_COLOR);
         _prevPresOut = _presOut;
     }
 }
@@ -766,12 +771,12 @@ void ILI9341::_showForecastIcons() {
 void ILI9341::_showForecastTemps() {
     for(uint8_t i=0; i<3; i++) {
         if(_prevDTemps[i] != _dTemps[i] || _forced) {
-            _showTemperature(int(round(_dTemps[i])), i * 106 + 49, 183, FONT2, TEMPERATURE_COLOR);
+            _showTemperature(_dTemps[i], i * 106 + 49, 183, FONT2, TEMPERATURE_COLOR);
             _prevDTemps[i] = _dTemps[i];
         }
 
         if(_prevNTemps[i] != _nTemps[i] || _forced) {
-            _showTemperature(int(round(_nTemps[i])), i * 106 + 49, 203, FONT2, TEMP_MIN_COLOR);
+            _showTemperature(_nTemps[i], i * 106 + 49, 203, FONT2, TEMP_MIN_COLOR);
             _prevNTemps[i] = _nTemps[i];
         }
     }
@@ -883,8 +888,11 @@ void ILI9341::_networkPage() {
         _printText(sr, 124 + y, w, 12, ip, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
     if(_prevNetMac != mac || _forced) 
         _printText(sr, 154 + y, w, 12, mac, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
-    if(_prevNetTemp != esp32Temp || _forced) 
-        _printText(sr, 184 + y, w, 12, String((int)round(esp32Temp)) + "°C", FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    if(_prevNetTemp != esp32Temp || _forced) {
+        String buf = String((int)round(config.units_temp() ? sensors.fahrenheit(esp32Temp) : esp32Temp));
+        buf += config.units_temp() ? "°F" : "°C"; 
+        _printText(sr, 184 + y, w, 12, buf, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
+    }
     if(_prevNetFw != fw || _forced) 
         _printText(sr, 214 + y, w, 12, fw, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
 
@@ -1088,7 +1096,7 @@ void ILI9341::_hourlyPage() {
 void ILI9341::_hourlyTemp(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 16, BG_COLOR);
     char buf[10];
-    if(validate.temp(_hrTemp[num])) sprintf(buf, "%.1f°", _hrTemp[num]);
+    if(validate.temp(_hrTemp[num])) sprintf(buf, "%.1f°", config.units_temp() ? sensors.fahrenheit(_hrTemp[num]) : _hrTemp[num]);
     else sprintf(buf, "--°");
     _printText(num * 32 + 30, y, 32, 12, String(buf), FONT_SMALL, CENTER, TEMPERATURE_COLOR);
 }
@@ -1101,8 +1109,8 @@ void ILI9341::_hourlyHum(uint8_t num, uint16_t y) {
 
 void ILI9341::_hourlyPres(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
-    String p = validate.pres(_hrPres[num]) ? String((int)round(_hrPres[num] * 0.75)) : "--";
-    _printText(num * 32 + 30, y, 32, 12, p + lang.mm(), FONT_TINY, CENTER, PRESSURE_COLOR);
+    String p = validate.pres(_hrPres[num]) ? String((int)round(config.units_pres() ? _hrPres[num] : sensors.mmHg(_hrPres[num]))) : "--";
+    _printText(num * 32 + 30, y, 32, 12, p + (config.units_pres() ? String(lang.hpa()[0]) : lang.mm()), FONT_TINY, CENTER, PRESSURE_COLOR);
 }
 
 void ILI9341::_hourlyIcon(uint8_t num, uint16_t y) {

@@ -67,6 +67,8 @@ class Sensors {
         void comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier);
         float absoluteHum(float temp, float hum);
         float dewPoint(float temp, float hum);
+        float fahrenheit(float temp);
+        float mmHg(float pres);
 
     private:
         bool _bme280_det = false;
@@ -651,4 +653,12 @@ float Sensors::dewPoint(float temp, float hum) {
     float dp = (b * alpha) / (a - alpha);
 
     return dp;
+}
+
+float Sensors::fahrenheit(float temp) {
+    return temp * 9 / 5 + 32;
+}
+
+float Sensors::mmHg(float pres) {
+    return pres * 0.75;
 }
