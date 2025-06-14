@@ -67,7 +67,7 @@ class Lang {
         };
 
         String _comfort[9][7] = {
-            {"Comfortable", "Gemütlich", "Комфортно", "Przyjemny", "Комфортно", "Комфортно", "Comodidad"},
+            {"Comfortable", "Gemütlich", "Комфортно", "Przyjemny", "Комфортно", "Комфортно", "Clima agradable"},
             {"Too hot", "Zu heiß", "Жарко", "Gorąco", "Жарко", "Горещо", "Muy caliente"},
             {"Too cold", "Zu kalt", "Холодно", "Zimno", "Холодно", "Студено", "Muy frío"},
             {"Too humid", "Zu feucht", "Слишком влажно", "Zbyt wilgotno", "Занадто волого", "Твърде влажно", "Muy húmedo"},
