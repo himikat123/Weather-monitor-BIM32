@@ -638,7 +638,7 @@ void Sensors::comfortDevices(bool heater, bool cooler, bool humidifier, bool deh
 float Sensors::absoluteHum(float temp, float hum) {
     float sat = 6.112 * exp((17.67 * temp) / (temp + 243.5));
     float vap = sat * (hum / 100.0);
-    float abs = 2.1674 * vap / (273.15 + temp);
+    float abs = (2.1674 * vap / (273.15 + temp)) * 100;
 
     return abs;
 }
