@@ -332,14 +332,21 @@ String AgregateLcdData::_iaq() {
 
 String AgregateLcdData::_absoluteHum(float temp, float hum) {
     float ah = sensors.absoluteHum(temp, hum);
-    if(validate.absoluteHum(ah)) return (String((int)round(ah)) + lang.gpm());
+    if(validate.absoluteHum(ah)) {
+        ah = round(ah * 10) / 10.0;
+        String buf = String(ah, 1);
+        buf += lang.gpm();
+        return buf;
+    }
     else return "--";
 }
 
 String AgregateLcdData::_dewPoint(float temp, float hum) {
     float dp = sensors.dewPoint(temp, hum);
     if(validate.dewPoint(dp, temp)) {
-        String buf = String((int)round(config.units_temp() ? sensors.fahrenheit(dp) : dp));
+        float value = config.units_temp() ? sensors.fahrenheit(dp) : dp;
+        value = round(value * 10) / 10.0;
+        String buf = String(value, 1);
         buf += config.units_temp() ? "°F" : "°C";
         return buf;
     }
