@@ -28,6 +28,7 @@ void TaskSensors(void *pvParameters) {
     delay(100);
     digitalWrite(HC12_SET_PIN, HIGH);
 
+    pinMode(ALARM_BUTTON_PIN, INPUT);
     attachInterrupt(ALARM_BUTTON_PIN, alarm_button, FALLING);
     attachInterrupt(MP3_BUSY_PIN, mp3_busy, FALLING);
 
@@ -219,7 +220,7 @@ void display2_toggle() {
  */
 void alarm_button() {
     global.alarm_but_pressed = true;
-    sound.stopPlaying();
+    //sound.stopPlaying();
 }
 
 /**
@@ -261,11 +262,23 @@ void get_time(void) {
 
 /**
  * Check the time and date for daylight saving time
- * (works with an error, changes the time at 1:00)
  */
-boolean is_summertime(void) {
-    if(month() < 3 || month() > 10) return false;
-    if(month() > 3 && month() < 10) return true;
-    if((month() == 3 && (hour() + 24 * day()) >= (1 + 24 * (31 - (5 * year() / 4 + 4) % 7))) || (month() == 10 && (hour() + 24 * day()) < (1 + 24 * (31 - (5 * year() / 4 + 1) % 7)))) return true;
-    else return false;
+boolean is_summertime() {
+    time_t now = time(nullptr);
+    struct tm *lt = localtime(&now);
+
+    int y = lt->tm_year + 1900;
+    int m = lt->tm_mon + 1;
+    int d = lt->tm_mday;
+    int h = lt->tm_hour;
+
+    int lastMarchSunday = 31 - ((5 * y / 4 + 4) % 7);
+    int lastOctoberSunday = 31 - ((5 * y / 4 + 1) % 7);
+
+    if(m < 3 || m > 10) return false;
+    if(m > 3 && m < 10) return true;
+    if(m == 3) return (d > lastMarchSunday || (d == lastMarchSunday && h >= 3));
+    if(m == 10) return (d < lastOctoberSunday || (d == lastOctoberSunday && h < 3));
+
+    return false;
 }

@@ -9,11 +9,11 @@ class Thingspeak {
         int get_updated();
         float get_historyField(unsigned int sensor, unsigned int slot);
         unsigned int get_historyUpdated(unsigned int slot);
-        boolean is_summertime();
 
     private:
         String _fieldPrepare(unsigned int field);
         String _historyFieldPrepare(unsigned int fieldNum);
+        boolean _is_summertime();
         
         float _field[8] = {-40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0};
         float _historyFields[7][24] = {
@@ -76,7 +76,7 @@ void Thingspeak::receive() {
         tmth.Second = atoi(strtok(NULL, ":"));
         _updated = makeTime(tmth);
         _updated += config.clock_utc() * 3600;
-        _updated += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
+        _updated += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
         Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
     }
     else Serial.println("error, code: " + String(httpCode));
@@ -191,7 +191,7 @@ void Thingspeak::receiveHistory() {
             tmth.Second = atoi(strtok(NULL, ":"));
             _historyUpdated[i] = makeTime(tmth);
             _historyUpdated[i] += config.clock_utc() * 3600;
-            _historyUpdated[i] += config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
+            _historyUpdated[i] += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
         }
         Serial.println("successfull");
     }
@@ -376,11 +376,23 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
 
 /**
  * Check the time and date for daylight saving time
- * (works with an error, changes the time at 1:00)
  */
-boolean Thingspeak::is_summertime(void) {
-    if(month() < 3 || month() > 10) return false;
-    if(month() > 3 && month() < 10) return true;
-    if((month() == 3 && (hour() + 24 * day()) >= (1 + 24 * (31 - (5 * year() / 4 + 4) % 7))) || (month() == 10 && (hour() + 24 * day()) < (1 + 24 * (31 - (5 * year() / 4 + 1) % 7)))) return true;
-    else return false;
+boolean Thingspeak::_is_summertime(void) {
+    time_t now = time(nullptr);
+    struct tm *lt = localtime(&now);
+
+    int y = lt->tm_year + 1900;
+    int m = lt->tm_mon + 1;
+    int d = lt->tm_mday;
+    int h = lt->tm_hour;
+
+    int lastMarchSunday = 31 - ((5 * y / 4 + 4) % 7);
+    int lastOctoberSunday = 31 - ((5 * y / 4 + 1) % 7);
+
+    if(m < 3 || m > 10) return false;
+    if(m > 3 && m < 10) return true;
+    if(m == 3) return (d > lastMarchSunday || (d == lastMarchSunday && h >= 3));
+    if(m == 10) return (d < lastOctoberSunday || (d == lastOctoberSunday && h < 3));
+
+    return false;
 }
