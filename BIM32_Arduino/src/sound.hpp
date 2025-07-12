@@ -78,7 +78,7 @@ void Sound::play(unsigned int folder, unsigned int track) {
         folder = 1;
         track++;
     }
-    if(folder==1 and track<=33) {
+    else if(folder==1 and track<=33) {
         if(String(config.lang()) == "de") folder = 3;
         else if(String(config.lang()) == "ru") folder = 4;
         else if(String(config.lang()) == "pl") folder = 5;
@@ -128,15 +128,12 @@ bool Sound::_isAllowed() {
 }
 
 bool Sound::_hourlyCheck() {
-    uint8_t fromH = config.sound_hour_from();
-    uint8_t toH = config.sound_hour_to();
-    if(fromH < toH) {
-        if(fromH <= hour() && hour() < toH) return true;
-    }
-    else {
-        if(hour() >= fromH || hour() < toH) return true;
-    }
-    return false;
+    uint16_t fromM = config.sound_hour_from(false) * 60 + config.sound_hour_from(true);
+    uint16_t toM = config.sound_hour_to(false) * 60 + config.sound_hour_to(false);
+    uint16_t nowM = hour() * 60 + minute();
+
+    if(fromM < toM) return (fromM <= nowM && nowM < toM);
+    else return (nowM >= fromM || nowM < toM);
 }
 
 /** 

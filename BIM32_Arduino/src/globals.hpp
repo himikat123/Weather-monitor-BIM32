@@ -2,7 +2,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v5.6a"                    // Firmware version
+#define FW "v5.6b"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -170,8 +170,8 @@ class Configuration {
     unsigned int _display_brightMethod[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
     unsigned int _display_autoOff[DISPLAYS] = {0, 0}; // Display auto-off time 0...1440
     bool _display_nightOff[DISPLAYS] = {false, false}; // Turn off display at night
-    unsigned int _display_nightOff_from[DISPLAYS] = {22, 22}; // The hour from which the display is turned off
-    unsigned int _display_nightOff_to[DISPLAYS] = {7, 7}; // The hour from which the display is turned on
+    char _display_nightOff_from[DISPLAYS][6] = {"23:00", "23:00"}; // The hour from which the display is turned off
+    char _display_nightOff_to[DISPLAYS][6] = {"07:00", "07:00"}; // The hour from which the display is turned on
     unsigned int _display_brightness_day[DISPLAYS] = {50, 50}; // Day mode brightness 1...100
     unsigned int _display_brightness_night[DISPLAYS] = {50, 50}; // Night mode brightness 1...100
     unsigned int _display_brightness_min[DISPLAYS] = {1, 1}; // Minimum brightness limit 0...255
@@ -227,8 +227,8 @@ class Configuration {
     unsigned int _sound_vol = 15; // Sound volume
     unsigned int _sound_eq = 0; // Equalizer: 0-Normal, 1-Pop, 2-Rock, 3-Jazz, 4-Classic, 5-Bass
     unsigned int _sound_hourly = 2; // Hourly signal: 0-Always ON, 1-Always OFF, 2-On from dawn to dusk, 3-Enabled by time
-    unsigned int _sound_hour_from = 8; // The hour from which the hourly signal is turned on
-    unsigned int _sound_hour_to = 21; // The hour from which the hourly signal is turned off
+    char _sound_hour_from[6] = "07:00"; // The hour from which the hourly signal is turned on
+    char _sound_hour_to[6] = "22:00"; // The hour from which the hourly signal is turned off
 
     // Sensors
     float _bme280_temp_corr = 0.0; // BME280 temperature correction
@@ -425,8 +425,8 @@ class Configuration {
                         COPYNUM(conf["display"]["brightMethod"][i], _display_brightMethod[i]);
                         COPYNUM(conf["display"]["autoOff"][i], _display_autoOff[i]);
                         COPYBOOL(conf["display"]["nightOff"]["need"][i], _display_nightOff[i]);
-                        COPYNUM(conf["display"]["nightOff"]["from"][i], _display_nightOff_from[i]);
-                        COPYNUM(conf["display"]["nightOff"]["to"][i], _display_nightOff_to[i]);
+                        COPYSTR(conf["display"]["nightOff"]["from"][i], _display_nightOff_from[i]);
+                        COPYSTR(conf["display"]["nightOff"]["to"][i], _display_nightOff_to[i]);
                         COPYNUM(conf["display"]["brightness"]["day"][i], _display_brightness_day[i]);
                         COPYNUM(conf["display"]["brightness"]["night"][i], _display_brightness_night[i]);
                         COPYNUM(conf["display"]["brightness"]["min"][i], _display_brightness_min[i]);
@@ -489,8 +489,8 @@ class Configuration {
                     COPYNUM(conf["sound"]["vol"], _sound_vol);
                     COPYNUM(conf["sound"]["eq"], _sound_eq);
                     COPYNUM(conf["sound"]["hourly"], _sound_hourly);
-                    COPYNUM(conf["sound"]["hour"]["from"], _sound_hour_from);
-                    COPYNUM(conf["sound"]["hour"]["to"], _sound_hour_to);
+                    COPYSTR(conf["sound"]["hour"]["from"], _sound_hour_from);
+                    COPYSTR(conf["sound"]["hour"]["to"], _sound_hour_to);
 
                     // Sensors
                     COPYNUM(conf["sensors"]["bme280"]["t"], _bme280_temp_corr);
@@ -888,16 +888,14 @@ class Configuration {
         return _display_nightOff[num];
     }
 
-    unsigned int display_nightOff_from(unsigned int num) {
+    unsigned int display_nightOff_from(unsigned int num, bool level) {
         if(num >= DISPLAYS) return 0;
-        if(_display_nightOff_from[num] > 23) return 0; 
-        return _display_nightOff_from[num];
+        return _get_time(level, _display_nightOff_from[num]);
     }
 
-    unsigned int display_nightOff_to(unsigned int num) {
+    unsigned int display_nightOff_to(unsigned int num, bool level) {
         if(num >= DISPLAYS) return 0;
-        if(_display_nightOff_to[num] > 23) return 0; 
-        return _display_nightOff_to[num];
+        return _get_time(level, _display_nightOff_to[num]);
     }
 
     unsigned int display_brightness_day(unsigned int num) {
@@ -1168,12 +1166,12 @@ class Configuration {
         return _sound_hourly;
     }
   
-    unsigned int sound_hour_from() {
-        return _sound_hour_from;
+    unsigned int sound_hour_from(bool level) {
+        return _get_time(level, _sound_hour_from);
     }
   
-    unsigned int sound_hour_to() {
-        return _sound_hour_to;
+    unsigned int sound_hour_to(bool level) {
+        return _get_time(level, _sound_hour_to);
     }
 
     float bme280_temp_corr() {
