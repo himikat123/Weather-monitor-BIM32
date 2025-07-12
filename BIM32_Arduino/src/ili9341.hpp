@@ -1258,7 +1258,7 @@ void ILI9341::_historyInPage() {
             _hourlyWeekday(i, 116);
         }
         for(uint8_t i=0; i<8; i++) {
-            _hrHum[i] = thingspeak.get_historyField(1, i + _historyInShift);
+            _hrHum[i] = thingspeak.get_historyField(4, i + _historyInShift);
             _hourlyHum(i, 102);
         }
         for(uint8_t i=0; i<8; i++) {
@@ -1290,7 +1290,7 @@ void ILI9341::_historyOutPage() {
             _hourlyTemp(i, 86);
         }
         for(uint8_t i=0; i<8; i++) {
-            _hrDate[i] = thingspeak.get_historyUpdated(i + _historyInShift);
+            _hrDate[i] = thingspeak.get_historyUpdated(i + _historyOutShift);
             _hourlyWeekday(i, 130);
         }
         for(uint8_t i=0; i<8; i++) {
