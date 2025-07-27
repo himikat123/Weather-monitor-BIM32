@@ -185,7 +185,7 @@ void Nextion::brightness(unsigned int bright) {
 }
 
 /**
- * Toggles display (on/off)
+ * Toggle display (on/off)
  */
 void Nextion::displayToggle() {
     if(_power) nex.writeNum("dim", 0);
@@ -194,7 +194,7 @@ void Nextion::displayToggle() {
 }
 
 /**
- * Turns on the display
+ * Turn on the display
  */
 void Nextion::displayOn(bool doinit) {
     _power = true;
@@ -202,7 +202,7 @@ void Nextion::displayOn(bool doinit) {
 }
 
 /*
- * Turns off the display
+ * Turn off the display
  */
 void Nextion::displayOff() {
     nex.writeNum("dim", 0);
@@ -210,7 +210,7 @@ void Nextion::displayOff() {
 }
 
 /**
- * Returns true if display is on
+ * Return true if display is on
  */
 bool Nextion::isDisplayOn() {
     return _power;
@@ -365,9 +365,9 @@ void Nextion::_showAntenna() {
 void Nextion::_showTempIn() {
     if(_prevTempIn != _tempIn or _forced) {
         if(config.display_source_tempIn_sens() != 4) {
-            nex.writeStr("Main.tempInside.txt", validate.temp(_tempIn) 
-                ? (String(int(round(_tempIn))) + "°C") : "--"
-            );
+            String buf = validate.temp(_tempIn) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_tempIn) : _tempIn)) : "--";
+            buf += config.units_temp() ? "°F" : "°C";
+            nex.writeStr("Main.tempInside.txt", buf);
         }
         _prevTempIn = _tempIn;
     }
@@ -379,9 +379,9 @@ void Nextion::_showTempIn() {
 void Nextion::_showTempOut() {
     if(_prevTempOut != _tempOut or _forced) {
         _showThermometer();
-        nex.writeStr("Main.tempOutside.txt", validate.temp(_tempOut) 
-            ? (String(int(round(_tempOut))) + "°C") : "--"
-        );
+        String buf = validate.temp(_tempOut) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_tempOut) : _tempOut)) : "--";
+        buf += config.units_temp() ? "°F" : "°C";
+        nex.writeStr("Main.tempOutside.txt", buf);
         _prevTempOut = _tempOut;
     }
 }
@@ -417,9 +417,11 @@ void Nextion::_showHumOut() {
  */
 void Nextion::_showPres() {
     if(_prevPresOut != _presOut or _forced) {
-        nex.writeStr("Main.presOutside.txt", validate.pres(_presOut) 
-            ? (String(int(round(_presOut * 0.75))) + lang.mm()) : "--"
-        );
+        int presInt = round(config.units_pres() ? _presOut : sensors.mmHg(_presOut));
+        String buf = validate.pres(_presOut) ? String(presInt) : "--";
+        buf += config.units_pres() ? lang.hpa() : lang.mm();
+        nex.writeStr("Main.presOutside.txt", buf);
+        nex.writeNum("Main.presOutside.font", presInt < 1000 ? 2 : 1);
         _prevPresOut = _presOut;
     }
 }
@@ -552,15 +554,15 @@ void Nextion::_showWeatherForecast() {
             _prevIcons[i] = _icons[i];
         }
         if(_prevDTemps[i] != _dTemps[i] or _forced) {
-            nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", validate.temp(_dTemps[i]) 
-                ? (String(int(round(_dTemps[i]))) + "°C") : "--"
-            );
+            String buf = validate.temp(_dTemps[i]) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_dTemps[i]) : _dTemps[i])) : "--";
+            buf += config.units_temp() ? "°F" : "°C";
+            nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", buf);
             _prevDTemps[i] = _dTemps[i];
         }
         if(_prevNTemps[i] != _nTemps[i] or _forced) {
-            nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", validate.temp(_nTemps[i]) 
-                ? (String(int(round(_nTemps[i]))) + "°C") : "--"
-            );
+            String buf = validate.temp(_nTemps[i]) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_nTemps[i]) : _nTemps[i])) : "--";
+            buf += config.units_temp() ? "°F" : "°C";
+            nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", buf);
             _prevNTemps[i] = _nTemps[i];
         }
         if(_prevWinds[i] != _winds[i] or _forced) {
@@ -577,55 +579,58 @@ void Nextion::_showWeatherForecast() {
  */
 void Nextion::_hourlyData() {
     if((_prevHourlyChecksum != _hourlyChecksum) or _forced) {
-        char dat[22] = "";
+        char dat[23] = "";
         char buf[20] = "";
         Serial1.print("Hourly.data0.txt=\"");
 
         for(uint8_t i=0; i<40; i++) {
             // temp
-            int t = round(weather.get_hourlyTemp(i) * 10);
+            float temp = weather.get_hourlyTemp(i);
+            if(config.units_temp()) temp = sensors.fahrenheit(temp);
+            int t = round(temp * 10);
             sprintf(buf, "%04d", t);
             for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
             // pres
-            unsigned int p = round(weather.get_hourlyPres(i) * 0.75);
-            sprintf(buf, "%03d", p);
-            for(uint8_t k=0; k<3; k++) dat[4 + k] = buf[k];
+            float pres = weather.get_hourlyPres(i);
+            unsigned int p = round(config.units_pres() ? pres : sensors.mmHg(pres));
+            sprintf(buf, "%04d", p);
+            for(uint8_t k=0; k<4; k++) dat[4 + k] = buf[k];
             // icon
             sprintf(buf, "%02d", weather.get_hourlyIcon(i));
-            for(uint8_t k=0; k<2; k++) dat[7 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[8 + k] = buf[k];
             // weekday
             sprintf(buf, "%d", weekday(weather.get_hourlyDate(i)) - 1);
-            dat[9] = buf[0];
+            dat[10] = buf[0];
             // day
             sprintf(buf, "%02d", day(weather.get_hourlyDate(i)));
-            for(uint8_t k=0; k<2; k++) dat[10 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[11 + k] = buf[k];
             // month
             sprintf(buf, "%02d", month(weather.get_hourlyDate(i)) - 1);
-            for(uint8_t k=0; k<2; k++) dat[12 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[13 + k] = buf[k];
             // hour
             unsigned int hr = config.clock_format() > 1 
                 ? hour(weather.get_hourlyDate(i)) 
                 : hourFormat12(weather.get_hourlyDate(i));
             sprintf(buf, "%02d", hr);
-            for(uint8_t k=0; k<2; k++) dat[14 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[15 + k] = buf[k];
             // wind speed
             unsigned int wind = round(weather.get_hourlyWindSpeed(i));
             sprintf(buf, "%02d", wind);
-            for(uint8_t k=0; k<2; k++) dat[16 + k] = buf[k];
+            for(uint8_t k=0; k<2; k++) dat[17 + k] = buf[k];
             // wind direction
             unsigned int deg = agregateLcdData.windDirection(weather.get_hourlyWindDir(i));
             if(deg > 7) deg = 0;
             sprintf(buf, "%d", deg);
-            dat[18] = buf[0];
+            dat[19] = buf[0];
             // precipitation
             int pr = 0;
             if(config.weather_provider() == OPEN_METEO) pr = weather.get_hourlyPrec(i);
             else pr = round(weather.get_hourlyPrec(i) * 100);
             sprintf(buf, "%03d", pr);
-            for(uint8_t k=0; k<3; k++) dat[19 + k] = buf[k];
+            for(uint8_t k=0; k<3; k++) dat[20 + k] = buf[k];
 
             // send all to display
-            for(uint8_t k=0; k<22; k++) Serial1.print(dat[k]);
+            for(uint8_t k=0; k<23; k++) Serial1.print(dat[k]);
         }
         Serial1.print("\"");
         Serial1.write(0xFF);
@@ -660,7 +665,9 @@ void Nextion::_historyOut() {
         Serial1.print("HistoryOut.data0.txt=\"");
         for(uint8_t i=0; i<24; i++) {
             // temperature
-            int t = round(thingspeak.get_historyField(0, i) * 10);
+            float temp = thingspeak.get_historyField(0, i);
+            if(config.units_temp()) temp = sensors.fahrenheit(temp);
+            int t = round(temp * 10);
             sprintf(buf, "%04d", t);
             for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
             // humidity
@@ -708,7 +715,9 @@ void Nextion::_historyIn() {
         Serial1.print("HistoryIn.data0.txt=\"");
         for(uint8_t i=0; i<24; i++) {
             // temperature
-            int t = round(thingspeak.get_historyField(3, i) * 10);
+            float temp = thingspeak.get_historyField(3, i);
+            if(config.units_temp()) temp = sensors.fahrenheit(temp);
+            int t = round(temp * 10);
             sprintf(buf, "%04d", t);
             for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
             // humidity
