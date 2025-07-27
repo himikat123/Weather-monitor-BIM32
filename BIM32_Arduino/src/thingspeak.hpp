@@ -378,21 +378,8 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
  * Check the time and date for daylight saving time
  */
 boolean Thingspeak::_is_summertime(void) {
-    time_t now = time(nullptr);
-    struct tm *lt = localtime(&now);
-
-    int y = lt->tm_year + 1900;
-    int m = lt->tm_mon + 1;
-    int d = lt->tm_mday;
-    int h = lt->tm_hour;
-
-    int lastMarchSunday = 31 - ((5 * y / 4 + 4) % 7);
-    int lastOctoberSunday = 31 - ((5 * y / 4 + 1) % 7);
-
-    if(m < 3 || m > 10) return false;
-    if(m > 3 && m < 10) return true;
-    if(m == 3) return (d > lastMarchSunday || (d == lastMarchSunday && h >= 3));
-    if(m == 10) return (d < lastOctoberSunday || (d == lastOctoberSunday && h < 3));
-
-    return false;
+    if(month() < 3 || month() > 10) return false;
+    if(month() > 3 && month() < 10) return true;
+    if((month() == 3 && (hour() + 24 * day()) >= (1 + 24 * (31 - (5 * year() / 4 + 4) % 7))) || (month() == 10 && (hour() + 24 * day()) < (1 + 24 * (31 - (5 * year() / 4 + 1) % 7)))) return true;
+    else return false;
 }
