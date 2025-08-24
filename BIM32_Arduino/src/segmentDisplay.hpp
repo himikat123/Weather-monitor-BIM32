@@ -207,7 +207,7 @@ void SegmentDisplay::_date(int* segImg, uint8_t slot) {
  */
 void SegmentDisplay::_temp(float t, int* segImg) {
     bool valid = validate.temp(t);
-    int tmp = round(config.units_temp() ? sensors.fahrenheit(t) : t);
+    int tmp = round(t);
     uint8_t th = floor(abs(tmp) / 10), tl = abs(tmp) % 10;
     if(th == 0) th = SYMB_SPACE;
     uint8_t c = config.units_temp() ? SYMB_F : SYMB_C;
@@ -280,12 +280,11 @@ void SegmentDisplay::_hum(float h, int* segImg) {
  */
 void SegmentDisplay::_pres(float p, int* segImg) {
     bool valid = validate.pres(p);
-    int prs = round(config.units_pres() ? p : sensors.mmHg(p));
-    uint8_t p1000 = valid ? floor(prs / 1000) : SYMB_MINUS;
-    uint8_t p100 = valid ? floor(prs % 1000 / 100) : SYMB_MINUS;
-    uint8_t p10 = valid ? floor(prs % 100 / 10) : SYMB_MINUS;
-    uint8_t p1 = valid ? prs % 10 : SYMB_MINUS;
-    bool m = config.units_pres() && prs > 999;
+    uint8_t p1000 = valid ? floor(p / 1000) : SYMB_MINUS;
+    uint8_t p100 = valid ? floor(p % 1000 / 100) : SYMB_MINUS;
+    uint8_t p10 = valid ? floor(p % 100 / 10) : SYMB_MINUS;
+    uint8_t p1 = valid ? p % 10 : SYMB_MINUS;
+    bool m = config.units_pres() && p > 999;
 
     int disp4Img[8] = { m ? p1000 : p100, m ? p100 : p10, m ? p10 : p1, m ? p1 : SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE };
     int disp6Img[8] = { p1000 == 0 ? SYMB_SPACE : p1000, p100, p10, p1, SYMB_SPACE, SYMB_P, SYMB_SPACE, SYMB_SPACE };

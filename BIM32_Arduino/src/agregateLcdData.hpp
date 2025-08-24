@@ -344,7 +344,7 @@ String AgregateLcdData::_absoluteHum(float temp, float hum) {
 String AgregateLcdData::_dewPoint(float temp, float hum) {
     float dp = sensors.dewPoint(temp, hum);
     if(validate.dewPoint(dp, temp)) {
-        float value = config.units_temp() ? sensors.fahrenheit(dp) : dp;
+        float value = dp;
         value = round(value * 10) / 10.0;
         String buf = String(value, 1);
         buf += config.units_temp() ? "°F" : "°C";

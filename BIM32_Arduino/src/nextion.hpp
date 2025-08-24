@@ -365,7 +365,7 @@ void Nextion::_showAntenna() {
 void Nextion::_showTempIn() {
     if(_prevTempIn != _tempIn or _forced) {
         if(config.display_source_tempIn_sens() != 4) {
-            String buf = validate.temp(_tempIn) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_tempIn) : _tempIn)) : "--";
+            String buf = validate.temp(_tempIn) ? String((int)round(_tempIn)) : "--";
             buf += config.units_temp() ? "°F" : "°C";
             nex.writeStr("Main.tempInside.txt", buf);
         }
@@ -379,7 +379,7 @@ void Nextion::_showTempIn() {
 void Nextion::_showTempOut() {
     if(_prevTempOut != _tempOut or _forced) {
         _showThermometer();
-        String buf = validate.temp(_tempOut) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_tempOut) : _tempOut)) : "--";
+        String buf = validate.temp(_tempOut) ? String((int)round(_tempOut)) : "--";
         buf += config.units_temp() ? "°F" : "°C";
         nex.writeStr("Main.tempOutside.txt", buf);
         _prevTempOut = _tempOut;
@@ -417,7 +417,7 @@ void Nextion::_showHumOut() {
  */
 void Nextion::_showPres() {
     if(_prevPresOut != _presOut or _forced) {
-        int presInt = round(config.units_pres() ? _presOut : sensors.mmHg(_presOut));
+        int presInt = round(_presOut);
         String buf = validate.pres(_presOut) ? String(presInt) : "--";
         buf += config.units_pres() ? lang.hpa() : lang.mm();
         nex.writeStr("Main.presOutside.txt", buf);
@@ -554,13 +554,13 @@ void Nextion::_showWeatherForecast() {
             _prevIcons[i] = _icons[i];
         }
         if(_prevDTemps[i] != _dTemps[i] or _forced) {
-            String buf = validate.temp(_dTemps[i]) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_dTemps[i]) : _dTemps[i])) : "--";
+            String buf = validate.temp(_dTemps[i]) ? String((int)round(_dTemps[i])) : "--";
             buf += config.units_temp() ? "°F" : "°C";
             nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", buf);
             _prevDTemps[i] = _dTemps[i];
         }
         if(_prevNTemps[i] != _nTemps[i] or _forced) {
-            String buf = validate.temp(_nTemps[i]) ? String((int)round(config.units_temp() ? sensors.fahrenheit(_nTemps[i]) : _nTemps[i])) : "--";
+            String buf = validate.temp(_nTemps[i]) ? String((int)round(_nTemps[i])) : "--";
             buf += config.units_temp() ? "°F" : "°C";
             nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", buf);
             _prevNTemps[i] = _nTemps[i];
@@ -586,13 +586,12 @@ void Nextion::_hourlyData() {
         for(uint8_t i=0; i<40; i++) {
             // temp
             float temp = weather.get_hourlyTemp(i);
-            if(config.units_temp()) temp = sensors.fahrenheit(temp);
             int t = round(temp * 10);
             sprintf(buf, "%04d", t);
             for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
             // pres
             float pres = weather.get_hourlyPres(i);
-            unsigned int p = round(config.units_pres() ? pres : sensors.mmHg(pres));
+            unsigned int p = round(pres);
             sprintf(buf, "%04d", p);
             for(uint8_t k=0; k<4; k++) dat[4 + k] = buf[k];
             // icon
@@ -666,7 +665,6 @@ void Nextion::_historyOut() {
         for(uint8_t i=0; i<24; i++) {
             // temperature
             float temp = thingspeak.get_historyField(0, i);
-            if(config.units_temp()) temp = sensors.fahrenheit(temp);
             int t = round(temp * 10);
             sprintf(buf, "%04d", t);
             for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
@@ -716,7 +714,6 @@ void Nextion::_historyIn() {
         for(uint8_t i=0; i<24; i++) {
             // temperature
             float temp = thingspeak.get_historyField(3, i);
-            if(config.units_temp()) temp = sensors.fahrenheit(temp);
             int t = round(temp * 10);
             sprintf(buf, "%04d", t);
             for(uint8_t k=0; k<4; k++) dat[k] = buf[k];
