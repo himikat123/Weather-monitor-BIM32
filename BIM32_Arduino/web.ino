@@ -322,6 +322,31 @@ void web_changeLang() {
 }
 
 /**
+ * Show reassigned digits on 7-segment display
+ */
+void web_showOrder() {
+    if(web_isLogged(true)) {
+        if(server.hasArg("order") && server.hasArg("showOrder") && server.hasArg("num")) {
+            uint8_t num = (server.arg("num")).toInt();
+            uint8_t showOrder = (server.arg("showOrder")).toInt();
+            String order = server.arg("order");
+            Serial.println(order);
+            int arr[16];
+            int count = 0;
+            char buf[64];
+            order.toCharArray(buf, sizeof(buf));
+            char *p = strtok(buf, ",");
+            while(p != NULL) {
+                arr[count++] = atoi(p);
+                p = strtok(NULL, ",");
+            }
+            // SHOW_ORDER(num, showOrder, arr);
+        }
+        else server.send(200, "text/plain", "error");
+    }
+}
+
+/**
  * Turn display on and off
  */
 void web_dispToggle() {
@@ -633,6 +658,7 @@ void webInterface_init(void) {
     server.on("/esp/sensitivity",   HTTP_GET,  web_sensitivity);
     server.on("/esp/animation",     HTTP_GET,  web_animation);
     server.on("/esp/color",         HTTP_GET,  web_color);
+    server.on("/esp/showOrder",     HTTP_GET,  web_showOrder);
     server.on("/esp/calibrate",     HTTP_GET,  web_touch_calibrate);
     server.on("/esp/syncClock",     HTTP_GET,  web_syncClock);
     server.on("/esp/syncdialog",    HTTP_GET,  web_syncdialog);
