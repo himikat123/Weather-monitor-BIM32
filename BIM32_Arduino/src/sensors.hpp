@@ -67,7 +67,6 @@ class Sensors {
         void comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier);
         float absoluteHum(float temp, float hum);
         float dewPoint(float temp, float hum);
-        float fahrenheit(float temp);
         float mmHg(float pres);
 
     private:
@@ -178,11 +177,11 @@ void Sensors::read(void) {
  * Getters
  */
 float Sensors::get_esp32_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_esp32_temp) : _esp32_temp) + (corr ? config.esp32_temp_corr() : 0.0);
+    return _esp32_temp + (corr ? config.esp32_temp_corr() : 0.0);
 }
 
 float Sensors::get_bme280_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_bme280_temp) : _bme280_temp) + (corr ? config.bme280_temp_corr() : 0.0);
+    return _bme280_temp + (corr ? config.bme280_temp_corr() : 0.0);
 }
 
 float Sensors::get_bme280_hum(bool corr) {
@@ -194,7 +193,7 @@ float Sensors::get_bme280_pres(bool corr) {
 }
 
 float Sensors::get_bmp180_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_bmp180_temp) : _bmp180_temp) + (corr ? config.bmp180_temp_corr() : 0.0);
+    return _bmp180_temp + (corr ? config.bmp180_temp_corr() : 0.0);
 }
 
 float Sensors::get_bmp180_pres(bool corr) {
@@ -202,7 +201,7 @@ float Sensors::get_bmp180_pres(bool corr) {
 }
 
 float Sensors::get_sht21_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_sht21_temp) : _sht21_temp) + (corr ? config.sht21_temp_corr() : 0.0);
+    return _sht21_temp + (corr ? config.sht21_temp_corr() : 0.0);
 }
 
 float Sensors::get_sht21_hum(bool corr) {
@@ -210,7 +209,7 @@ float Sensors::get_sht21_hum(bool corr) {
 }
 
 float Sensors::get_dht22_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_dht22_temp) : _dht22_temp) + (corr ? config.dht22_temp_corr() : 0.0);
+    return _dht22_temp + (corr ? config.dht22_temp_corr() : 0.0);
 }
 
 float Sensors::get_dht22_hum(bool corr) {
@@ -218,7 +217,7 @@ float Sensors::get_dht22_hum(bool corr) {
 }
 
 float Sensors::get_ds18b20_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_ds18b20_temp) : _ds18b20_temp) + (corr ? config.ds18b20_temp_corr() : 0.0);
+    return _ds18b20_temp + (corr ? config.ds18b20_temp_corr() : 0.0);
 }
 
 float Sensors::get_max44009_light(bool corr) {
@@ -234,7 +233,7 @@ float Sensors::get_analog_voltage(bool corr) {
 }
 
 float Sensors::get_bme680_temp(bool corr) {
-    return (config.units_temp() ? fahrenheit(_bme680_temp) : _bme680_temp) + (corr ? config.bme680_temp_corr() : 0.0);
+    return _bme680_temp + (corr ? config.bme680_temp_corr() : 0.0);
 }
 
 float Sensors::get_bme680_hum(bool corr) {
@@ -655,10 +654,9 @@ float Sensors::dewPoint(float temp, float hum) {
     return dp;
 }
 
-float Sensors::fahrenheit(float temp) {
-    return temp * 9 / 5 + 32;
-}
-
+/*
+ * Convert hPa to mmHg
+ */
 float Sensors::mmHg(float pres) {
     return pres * 0.75;
 }

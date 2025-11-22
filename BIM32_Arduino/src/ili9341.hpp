@@ -386,7 +386,7 @@ void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height
  */
 void ILI9341::_showTemperature(float temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
     String buf = validate.temp(temp) ? String((int)round(temp)) : "--";
-    buf += config.units_temp() ? "°F" : "°C";
+    buf += "°C";
     _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, CENTER, color);
 }
 
@@ -681,7 +681,7 @@ void ILI9341::_showPressure() {
  */
 void ILI9341::_showWindSpeed() {
     if(_prevWindSpd != _windSpd || _forced) {
-        String wnd = validate.wind(_windSpd) ? String(int(round(_windSpd))) + lang.ms() : "--";
+        String wnd = validate.windSpeed(_windSpd) ? String(int(round(_windSpd))) + lang.ms() : "--";
         _printText(93, 146, 40, 16, wnd, FONT1, CENTER, TEXT_COLOR);
         _prevWindSpd = _windSpd;
     }
@@ -788,7 +788,7 @@ void ILI9341::_showForecastTemps() {
 void ILI9341::_showForecastWinds() {
     for(uint8_t i=0; i<3; i++) {
         if(_prevWinds[i] != _winds[i] || _forced) {
-            String wnd = validate.wind(_winds[i]) ? String(int(round(_winds[i]))) + lang.ms() : "--";
+            String wnd = validate.windSpeed(_winds[i]) ? String(int(round(_winds[i]))) + lang.ms() : "--";
             _printText(i * 106 + 31, 224, 44, 15, wnd, FONT1, CENTER, TEXT_COLOR);
             _prevWinds[i] = _winds[i];
         }
@@ -890,7 +890,7 @@ void ILI9341::_networkPage() {
         _printText(sr, 154 + y, w, 12, mac, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
     if(_prevNetTemp != esp32Temp || _forced) {
         String buf = String((int)round(esp32Temp));
-        buf += config.units_temp() ? "°F" : "°C"; 
+        buf += "°C"; 
         _printText(sr, 184 + y, w, 12, buf, FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
     }
     if(_prevNetFw != fw || _forced) 
@@ -1153,7 +1153,7 @@ void ILI9341::_hourlyTime(uint8_t num, uint16_t y) {
 void ILI9341::_hourlyWindSpeed(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
     float wind = weather.get_hourlyWindSpeed(num + _hourlyShift);
-    String ws = validate.wind(wind) ? String((int)round(wind)) : "--";
+    String ws = validate.windSpeed(wind) ? String((int)round(wind)) : "--";
     _printText(num * 32 + 30, y, 32, 12, ws + lang.ms(), FONT_TINY, CENTER, TEXT_COLOR);
 }
 

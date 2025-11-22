@@ -2,7 +2,7 @@
 
 #define SEPARATOR "**********************************************************************"
 
-#define FW "v5.6b"                    // Firmware version
+#define FW "v6.0a"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define UNDEFINED            0
@@ -39,7 +39,8 @@
 #define NUMITRON_DISPLAY     4
 #define D_NX4832K035         0
 #define D_NX4832T035         1
-#define D_ILI9341            2
+#define D_NX4827T043         2
+#define D_ILI9341            3
 
 static struct {
     bool clockSynchronized = false; // Is the time synchronized with the ntp server?
@@ -148,7 +149,6 @@ class Configuration {
 
     // Localization
     char _lang[3] = "en";
-    uint8_t _units_temp = 0;
     uint8_t _units_pres = 0;
 
     // Clock
@@ -204,6 +204,12 @@ class Configuration {
     unsigned int _display_source_bat_wsensNum = 0; // Wireless sensor number for the battery level:
     unsigned int _display_source_bat_thing = 0; // Thingspeak field number for the battery level
     unsigned int _display_source_descr = 0; // Additional description data source: 0-Nothing, 1-Comfort level, 2-Sequence
+    unsigned int _display_source_wind_speed_sens = 1; // Wind speed data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
+    unsigned int _display_source_wind_speed_wsensNum = 0; // Wireless sensor number for wind speed
+    unsigned int _display_source_wind_speed_thing = 0; // Thingspeak field number for wind speed
+    unsigned int _display_source_wind_dir_sens = 1; // Wind direction data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
+    unsigned int _display_source_wind_dir_wsensNum = 0; // Wireless sensor number for wind direction
+    unsigned int _display_source_wind_dir_thing = 0; // Thingspeak field number for wind direction
     unsigned int _display_source_sequence_dur = 2; // Sequence data display duration (seconds)
     char _display_source_sequence_name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
     unsigned int _display_source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
@@ -254,6 +260,8 @@ class Configuration {
     float _wsensor_temp_corr[WSENSORS][WSENSOR_TEMPS] = { {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0} }; // Wireless sensor temperature correction
     float _wsensor_hum_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor humidity correction
     float _wsensor_pres_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor pressure correction
+    float _wsensor_wind_speed_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor wind speed correction
+    float _wsensor_wind_dir_corr[WSENSORS]= {0.0, 0.0}; // Wireless sensor wind direction correction
     float _wsensor_light_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor ambient light correction
     float _wsensor_volt_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t voltage correction
     float _wsensor_curr_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t current correction
@@ -314,7 +322,7 @@ class Configuration {
     unsigned int _mqttSend_wsensors[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send via MQTT
     unsigned int _mqttSend_wtypes[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send via MQTT
     char _mqttSend_topics[12][17] = {"", "", "", "", "", "", "", "", "", "", "", ""}; // Topic names for sending via MQTT
-    
+
     // Account
     char _account_name[32] = ""; // Web interface default username
     char _account_pass[64] = ""; // Web interface default password
@@ -403,7 +411,6 @@ class Configuration {
 
                     // Localization 
                     COPYSTR(conf["lang"], _lang);
-                    COPYNUM(conf["units"]["temp"], _units_temp);
                     COPYNUM(conf["units"]["pres"], _units_pres);
 
                     // Clock
@@ -472,6 +479,12 @@ class Configuration {
                     COPYNUM(conf["display"]["source"]["bat"]["wsensNum"], _display_source_bat_wsensNum);
                     COPYNUM(conf["display"]["source"]["bat"]["thing"], _display_source_bat_thing);
                     COPYNUM(conf["display"]["source"]["descr"], _display_source_descr);
+                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["sens"], _display_source_wind_speed_sens);
+                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["wsensNum"], _display_source_wind_speed_wsensNum);
+                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["thing"], _display_source_wind_speed_thing);
+                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["sens"], _display_source_wind_dir_sens);
+                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["wsensNum"], _display_source_wind_dir_wsensNum);
+                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["thing"], _display_source_wind_dir_thing);
                     COPYNUM(conf["display"]["source"]["sequence"]["dur"], _display_source_sequence_dur);
                     for(unsigned int i=0; i<SEQUENCES; i++) {
                         COPYSTR(conf["display"]["source"]["sequence"]["name"][i], _display_source_sequence_name[i]);
@@ -515,17 +528,19 @@ class Configuration {
                     // Wireless sensors
                     for(unsigned int i=0; i<WSENSORS; i++) {
                         for(unsigned int k=0; k<WSENSOR_TEMPS; k++) {
-                            COPYNUM(conf["wsensor"]["temp"]["corr"][i][k], _wsensor_temp_corr[i][k]);
+                            COPYNUM(conf["wsensor"]["temp"][i][k], _wsensor_temp_corr[i][k]);
                         }
-                        COPYNUM(conf["wsensor"]["hum"]["corr"][i], _wsensor_hum_corr[i]);
-                        COPYNUM(conf["wsensor"]["pres"]["corr"][i], _wsensor_pres_corr[i]);
-                        COPYNUM(conf["wsensor"]["light"]["corr"][i], _wsensor_light_corr[i]);
-                        COPYNUM(conf["wsensor"]["volt"]["corr"][i], _wsensor_volt_corr[i]);
-                        COPYNUM(conf["wsensor"]["curr"]["corr"][i], _wsensor_curr_corr[i]);
-                        COPYNUM(conf["wsensor"]["pow"]["corr"][i], _wsensor_pow_corr[i]);
-                        COPYNUM(conf["wsensor"]["enrg"]["corr"][i], _wsensor_enrg_corr[i]);
-                        COPYNUM(conf["wsensor"]["freq"]["corr"][i], _wsensor_freq_corr[i]);
-                        COPYNUM(conf["wsensor"]["co2"]["corr"][i], _wsensor_co2_corr[i]);
+                        COPYNUM(conf["wsensor"]["hum"][i], _wsensor_hum_corr[i]);
+                        COPYNUM(conf["wsensor"]["pres"][i], _wsensor_pres_corr[i]);
+                        COPYNUM(conf["wsensor"]["wind"]["speed"], _wsensor_wind_speed_corr[i]);
+                        COPYNUM(conf["wsensor"]["wind"]["dir"], _wsensor_wind_dir_corr[i]);
+                        COPYNUM(conf["wsensor"]["light"][i], _wsensor_light_corr[i]);
+                        COPYNUM(conf["wsensor"]["volt"][i], _wsensor_volt_corr[i]);
+                        COPYNUM(conf["wsensor"]["curr"][i], _wsensor_curr_corr[i]);
+                        COPYNUM(conf["wsensor"]["pow"][i], _wsensor_pow_corr[i]);
+                        COPYNUM(conf["wsensor"]["enrg"][i], _wsensor_enrg_corr[i]);
+                        COPYNUM(conf["wsensor"]["freq"][i], _wsensor_freq_corr[i]);
+                        COPYNUM(conf["wsensor"]["co2"][i], _wsensor_co2_corr[i]);
                         COPYNUM(conf["wsensor"]["bat"]["k"][i], _wsensor_bat_k[i]);
                         COPYNUM(conf["wsensor"]["bat"]["type"][i], _wsensor_bat_type[i]);
                         COPYNUM(conf["wsensor"]["expire"][i], _wsensor_expire[i]); 
@@ -799,10 +814,6 @@ class Configuration {
         return String(_lang);
     }
 
-    uint8_t units_temp() {
-        return _units_temp ? 1 : 0;
-    }
-
     uint8_t units_pres() {
         return _units_pres ? 1 : 0;
     }
@@ -1061,6 +1072,36 @@ class Configuration {
         return _display_source_descr; 
     }
 
+    unsigned int display_source_wind_speed_sens() {
+        if(_display_source_wind_speed_sens > 3) return 0;
+        return _display_source_wind_speed_sens;
+    }
+
+    unsigned int display_source_wind_speed_wsensNum() {
+        if(_display_source_wind_speed_wsensNum >= WSENSORS) return 0;
+        return _display_source_wind_speed_wsensNum; 
+    }
+
+    unsigned int display_source_wind_speed_thing() {
+        if(_display_source_wind_speed_thing >= THNG_FIELDS) return 0;
+        return _display_source_wind_speed_thing;
+    }
+
+    unsigned int display_source_wind_dir_sens() {
+        if(_display_source_wind_dir_sens > 3) return 0;
+        return _display_source_wind_dir_sens;
+    }
+
+    unsigned int display_source_wind_dir_wsensNum() {
+        if(_display_source_wind_dir_wsensNum >= WSENSORS) return 0;
+        return _display_source_wind_dir_wsensNum; 
+    }
+
+    unsigned int display_source_wind_dir_thing() {
+        if(_display_source_wind_dir_thing >= THNG_FIELDS) return 0;
+        return _display_source_wind_dir_thing;
+    }
+
     unsigned int display_source_sequence_dur() {
         return _display_source_sequence_dur;
     }
@@ -1247,19 +1288,29 @@ class Configuration {
     }
 
     float wsensor_temp_corr(unsigned int num, unsigned int sens) {
-        if(num >= WSENSORS) return 0;
-        if(sens >= WSENSOR_TEMPS) return 0;
+        if(num >= WSENSORS) return 0.0;
+        if(sens >= WSENSOR_TEMPS) return 0.0;
         return _wsensor_temp_corr[num][sens];
     }
 
     float wsensor_hum_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
+        if(num >= WSENSORS) return 0.0;
         return _wsensor_hum_corr[num];
     }
 
     float wsensor_pres_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
+        if(num >= WSENSORS) return 0.0;
         return _wsensor_pres_corr[num];
+    }
+
+    float wsensor_wind_speed_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0.0;
+        return _wsensor_wind_speed_corr[num];
+    }
+
+    float wsensor_wind_dir_corr(unsigned int num) {
+        if(num >= WSENSORS) return 0.0;
+        return _wsensor_wind_dir_corr[num];
     }
 
     float wsensor_light_corr(unsigned int num) {

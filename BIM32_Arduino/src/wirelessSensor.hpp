@@ -10,9 +10,14 @@ class WirelessSensor {
         String get_lightType(unsigned int num);
         String get_energyType();
         String get_co2Type();
+        String get_windSpeedType();
+        String get_windDirType();
+
         float get_temperature(unsigned int num, unsigned int sensor, bool corr);
         float get_humidity(unsigned int num, bool corr);
         float get_pressure(unsigned int num, bool corr);
+        float get_windSpeed(unsigned int num, bool corr);
+        int get_windDir(unsigned int num, bool corr);
         float get_light(unsigned int num, bool corr);
         float get_voltage(unsigned int num, bool corr);
         float get_current(unsigned int num, bool corr);
@@ -36,6 +41,8 @@ class WirelessSensor {
         float _humidity[WSENSORS] = {40400.0, 40400.0};  // Humidity
         float _pressure[WSENSORS] = {40400.0, 40400.0};  // Pressure
         char _sensorType[WSENSORS][20] = {"", ""};       // Temperature, Humidity, Pressure sensor type (name)
+        float _windSpeed[WSENSORS] = {-1, -1};           // Wind speed
+        int _windDir[WSENSORS] = {-1, -1};               // Wind direction
         float _light[WSENSORS] = {-1.0, -1.0};           // Ambient light
         char _lightType[WSENSORS][20] = {"", ""};        // Ambient light sensor type (name)
         float _voltage[WSENSORS] = {-1.0, -1.0};         // Voltage
@@ -98,6 +105,9 @@ void WirelessSensor::receive() {
 
                     _humidity[number] = root["h"] | 40400.0;
                     _pressure[number] = root["p"] | 40400.0;
+
+                    _windSpeed[number] = root["wind"][0] | -1;
+                    _windDir[number] = root["wind"][1] | -1;
 
                     _light[number] = root["l"] | -1.0;
 
@@ -196,6 +206,14 @@ String WirelessSensor::get_co2Type() {
     return "Senseair S8";
 }
 
+String WirelessSensor::get_windSpeedType() {
+    return "RS485";
+}
+
+String WirelessSensor::get_windDirType() {
+    return "RS485";
+}
+
 float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor, bool corr) {
     if(num >= WSENSORS or sensor > 4) return 40400.0;
     return _temperature[num][sensor] + (corr ? config.wsensor_temp_corr(num, sensor) : 0.0);
@@ -209,6 +227,16 @@ float WirelessSensor::get_humidity(unsigned int num, bool corr) {
 float WirelessSensor::get_pressure(unsigned int num, bool corr) {
     if(num >= WSENSORS) return 40400.0;
     return _pressure[num] + (corr ? config.wsensor_pres_corr(num) : 0.0);
+}
+
+float WirelessSensor::get_windSpeed(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return -1.0;
+    return _windSpeed[num] + (corr ? config.wsensor_wind_speed_corr(num) : 0.0);
+}
+
+int WirelessSensor::get_windDir(unsigned int num, bool corr) {
+    if(num >= WSENSORS) return 40400.0;
+    return _windDir[num] + (corr ? config.wsensor_wind_dir_corr(corr) : 0.0); 
 }
 
 float WirelessSensor::get_light(unsigned int num, bool corr) {

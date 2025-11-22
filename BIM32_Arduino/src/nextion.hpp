@@ -366,7 +366,7 @@ void Nextion::_showTempIn() {
     if(_prevTempIn != _tempIn or _forced) {
         if(config.display_source_tempIn_sens() != 4) {
             String buf = validate.temp(_tempIn) ? String((int)round(_tempIn)) : "--";
-            buf += config.units_temp() ? "°F" : "°C";
+            buf += "°C";
             nex.writeStr("Main.tempInside.txt", buf);
         }
         _prevTempIn = _tempIn;
@@ -380,7 +380,7 @@ void Nextion::_showTempOut() {
     if(_prevTempOut != _tempOut or _forced) {
         _showThermometer();
         String buf = validate.temp(_tempOut) ? String((int)round(_tempOut)) : "--";
-        buf += config.units_temp() ? "°F" : "°C";
+        buf += "°C";
         nex.writeStr("Main.tempOutside.txt", buf);
         _prevTempOut = _tempOut;
     }
@@ -512,7 +512,7 @@ void Nextion::_showThermometer() {
  */
 void Nextion::_showWindSpeed() {
     if(_prevWindSpd != _windSpd or _forced) {
-        nex.writeStr("Main.wind0.txt", validate.wind(_windSpd) 
+        nex.writeStr("Main.wind0.txt", validate.windSpeed(_windSpd) 
             ? (String(int(round(_windSpd))) + lang.ms()) : "--"
         );
         _prevWindSpd = _windSpd;
@@ -555,18 +555,18 @@ void Nextion::_showWeatherForecast() {
         }
         if(_prevDTemps[i] != _dTemps[i] or _forced) {
             String buf = validate.temp(_dTemps[i]) ? String((int)round(_dTemps[i])) : "--";
-            buf += config.units_temp() ? "°F" : "°C";
+            buf += "°C";
             nex.writeStr("Main.tempMax" + String(i + 1) + ".txt", buf);
             _prevDTemps[i] = _dTemps[i];
         }
         if(_prevNTemps[i] != _nTemps[i] or _forced) {
             String buf = validate.temp(_nTemps[i]) ? String((int)round(_nTemps[i])) : "--";
-            buf += config.units_temp() ? "°F" : "°C";
+            buf += "°C";
             nex.writeStr("Main.tempMin" + String(i + 1) + ".txt", buf);
             _prevNTemps[i] = _nTemps[i];
         }
         if(_prevWinds[i] != _winds[i] or _forced) {
-            nex.writeStr("Main.wind" + String(i + 1) + ".txt", validate.wind(_winds[i])
+            nex.writeStr("Main.wind" + String(i + 1) + ".txt", validate.windSpeed(_winds[i])
                 ? (String(int(round(_winds[i]))) + lang.ms()) : "--"
             );
             _prevWinds[i] = _winds[i];

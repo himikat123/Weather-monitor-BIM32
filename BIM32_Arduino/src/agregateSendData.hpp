@@ -10,13 +10,17 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             float t = weather.get_currentTemp(CORRECTED);
             float h = weather.get_currentHum(CORRECTED);
             float p = weather.get_currentPres(CORRECTED);
+            float ws = weather.get_currentWindSpeed();
+            int wd = weather.get_currentWindDir();
             float ah = sensors.absoluteHum(t, h);
             float dp = sensors.dewPoint(t, h);
             if(type == 0 and validate.temp(t)) data = t;
             if(type == 1 and validate.hum(h)) data = h;
             if(type == 2 and validate.pres(p)) data = p;
-            if(type == 3 and validate.absoluteHum(ah)) data = ah;
-            if(type == 4 and validate.dewPoint(dp, t)) data = dp;
+            if(type == 3 and validate.windSpeed(ws)) data = ws;
+            if(type == 4 and validate.windDir(wd)) data = wd;
+            if(type == 5 and validate.absoluteHum(ah)) data = ah;
+            if(type == 6 and validate.dewPoint(dp, t)) data = dp;
         }; break;
         case 2: { // Wireless sensor
             if(wsensor.dataRelevance(wsensNum)) {
@@ -24,6 +28,8 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
                 float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
                 float hum = wsensor.get_humidity(wsensNum, CORRECTED);
                 float pres = wsensor.get_pressure(wsensNum, CORRECTED);
+                float windSpeed = wsensor.get_windSpeed(wsensNum, CORRECTED);
+                int windDir = wsensor.get_windDir(wsensNum, CORRECTED);
                 float light = wsensor.get_light(wsensNum, CORRECTED);
                 float volt = wsensor.get_voltage(wsensNum, CORRECTED);
                 float cur = wsensor.get_current(wsensNum, CORRECTED);
@@ -39,18 +45,20 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
                 if(wsensType <= 4 and validate.temp(temp)) data = temp;
                 if(wsensType == 5 and validate.hum(hum)) data = hum;
                 if(wsensType == 6 and validate.pres(pres)) data = pres;
-                if(wsensType == 7 and validate.light(light)) data = light;
-                if(wsensType == 8 and validate.hVolt(volt)) data = volt;
-                if(wsensType == 9 and validate.current(cur)) data = cur;
-                if(wsensType == 10 and validate.power(pwr)) data = pwr;
-                if(wsensType == 11 and validate.energy(enrg)) data = enrg;
-                if(wsensType == 12 and validate.frequence(freq)) data = freq;
-                if(wsensType == 13 and validate.batVolt(vbat)) data = vbat;
-                if(wsensType == 14 and validate.batPercent(batprc)) data = batprc;
-                if(wsensType == 15 and validate.batLvl(batlvl)) data = batlvl;
-                if(wsensType == 16 and validate.co2(co2)) data = co2;
-                if(wsensType == 17 and validate.absoluteHum(ah)) data = ah;
-                if(wsensType == 18 and validate.dewPoint(dp, t0)) data = dp;
+                if(wsensType == 7 and validate.windSpeed(windSpeed)) data = windSpeed;
+                if(wsensType == 8 and validate.windDir(pres)) data = windDir;
+                if(wsensType == 9 and validate.light(light)) data = light;
+                if(wsensType == 10 and validate.hVolt(volt)) data = volt;
+                if(wsensType == 11 and validate.current(cur)) data = cur;
+                if(wsensType == 12 and validate.power(pwr)) data = pwr;
+                if(wsensType == 13 and validate.energy(enrg)) data = enrg;
+                if(wsensType == 14 and validate.frequence(freq)) data = freq;
+                if(wsensType == 15 and validate.batVolt(vbat)) data = vbat;
+                if(wsensType == 16 and validate.batPercent(batprc)) data = batprc;
+                if(wsensType == 17 and validate.batLvl(batlvl)) data = batlvl;
+                if(wsensType == 18 and validate.co2(co2)) data = co2;
+                if(wsensType == 19 and validate.absoluteHum(ah)) data = ah;
+                if(wsensType == 20 and validate.dewPoint(dp, t0)) data = dp;
             }
         }; break;
         case 3: { // BME280

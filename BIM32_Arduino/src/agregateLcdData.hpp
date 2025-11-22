@@ -5,12 +5,15 @@ class AgregateLcdData {
         float humIn(float* humSequence);
         float humOut();
         float presOut();
+        float windSpeed();
+        int windDir();
         void sequenceNames(String* nameSequence);
         String voltage();
         uint8_t voltageColor();
         int batteryLevel();
         String comfort();
         uint8_t windDirection(int deg);
+        String localDate();
 
     private:
         void _tempSequence(float* tempSequence);
@@ -165,10 +168,10 @@ float AgregateLcdData::humOut() {
             if(thingspeak.dataRelevance()) 
                 hum = thingspeak.get_field(config.display_source_humOut_thing());
         }; break;
-        case 6: hum = sensors.get_bme280_hum(CORRECTED); break; /* humidity from BME280 */
-        case 7: hum = sensors.get_sht21_hum(CORRECTED); break; /* humidity from SHT21 */
-        case 8: hum = sensors.get_dht22_hum(CORRECTED); break; /* humidity from DHT22 */
-        case 9: hum = sensors.get_bme680_hum(CORRECTED); break; /* humidity from BME680 */
+        case 4: hum = sensors.get_bme280_hum(CORRECTED); break; /* humidity from BME280 */
+        case 5: hum = sensors.get_sht21_hum(CORRECTED); break; /* humidity from SHT21 */
+        case 6: hum = sensors.get_dht22_hum(CORRECTED); break; /* humidity from DHT22 */
+        case 7: hum = sensors.get_bme680_hum(CORRECTED); break; /* humidity from BME680 */
         default: ; break;
     }
     return hum;
@@ -193,22 +196,55 @@ float AgregateLcdData::presOut() {
     return pres;
 }
 
+float AgregateLcdData::windSpeed() {
+    float windSpeed = -1;
+    switch(config.display_source_wind_speed_sens()) {
+        case 1: windSpeed = weather.get_currentWindSpeed(); break; // wind speed from weather forecast
+        case 2: { // wind speed from wireless sensor
+            if(wsensor.dataRelevance(config.display_source_wind_speed_wsensNum()))
+                windSpeed = wsensor.get_windSpeed(config.display_source_wind_speed_wsensNum(), CORRECTED);
+        }; break;
+        case 3: { // wind speed from thingspeak
+            if(thingspeak.dataRelevance()) 
+                windSpeed = thingspeak.get_field(config.display_source_wind_speed_thing());
+        }; break;
+    }
+    return windSpeed;
+}
+
+int AgregateLcdData::windDir() {
+    int windDir = -1;
+    switch(config.display_source_wind_dir_sens()) {
+        case 1: windDir = weather.get_currentWindDir(); break; // wind directory from weather forecast
+        case 2: { // wind directory from wireless sensor
+            if(wsensor.dataRelevance(config.display_source_wind_dir_wsensNum()))
+                windDir = wsensor.get_windDir(config.display_source_wind_dir_wsensNum(), CORRECTED);
+        }; break;
+        case 3: { // wind directory from thingspeak
+            if(thingspeak.dataRelevance()) 
+                windDir = round(thingspeak.get_field(config.display_source_wind_dir_thing()));
+        }; break;
+    }
+    return windDir;
+}
+
 String AgregateLcdData::voltage() {
     String value = "";
     switch(config.display_source_volt_sens()) {
         case 1: value = _voltageWsensor(); break; /* from wireless sensor */
         case 2: value = _voltageThingspeak(); break; /* from thingspeak */
-        case 3: value = _iaq(); break; // iaq from BME680
-        case 4: value = _absoluteHum(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // absolute humidity from BME680
-        case 5: value = _dewPoint(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // dew point from BME680
-        case 6: value = _absoluteHum(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // absolute humidity from BME280
-        case 7: value = _dewPoint(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // dew point from BME280
-        case 8: value = _absoluteHum(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // absolute humidity from DHT22
-        case 9: value = _dewPoint(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // dew point from DHT22
-        case 10: value = _absoluteHum(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // absolute humidity from SHT21
-        case 11: value = _dewPoint(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // dew point from SHT21
-        case 12: value = _absoluteHum(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // absolute humidity from weather forecast
-        case 13: value = _dewPoint(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // dew point from weather forecast
+        case 3: value = localDate(); break; /* date */
+        case 4: value = _iaq(); break; // iaq from BME680
+        case 5: value = _absoluteHum(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // absolute humidity from BME680
+        case 6: value = _dewPoint(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // dew point from BME680
+        case 7: value = _absoluteHum(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // absolute humidity from BME280
+        case 8: value = _dewPoint(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // dew point from BME280
+        case 9: value = _absoluteHum(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // absolute humidity from DHT22
+        case 10: value = _dewPoint(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // dew point from DHT22
+        case 11: value = _absoluteHum(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // absolute humidity from SHT21
+        case 12: value = _dewPoint(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // dew point from SHT21
+        case 13: value = _absoluteHum(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // absolute humidity from weather forecast
+        case 14: value = _dewPoint(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // dew point from weather forecast
         default: ; break;
     }
     return value;
@@ -269,7 +305,7 @@ uint8_t AgregateLcdData::voltageColor() {
             if(config.display_source_volt_volt() == 3) /* SenseAir S8 CO2 level */
                 type = global.co2_level;
         }; break; 
-        case 3: { // iaq from BME680
+        case 4: { // iaq from BME680
             type = global.iaq_level;
         }; break;
         default: ; break;
@@ -346,9 +382,17 @@ String AgregateLcdData::_dewPoint(float temp, float hum) {
     if(validate.dewPoint(dp, temp)) {
         float value = dp;
         value = round(value * 10) / 10.0;
-        String buf = String(value, 1);
-        buf += config.units_temp() ? "°F" : "°C";
+        String buf = String(value, 1) + "°C";
         return buf;
     }
     else return "--";
+}
+
+String AgregateLcdData::localDate() {
+    char buf[20];
+    if(config.lang() == "en") sprintf(buf, "%s %02d, %d", lang.monthShortName(month()), day(), year()); 
+    else if(config.lang() == "de") sprintf(buf, "%02d. %s %d", day(), lang.monthShortName(month()), year());
+    else sprintf(buf, "%02d %s %d", day(), lang.monthShortName(month()), year());
+
+    return String(buf);
 }

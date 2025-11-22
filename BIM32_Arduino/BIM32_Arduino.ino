@@ -1,5 +1,5 @@
 /**
- *  Weather Monitor BIM32 v5.6
+ *  Weather Monitor BIM32 v6.0a
  *  https://github.com/himikat123/Weather-monitor-BIM32
  *
  *  © himikat123@gmail.com, Nürnberg, Deutschland, 2020-2025

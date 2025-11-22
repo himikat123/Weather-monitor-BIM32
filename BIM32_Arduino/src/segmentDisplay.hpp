@@ -210,7 +210,7 @@ void SegmentDisplay::_temp(float t, int* segImg) {
     int tmp = round(t);
     uint8_t th = floor(abs(tmp) / 10), tl = abs(tmp) % 10;
     if(th == 0) th = SYMB_SPACE;
-    uint8_t c = config.units_temp() ? SYMB_F : SYMB_C;
+    uint8_t c = SYMB_C;
 
     int disp4Img[8] = {
         valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
@@ -278,8 +278,9 @@ void SegmentDisplay::_hum(float h, int* segImg) {
  * Preparing data for displaying the pressure
  * @param p pressure
  */
-void SegmentDisplay::_pres(float p, int* segImg) {
-    bool valid = validate.pres(p);
+void SegmentDisplay::_pres(float pres, int* segImg) {
+    int p = round(pres);
+    bool valid = validate.pres(pres);
     uint8_t p1000 = valid ? floor(p / 1000) : SYMB_MINUS;
     uint8_t p100 = valid ? floor(p % 1000 / 100) : SYMB_MINUS;
     uint8_t p10 = valid ? floor(p % 100 / 10) : SYMB_MINUS;

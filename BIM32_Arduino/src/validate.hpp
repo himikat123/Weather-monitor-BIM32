@@ -3,7 +3,8 @@ class Validate {
         bool temp(float t);
         bool hum(float h);
         bool pres(float p);
-        bool wind(float w);
+        bool windSpeed(float w);
+        bool windDir(int w);
         bool light(float l);
         bool volt(float v);
         bool iaq(float i);
@@ -45,8 +46,15 @@ bool Validate::pres(float p) {
 /**
  * Validate if wind speed is within the normal range
  */
-bool Validate::wind(float w) {
+bool Validate::windSpeed(float w) {
     return (w >= 0.0 and w <= 100.0);
+}
+
+/**
+ * Validate if wind direction is within the normal range
+ */
+bool Validate::windDir(int w) {
+    return (w >= 0 and w <= 360.0);
 }
 
 /**
