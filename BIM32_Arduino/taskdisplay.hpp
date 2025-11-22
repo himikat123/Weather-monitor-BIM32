@@ -469,10 +469,13 @@ bool isTimeoutOffTime(unsigned int dispNum) {
  * Check if need be and it's time to turn off display
  */
 bool isNightOffTime(unsigned int dispNum) {
-    uint16_t fromM = config.display_nightOff_from(dispNum, false) * 60 + config.display_nightOff_from(dispNum, true);
-    uint16_t toM = config.display_nightOff_to(dispNum, false) * 60 + config.display_nightOff_to(dispNum, true);
-    uint16_t nowM = hour() * 60 + minute();
+    if(config.display_nightOff(dispNum)) {
+        uint16_t fromM = config.display_nightOff_from(dispNum, false) * 60 + config.display_nightOff_from(dispNum, true);
+        uint16_t toM = config.display_nightOff_to(dispNum, false) * 60 + config.display_nightOff_to(dispNum, true);
+        uint16_t nowM = hour() * 60 + minute();
 
-    if(fromM < toM) return (fromM <= nowM && nowM < toM);
-    else return (nowM >= fromM || nowM < toM);
+        if(fromM < toM) return (fromM <= nowM && nowM < toM);
+        else return (nowM >= fromM || nowM < toM);
+    }
+    return false;
 }
