@@ -46,7 +46,7 @@ public:                                                      \
 #define W_NAME_LEN 32
 
 
-class DataModel {
+class State {
 public:
     class Network {
     public:

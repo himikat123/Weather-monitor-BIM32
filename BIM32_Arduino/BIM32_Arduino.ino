@@ -48,6 +48,8 @@ WebServer server(80);
 #include "src/picturesWindTiny.hpp"
 
 /* Own classes */
+#include "src/state.hpp"
+State state;
 #include "src/validate.hpp"
 Validate validate;
 #include "src/pinout.hpp"

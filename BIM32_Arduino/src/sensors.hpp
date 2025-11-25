@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Wire.h>
 #include <Adafruit_BME280.h> // v2.2.4 https://github.com/adafruit/Adafruit_BME280_Library
 #include <Adafruit_BMP085.h> // v1.2.4 https://github.com/adafruit/Adafruit-BMP085-Library
@@ -10,6 +12,9 @@
 #include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
 #include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
 #include "DS3232.h" // v0.4.1 https://github.com/RobTillaart/DS3232
+
+#include "src/state.hpp"
+extern State state;
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
 DallasTemperature   term(&oneWire);
@@ -464,6 +469,11 @@ void Sensors::_BME680_updateState(void) {
 void Sensors::_BME280Read(void) {
     if(_bme280_det) {
         _bme280_temp = bme.readTemperature();
+        if(state.getbme280().gettemp() != _bme280_temp) { 
+            state.getbme280().setupdated(true);
+        }
+        state.getbme280().settemp(_bme280_temp);
+//////////////////
         _bme280_hum = bme.readHumidity();
         _bme280_pres = bme.readPressure() / 100.0F;
     }
