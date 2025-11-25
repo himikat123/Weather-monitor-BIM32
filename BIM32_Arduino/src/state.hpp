@@ -1,43 +1,4 @@
-#ifndef DATA_MODEL_H
-#define DATA_MODEL_H
-
-#include <ArduinoJson.h>
-#include <cstring>
-
-
-#define PROPERTY(type, name)                                 \
-private:                                                     \
-    type name;                                               \
-public:                                                      \
-    const type& get##name() const { return name; }           \
-    void set##name(const type& v) { name = v; }
-
-#define PROPERTY_ARRAY(type, name, size)                     \
-private:                                                     \
-    type name[size];                                         \
-public:                                                      \
-    type get##name(int i) const { return name[i]; }          \
-    void set##name(int i, type v) { name[i] = v; }
-
-#define PROPERTY_ARRAY_STR(name, size, len)                  \
-private:                                                     \
-    char name[size][len];                                    \
-public:                                                      \
-    const char* get##name(int i) const { return name[i]; }   \
-    void set##name(int i, const char* v) {                   \
-        strncpy(name[i], v, len);                            \
-        name[i][len-1] = 0;                                  \
-    }
-
-#define PROPERTY_STR(name, len)                              \
-private:                                                     \
-    char name[len];                                          \
-public:                                                      \
-    const char* get##name() const { return name; }           \
-    void set##name(const char* v) {                          \
-        strncpy(name, v, len);                               \
-        name[len-1] = 0;                                     \
-    }
+#pragma once
 
 #define SSID_COUNT 30
 #define SSID_LEN   33
@@ -45,392 +6,324 @@ public:                                                      \
 #define MAC_LEN    18
 #define W_NAME_LEN 32
 
+struct ESP32 {
+    float temp;
+    void toJson(JsonObject o) const {
+        o["esp32"]["temp"] = temp;
+    }
+};
 
-class State {
-public:
-    class Network {
-    public:
-        PROPERTY_ARRAY_STR(ssids, SSID_COUNT, SSID_LEN)
-        PROPERTY_ARRAY(int, rssis, SSID_COUNT)
+struct Network {
+    char ssid[SSID_LEN];
+    unsigned int ch;
+    int sig;
+    char mac[MAC_LEN];
+    char ip[IP_LEN];
+    char mask[IP_LEN];
+    char gw[IP_LEN];
+    char dns1[IP_LEN];
+    char dns2[IP_LEN];
 
-        PROPERTY_STR(ssid, SSID_LEN)
+    char ssids[SSID_COUNT][SSID_LEN];
+    int rssis[SSID_COUNT];
 
-        PROPERTY(unsigned int, ch)
-        PROPERTY(int, sig)
+    void toJson(JsonObject o) const {
+        o["network"]["ssid"] = ssid;
+        o["network"]["ch"] = ch;
+        o["network"]["sig"] = sig;
+        o["network"]["mac"] = mac;
+        o["network"]["ip"] = ip;
+        o["network"]["mask"] = mask;
+        o["network"]["gw"] = gw;
+        o["network"]["dns1"] = dns1;
+        o["network"]["dns2"] = dns2;
 
-        PROPERTY_STR(mac, MAC_LEN)
-        PROPERTY_STR(ip, IP_LEN)
-        PROPERTY_STR(mask, IP_LEN)
-        PROPERTY_STR(gw, IP_LEN)
-        PROPERTY_STR(dns1, IP_LEN)
-        PROPERTY_STR(dns2, IP_LEN)
+        JsonArray a_ssids = o.createNestedArray("ssids");
+        for(int i=0; i<SSID_COUNT; i++) {
+            JsonArray entry = a_ssids.createNestedArray();
+            entry.add(ssids[i]);
+            entry.add(rssis[i]);
+        }
+    }
+};
 
-        PROPERTY(bool, updated)
+struct BME680 {
+    float temp;
+    float hum;
+    float pres;
+    float iaq;
+    unsigned int iaqAccr;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["bme680"]["temp"] = temp;
+        o["bme680"]["hum"] = hum;
+        o["bme680"]["pres"] = pres;
+        o["bme680"]["iaq"] = iaq;
+        o["bme680"]["iaqAccr"] = iaqAccr;
+    }
+};
+
+struct BME280 {
+    float temp;
+    float hum;
+    float pres;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["bme280"]["temp"] = temp;
+        o["bme280"]["hum"] = hum;
+        o["bme280"]["pres"] = pres;
+    }
+};
+
+struct BMP180 {
+    float temp;
+    float pres;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["bmp180"]["temp"] = temp;
+        o["bmp180"]["pres"] = pres;
+    }
+};
+
+struct SHT21 {
+    float temp;
+    float hum;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["sht21"]["temp"] = temp;
+        o["sht21"]["hum"] = hum;
+    }
+};
+
+struct DHT22 {
+    float temp;
+    float hum;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["dht22"]["temp"] = temp;
+        o["dht22"]["hum"] = hum;
+    }
+};
+
+struct DS18B20 {
+    float temp;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["ds18b20"]["temp"] = temp;
+    }
+};
+
+struct MAX44009 {
+    float light;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["max44009"]["light"] = light;
+    }
+};
+
+struct BH1750 {
+    float light;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["bh1750"]["light"] = light;
+    }
+};
+
+struct Analog {
+    float volt;
+    bool updated;
+
+    void toJson(JsonObject o) const {
+        o["analog"]["volt"] = volt;
+    }
+};
+
+struct Thing {
+    unsigned int time;
+    float data[8];
+    bool updated;
+
+    void toJson(JsonObject obj) const {
+        JsonObject o = obj.createNestedObject("thing");
+        o["time"] = time;
+        JsonArray a = o.createNestedArray("data");
+        for(int i=0;i<8;i++) a.add(data[i]);
+    }
+};
+
+struct Weather {
+    float temp;
+    float hum;
+    float pres;
+    unsigned int icon;
+    bool isDay;
+    char descript[64];
+    unsigned int time;
+    bool updated;
+
+    struct Wind {
+        float speed;
+        int dir;
 
         void toJson(JsonObject o) const {
-            JsonArray a_ssids = o["ssids"].to<JsonArray>();
-            JsonArray a_rssis = o["rssis"].to<JsonArray>();
+            o["speed"] = speed;
+            o["dir"] = dir;
+        }
+    } wind;
 
-            for(int i=0; i<SSID_COUNT; i++) {
-                a_ssids.add(getssids(i));
-                a_rssis.add(getrssis(i));
+    struct Daily {
+        float tMax[5];
+        float tMin[5];
+        float wind[5];
+        unsigned int icon[5];
+
+        void toJson(JsonObject o) const {
+            JsonArray a_tMax = o.createNestedArray("tMax");
+            JsonArray a_tMin = o.createNestedArray("tMin");
+            JsonArray a_wind = o.createNestedArray("wind");
+            JsonArray a_icon = o.createNestedArray("icon");
+            for(int i=0; i<5; i++){
+                a_tMax.add(tMax[i]);
+                a_tMin.add(tMin[i]);
+                a_wind.add(wind[i]);
+                a_icon.add(icon[i]);
             }
-
-            o["ssid"] = getssid();
-            o["ch"]   = getch();
-            o["sig"]  = getsig();
-            o["mac"]  = getmac();
-            o["ip"]   = getip();
-            o["mask"] = getmask();
-            o["gw"]   = getgw();
-            o["dns1"] = getdns1();
-            o["dns2"] = getdns2();
         }
-    };
+    } daily;
 
-    class BME280 {
-        PROPERTY(float, temp)
-        PROPERTY(float, hum)
-        PROPERTY(float, pres)
-        PROPERTY(bool, updated)
-    public:
+    void toJson(JsonObject obj) const {
+        JsonObject o = obj.createNestedObject("weather");
+        o["temp"] = temp;
+        o["hum"] = hum;
+        o["pres"] = pres;
+        o["icon"] = icon;
+        o["isDay"] = isDay;
+        o["descript"] = descript;
+        o["time"] = time;
+
+        JsonObject windObj = o.createNestedObject("wind");
+        wind.toJson(windObj);
+
+        JsonObject dailyObj = o.createNestedObject("daily");
+        daily.toJson(dailyObj);
+    }
+};
+
+struct WSensor {
+    float time[2];
+    bool updated;
+
+    struct Block1D {
+        float data[2];
+        char name[2][W_NAME_LEN];
+
         void toJson(JsonObject o) const {
-            o["temp"] = gettemp();
-            o["hum"] = gethum();
-            o["pres"] = getpres();
-        }
-    };
-
-    class BMP180 {
-        PROPERTY(float, temp)
-        PROPERTY(float, pres)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const {
-            o["temp"] = gettemp();
-            o["pres"] = getpres();
-        }
-    };
-
-    class SHT21 {
-        PROPERTY(float, temp)
-        PROPERTY(float, hum)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const {
-            o["temp"] = gettemp();
-            o["hum"] = gethum();
-        }
-    };
-
-    class DHT22 {
-        PROPERTY(float, temp)
-        PROPERTY(float, hum)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const {
-            o["temp"] = gettemp();
-            o["hum"] = gethum();
-        }
-    };
-
-    class ESP32Temp {
-        PROPERTY(float, temp)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const { o["temp"] = gettemp(); }
-    };
-
-    class DS18B20 {
-        PROPERTY(float, temp)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const { o["temp"] = gettemp(); }
-    };
-
-    class MAX44009 {
-        PROPERTY(float, light)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const { o["light"] = getlight(); }
-    };
-
-    class BH1750 {
-        PROPERTY(float, light)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const { o["light"] = getlight(); }
-    };
-
-    class Analog {
-        PROPERTY(float, volt)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const { o["volt"] = getvolt(); }
-    };
-
-    class BME680 {
-        PROPERTY(float, temp)
-        PROPERTY(float, hum)
-        PROPERTY(float, pres)
-        PROPERTY(float, iaq)
-        PROPERTY(unsigned int, iaqAccr)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const {
-            o["temp"] = gettemp();
-            o["hum"]  = gethum();
-            o["pres"] = getpres();
-            o["iaq"]  = getiaq();
-            o["iaqAccr"] = getiaqAccr();
-        }
-    };
-
-    class Thing {
-        PROPERTY(unsigned int, time)
-        PROPERTY_ARRAY(float, data, 8)
-        PROPERTY(bool, updated)
-    public:
-        void toJson(JsonObject o) const {
-            o["time"] = gettime();
-            JsonArray a = o["data"].to<JsonArray>();
-            for(int i=0; i<8; i++) a.add(getdata(i));
-        }
-    };
-
-    class Weather {
-        PROPERTY(float, temp)
-        PROPERTY(float, hum)
-        PROPERTY(float, pres)
-
-        class Wind {
-            PROPERTY(float, speed)
-            PROPERTY(int, dir)
-        public:
-            void toJson(JsonObject o) const {
-                o["speed"]=getspeed();
-                o["dir"]=getdir();
+            JsonArray D = o.createNestedArray("data");
+            JsonArray N = o.createNestedArray("name");
+            for(int i=0; i<2; i++) {
+                D.add(data[i]);
+                N.add(name[i]);
             }
-        } wind;
+        }
+    };
 
-        PROPERTY_STR(descript, 64)
-        PROPERTY(unsigned int, time)
-        PROPERTY(unsigned int, icon)
-        PROPERTY(bool, isDay)
-        PROPERTY(bool, updated)
+    struct Block2D {
+        float data[5][2];
+        char name[5][2][W_NAME_LEN];
 
-        class Daily {
-            PROPERTY_ARRAY(float, tMax, 5)
-            PROPERTY_ARRAY(float, tMin, 5)
-            PROPERTY_ARRAY(float, wind, 5)
-            PROPERTY_ARRAY(unsigned int, icon, 5)
-        public:
-            void toJson(JsonObject o) const {
-                JsonArray A = o["tMax"].to<JsonArray>();
-                JsonArray B = o["tMin"].to<JsonArray>();
-                JsonArray C = o["wind"].to<JsonArray>();
-                JsonArray D = o["icon"].to<JsonArray>();
-
-                for(int i=0; i<5; i++){
-                    A.add(gettMax(i));
-                    B.add(gettMin(i));
-                    C.add(getwind(i));
-                    D.add(geticon(i));
+        void toJson(JsonObject o) const {
+            JsonArray dataArr = o.createNestedArray("data");
+            JsonArray nameArr = o.createNestedArray("name");
+            for(int r=0; r<5; r++){
+                JsonArray rowD = dataArr.createNestedArray();
+                JsonArray rowN = nameArr.createNestedArray();
+                for(int c=0; c<2; c++){
+                    rowD.add(data[r][c]);
+                    rowN.add(name[r][c]);
                 }
             }
-        } daily;
-
-    public:
-        Wind& getWind(){ return wind; }
-        Daily& getDaily(){ return daily; }
-
-        void toJson(JsonObject o) const {
-            o["temp"] = gettemp();
-            o["hum"] = gethum();
-            o["pres"] = getpres();
-
-            wind.toJson(o["wind"].to<JsonObject>());
-            o["descript"] = getdescript();
-            o["time"] = gettime();
-            o["icon"] = geticon();
-            o["isDay"] = getisDay();
-
-            daily.toJson(o["daily"].to<JsonObject>());
         }
     };
 
-    class WSensor {
-        PROPERTY(bool, updated)
-        PROPERTY_ARRAY(unsigned int, time, 2)
+    Block2D temp;
+    Block1D hum, pres, light, voltage, current, power, energy, freq, co2;
 
-        class Block2D {
-            PROPERTY_ARRAY(float, data_row0, 2)
-            PROPERTY_ARRAY(float, data_row1, 2)
-            PROPERTY_ARRAY(float, data_row2, 2)
-            PROPERTY_ARRAY(float, data_row3, 2)
-            PROPERTY_ARRAY(float, data_row4, 2)
+    void toJson(JsonObject obj) const {
+        JsonObject o = obj.createNestedObject("wsensor");
+        JsonArray aTime = o.createNestedArray("time");
+        aTime.add(time[0]);
+        aTime.add(time[1]);
 
-            PROPERTY_ARRAY_STR(name_row0, 2, W_NAME_LEN)
-            PROPERTY_ARRAY_STR(name_row1, 2, W_NAME_LEN)
-            PROPERTY_ARRAY_STR(name_row2, 2, W_NAME_LEN)
-            PROPERTY_ARRAY_STR(name_row3, 2, W_NAME_LEN)
-            PROPERTY_ARRAY_STR(name_row4, 2, W_NAME_LEN)
+        temp.toJson(o.createNestedObject("temp"));
+        hum.toJson(o.createNestedObject("hum"));
+        pres.toJson(o.createNestedObject("pres"));
+        light.toJson(o.createNestedObject("light"));
+        voltage.toJson(o.createNestedObject("voltage"));
+        current.toJson(o.createNestedObject("current"));
+        power.toJson(o.createNestedObject("power"));
+        energy.toJson(o.createNestedObject("energy"));
+        freq.toJson(o.createNestedObject("freq"));
+        co2.toJson(o.createNestedObject("co2"));
 
-        public:
-            void toJson(JsonObject o) const {
-                JsonArray D = o["data"].to<JsonArray>();
-                JsonArray N = o["name"].to<JsonArray>();
+        JsonArray b = o.createNestedArray("bat");
+        for(int i=0;i<2;i++) b.add(time[i]);
+    }
+};
 
-                auto addRow = [&](auto& getterVal, auto& getterName){
-                    JsonArray rd = D.add<JsonArray>();
-                    JsonArray rn = N.add<JsonArray>();
-                    rd.add(getterVal(0));
-                    rd.add(getterVal(1));
-                    rn.add(getterName(0));
-                    rn.add(getterName(1));
-                };
+struct FS {
+    unsigned int total;
+    unsigned int free;
+    char list[2048];
+    bool updated;
 
-                addRow([&](int i){return getdata_row0(i);}, [&](int i){return getname_row0(i);} );
-                addRow([&](int i){return getdata_row1(i);}, [&](int i){return getname_row1(i);} );
-                addRow([&](int i){return getdata_row2(i);}, [&](int i){return getname_row2(i);} );
-                addRow([&](int i){return getdata_row3(i);}, [&](int i){return getname_row3(i);} );
-                addRow([&](int i){return getdata_row4(i);}, [&](int i){return getname_row4(i);} );
-            }
-        };
+    void toJson(JsonObject obj) const {
+        JsonObject o = obj.createNestedObject("fs");
+        o["total"] = total;
+        o["free"] = free;
+        o["list"] = list;
+    }
+};
 
-        class Block1D {
-            PROPERTY_ARRAY(float, data, 2)
-            PROPERTY_ARRAY_STR(name, 2, W_NAME_LEN)
-        public:
-            void toJson(JsonObject o) const {
-                JsonArray D = o["data"].to<JsonArray>();
-                JsonArray N = o["name"].to<JsonArray>();
-                for(int i=0; i<2; i++){
-                    D.add(getdata(i));
-                    N.add(getname(i));
-                }
-            }
-        };
-
-        Block2D temp;
-        Block1D hum, pres, light, voltage, current, power, energy, freq, co2;
-
-        PROPERTY_ARRAY(float, bat, 2)
-        PROPERTY(bool, updated)
-
-    public:
-        Block2D& gettemp(){ return temp; }
-        Block1D& gethum(){ return hum; }
-        Block1D& getpres(){ return pres; }
-        Block1D& getlight(){ return light; }
-        Block1D& getvoltage(){ return voltage; }
-        Block1D& getcurrent(){ return current; }
-        Block1D& getpower(){ return power; }
-        Block1D& getenergy(){ return energy; }
-        Block1D& getfreq(){ return freq; }
-        Block1D& getco2(){ return co2; }
-
-        void toJson(JsonObject o) const {
-            JsonArray t = o["time"].to<JsonArray>();
-            t.add(gettime(0));
-            t.add(gettime(1));
-
-            temp.toJson(o["temp"].to<JsonObject>());
-            hum.toJson(o["hum"].to<JsonObject>());
-            pres.toJson(o["pres"].to<JsonObject>());
-            light.toJson(o["light"].to<JsonObject>());
-            voltage.toJson(o["voltage"].to<JsonObject>());
-            current.toJson(o["current"].to<JsonObject>());
-            power.toJson(o["power"].to<JsonObject>());
-            energy.toJson(o["energy"].to<JsonObject>());
-            freq.toJson(o["freq"].to<JsonObject>());
-            co2.toJson(o["co2"].to<JsonObject>());
-
-            JsonArray b = o["bat"].to<JsonArray>();
-            b.add(getbat(0));
-            b.add(getbat(1));
-        }
-    };
-
-private:
+struct State {
+    ESP32 esp32;
     Network network;
+    BME680 bme680;
     BME280 bme280;
     BMP180 bmp180;
     SHT21 sht21;
     DHT22 dht22;
-    ESP32Temp esp32;
     DS18B20 ds18b20;
     MAX44009 max44009;
     BH1750 bh1750;
     Analog analog;
-    BME680 bme680;
     Thing thing;
     Weather weather;
     WSensor wsensor;
+    FS fs;
 
-public:
-    Network& getnetwork() { return network; }
-    BME280& getbme280() { return bme280; }
-    BMP180& getbmp180() { return bmp180; }
-    SHT21& getsht21() { return sht21; }
-    DHT22& getdht22() { return dht22; }
-    ESP32Temp& getesp32() { return esp32; }
-    DS18B20& getds18b20() { return ds18b20; }
-    MAX44009& getmax44009() { return max44009; }
-    BH1750& getbh1750() { return bh1750; }
-    Analog& getanalog() { return analog; }
-    BME680& getbme680() { return bme680; }
-    Thing& getthing() { return thing; }
-    Weather& getweather() { return weather; }
-    WSensor& getwsensor() { return wsensor; }
-
-    void toJson(JsonDocument& doc) {
-        network.toJson(doc["network"].to<JsonObject>());
-        bme280.toJson(doc["bme280"].to<JsonObject>());
-        bmp180.toJson(doc["bmp180"].to<JsonObject>());
-        sht21.toJson(doc["sht21"].to<JsonObject>());
-        dht22.toJson(doc["dht22"].to<JsonObject>());
-        esp32.toJson(doc["esp32"].to<JsonObject>());
-        ds18b20.toJson(doc["ds18b20"].to<JsonObject>());
-        max44009.toJson(doc["max44009"].to<JsonObject>());
-        bh1750.toJson(doc["bh1750"].to<JsonObject>());
-        analog.toJson(doc["analog"].to<JsonObject>());
-        bme680.toJson(doc["bme680"].to<JsonObject>());
-        thing.toJson(doc["thing"].to<JsonObject>());
-        weather.toJson(doc["weather"].to<JsonObject>());
-        wsensor.toJson(doc["wsensor"].to<JsonObject>());
+    void toJson(JsonDocument doc) const {
+        esp32.toJson(doc);
+        network.toJson(doc);
+        bme680.toJson(doc);
+        bme280.toJson(doc);
+        bmp180.toJson(doc);
+        sht21.toJson(doc);
+        dht22.toJson(doc);
+        ds18b20.toJson(doc);
+        max44009.toJson(doc);
+        bh1750.toJson(doc);
+        analog.toJson(doc);
+        thing.toJson(doc);
+        weather.toJson(doc);
+        wsensor.toJson(doc);
+        fs.toJson(doc);
     }
 };
-
-#endif
-
-
-//////////////////////////////
-//пример
-
-//DataModel model;
-
-// ... записываем данные ...
-//model.getbme280().settemp(23.5);
-
-//StaticJsonDocument<5000> doc;
-//model.toJson(doc);
-
-//String json;
-//serializeJson(doc, json);
-
-//Serial.println(json);   // ← JSON-строка готова
-
-//////////////////////////////////
-//main.ino
-//#include "data_model.h"
-
-//DataModel model;
-
-/////////////////////////////////
-//class.hpp
-//#
-//#pragma once
-//#include "sensor_manager.h"
-
-//extern DataModel model;

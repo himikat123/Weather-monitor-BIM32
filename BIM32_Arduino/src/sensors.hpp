@@ -13,7 +13,7 @@
 #include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
 #include "DS3232.h" // v0.4.1 https://github.com/RobTillaart/DS3232
 
-#include "src/state.hpp"
+#include "state.hpp"
 extern State state;
 
 OneWire             oneWire(ONE_WIRE_BUS_PIN);
@@ -469,10 +469,10 @@ void Sensors::_BME680_updateState(void) {
 void Sensors::_BME280Read(void) {
     if(_bme280_det) {
         _bme280_temp = bme.readTemperature();
-        if(state.getbme280().gettemp() != _bme280_temp) { 
-            state.getbme280().setupdated(true);
+        if(state.bme280.temp != _bme280_temp) { 
+            state.bme280.updated = true;
         }
-        state.getbme280().settemp(_bme280_temp);
+        state.bme280.temp = _bme280_temp;
 //////////////////
         _bme280_hum = bme.readHumidity();
         _bme280_pres = bme.readPressure() / 100.0F;
