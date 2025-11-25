@@ -1,8 +1,8 @@
 RTC_DATA_ATTR double secretCode = esp_random();
 size_t content_len;
-String web_filelist = "";
-size_t fsUsed = 0;
-size_t fsTotal = 0;
+//String web_filelist = "";
+//size_t fsUsed = 0;
+//size_t fsTotal = 0;
 File fsUploadFile;
 
 /**
@@ -17,27 +17,27 @@ String web_timeString(unsigned int tm) {
 /**
  * Update filelist
  */
-void web_listAllFilesInDir(String dirname) {
-    File root = LittleFS.open(dirname);
-    if(!root) return;
-    if(!root.isDirectory()) return;
+//void web_listAllFilesInDir(String dirname) {
+//    File root = LittleFS.open(dirname);
+//    if(!root) return;
+//    if(!root.isDirectory()) return;
 
-    File file = root.openNextFile();
-    while(file) {
-        if(file.isDirectory()) web_listAllFilesInDir(String(file.path()) + "/");
-        else {
-            String filename = file.name();
-            if(filename != "user.us") {
-                web_filelist += dirname;
-                web_filelist += filename;
-                web_filelist += ":";
-                web_filelist += String(file.size());
-                web_filelist += ",";
-            }
-        }
-        file = root.openNextFile();
-    }
-}
+//    File file = root.openNextFile();
+//    while(file) {
+//        if(file.isDirectory()) web_listAllFilesInDir(String(file.path()) + "/");
+//        else {
+//            String filename = file.name();
+//            if(filename != "user.us") {
+//                web_filelist += dirname;
+//                web_filelist += filename;
+//                web_filelist += ":";
+//                web_filelist += String(file.size());
+//                web_filelist += ",";
+//            }
+//        }
+//        file = root.openNextFile();
+//    }
+//}
 
 /**
  * Check if the user is logged in
@@ -273,16 +273,16 @@ void web_sens() {
         json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
     }
 
-    if(global.fsInfoUpdate) {
-        web_filelist = String();
-        web_listAllFilesInDir("/");
-        fsTotal = LittleFS.totalBytes();
-        fsUsed = fsTotal - LittleFS.usedBytes();
-        global.fsInfoUpdate = false;
-    }
-    json["fs"]["list"] = web_filelist;
-    json["fs"]["total"] = fsTotal;
-    json["fs"]["free"] = fsUsed;
+    //if(global.fsInfoUpdate) {
+    //    web_filelist = String();
+    //    web_listAllFilesInDir("/");
+    //    fsTotal = LittleFS.totalBytes();
+    //    fsUsed = fsTotal - LittleFS.usedBytes();
+    //    global.fsInfoUpdate = false;
+    //}
+    //json["fs"]["list"] = web_filelist;
+    //json["fs"]["total"] = fsTotal;
+    //json["fs"]["free"] = fsUsed;
 
     String data = "";
     serializeJson(json, data);
@@ -679,6 +679,7 @@ void webInterface_init(void) {
     MDNS.begin("bim32");
 
     server.begin();
+    websocket.begin();
 
     uint32_t chipId = 0;
     for(int i=0; i<17; i=i+8) {

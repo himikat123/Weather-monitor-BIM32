@@ -23,6 +23,7 @@
 WiFiClient client;
 #include <WebServer.h>
 WebServer server(80);
+#include <WebSocketsServer.h>
 #include <ESPmDNS.h>
 #include <time.h>
 
@@ -103,6 +104,10 @@ Network network;
 AgregateComfortData agregateComfortData;
 #include "src/comfort.hpp"
 Comfort comfort;
+#include "src/data2json.hpp"
+Data2json data2json;
+#include "src/websocket.hpp"
+WebSocket websocket(88, 1);
 
 #include "taskdisplay.hpp"
 #include "tasksensors.hpp"
