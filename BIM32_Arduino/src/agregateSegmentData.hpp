@@ -23,54 +23,54 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
         }; break;
         case 2: { // BME280
             if(type == 0) {
-                data = sensors.get_bme280_temp(CORRECTED);
+                data = sensors.get_bme280_temp();
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = sensors.get_bme280_hum(CORRECTED);
+                data = sensors.get_bme280_hum();
                 *dType = HUM;
             }
             if(type == 2) {
-                data = sensors.get_bme280_pres(CORRECTED);
+                data = sensors.get_bme280_pres();
                 *dType = PRES;
             }
         }; break;
         case 3: {// BMP180
             if(type == 0) {
-                data = sensors.get_bmp180_temp(CORRECTED);
+                data = sensors.get_bmp180_temp();
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = sensors.get_bmp180_pres(CORRECTED);
+                data = sensors.get_bmp180_pres();
                 *dType = PRES;
             }
         }; break;
         case 4: {// SHT21
             if(type == 0) {
-                data = sensors.get_sht21_temp(CORRECTED);
+                data = sensors.get_sht21_temp();
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = sensors.get_sht21_hum(CORRECTED);
+                data = sensors.get_sht21_hum();
                 *dType = HUM;
             }
         }; break;
         case 5: { // DHT22
             if(type == 0) {
-                data = sensors.get_dht22_temp(CORRECTED);
+                data = sensors.get_dht22_temp();
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = sensors.get_dht22_hum(CORRECTED);
+                data = sensors.get_dht22_hum();
                 *dType = HUM;
             }
         }; break;
         case 6: { // DS18B20
-            data = sensors.get_ds18b20_temp(CORRECTED);
+            data = sensors.get_ds18b20_temp();
             *dType = TEMP;
         }; break;
         case 7: { // ESP32
-            data = sensors.get_esp32_temp(CORRECTED);
+            data = sensors.get_esp32_temp();
             *dType = TEMP;
         }; break;
         case 8: { // Thingspeak
@@ -126,19 +126,19 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
         }; break;
         case 11: { // BME680
             if(type == 0) {
-                data = sensors.get_bme680_temp(CORRECTED);
+                data = sensors.get_bme680_temp();
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = sensors.get_bme680_hum(CORRECTED);
+                data = sensors.get_bme680_hum();
                 *dType = HUM;
             }
             if(type == 2) {
-                data = sensors.get_bme680_pres(CORRECTED);
+                data = sensors.get_bme680_pres();
                 *dType = PRES;
             }
             if(type == 3) {
-                data = sensors.get_bme680_iaq(CORRECTED);
+                data = sensors.get_bme680_iaq();
                 *dType = IAQ;
             }
         }; break;

@@ -877,7 +877,7 @@ void ILI9341::_networkPage() {
     String rssi = global.apMode ? "100%" : String(_rssi) + "dBm";
     String ip = global.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();;
     String mac = global.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
-    float esp32Temp = sensors.get_esp32_temp(RAW);
+    float esp32Temp = sensors.get_esp32_temp();
     String fw = FW;
 
     if(_prevNetSsid != ssid || _forced) 

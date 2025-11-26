@@ -118,7 +118,7 @@ void LcdDisplay::_getData() {
     _netRssi = global.apMode ? "100%" : String(_rssi) + "dBm";
     _netIp = global.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();
     _netMac = global.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
-    _netTemp = sensors.get_esp32_temp(RAW);
+    _netTemp = sensors.get_esp32_temp();
     _netFw = FW;
     _tempIn = agregateLcdData.tempIn(_tempSequence);
     _tempOut = agregateLcdData.tempOut();

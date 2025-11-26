@@ -42,12 +42,12 @@ float AgregateLcdData::tempIn(float* tempSequence) {
                 temp = thingspeak.get_field(config.display_source_tempIn_thing());
         }; break;
         case 4: _tempSequence(tempSequence); break;
-        case 5: temp = sensors.get_bme280_temp(CORRECTED); break; /* temperature from BME280 */
-        case 6: temp = sensors.get_bmp180_temp(CORRECTED); break; /* temperature from BMP180 */
-        case 7: temp = sensors.get_sht21_temp(CORRECTED); break; /* temperature from SHT21 */
-        case 8: temp = sensors.get_dht22_temp(CORRECTED); break; /* temperature from DHT22 */
-        case 9: temp = sensors.get_ds18b20_temp(CORRECTED); break; /* temperature from DS18B20 */
-        case 10: temp = sensors.get_bme680_temp(CORRECTED); break; /* temperature from BME680 */
+        case 5: temp = sensors.get_bme280_temp(); break; /* temperature from BME280 */
+        case 6: temp = sensors.get_bmp180_temp(); break; /* temperature from BMP180 */
+        case 7: temp = sensors.get_sht21_temp(); break; /* temperature from SHT21 */
+        case 8: temp = sensors.get_dht22_temp(); break; /* temperature from DHT22 */
+        case 9: temp = sensors.get_ds18b20_temp(); break; /* temperature from DS18B20 */
+        case 10: temp = sensors.get_bme680_temp(); break; /* temperature from BME680 */
         default: ; break;
     }
     return temp;
@@ -69,12 +69,12 @@ void AgregateLcdData::_tempSequence(float* tempSequence) {
                 if(thingspeak.dataRelevance())
                     tempSequence[i] = thingspeak.get_field(config.display_source_sequence_thngtemp(i));
             }; break;
-            case 4: tempSequence[i] = sensors.get_bme280_temp(CORRECTED); break; /* BME280 */
-            case 5: tempSequence[i] = sensors.get_bmp180_temp(CORRECTED); break; /* BMP180 */
-            case 6: tempSequence[i] = sensors.get_sht21_temp(CORRECTED); break; /* SHT21 */
-            case 7: tempSequence[i] = sensors.get_dht22_temp(CORRECTED); break; /* DHT22 */
-            case 8: tempSequence[i] = sensors.get_ds18b20_temp(CORRECTED); break; /* DS18B20 */
-            case 9: tempSequence[i] = sensors.get_bme680_temp(CORRECTED); break; /* BME680 */
+            case 4: tempSequence[i] = sensors.get_bme280_temp(); break; /* BME280 */
+            case 5: tempSequence[i] = sensors.get_bmp180_temp(); break; /* BMP180 */
+            case 6: tempSequence[i] = sensors.get_sht21_temp(); break; /* SHT21 */
+            case 7: tempSequence[i] = sensors.get_dht22_temp(); break; /* DHT22 */
+            case 8: tempSequence[i] = sensors.get_ds18b20_temp(); break; /* DS18B20 */
+            case 9: tempSequence[i] = sensors.get_bme680_temp(); break; /* BME680 */
             default: ; break;
         }
     }
@@ -102,12 +102,12 @@ float AgregateLcdData::tempOut() {
             if(thingspeak.dataRelevance())
                 temp = thingspeak.get_field(config.display_source_tempOut_thing());
         }; break;
-        case 4: temp = sensors.get_bme280_temp(CORRECTED); break; /* temperature from BME280 */
-        case 5: temp = sensors.get_bmp180_temp(CORRECTED); break; /* temperature from BMP180 */
-        case 6: temp = sensors.get_sht21_temp(CORRECTED); break; /* temperature from SHT21 */
-        case 7: temp = sensors.get_dht22_temp(CORRECTED); break; /* temperature from DHT22 */
-        case 8: temp = sensors.get_ds18b20_temp(CORRECTED); break; /* temperature from DS18B20 */
-        case 9: temp = sensors.get_bme680_temp(CORRECTED); break; /* temperature from BME680 */
+        case 4: temp = sensors.get_bme280_temp(); break; /* temperature from BME280 */
+        case 5: temp = sensors.get_bmp180_temp(); break; /* temperature from BMP180 */
+        case 6: temp = sensors.get_sht21_temp(); break; /* temperature from SHT21 */
+        case 7: temp = sensors.get_dht22_temp(); break; /* temperature from DHT22 */
+        case 8: temp = sensors.get_ds18b20_temp(); break; /* temperature from DS18B20 */
+        case 9: temp = sensors.get_bme680_temp(); break; /* temperature from BME680 */
         default: ; break;
     }
     return temp;
@@ -126,10 +126,10 @@ float AgregateLcdData::humIn(float* humSequence) {
                 hum = thingspeak.get_field(config.display_source_humIn_thing());
         }; break;
         case 4: _humSequence(humSequence); break;
-        case 5: hum = sensors.get_bme280_hum(CORRECTED); break; /* humidity from BME280 */
-        case 6: hum = sensors.get_sht21_hum(CORRECTED); break; /* humidity from SHT21 */
-        case 7: hum = sensors.get_dht22_hum(CORRECTED); break; /* humidity from DHT22 */
-        case 8: hum = sensors.get_bme680_hum(CORRECTED); break; /* humidity from BME680 */
+        case 5: hum = sensors.get_bme280_hum(); break; /* humidity from BME280 */
+        case 6: hum = sensors.get_sht21_hum(); break; /* humidity from SHT21 */
+        case 7: hum = sensors.get_dht22_hum(); break; /* humidity from DHT22 */
+        case 8: hum = sensors.get_bme680_hum(); break; /* humidity from BME680 */
         default: ; break;
     }
     return hum;
@@ -147,10 +147,10 @@ void AgregateLcdData::_humSequence(float* humSequence) {
                 if(thingspeak.dataRelevance())
                     humSequence[i] = thingspeak.get_field(config.display_source_sequence_thnghum(i));
             }; break;
-            case 4: humSequence[i] = sensors.get_bme280_hum(CORRECTED); break; /* BME280 */
-            case 5: humSequence[i] = sensors.get_sht21_hum(CORRECTED); break; /* SHT21 */
-            case 6: humSequence[i] = sensors.get_dht22_hum(CORRECTED); break; /* DHT22 */
-            case 7: humSequence[i] = sensors.get_bme680_hum(CORRECTED); break; /* BME680 */
+            case 4: humSequence[i] = sensors.get_bme280_hum(); break; /* BME280 */
+            case 5: humSequence[i] = sensors.get_sht21_hum(); break; /* SHT21 */
+            case 6: humSequence[i] = sensors.get_dht22_hum(); break; /* DHT22 */
+            case 7: humSequence[i] = sensors.get_bme680_hum(); break; /* BME680 */
             default: ; break;
         }
     }
@@ -168,10 +168,10 @@ float AgregateLcdData::humOut() {
             if(thingspeak.dataRelevance()) 
                 hum = thingspeak.get_field(config.display_source_humOut_thing());
         }; break;
-        case 4: hum = sensors.get_bme280_hum(CORRECTED); break; /* humidity from BME280 */
-        case 5: hum = sensors.get_sht21_hum(CORRECTED); break; /* humidity from SHT21 */
-        case 6: hum = sensors.get_dht22_hum(CORRECTED); break; /* humidity from DHT22 */
-        case 7: hum = sensors.get_bme680_hum(CORRECTED); break; /* humidity from BME680 */
+        case 4: hum = sensors.get_bme280_hum(); break; /* humidity from BME280 */
+        case 5: hum = sensors.get_sht21_hum(); break; /* humidity from SHT21 */
+        case 6: hum = sensors.get_dht22_hum(); break; /* humidity from DHT22 */
+        case 7: hum = sensors.get_bme680_hum(); break; /* humidity from BME680 */
         default: ; break;
     }
     return hum;
@@ -189,9 +189,9 @@ float AgregateLcdData::presOut() {
             if(thingspeak.dataRelevance()) 
                 pres = thingspeak.get_field(config.display_source_presOut_thing());
         }; break;
-        case 4: pres = sensors.get_bme280_pres(CORRECTED); break; // pressure outside from BME280
-        case 5: pres = sensors.get_bmp180_pres(CORRECTED); break; // pressure outside from BMP180
-        case 6: pres = sensors.get_bme680_pres(CORRECTED); break; // pressure outside from BME680
+        case 4: pres = sensors.get_bme280_pres(); break; // pressure outside from BME280
+        case 5: pres = sensors.get_bmp180_pres(); break; // pressure outside from BMP180
+        case 6: pres = sensors.get_bme680_pres(); break; // pressure outside from BME680
     }
     return pres;
 }
@@ -235,14 +235,14 @@ String AgregateLcdData::voltage() {
         case 2: value = _voltageThingspeak(); break; /* from thingspeak */
         case 3: value = localDate(); break; /* date */
         case 4: value = _iaq(); break; // iaq from BME680
-        case 5: value = _absoluteHum(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // absolute humidity from BME680
-        case 6: value = _dewPoint(sensors.get_bme680_temp(CORRECTED), sensors.get_bme680_hum(CORRECTED)); break; // dew point from BME680
-        case 7: value = _absoluteHum(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // absolute humidity from BME280
-        case 8: value = _dewPoint(sensors.get_bme280_temp(CORRECTED), sensors.get_bme280_hum(CORRECTED)); break; // dew point from BME280
-        case 9: value = _absoluteHum(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // absolute humidity from DHT22
-        case 10: value = _dewPoint(sensors.get_dht22_temp(CORRECTED), sensors.get_dht22_hum(CORRECTED)); break; // dew point from DHT22
-        case 11: value = _absoluteHum(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // absolute humidity from SHT21
-        case 12: value = _dewPoint(sensors.get_sht21_temp(CORRECTED), sensors.get_sht21_hum(CORRECTED)); break; // dew point from SHT21
+        case 5: value = _absoluteHum(sensors.get_bme680_temp(), sensors.get_bme680_hum()); break; // absolute humidity from BME680
+        case 6: value = _dewPoint(sensors.get_bme680_temp(), sensors.get_bme680_hum()); break; // dew point from BME680
+        case 7: value = _absoluteHum(sensors.get_bme280_temp(), sensors.get_bme280_hum()); break; // absolute humidity from BME280
+        case 8: value = _dewPoint(sensors.get_bme280_temp(), sensors.get_bme280_hum()); break; // dew point from BME280
+        case 9: value = _absoluteHum(sensors.get_dht22_temp(), sensors.get_dht22_hum()); break; // absolute humidity from DHT22
+        case 10: value = _dewPoint(sensors.get_dht22_temp(), sensors.get_dht22_hum()); break; // dew point from DHT22
+        case 11: value = _absoluteHum(sensors.get_sht21_temp(), sensors.get_sht21_hum()); break; // absolute humidity from SHT21
+        case 12: value = _dewPoint(sensors.get_sht21_temp(), sensors.get_sht21_hum()); break; // dew point from SHT21
         case 13: value = _absoluteHum(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // absolute humidity from weather forecast
         case 14: value = _dewPoint(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // dew point from weather forecast
         default: ; break;
@@ -361,7 +361,7 @@ uint8_t AgregateLcdData::windDirection(int deg) {
 }
 
 String AgregateLcdData::_iaq() {
-    float iaq = sensors.get_bme680_iaq(CORRECTED);
+    float iaq = sensors.get_bme680_iaq();
     if(validate.iaq(iaq)) return ("IAQ " + String((int)round(iaq)));
     else return "--";
 }

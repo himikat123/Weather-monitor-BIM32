@@ -62,9 +62,9 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             }
         }; break;
         case 3: { // BME280
-            float t = sensors.get_bme280_temp(CORRECTED);
-            float h = sensors.get_bme280_hum(CORRECTED);
-            float p = sensors.get_bme280_pres(CORRECTED);
+            float t = sensors.get_bme280_temp();
+            float h = sensors.get_bme280_hum();
+            float p = sensors.get_bme280_pres();
             float ah = sensors.absoluteHum(t, h);
             float dp = sensors.dewPoint(t, h);
             if(type == 0 and validate.temp(t)) data = t;
@@ -74,14 +74,14 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             if(type == 4 and validate.dewPoint(dp, t)) data = dp;
         }; break;
         case 4: { // BMP180
-            float t = sensors.get_bmp180_temp(CORRECTED);
-            float p = sensors.get_bmp180_pres(CORRECTED);
+            float t = sensors.get_bmp180_temp();
+            float p = sensors.get_bmp180_pres();
             if(type == 0 and validate.temp(t)) data = t;
             if(type == 1 and validate.pres(p)) data = p;
         }; break;
         case 5: { // SHT21
-            float t = sensors.get_sht21_temp(CORRECTED);
-            float h = sensors.get_sht21_hum(CORRECTED);
+            float t = sensors.get_sht21_temp();
+            float h = sensors.get_sht21_hum();
             float ah = sensors.absoluteHum(t, h);
             float dp = sensors.dewPoint(t, h);
             if(type == 0 and validate.temp(t)) data = t;
@@ -90,8 +90,8 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             if(type == 3 and validate.dewPoint(dp, t)) data = dp;
         }; break;
         case 6: { // DHT22
-            float t = sensors.get_dht22_temp(CORRECTED);
-            float h = sensors.get_dht22_hum(CORRECTED);
+            float t = sensors.get_dht22_temp();
+            float h = sensors.get_dht22_hum();
             float ah = sensors.absoluteHum(t, h);
             float dp = sensors.dewPoint(t, h);
             if(type == 0 and validate.temp(t)) data = t;
@@ -100,31 +100,31 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
             if(type == 3 and validate.dewPoint(dp, t)) data = dp;
         }; break;
         case 7: { // DS18B20
-            float t = sensors.get_ds18b20_temp(CORRECTED);
+            float t = sensors.get_ds18b20_temp();
             if(validate.temp(t)) data = t;
         }; break;
         case 8: { // MAX44009
-            float l = sensors.get_max44009_light(CORRECTED);
+            float l = sensors.get_max44009_light();
             if(validate.light(l)) data = l;
         }; break;
         case 9: { // BH1750
-            float l = sensors.get_bh1750_light(CORRECTED);
+            float l = sensors.get_bh1750_light();
             if(validate.light(l)) data = l;
         }; break;
         case 10: { // Ananlog input
-            float a = sensors.get_analog_voltage(CORRECTED);
+            float a = sensors.get_analog_voltage();
             if(validate.volt(a)) data = a;
         }; break;
         case 11: { // ESP32
-            float t = sensors.get_esp32_temp(CORRECTED);
+            float t = sensors.get_esp32_temp();
             if(type == 0 and validate.temp(t)) data = t;
             if(type == 1) data = millis() / 1000;
         }; break;
         case 12: { // BME680
-            float t = sensors.get_bme680_temp(CORRECTED);
-            float h = sensors.get_bme680_hum(CORRECTED);
-            float p = sensors.get_bme680_pres(CORRECTED);
-            float i = sensors.get_bme680_iaq(CORRECTED);
+            float t = sensors.get_bme680_temp();
+            float h = sensors.get_bme680_hum();
+            float p = sensors.get_bme680_pres();
+            float i = sensors.get_bme680_iaq();
             float ah = sensors.absoluteHum(t, h);
             float dp = sensors.dewPoint(t, h);
             if(type == 0 and validate.temp(t)) data = t;

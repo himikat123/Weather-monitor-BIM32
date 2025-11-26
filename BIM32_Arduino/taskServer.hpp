@@ -31,13 +31,10 @@ void TaskServer(void *pvParameters) {
                 JsonDocument doc;
                 JsonObject root = doc.to<JsonObject>();
 
-                //String json = "{\"time\":" + String(now()) + ", \"runtime\": " + String(round(millis() / 1000)) + "}";
-                //Serial.println(json);
-                //JsonDocument json;
                 //json["state"] = web_isLogged(false) ? "OK" : "LOGIN";
-                //json["runtime"] = round(millis() / 1000);
-                //json["heap"] = ESP.getFreeHeap();
-                //json["time"] = now();
+                doc["runtime"] = round(millis() / 1000);
+                doc["heap"] = ESP.getFreeHeap();
+                doc["time"] = now();
 
                 //for(unsigned int i=0; i<global.nets; i++) {
                 //    json["ssids"][i][0] = global.ssids[i];
@@ -61,20 +58,34 @@ void TaskServer(void *pvParameters) {
                     state.bmp180.toJson(root);
                     state.bmp180.updated = false;
                 }
-                //json["sht21"]["temp"] = sensors.get_sht21_temp(RAW);
-                //json["sht21"]["hum"] = sensors.get_sht21_hum(RAW);
-                //json["dht22"]["temp"] = sensors.get_dht22_temp(RAW);
-                //json["dht22"]["hum"] = sensors.get_dht22_hum(RAW);
-                //json["esp32"]["temp"] = sensors.get_esp32_temp(RAW);
-                //json["ds18b20"]["temp"] = sensors.get_ds18b20_temp(RAW);
-                //json["max44009"]["light"] = sensors.get_max44009_light(RAW);
-                //json["bh1750"]["light"] = sensors.get_bh1750_light(RAW);
-                //json["analog"]["volt"] = sensors.get_analog_voltage(RAW);
-                //json["bme680"]["temp"] = sensors.get_bme680_temp(RAW);
-                //json["bme680"]["hum"] = sensors.get_bme680_hum(RAW);
-                //json["bme680"]["pres"] = sensors.get_bme680_pres(RAW);
-                //json["bme680"]["iaq"] = sensors.get_bme680_iaq(RAW);
-                //json["bme680"]["iaqAccr"] = sensors.get_bme680_iaq_accuracy();
+                if(state.sht21.updated) {
+                    state.sht21.toJson(root);
+                    state.sht21.updated = false;
+                }
+                if(state.dht22.updated) {
+                    state.dht22.toJson(root);
+                    state.dht22.updated = false;
+                }
+                if(state.esp32core.updated) {
+                    state.esp32core.toJson(root);
+                    state.esp32core.updated = false;
+                }
+                if(state.max44009.updated) {
+                    state.max44009.toJson(root);
+                    state.max44009.updated = false;
+                }
+                if(state.bh1750.updated) {
+                    state.bh1750.toJson(root);
+                    state.bh1750.updated = false;
+                }
+                if(state.analog.updated) {
+                    state.analog.toJson(root);
+                    state.analog.updated = false;
+                }
+                if(state.bme680.updated) {
+                    state.bme680.toJson(root);
+                    state.bme680.updated = false;
+                }
 
                 //json["thing"]["time"] = thingspeak.get_updated();
                 //for(unsigned int i=0; i<THNG_FIELDS; i++) {
@@ -145,7 +156,7 @@ void TaskServer(void *pvParameters) {
          * Automatic daily restart of the device at the specified time.
          * Uncomment this line and specify the time if you need autorestart. 
          */
-        // if(hour() == 12 and minute() == 0 and second() == 0) ESP.restart();
+        // if(hour() == 17 and minute() == 0 and second() == 0) ESP.restart();
         
         vTaskDelay(10);
     }

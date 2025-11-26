@@ -16,15 +16,8 @@ class Thingspeak {
         boolean _is_summertime();
         
         float _field[8] = {-40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0};
-        float _historyFields[7][24] = {
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        };
-        unsigned int _historyUpdated[24] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        float _historyFields[7][24] = { 0 };
+        unsigned int _historyUpdated[24] = { 0 };
         int _updated = -1;
 };
 
@@ -308,67 +301,67 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
     }
     
     if(config.history_fields(fieldNum) == 4 and (fieldNum == 0 or fieldNum == 3)) { // BME280 Temperature
-        if(validate.temp(sensors.get_bme280_temp(CORRECTED))) 
-            fields = field + String(sensors.get_bme280_temp(CORRECTED));
+        if(validate.temp(sensors.get_bme280_temp())) 
+            fields = field + String(sensors.get_bme280_temp());
     }
     if(config.history_fields(fieldNum) == 4 and (fieldNum == 1 or fieldNum == 4)) { // BME280 Humidity 
-        if(validate.hum(sensors.get_bme280_hum(CORRECTED)))
-            fields = field + String(sensors.get_bme280_hum(CORRECTED));
+        if(validate.hum(sensors.get_bme280_hum()))
+            fields = field + String(sensors.get_bme280_hum());
     }
     if(config.history_fields(fieldNum) == 4 and fieldNum == 2) {                    // BME280 Pressure
-        if(validate.pres(sensors.get_bme280_pres(CORRECTED)))
-            fields = field + String(sensors.get_bme280_pres(CORRECTED));
+        if(validate.pres(sensors.get_bme280_pres()))
+            fields = field + String(sensors.get_bme280_pres());
     }
 
     if(config.history_fields(fieldNum) == 5 and (fieldNum == 0 or fieldNum == 3)) { // BMP180 Temperature
-        if(validate.temp(sensors.get_bmp180_temp(CORRECTED))) 
-            fields = field + String(sensors.get_bmp180_temp(CORRECTED));
+        if(validate.temp(sensors.get_bmp180_temp())) 
+            fields = field + String(sensors.get_bmp180_temp());
     }
     if(config.history_fields(fieldNum) == 5 and fieldNum == 2) {                    // BMP180 Pressure
-        if(validate.pres(sensors.get_bmp180_pres(CORRECTED))) 
-            fields = field + String(sensors.get_bmp180_pres(CORRECTED));
+        if(validate.pres(sensors.get_bmp180_pres())) 
+            fields = field + String(sensors.get_bmp180_pres());
     }
 
     if(config.history_fields(fieldNum) == 5 and (fieldNum == 1 or fieldNum == 4)) { // SHT21 Humidity
-        if(validate.hum(sensors.get_sht21_hum(CORRECTED)))
-            fields = field + String(sensors.get_sht21_hum(CORRECTED));
+        if(validate.hum(sensors.get_sht21_hum()))
+            fields = field + String(sensors.get_sht21_hum());
     }
 
     if(config.history_fields(fieldNum) == 6 and (fieldNum == 0 or fieldNum == 3)) { // SHT21 Temperature
-        if(validate.temp(sensors.get_sht21_temp(CORRECTED))) 
-            fields = field + String(sensors.get_sht21_temp(CORRECTED));
+        if(validate.temp(sensors.get_sht21_temp())) 
+            fields = field + String(sensors.get_sht21_temp());
     }
 
     if(config.history_fields(fieldNum) == 6 and (fieldNum == 1 or fieldNum == 4)) { // DHT22 Humidity
-        if(validate.hum(sensors.get_dht22_hum(CORRECTED))) 
-            fields = field + String(sensors.get_dht22_hum(CORRECTED));
+        if(validate.hum(sensors.get_dht22_hum())) 
+            fields = field + String(sensors.get_dht22_hum());
     }
 
     if(config.history_fields(fieldNum) == 7 and (fieldNum == 0 or fieldNum == 3)) { // DHT22 Temperature
-        if(validate.temp(sensors.get_dht22_temp(CORRECTED))) 
-            fields = field + String(sensors.get_dht22_temp(CORRECTED));
+        if(validate.temp(sensors.get_dht22_temp())) 
+            fields = field + String(sensors.get_dht22_temp());
     }
   
     if(config.history_fields(fieldNum) == 8 and (fieldNum == 0 or fieldNum == 3)) { // DS18B20 Temperature
-        if(validate.temp(sensors.get_ds18b20_temp(CORRECTED)))
-            fields = field + String(sensors.get_ds18b20_temp(CORRECTED));
+        if(validate.temp(sensors.get_ds18b20_temp()))
+            fields = field + String(sensors.get_ds18b20_temp());
     }
 
     if(config.history_fields(fieldNum) == 9 and (fieldNum == 0 or fieldNum == 3)) { // BME680 Temperature
-        if(validate.temp(sensors.get_bme680_temp(CORRECTED))) 
-            fields = field + String(sensors.get_bme680_temp(CORRECTED));
+        if(validate.temp(sensors.get_bme680_temp())) 
+            fields = field + String(sensors.get_bme680_temp());
     }
     if(config.history_fields(fieldNum) == 7 and (fieldNum == 1 or fieldNum == 4)) { // BME680 Humidity 
-        if(validate.hum(sensors.get_bme680_hum(CORRECTED)))
-            fields = field + String(sensors.get_bme680_hum(CORRECTED));
+        if(validate.hum(sensors.get_bme680_hum()))
+            fields = field + String(sensors.get_bme680_hum());
     }
     if(config.history_fields(fieldNum) == 6 and fieldNum == 2) {                    // BME680 Pressure
-        if(validate.pres(sensors.get_bme680_pres(CORRECTED)))
-            fields = field + String(sensors.get_bme680_pres(CORRECTED));
+        if(validate.pres(sensors.get_bme680_pres()))
+            fields = field + String(sensors.get_bme680_pres());
     }
     if(config.history_fields(fieldNum) == 1 and fieldNum == 5) {                    // BME680 IAQ
-        if(validate.iaq(sensors.get_bme680_iaq(CORRECTED))) 
-            fields = field + String(sensors.get_bme680_iaq(CORRECTED));
+        if(validate.iaq(sensors.get_bme680_iaq())) 
+            fields = field + String(sensors.get_bme680_iaq());
     }
  
     return fields;
