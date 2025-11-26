@@ -28,6 +28,9 @@ void TaskServer(void *pvParameters) {
         if(websocket.hasClient()) {
             if(millis() - ws_update >= 1000) {
                 ws_update = millis();
+                JsonDocument doc;
+                JsonObject root = doc.to<JsonObject>();
+
                 //String json = "{\"time\":" + String(now()) + ", \"runtime\": " + String(round(millis() / 1000)) + "}";
                 //Serial.println(json);
                 //JsonDocument json;
@@ -50,11 +53,14 @@ void TaskServer(void *pvParameters) {
                 //json["network"]["dns1"] = WiFi.dnsIP().toString();
                 //json["network"]["dns2"] = WiFi.dnsIP().toString();
 
-                //json["bme280"]["temp"] = sensors.get_bme280_temp(RAW);
-                //json["bme280"]["hum"] = sensors.get_bme280_hum(RAW);
-                //json["bme280"]["pres"] = sensors.get_bme280_pres(RAW);
-                //json["bmp180"]["temp"] = sensors.get_bmp180_temp(RAW);
-                //json["bmp180"]["pres"] = sensors.get_bmp180_pres(RAW);
+                if(state.bme280.updated) {
+                    state.bme280.toJson(root);
+                    state.bme280.updated = false;
+                }
+                if(state.bmp180.updated) {
+                    state.bmp180.toJson(root);
+                    state.bmp180.updated = false;
+                }
                 //json["sht21"]["temp"] = sensors.get_sht21_temp(RAW);
                 //json["sht21"]["hum"] = sensors.get_sht21_hum(RAW);
                 //json["dht22"]["temp"] = sensors.get_dht22_temp(RAW);
@@ -130,7 +136,7 @@ void TaskServer(void *pvParameters) {
                 //json["fs"]["free"] = fsUsed;
 
                 String data = "";
-                //serializeJson(json, data);
+                serializeJson(root, data);
                 websocket.sendJson(data);
             }
         }

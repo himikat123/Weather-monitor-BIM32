@@ -48,25 +48,25 @@ class Sensors {
         void init(void);
         void read(void);
         void BME680Read(void);
-        float get_esp32_temp(bool corr);
-        float get_bme280_temp(bool corr);
-        float get_bme280_hum(bool corr);
-        float get_bme280_pres(bool corr);
-        float get_bmp180_temp(bool corr);
-        float get_bmp180_pres(bool corr);
-        float get_sht21_temp(bool corr);
-        float get_sht21_hum(bool corr);
-        float get_dht22_temp(bool corr);
-        float get_dht22_hum(bool corr);
-        float get_ds18b20_temp(bool corr);
-        float get_max44009_light(bool corr);
-        float get_bh1750_light(bool corr);
-        float get_analog_voltage(bool corr);
-        float get_bme680_temp(bool corr);
-        float get_bme680_hum(bool corr);
-        float get_bme680_pres(bool corr);
-        float get_bme680_iaq(bool corr);
-        uint8_t get_bme680_iaq_accuracy();
+        float get_esp32_temp();
+        float get_bme280_temp();
+        float get_bme280_hum();
+        float get_bme280_pres();
+        float get_bmp180_temp();
+        float get_bmp180_pres();
+        float get_sht21_temp();
+        float get_sht21_hum();
+        float get_dht22_temp();
+        float get_dht22_hum();
+        float get_ds18b20_temp();
+        float get_max44009_light();
+        float get_bh1750_light();
+        float get_analog_voltage();
+        float get_bme680_temp();
+        float get_bme680_hum();
+        float get_bme680_pres();
+        float get_bme680_iaq();
+        unsigned int get_bme680_iaq_accuracy();
         void get_ds3231_timeDate();
         void set_ds3231_timeDate();
         void comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier);
@@ -89,26 +89,6 @@ class Sensors {
         uint16_t _bme680_stateUpdateCounter = 0;
         unsigned int _bme680_stateCounter = 0;
         unsigned int _bme680_stateTimestamp = 0;
-
-        float _esp32_temp = 40400.0;
-        float _bme280_temp = 40400.0;
-        float _bme280_hum = 40400.0;
-        float _bme280_pres = 40400.0;
-        float _bmp180_temp = 40400.0;
-        float _bmp180_pres = 40400.0;
-        float _sht21_temp = 40400.0;
-        float _sht21_hum = 40400.0;
-        float _dht22_temp = 40400.0;
-        float _dht22_hum = 40400.0;
-        float _ds18b20_temp = 40400.0;
-        float _max44009_light = -1000.0;
-        float _bh1750_light = -10000.0;
-        float _analog_voltage = -10000.0;
-        float _bme680_temp = 40400.0;
-        float _bme680_hum = 40400.0;
-        float _bme680_pres = 40400.0;
-        float _bme680_iaq = 40400.0;
-        uint8_t _bme680_iaq_accuracy = 0;
 
         void _BME280Init(void);
         void _BMP180Init(void);
@@ -181,80 +161,83 @@ void Sensors::read(void) {
 /**
  * Getters
  */
-float Sensors::get_esp32_temp(bool corr) {
-    return _esp32_temp + (corr ? config.esp32_temp_corr() : 0.0);
+float Sensors::get_esp32_temp() {
+    return state.esp32core.temp + config.esp32_temp_corr();
 }
 
-float Sensors::get_bme280_temp(bool corr) {
-    return _bme280_temp + (corr ? config.bme280_temp_corr() : 0.0);
+float Sensors::get_bme280_temp() {
+    return state.bme280.temp + config.bme280_temp_corr();
 }
 
-float Sensors::get_bme280_hum(bool corr) {
-    return _bme280_hum + (corr ? config.bme280_hum_corr() : 0.0);
+float Sensors::get_bme280_hum() {
+    return state.bme280.hum + config.bme280_hum_corr();
 }
 
-float Sensors::get_bme280_pres(bool corr) {
-    return (config.units_pres() ? _bme280_pres : mmHg(_bme280_pres)) + (corr ? config.bme280_pres_corr() : 0.0);
+float Sensors::get_bme280_pres() {
+    float pres = state.bme280.pres;
+    return (config.units_pres() ? pres : mmHg(pres)) + config.bme280_pres_corr();
 }
 
-float Sensors::get_bmp180_temp(bool corr) {
-    return _bmp180_temp + (corr ? config.bmp180_temp_corr() : 0.0);
+float Sensors::get_bmp180_temp() {
+    return state.bmp180.temp + config.bmp180_temp_corr();
 }
 
-float Sensors::get_bmp180_pres(bool corr) {
-    return (config.units_pres() ? _bmp180_pres : mmHg(_bmp180_pres)) + (corr ? config.bmp180_pres_corr() : 0.0);
+float Sensors::get_bmp180_pres() {
+    float pres = state.bmp180.pres;
+    return (config.units_pres() ? pres : mmHg(pres)) + config.bmp180_pres_corr();
 }
 
-float Sensors::get_sht21_temp(bool corr) {
-    return _sht21_temp + (corr ? config.sht21_temp_corr() : 0.0);
+float Sensors::get_sht21_temp() {
+    return state.sht21.temp + config.sht21_temp_corr();
 }
 
-float Sensors::get_sht21_hum(bool corr) {
-    return _sht21_hum + (corr ? config.sht21_hum_corr() : 0.0);
+float Sensors::get_sht21_hum() {
+    return state.sht21.hum + config.sht21_hum_corr();
 }
 
-float Sensors::get_dht22_temp(bool corr) {
-    return _dht22_temp + (corr ? config.dht22_temp_corr() : 0.0);
+float Sensors::get_dht22_temp() {
+    return state.dht22.temp + config.dht22_temp_corr();
 }
 
-float Sensors::get_dht22_hum(bool corr) {
-    return _dht22_hum + (corr ? config.dht22_hum_corr() : 0.0);
+float Sensors::get_dht22_hum() {
+    return state.dht22.hum + config.dht22_hum_corr();
 }
 
-float Sensors::get_ds18b20_temp(bool corr) {
-    return _ds18b20_temp + (corr ? config.ds18b20_temp_corr() : 0.0);
+float Sensors::get_ds18b20_temp() {
+    return state.ds18b20.temp + config.ds18b20_temp_corr();
 }
 
-float Sensors::get_max44009_light(bool corr) {
-    return _max44009_light + (corr ? config.max44009_light_corr() : 0.0);
+float Sensors::get_max44009_light() {
+    return state.max44009.light + config.max44009_light_corr();
 }
 
-float Sensors::get_bh1750_light(bool corr) {
-    return _bh1750_light + (corr ? config.bh1750_light_corr() : 0.0);
+float Sensors::get_bh1750_light() {
+    return state.bh1750.light + config.bh1750_light_corr();
 }
 
-float Sensors::get_analog_voltage(bool corr) {
-    return _analog_voltage + (corr ? config.analog_voltage_corr() : 0.0);
+float Sensors::get_analog_voltage() {
+    return state.analog.volt + config.analog_voltage_corr();
 }
 
-float Sensors::get_bme680_temp(bool corr) {
-    return _bme680_temp + (corr ? config.bme680_temp_corr() : 0.0);
+float Sensors::get_bme680_temp() {
+    return state.bme680.temp + config.bme680_temp_corr();
 }
 
-float Sensors::get_bme680_hum(bool corr) {
-    return _bme680_hum + (corr ? config.bme680_hum_corr() : 0.0);
+float Sensors::get_bme680_hum() {
+    return state.bme680.hum + config.bme680_hum_corr();
 }
 
-float Sensors::get_bme680_pres(bool corr) {
-    return (config.units_pres() ? _bme680_pres : mmHg(_bme680_pres)) + (corr ? config.bme680_pres_corr() : 0.0);
+float Sensors::get_bme680_pres() {
+    float pres = state.bme680.pres;
+    return (config.units_pres() ? pres : mmHg(pres)) + config.bme680_pres_corr();
 }
 
-float Sensors::get_bme680_iaq(bool corr) {
-    return _bme680_iaq + (corr ? config.bme680_iaq_corr() : 0.0);
+float Sensors::get_bme680_iaq() {
+    return state.bme680.iaq + config.bme680_iaq_corr();
 }
 
-uint8_t Sensors::get_bme680_iaq_accuracy() {
-    return _bme680_iaq_accuracy;
+unsigned int Sensors::get_bme680_iaq_accuracy() {
+    return state.bme680.iaqAccr;
 }
 
 /**
@@ -468,19 +451,15 @@ void Sensors::_BME680_updateState(void) {
  */
 void Sensors::_BME280Read(void) {
     if(_bme280_det) {
-        _bme280_temp = bme.readTemperature();
-        if(state.bme280.temp != _bme280_temp) { 
-            state.bme280.updated = true;
-        }
-        state.bme280.temp = _bme280_temp;
-//////////////////
-        _bme280_hum = bme.readHumidity();
-        _bme280_pres = bme.readPressure() / 100.0F;
+        state.bme280.temp = bme.readTemperature();
+        state.bme280.hum = bme.readHumidity();
+        state.bme280.pres = bme.readPressure() / 100.0F;
+        state.bme280.updated = true;
     }
     else {
-        _bme280_temp = 40400.0;
-        _bme280_hum = 40400.0;
-        _bme280_pres = 40400.0;
+        state.bme280.temp = 40400.0;
+        state.bme280.hum = 40400.0;
+        state.bme280.pres = 40400.0;
     }
 }
 
@@ -489,12 +468,13 @@ void Sensors::_BME280Read(void) {
  */
 void Sensors::_BMP180Read(void) {
     if(_bmp180_det) {
-        _bmp180_temp = bmp.readTemperature();
-        _bmp180_pres = bmp.readPressure() / 100.0F;
+        state.bmp180.temp = bmp.readTemperature();
+        state.bmp180.pres = bmp.readPressure() / 100.0F;
+        state.bmp180.updated = true;
     }
     else {
-        _bmp180_temp = 40400.0;
-        _bmp180_pres = 40400.0;
+        state.bmp180.temp = 40400.0;
+        state.bmp180.pres = 40400.0;
     }
 }
 
@@ -503,12 +483,13 @@ void Sensors::_BMP180Read(void) {
  */
 void Sensors::_SHT21Read(void) {
     if(_sht21_det) {
-        _sht21_temp = SHT21.getTemperature();
-        _sht21_hum = SHT21.getHumidity();
+        state.sht21.temp = SHT21.getTemperature();
+        state.sht21.hum = SHT21.getHumidity();
+        state.sht21.updated = true;
     }
     else {
-        _sht21_temp = 40400.0;
-        _sht21_hum = 40400.0;
+        state.sht21.temp = 40400.0;
+        state.sht21.hum = 40400.0;
     }
 }
 
@@ -517,12 +498,13 @@ void Sensors::_SHT21Read(void) {
  */
 void Sensors::_DHT22Read(void) {
     if(_dht22_det) {
-        _dht22_temp = dht.getTemperature();
-        _dht22_hum = dht.getHumidity();
+        state.dht22.temp = dht.getTemperature();
+        state.dht22.hum = dht.getHumidity();
+        state.dht22.updated = true;
     }
     else {
-        _dht22_temp = 40400.0;
-        _dht22_hum = 40400.0;
+        state.dht22.temp = 40400.0;
+        state.dht22.hum = 40400.0;
     }
 }
 
@@ -531,26 +513,33 @@ void Sensors::_DHT22Read(void) {
  */
 void Sensors::_DS18B20Read(void) {
     if(_ds18b20_det) {
-        _ds18b20_temp = term.getTempC(thermometer);
+        state.ds18b20.temp = term.getTempC(thermometer);
+        state.ds18b20.updated = true;
         term.requestTemperatures();
     }
-    else _ds18b20_temp = 40400.0;
+    else state.ds18b20.temp = 40400.0;
 }
 
 /**
  * Read data from MAX44009 sensor
  */
 void Sensors::_MAX44009Read(void) {
-    if(_max44009_det) _max44009_light = max_light.get_lux();
-    else _max44009_light = -10000.0;
+    if(_max44009_det) {
+        state.max44009.light = max_light.get_lux();
+        state.max44009.updated = true;
+    }
+    else state.max44009.light = -10000.0;
 }
 
 /**
  * Read data from BH1750 sensor
  */
 void Sensors::_BH1750Read(void) {
-    if(_bh1750_det) _bh1750_light = lightMeter.readLightLevel();
-    else _bh1750_light = -10000.0;
+    if(_bh1750_det) {
+        state.bh1750.light = lightMeter.readLightLevel();
+        state.bh1750.updated = true;
+    }
+    else state.bh1750.light = -10000.0;
 }
 
 /**
@@ -559,17 +548,19 @@ void Sensors::_BH1750Read(void) {
 void Sensors::_AnalogRead(void) {
     float adc = float(analogRead(PHOTORESISTOR_PIN));
     #if defined(BIM32_CYD)
-        _analog_voltage = 3.3 - (adc / 1241.0);
+        state.analog.volt = 3.3 - (adc / 1241.0);
     #else
-        _analog_voltage = adc / 1241.0;
+        state.analog.volt = adc / 1241.0;
     #endif
+    state.analog.updated = true;
 }
 
 /**
  * Read ESP32 temperature
  */
 void Sensors::_ESP32Read(void) {
-    _esp32_temp = (temprature_sens_read() - 32) / 1.8;
+    state.esp32core.temp = (temprature_sens_read() - 32) / 1.8;
+    state.esp32core.updated = true;
 }
 
 /**
@@ -578,20 +569,21 @@ void Sensors::_ESP32Read(void) {
 void Sensors::BME680Read(void) {
     if(_bme680_det) {
         if(iaqSensor.run()) {
-            _bme680_temp = iaqSensor.temperature;
-            _bme680_hum = iaqSensor.humidity;
-            _bme680_pres = iaqSensor.pressure / 100.0F;
-            _bme680_iaq = iaqSensor.iaq;
-            _bme680_iaq_accuracy = iaqSensor.iaqAccuracy;
+            state.bme680.temp = iaqSensor.temperature;
+            state.bme680.hum = iaqSensor.humidity;
+            state.bme680.pres = iaqSensor.pressure / 100.0F;
+            state.bme680.iaq = iaqSensor.iaq;
+            state.bme680.iaqAccr = iaqSensor.iaqAccuracy;
+            state.bme680.updated = true;
             _BME680_updateState();
         }
         else _BME680_validateIaqSensorStatus();
     }
     else {
-        _bme680_temp = 40400.0;
-        _bme680_hum = 40400.0;
-        _bme680_pres = 40400.0;
-        _bme680_iaq = 40400.0;
+        state.bme680.temp = 40400.0;
+        state.bme680.hum = 40400.0;
+        state.bme680.pres = 40400.0;
+        state.bme680.iaq = 40400.0;
     }
 }
 

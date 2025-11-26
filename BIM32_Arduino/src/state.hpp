@@ -6,26 +6,28 @@
 #define MAC_LEN    18
 #define W_NAME_LEN 32
 
-struct ESP32 {
-    float temp;
+struct ESP32State {
+    float temp = 40400.0;
+    bool updated = false;
+
     void toJson(JsonObject o) const {
         o["esp32"]["temp"] = temp;
     }
 };
 
-struct Network {
-    char ssid[SSID_LEN];
-    unsigned int ch;
-    int sig;
-    char mac[MAC_LEN];
-    char ip[IP_LEN];
-    char mask[IP_LEN];
-    char gw[IP_LEN];
-    char dns1[IP_LEN];
-    char dns2[IP_LEN];
+struct NetworkState {
+    char ssid[SSID_LEN] = "";
+    unsigned int ch = 0;
+    int sig = 0;
+    char mac[MAC_LEN] = "";
+    char ip[IP_LEN] = "";
+    char mask[IP_LEN] = "";
+    char gw[IP_LEN] = "";
+    char dns1[IP_LEN] = "";
+    char dns2[IP_LEN] = "";
 
-    char ssids[SSID_COUNT][SSID_LEN];
-    int rssis[SSID_COUNT];
+    char ssids[SSID_COUNT][SSID_LEN] = { 0 };
+    int rssis[SSID_COUNT] = { 0 };
 
     void toJson(JsonObject o) const {
         o["network"]["ssid"] = ssid;
@@ -47,13 +49,13 @@ struct Network {
     }
 };
 
-struct BME680 {
-    float temp;
-    float hum;
-    float pres;
-    float iaq;
-    unsigned int iaqAccr;
-    bool updated;
+struct BME680State {
+    float temp = 40400.0;
+    float hum = 40400.0;
+    float pres = 40400.0;
+    float iaq = -1.0;
+    unsigned int iaqAccr = 0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["bme680"]["temp"] = temp;
@@ -64,11 +66,11 @@ struct BME680 {
     }
 };
 
-struct BME280 {
-    float temp;
-    float hum;
-    float pres;
-    bool updated;
+struct BME280State {
+    float temp = 40400.0;
+    float hum = 40400.0;
+    float pres = 40400.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["bme280"]["temp"] = temp;
@@ -77,10 +79,10 @@ struct BME280 {
     }
 };
 
-struct BMP180 {
-    float temp;
-    float pres;
-    bool updated;
+struct BMP180State {
+    float temp = 40400.0;
+    float pres = 40400.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["bmp180"]["temp"] = temp;
@@ -88,10 +90,10 @@ struct BMP180 {
     }
 };
 
-struct SHT21 {
-    float temp;
-    float hum;
-    bool updated;
+struct SHT21State {
+    float temp = 40400.0;
+    float hum = 40400.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["sht21"]["temp"] = temp;
@@ -99,10 +101,10 @@ struct SHT21 {
     }
 };
 
-struct DHT22 {
-    float temp;
-    float hum;
-    bool updated;
+struct DHT22State {
+    float temp = 40400.0;
+    float hum = 40400.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["dht22"]["temp"] = temp;
@@ -110,46 +112,46 @@ struct DHT22 {
     }
 };
 
-struct DS18B20 {
-    float temp;
-    bool updated;
+struct DS18B20State {
+    float temp = 40400.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["ds18b20"]["temp"] = temp;
     }
 };
 
-struct MAX44009 {
-    float light;
-    bool updated;
+struct MAX44009State {
+    float light = -1.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["max44009"]["light"] = light;
     }
 };
 
-struct BH1750 {
-    float light;
-    bool updated;
+struct BH1750State {
+    float light = -1.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["bh1750"]["light"] = light;
     }
 };
 
-struct Analog {
-    float volt;
-    bool updated;
+struct AnalogState {
+    float volt = -1.0;
+    bool updated = false;
 
     void toJson(JsonObject o) const {
         o["analog"]["volt"] = volt;
     }
 };
 
-struct Thing {
-    unsigned int time;
-    float data[8];
-    bool updated;
+struct ThingState {
+    time_t time = 0;
+    float data[8] = { -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0 };
+    bool updated = false;
 
     void toJson(JsonObject obj) const {
         JsonObject o = obj.createNestedObject("thing");
@@ -159,19 +161,19 @@ struct Thing {
     }
 };
 
-struct Weather {
-    float temp;
-    float hum;
-    float pres;
-    unsigned int icon;
-    bool isDay;
-    char descript[64];
-    unsigned int time;
-    bool updated;
+struct WeatherState {
+    float temp = 40400.0;
+    float hum = 40400.0;
+    float pres = 40400.0;
+    unsigned int icon = 1;
+    bool isDay = true;
+    char descript[64] = "----";
+    time_t time = 0;
+    bool updated = false;
 
     struct Wind {
-        float speed;
-        int dir;
+        float speed = -1.0;
+        int dir = 0;
 
         void toJson(JsonObject o) const {
             o["speed"] = speed;
@@ -180,10 +182,10 @@ struct Weather {
     } wind;
 
     struct Daily {
-        float tMax[5];
-        float tMin[5];
-        float wind[5];
-        unsigned int icon[5];
+        float tMax[5] = { 40400.0, 40400.0, 40400.0, 40400.0, 40400.0 };
+        float tMin[5] = { 40400.0, 40400.0, 40400.0, 40400.0, 40400.0 };
+        float wind[5] = { -1.0, -1.0, -1.0, -1.0, -1.0 };
+        unsigned int icon[5] = { 0, 0, 0, 0, 0 };
 
         void toJson(JsonObject o) const {
             JsonArray a_tMax = o.createNestedArray("tMax");
@@ -217,13 +219,13 @@ struct Weather {
     }
 };
 
-struct WSensor {
-    float time[2];
-    bool updated;
+struct WSensorState {
+    time_t time[2] = { 0 };
+    bool updated = false;
 
     struct Block1D {
-        float data[2];
-        char name[2][W_NAME_LEN];
+        float data[2] = { 0 };
+        char name[2][W_NAME_LEN] = { 0 };
 
         void toJson(JsonObject o) const {
             JsonArray D = o.createNestedArray("data");
@@ -236,8 +238,8 @@ struct WSensor {
     };
 
     struct Block2D {
-        float data[5][2];
-        char name[5][2][W_NAME_LEN];
+        float data[5][2] = { 0 };
+        char name[5][2][W_NAME_LEN] = { 0 };
 
         void toJson(JsonObject o) const {
             JsonArray dataArr = o.createNestedArray("data");
@@ -278,11 +280,11 @@ struct WSensor {
     }
 };
 
-struct FS {
-    unsigned int total;
-    unsigned int free;
-    char list[2048];
-    bool updated;
+struct FilesystemState {
+    unsigned int total = 0;
+    unsigned int free = 0;
+    char list[2048] = "";
+    bool updated = false;
 
     void toJson(JsonObject obj) const {
         JsonObject o = obj.createNestedObject("fs");
@@ -293,37 +295,39 @@ struct FS {
 };
 
 struct State {
-    ESP32 esp32;
-    Network network;
-    BME680 bme680;
-    BME280 bme280;
-    BMP180 bmp180;
-    SHT21 sht21;
-    DHT22 dht22;
-    DS18B20 ds18b20;
-    MAX44009 max44009;
-    BH1750 bh1750;
-    Analog analog;
-    Thing thing;
-    Weather weather;
-    WSensor wsensor;
-    FS fs;
+    ESP32State esp32core;
+    NetworkState network;
+    BME680State bme680;
+    BME280State bme280;
+    BMP180State bmp180;
+    SHT21State sht21;
+    DHT22State dht22;
+    DS18B20State ds18b20;
+    MAX44009State max44009;
+    BH1750State bh1750;
+    AnalogState analog;
+    ThingState thing;
+    WeatherState weather;
+    WSensorState wsensor;
+    FilesystemState filesystem;
 
-    void toJson(JsonDocument doc) const {
-        esp32.toJson(doc);
-        network.toJson(doc);
-        bme680.toJson(doc);
-        bme280.toJson(doc);
-        bmp180.toJson(doc);
-        sht21.toJson(doc);
-        dht22.toJson(doc);
-        ds18b20.toJson(doc);
-        max44009.toJson(doc);
-        bh1750.toJson(doc);
-        analog.toJson(doc);
-        thing.toJson(doc);
-        weather.toJson(doc);
-        wsensor.toJson(doc);
-        fs.toJson(doc);
+    void toJson(JsonDocument& doc) const {
+        JsonObject root = doc.to<JsonObject>();
+
+        esp32core.toJson(root);
+        network.toJson(root);
+        bme680.toJson(root);
+        bme280.toJson(root);
+        bmp180.toJson(root);
+        sht21.toJson(root);
+        dht22.toJson(root);
+        ds18b20.toJson(root);
+        max44009.toJson(root);
+        bh1750.toJson(root);
+        analog.toJson(root);
+        thing.toJson(root);
+        weather.toJson(root);
+        wsensor.toJson(root);
+        filesystem.toJson(root);
     }
 };
