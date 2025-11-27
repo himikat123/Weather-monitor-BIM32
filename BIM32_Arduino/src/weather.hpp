@@ -33,38 +33,30 @@ class Weather {
         float get_hourlyPrec(unsigned int num); 
 
     private:
-        String _description = "----";
-        unsigned int _currentDate = 0;
-        float _currentTemp = 40400.0;
-        float _currentHum = 40400.0;
-        float _currentPres = 40400.0;
-        float _currentWindSpeed = -1.0;
-        int _currentWindDir = -1;
-        unsigned int _currentIcon = 0;
-        bool _is_day = false;
-        time_t _currentUpdated = -1;
-        String _country = "";
-        String _city = "";
-        String _lon = "";
-        String _lat = "";
+        //unsigned int _currentDate = 0;
+        //float _currentWindSpeed = -1.0;
+        //String _country = "";
+        //String _city = "";
+        float _lon = 0.0;
+        float _lat = 0.0;
 
-        float _dailyDayTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
-        float _dailyNightTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
-        float _dailyWindSpeed[DAYS] = {-1.0, -1.0, -1.0, -1.0, -1.0};
-        unsigned int _dailyIcon[DAYS] = {0, 0, 0, 0, 0};
-        unsigned int _dailyUpdated = 0;
+        // float _dailyDayTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
+        // float _dailyNightTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
+        // float _dailyWindSpeed[DAYS] = {-1.0, -1.0, -1.0, -1.0, -1.0};
+        // unsigned int _dailyIcon[DAYS] = {0, 0, 0, 0, 0};
+        // unsigned int _dailyUpdated = 0;
 
-        unsigned int _hourlyDate[DAYS * 8];
-        unsigned int _hourlyIcon[DAYS * 8];
-        float _hourlyTemp[DAYS * 8];
-        float _hourlyPres[DAYS * 8];
-        float _hourlyWindSpeed[DAYS * 8];
-        int _hourlyWindDir[DAYS * 8];
-        float _hourlyPrec[DAYS * 8];
-        unsigned int _hourlyUpdated = 0;
+        // unsigned int _hourlyDate[DAYS * 8];
+        // unsigned int _hourlyIcon[DAYS * 8];
+        // float _hourlyTemp[DAYS * 8];
+        // float _hourlyPres[DAYS * 8];
+        // float _hourlyWindSpeed[DAYS * 8];
+        // int _hourlyWindDir[DAYS * 8];
+        // float _hourlyPrec[DAYS * 8];
+        // unsigned int _hourlyUpdated = 0;
 
         unsigned int _convertIcon(int code);
-        String _openMeteoCode2Description(uint8_t code);
+        const char* _openMeteoCode2Description(uint8_t code);
         unsigned int _openMeteoIcon(int code);
         unsigned int _weatherbitIcon(int code);
         void _updateWeatherbitDaily(void);
@@ -92,7 +84,7 @@ unsigned int Weather::_convertIcon(int code) {
     }
 }
 
-String Weather::_openMeteoCode2Description(uint8_t code) {
+const char* Weather::_openMeteoCode2Description(uint8_t code) {
     switch(code) {
         case 0: return lang.weatherDescription(0);
         case 1: return lang.weatherDescription(1);
@@ -221,49 +213,50 @@ void Weather::update() {
         }
 
         if(config.weather_provider() == OPENWEATHERMAP) {
-            _description      = weather["weather"][0]["description"].as<String>();
-            _currentTemp      = weather["main"]["temp"] | 40400.0;
-            _currentHum       = weather["main"]["humidity"] | 40400.0;
-            _currentPres      = weather["main"]["pressure"] | 40400.0;
-            _currentWindSpeed = weather["wind"]["speed"] | -1.0;
-            _currentWindDir   = weather["wind"]["deg"] | -1;
-            _currentIcon      = atoi(weather["weather"][0]["icon"]);
-            String pod        = weather["weather"][0]["icon"] | "";
-            _is_day           = (pod.substring(2) == "d") ? true : false;
-            _country          = weather["sys"]["country"].as<String>();
-            _city             = weather["name"].as<String>();
-            _currentDate      = weather["dt"];
-            _lon              = weather["coord"]["lon"].as<String>();
-            _lat              = weather["coord"]["lat"].as<String>();
+            strlcpy(state.weather.descript, weather["weather"][0]["description"] | "", sizeof(state.weather.descript));
+            state.weather.temp       = weather["main"]["temp"] | 40400.0;
+            state.weather.hum        = weather["main"]["humidity"] | 40400.0;
+            state.weather.pres       = weather["main"]["pressure"] | 40400.0;
+            state.weather.wind.speed = weather["wind"]["speed"] | -1.0;
+            state.weather.wind.dir   = weather["wind"]["deg"] | -1;
+            state.weather.icon       = atoi(weather["weather"][0]["icon"] | "0");
+            String pod               = weather["weather"][0]["icon"] | "";
+            state.weather.isDay      = (pod.substring(2) == "d") ? true : false;
+            //_country          = weather["sys"]["country"].as<String>();
+            //_city             = weather["name"].as<String>();
+            state.weather.time       = weather["dt"] | 0;
+            _lon                     = weather["coord"]["lon"] | 0.0;
+            _lat                     = weather["coord"]["lat"] | 0.0;
         }
 
         if(config.weather_provider() == WEATHERBIT) {
-            _description      = weather["data"][0]["weather"]["description"].as<String>();
-            _currentTemp      = weather["data"][0]["temp"] | 40400.0;
-            _currentHum       = weather["data"][0]["rh"] | 40400.0;
-            _currentPres      = weather["data"][0]["pres"] | 40400.0;
-            _currentWindSpeed = weather["data"][0]["wind_spd"] | -1.0;
-            _currentWindDir   = weather["data"][0]["wind_dir"] | -1;
-            const char* pod   = weather["data"][0]["pod"] | "";
-            _is_day           = (String(pod) == String('d')) ? true : false;
-            _country          = weather["data"][0]["country_code"].as<String>();
-            _city             = weather["data"][0]["city_name"].as<String>();
-            _currentIcon      = _weatherbitIcon(weather["data"][0]["weather"]["code"].as<int>() | 0);
+            strlcpy(state.weather.descript, weather["data"][0]["weather"]["description"] | "", sizeof(state.weather.descript));
+            state.weather.temp       = weather["data"][0]["temp"] | 40400.0;
+            state.weather.hum        = weather["data"][0]["rh"] | 40400.0;
+            state.weather.pres       = weather["data"][0]["pres"] | 40400.0;
+            state.weather.wind.speed = weather["data"][0]["wind_spd"] | -1.0;
+            state.weather.wind.dir   = weather["data"][0]["wind_dir"] | -1;
+            const char* pod          = weather["data"][0]["pod"] | "";
+            state.weather.isDay      = (String(pod) == String('d')) ? true : false;
+            //_country          = weather["data"][0]["country_code"].as<String>();
+            //_city             = weather["data"][0]["city_name"].as<String>();
+            state.weather.icon       = _weatherbitIcon(weather["data"][0]["weather"]["code"].as<int>() | 0);
         }
 
         if(config.weather_provider() == OPEN_METEO) {
-            _description      = _openMeteoCode2Description(weather["current"]["weather_code"] | 0);
-            _currentTemp      = weather["current"]["temperature_2m"] | 40400.0;
-            _currentHum       = weather["current"]["relative_humidity_2m"] | 40400.0;
-            _currentPres      = weather["current"]["pressure_msl"] | 40400.0;
-            _currentWindSpeed = weather["current"]["wind_speed_10m"] | -1.0;
-            _currentWindDir   = weather["current"]["wind_direction_10m"] | -1;
-            _is_day           = weather["current"]["is_day"] == 0 ? false : true;
-            _currentIcon      = _openMeteoIcon(weather["current"]["weather_code"] | 0);
+            String descr        = _openMeteoCode2Description(weather["current"]["weather_code"] | 0);
+            strlcpy(state.weather.descript, descr, sizeof(state.weather.descript));
+            state.weather.temp       = weather["current"]["temperature_2m"] | 40400.0;
+            state.weather.hum        = weather["current"]["relative_humidity_2m"] | 40400.0;
+            state.weather.pres       = weather["current"]["pressure_msl"] | 40400.0;
+            state.weather.wind.speed = weather["current"]["wind_speed_10m"] | -1.0;
+            state.weather.wind.dir   = weather["current"]["wind_direction_10m"] | -1;
+            state.weather.isDay      = weather["current"]["is_day"] == 0 ? false : true;
+            state.weather.icon       = _openMeteoIcon(weather["current"]["weather_code"] | 0);
         }
 
         httpData = "";
-        _currentUpdated = now();
+        state.weather.time = now();
         Serial.print("Current weather updated successfully at: ");
         Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
     }
@@ -282,6 +275,7 @@ void Weather::update() {
     #if !defined(BIM32_CYD)
         }
     #endif
+    state.weather.updated = true;
 }
 
 /**
@@ -348,13 +342,13 @@ void Weather::_updateWeatherbitDaily(void) {
             return;
         }
         for(unsigned int i=0; i<DAYS; i++) {
-            _dailyDayTemp[i]   = forecast["data"][i]["high_temp"] | 40400.0;
-            _dailyNightTemp[i] = forecast["data"][i]["min_temp"] | 40400.0;
-            _dailyWindSpeed[i] = forecast["data"][i]["wind_spd"] | -1.0;
-            _dailyIcon[i]      = _weatherbitIcon(forecast["data"][i]["weather"]["code"].as<int>() | 0);
+            state.weather.daily.tMax[i] = forecast["data"][i]["high_temp"] | 40400.0;
+            state.weather.daily.tMin[i] = forecast["data"][i]["min_temp"] | 40400.0;
+            state.weather.daily.wind[i] = forecast["data"][i]["wind_spd"] | -1.0;
+            state.weather.daily.icon[i] = _weatherbitIcon(forecast["data"][i]["weather"]["code"].as<int>() | 0);
         }
         httpData = "";
-        _dailyUpdated = now();
+        state.weather.daily.time = now();
         Serial.print("Weatherbit.io: daily forecast updated successfully at: ");
         Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
     }
@@ -369,34 +363,37 @@ void Weather::_updateOpenweathermapHourly(void) {
     Serial.println(SEPARATOR);
     Serial.println("Hourly forecast update... ");
 
-    if(_lat.length() and _lon.length()) {
-        OW_Weather ow;
-        OW_forecast  *forecast;
-        forecast = new OW_forecast;
-        bool parsed = ow.getForecast(forecast, config.weather_appid(OPENWEATHERMAP), _lat, _lon, "metric", "en", false);
+    OW_Weather ow;
+    OW_forecast  *forecast;
+    forecast = new OW_forecast;
+    bool parsed = ow.getForecast(
+        forecast, 
+        config.weather_appid(OPENWEATHERMAP), 
+        String(_lat), 
+        String(_lon), 
+        "metric", "en", false
+    );
 
-        if(parsed) {
-            _hourlyUpdated = now();
+    if(parsed) {
+        state.weather.hourly.time = now();
 
-            for(unsigned int n=0; n<DAYS*8; n++) {
-                _hourlyDate[n] = forecast->dt[n];
-                _hourlyIcon[n] = forecast->icon[n].toInt();
-                _hourlyTemp[n] = forecast->temp[n];
-                _hourlyPres[n] = forecast->pressure[n];
-                _hourlyWindSpeed[n] = round(forecast->wind_speed[n]);
-                _hourlyWindDir[n] = forecast->wind_deg[n];
-                _hourlyPrec[n] = forecast->prec[n];
-            }
-
-            Serial.print("Hourly forecast updated successfully at: ");
-            Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
-
-            _calculateDaily();
+        for(unsigned int n=0; n<DAYS*8; n++) {
+            state.weather.hourly.date[n] = forecast->dt[n];
+            state.weather.hourly.icon[n] = forecast->icon[n].toInt();
+            state.weather.hourly.temp[n] = forecast->temp[n];
+            state.weather.hourly.pres[n] = forecast->pressure[n];
+            state.weather.hourly.windSpeed[n] = round(forecast->wind_speed[n]);
+            state.weather.hourly.windDir[n] = forecast->wind_deg[n];
+            state.weather.hourly.prec[n] = forecast->prec[n];
         }
-        else Serial.println("Hourly forecast update error");
-        delete forecast;
+
+        Serial.print("Hourly forecast updated successfully at: ");
+        Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
+
+        _calculateDaily();
     }
-    else Serial.println("City undefined");
+    else Serial.println("Hourly forecast update error");
+    delete forecast;
 }
 
 /**
@@ -429,13 +426,13 @@ void Weather::_updateOpenMeteoDaily() {
             return;
         }
         for(unsigned int i=0; i<DAYS; i++) {
-            _dailyDayTemp[i]   = forecast["daily"]["temperature_2m_max"][i] | 40400.0;
-            _dailyNightTemp[i] = forecast["daily"]["temperature_2m_min"][i] | 40400.0;
-            _dailyWindSpeed[i] = forecast["daily"]["wind_speed_10m_max"][i] | -1.0;
-            _dailyIcon[i]      = _openMeteoIcon(forecast["daily"]["weather_code"][i] | 0);
+            state.weather.daily.tMax[i] = forecast["daily"]["temperature_2m_max"][i] | 40400.0;
+            state.weather.daily.tMin[i] = forecast["daily"]["temperature_2m_min"][i] | 40400.0;
+            state.weather.daily.wind[i] = forecast["daily"]["wind_speed_10m_max"][i] | -1.0;
+            state.weather.daily.icon[i] = _openMeteoIcon(forecast["daily"]["weather_code"][i] | 0);
         }
         httpData = "";
-        _dailyUpdated = now();
+        state.weather.daily.time = now();
         Serial.print("Open-meteo.com: daily forecast updated successfully at: ");
         Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
     }
@@ -490,20 +487,20 @@ void Weather::_updateOpenMeteoHourly() {
                     time_t utc = forecast["utc_offset_seconds"] | 0;
                     uint8_t hr = hour(time + utc);
                     if(hr % 3 == 0 && (time + utc) >= now()) {
-                        _hourlyDate[n] = forecast["hourly"]["time"][i] | 0;
-                        _hourlyDate[n] += utc;
+                        state.weather.hourly.date[n] = forecast["hourly"]["time"][i] | 0;
+                        state.weather.hourly.date[n] += utc;
                         timePoint[n] = i;
                         if(n<39) n++;
                         else break;
                     }
                 }
                 else if(timePoint[n] == i) {
-                    if(f == 1) _hourlyTemp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
-                    if(f == 4) _hourlyPres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
-                    if(f == 5) _hourlyWindSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
-                    if(f == 6) _hourlyWindDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
-                    if(f == 2) _hourlyPrec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
-                    if(f == 3) _hourlyIcon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
+                    if(f == 1) state.weather.hourly.temp[n] = forecast["hourly"]["temperature_2m"][i] | 40400.0;
+                    if(f == 4) state.weather.hourly.pres[n] = forecast["hourly"]["surface_pressure"][i] | 40400.0;
+                    if(f == 5) state.weather.hourly.windSpeed[n] = forecast["hourly"]["wind_speed_10m"][i] | -1.0;
+                    if(f == 6) state.weather.hourly.windDir[n] = forecast["hourly"]["wind_direction_10m"][i] | 0.0;
+                    if(f == 2) state.weather.hourly.prec[n] = forecast["hourly"]["precipitation_probability"][i] | 0.0;
+                    if(f == 3) state.weather.hourly.icon[n] = _openMeteoIcon(forecast["hourly"]["weather_code"][i] | 0);
                     if(n<39) n++;
                     else break;
                 }  
@@ -511,7 +508,7 @@ void Weather::_updateOpenMeteoHourly() {
         }
         
         httpData = "";
-        _hourlyUpdated = now();
+        state.weather.hourly.time = now();
         Serial.print("Open-meteo.com: hourly forecast updated successfully at: ");
         Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
     }
@@ -525,25 +522,25 @@ void Weather::_updateOpenMeteoHourly() {
 void Weather::_calculateDaily(void) {
     Serial.print("Calculate daily forecast... ");
     for(unsigned int i=0; i<DAYS; i++) {
-        _dailyDayTemp[i] = -40400.0;
-        _dailyNightTemp[i] = 40400.0;
-        _dailyWindSpeed[i] = -1.0;
-        _dailyIcon[i] = 0;
+        state.weather.daily.tMax[i] = -40400.0;
+        state.weather.daily.tMin[i] = 40400.0;
+        state.weather.daily.wind[i] = -1.0;
+        state.weather.daily.icon[i] = 0;
     }
     for(unsigned int i=0; i<DAYS*8; i++) {
-        unsigned int wd = weekday(_currentDate);
+        unsigned int wd = weekday(state.weather.time);
         if(i == 0) {
-            _dailyDayTemp[0] = _currentTemp;;
-            _dailyNightTemp[0] = _currentTemp;;
-            _dailyIcon[0] = _currentIcon;
-            _dailyWindSpeed[0] = _currentWindSpeed;
+            state.weather.daily.tMax[0] = state.weather.temp;
+            state.weather.daily.tMin[0] = state.weather.temp;
+            state.weather.daily.icon[0] = state.weather.icon;
+            state.weather.daily.wind[0] = state.weather.wind.speed;
         }
         for(unsigned int k=0; k<DAYS; k++) {
-            if(weekday(_hourlyDate[i]) == wd) {
-                if(_dailyDayTemp[k] < _hourlyTemp[i]) _dailyDayTemp[k] = _hourlyTemp[i];
-                if(_dailyNightTemp[k] > _hourlyTemp[i]) _dailyNightTemp[k] = _hourlyTemp[i];
-                if(_dailyIcon[k] < _hourlyIcon[i]) _dailyIcon[k] = _hourlyIcon[i];
-                if(_dailyWindSpeed[k] < _hourlyWindSpeed[i]) _dailyWindSpeed[k] = _hourlyWindSpeed[i];
+            if(weekday(state.weather.hourly.date[i]) == wd) {
+                if(state.weather.daily.tMax[k] < state.weather.hourly.temp[i]) state.weather.daily.tMax[k] = state.weather.hourly.temp[i];
+                if(state.weather.daily.tMin[k] > state.weather.hourly.temp[i]) state.weather.daily.tMin[k] = state.weather.hourly.temp[i];
+                if(state.weather.daily.icon[k] < state.weather.hourly.icon[i]) state.weather.daily.icon[k] = state.weather.hourly.icon[i];
+                if(state.weather.daily.wind[k] < state.weather.hourly.windSpeed[i]) state.weather.daily.wind[k] = state.weather.hourly.windSpeed[i];
             }
             if(++wd > 7) wd = 1;
         }
@@ -555,92 +552,92 @@ void Weather::_calculateDaily(void) {
  * Getters 
  */
 float Weather::get_currentTemp(bool corr) {
-    return _currentTemp + (corr ? config.weather_temp_corr() : 0.0);
+    return state.weather.temp + (corr ? config.weather_temp_corr() : 0.0);
 }
 
 float Weather::get_currentHum(bool corr) {
-    return _currentHum + (corr ? config.weather_hum_corr() : 0.0);
+    return state.weather.hum + (corr ? config.weather_hum_corr() : 0.0);
 }
 
 float Weather::get_currentPres(bool corr) {
-    return _currentPres + (corr ? config.weather_pres_corr() : 0.0);
+    return _state.weather.pres + (corr ? config.weather_pres_corr() : 0.0);
 }
 
 float Weather::get_currentWindSpeed() {
-    return _currentWindSpeed;
+    return state.weather.wind.speed;
 }
 
 int Weather::get_currentWindDir() {
-    return _currentWindDir;
+    return state.weather.wind.dir;
 }
 
 unsigned int Weather::get_currentIcon() {
-    return _convertIcon(_currentIcon);
+    return _convertIcon(state.weather.icon);
 }
 
 bool Weather::get_isDay() {
-    return _is_day;
+    return state.weather.isDay;
 }
 
 String Weather::get_description() {
-    return _description;
+    return String(state.weather.descript);
 }
 
 time_t Weather::get_currentUpdated() {
-    return _currentUpdated;
+    return state.weather.time;
 }
 
 float Weather::get_dailyDayTemp(unsigned int num) {
     if(num >= DAYS) return 40400.0;
-    return _dailyDayTemp[num];
+    return state.weather.daily.tMax[num];
 }
 
 float Weather::get_dailyNightTemp(unsigned int num) {
     if(num >= DAYS) return 40400.0;
-    return _dailyNightTemp[num];
+    return state.weather.daily.tMin[num];
 }
 
 float Weather::get_dailyWindSpeed(unsigned int num) {
     if(num >= DAYS) return -1.0;
-    return _dailyWindSpeed[num];
+    return state.weather.daily.wind[num];
 }
 
 unsigned int Weather::get_dailyIcon(unsigned int num) {
     if(num >= DAYS) return 0;
-    return _convertIcon(_dailyIcon[num]);
+    return _convertIcon(state.weather.daily.icon[num]);
 }
 
 unsigned int Weather::get_hourlyDate(unsigned int num) {
     if(num >= DAYS * 8) return 0;
-    return _hourlyDate[num];
+    return state.weather.hourly.date[num];
 }
 
 unsigned int Weather::get_hourlyIcon(unsigned int num) {
     if(num >= DAYS * 8) return 0;
-    return _hourlyIcon[num];
+    return state.weather.hourly.icon[num];
 }
 
 float Weather::get_hourlyTemp(unsigned int num) {
     if(num >= DAYS * 8) return 40400.0;
-    return _hourlyTemp[num];
+    return state.weather.hourly.temp[num];
 }
 
 float Weather::get_hourlyPres(unsigned int num) {
     if(num >= DAYS * 8) return 40400.0;
-    return _hourlyPres[num];
+    return state.weather.hourly.pres[num];
 }
 
 float Weather::get_hourlyWindSpeed(unsigned int num) {
     if(num >= DAYS * 8) return -1.0;
-    return _hourlyWindSpeed[num];
+    return state.weather.hourly.windSpeed[num];
 }
 
 int Weather::get_hourlyWindDir(unsigned int num) {
     if(num >= DAYS * 8) return -1;
-    return _hourlyWindDir[num];
+    return state.weather.hourly.windDir[num];
 }
 
 float Weather::get_hourlyPrec(unsigned int num) {
     if(num >= DAYS * 8) return -1.0;
-    return _hourlyPrec[num];
+    return state.weather.hourly.prec[num];
 }

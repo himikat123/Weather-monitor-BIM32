@@ -1,10 +1,11 @@
 #pragma once
 
-#define SSID_COUNT 30
-#define SSID_LEN   33
-#define IP_LEN     16
-#define MAC_LEN    18
-#define W_NAME_LEN 32
+#define SSID_COUNT   30
+#define SSID_LEN     33
+#define IP_LEN       16
+#define MAC_LEN      18
+#define W_NAME_LEN   32
+#define HOURLY_COUNT 40
 
 struct ESP32State {
     float temp = 40400.0;
@@ -167,7 +168,7 @@ struct WeatherState {
     float pres = 40400.0;
     unsigned int icon = 1;
     bool isDay = true;
-    char descript[64] = "----";
+    char descript[128] = "----";
     time_t time = 0;
     bool updated = false;
 
@@ -186,6 +187,7 @@ struct WeatherState {
         float tMin[5] = { 40400.0, 40400.0, 40400.0, 40400.0, 40400.0 };
         float wind[5] = { -1.0, -1.0, -1.0, -1.0, -1.0 };
         unsigned int icon[5] = { 0, 0, 0, 0, 0 };
+        time_t time = 0;
 
         void toJson(JsonObject o) const {
             JsonArray a_tMax = o.createNestedArray("tMax");
@@ -200,6 +202,17 @@ struct WeatherState {
             }
         }
     } daily;
+
+    struct Hourly {
+        time_t date[HOURLY_COUNT] = { 0 };
+        unsigned int icon[HOURLY_COUNT] = { 0 };
+        float temp[HOURLY_COUNT] = { 0 };
+        float pres[HOURLY_COUNT] = { 0 };
+        float windSpeed[HOURLY_COUNT] = { 0 };
+        int windDir[HOURLY_COUNT] = { 0 };
+        float prec[HOURLY_COUNT] = { 0 };
+        time_t time = 0;
+    } hourly;
 
     void toJson(JsonObject obj) const {
         JsonObject o = obj.createNestedObject("weather");

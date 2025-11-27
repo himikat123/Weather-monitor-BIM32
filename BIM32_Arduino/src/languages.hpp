@@ -84,7 +84,7 @@ class Lang {
             {"Air is heavily polluted", "Luft ist stark verschmutzt", "Воздух сильно загрязнен", "Powietrze silnie zanieczyszczone", "Повітря сильно забруднене", "Въздухът е силно замърсен", "Aire muy contaminado"}
         };
 
-        String _weatherDescription[16][7] = {
+        static constexpr const char* _weatherDescription[16][7] = {
             {"Clear sky", "Klarer Himmel", "Ясно", "Czyste Niebo", "Ясно", "Ясно", "Despejado"},
             {"Mainly clear", "Überwiegend klar", "Преимущественно ясно", "Głównie jasne", "Переважно ясно", "Предимно ясно", "Mayormente despejado"},
             {"Partly cloudy", "Teilweise bewölkt", "Переменная облачность", "Częściowe zachmurzenie", "Мінлива хмарність", "Предимно облачно", "Parcialmente nublado"},
@@ -223,7 +223,7 @@ class Lang {
             return _airQuality[level - 1][_lang()];
         }
 
-        String weatherDescription(unsigned int level) {
+        const char* weatherDescription(unsigned int level) {
             if(level > 15) return "???";
             return _weatherDescription[level][_lang()];
         }
