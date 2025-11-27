@@ -244,7 +244,7 @@ void Weather::update() {
         }
 
         if(config.weather_provider() == OPEN_METEO) {
-            String descr        = _openMeteoCode2Description(weather["current"]["weather_code"] | 0);
+            const char* descr              = _openMeteoCode2Description(weather["current"]["weather_code"] | 0);
             strlcpy(state.weather.descript, descr, sizeof(state.weather.descript));
             state.weather.temp       = weather["current"]["temperature_2m"] | 40400.0;
             state.weather.hum        = weather["current"]["relative_humidity_2m"] | 40400.0;
@@ -560,7 +560,7 @@ float Weather::get_currentHum(bool corr) {
 }
 
 float Weather::get_currentPres(bool corr) {
-    return _state.weather.pres + (corr ? config.weather_pres_corr() : 0.0);
+    return state.weather.pres + (corr ? config.weather_pres_corr() : 0.0);
 }
 
 float Weather::get_currentWindSpeed() {

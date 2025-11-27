@@ -1,3 +1,22 @@
+static const char* weatherDescription[16][7] PROGMEM = {
+    {"Clear sky", "Klarer Himmel", "Ясно", "Czyste Niebo", "Ясно", "Ясно", "Despejado"},
+    {"Mainly clear", "Überwiegend klar", "Преимущественно ясно", "Głównie jasne", "Переважно ясно", "Предимно ясно", "Mayormente despejado"},
+    {"Partly cloudy", "Teilweise bewölkt", "Переменная облачность", "Częściowe zachmurzenie", "Мінлива хмарність", "Предимно облачно", "Parcialmente nublado"},
+    {"Overcast", "Bedeckt", "Пасмурно", "Pochmurny", "Хмарно", "Облачно", "Nublado"},
+    {"Fog", "Nebel", "Туман", "Mgła", "Туман", "Мъгла", "Neblina"},
+    {"Depositing rime fog", "Ablagerung von Raureifnebel", "Туман с инеем", "Deponująca się mgła szronowa", "Туман з інеєм", "Мъгла със скреж", "Escarcha"},
+    {"Drizzle", "Nieselregen", "Морось", "Mżawka", "Мряка", "Дъжд", "Llovizna"},
+    {"Freezing drizzle", "Gefrierender Nieselregen", "Изморозь", "Marznąca mżawka", "Ізморозь", "Скреж", "Llovizna helada"},
+    {"Rain", "Regen", "Дождь", "Deszcz", "Дощ", "Дъжд", "Lluvia"},
+    {"Freezing rain", "Gefrierender Regen", "Ледяной дождь", "Marznący deszcz", "Крижаний дощ", "Леден дъжд", "Lluvia helada"},
+    {"Snowfall", "Schneefall", "Снегопад", "Opady śniegu", "Снігопад", "Снеговалеж", "Nevada"},
+    {"Snow grains", "Schneekörner", "Снежные зерна", "Ziarna śniegu", "Снігові зерна", "Скреж", "Copos de nieve"},
+    {"Rain showers", "Regenschauer", "Ливень", "Przelotne opady deszczu", "Злива", "Ръмеж", "Chubascos"},
+    {"Snow showers", "Schneeschauer", "Сильный снегопад", "Opady śniegu", "Сильний снігопад", "Обилен снеговалеж", "Tormenta de nieve"},
+    {"Thunderstorm", "Gewitter", "Гроза", "Burza z piorunami", "Гроза", "Буря", "Tormenta eléctrica"},
+    {"Thunderstorm with hail", "Gewitter mit Hagel", "Гроза с градом", "Burza z gradem", "Гроза з градом", "Буря с градушка", "Tormenta eléctrica con granizo"}
+};
+
 class Lang {
     private:
         /* English, German, Russian, Polish, Ukrainian, Bulgarian, Spanish */
@@ -84,24 +103,6 @@ class Lang {
             {"Air is heavily polluted", "Luft ist stark verschmutzt", "Воздух сильно загрязнен", "Powietrze silnie zanieczyszczone", "Повітря сильно забруднене", "Въздухът е силно замърсен", "Aire muy contaminado"}
         };
 
-        static constexpr const char* _weatherDescription[16][7] = {
-            {"Clear sky", "Klarer Himmel", "Ясно", "Czyste Niebo", "Ясно", "Ясно", "Despejado"},
-            {"Mainly clear", "Überwiegend klar", "Преимущественно ясно", "Głównie jasne", "Переважно ясно", "Предимно ясно", "Mayormente despejado"},
-            {"Partly cloudy", "Teilweise bewölkt", "Переменная облачность", "Częściowe zachmurzenie", "Мінлива хмарність", "Предимно облачно", "Parcialmente nublado"},
-            {"Overcast", "Bedeckt", "Пасмурно", "Pochmurny", "Хмарно", "Облачно", "Nublado"},
-            {"Fog", "Nebel", "Туман", "Mgła", "Туман", "Мъгла", "Neblina"},
-            {"Depositing rime fog", "Ablagerung von Raureifnebel", "Туман с инеем", "Deponująca się mgła szronowa", "Туман з інеєм", "Мъгла със скреж", "Escarcha"},
-            {"Drizzle", "Nieselregen", "Морось", "Mżawka", "Мряка", "Дъжд", "Llovizna"},
-            {"Freezing drizzle", "Gefrierender Nieselregen", "Изморозь", "Marznąca mżawka", "Ізморозь", "Скреж", "Llovizna helada"},
-            {"Rain", "Regen", "Дождь", "Deszcz", "Дощ", "Дъжд", "Lluvia"},
-            {"Freezing rain", "Gefrierender Regen", "Ледяной дождь", "Marznący deszcz", "Крижаний дощ", "Леден дъжд", "Lluvia helada"},
-            {"Snowfall", "Schneefall", "Снегопад", "Opady śniegu", "Снігопад", "Снеговалеж", "Nevada"},
-            {"Snow grains", "Schneekörner", "Снежные зерна", "Ziarna śniegu", "Снігові зерна", "Скреж", "Copos de nieve"},
-            {"Rain showers", "Regenschauer", "Ливень", "Przelotne opady deszczu", "Злива", "Ръмеж", "Chubascos"},
-            {"Snow showers", "Schneeschauer", "Сильный снегопад", "Opady śniegu", "Сильний снігопад", "Обилен снеговалеж", "Tormenta de nieve"},
-            {"Thunderstorm", "Gewitter", "Гроза", "Burza z piorunami", "Гроза", "Буря", "Tormenta eléctrica"},
-            {"Thunderstorm with hail", "Gewitter mit Hagel", "Гроза с градом", "Burza z gradem", "Гроза з градом", "Буря с градушка", "Tormenta eléctrica con granizo"}
-        };
 
         String _alarm[7] = {"Alarm", "Wecker", "Будильник", "Budzik", "Будильник", "Будилник", "Alarma"};
         String _network[7] = {"Network", "Netzwerk", "Сеть", "Sieć", "Мережа", "Мрежа", "Red"};
@@ -225,7 +226,7 @@ class Lang {
 
         const char* weatherDescription(unsigned int level) {
             if(level > 15) return "???";
-            return _weatherDescription[level][_lang()];
+            return ::weatherDescription[level][_lang()];
         }
 
         String touchCalibrate() {

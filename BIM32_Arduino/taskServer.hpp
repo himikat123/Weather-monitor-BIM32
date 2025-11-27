@@ -31,25 +31,14 @@ void TaskServer(void *pvParameters) {
                 JsonDocument doc;
                 JsonObject root = doc.to<JsonObject>();
 
-                //json["state"] = web_isLogged(false) ? "OK" : "LOGIN";
                 doc["runtime"] = round(millis() / 1000);
                 doc["heap"] = ESP.getFreeHeap();
                 doc["time"] = now();
 
-                //for(unsigned int i=0; i<global.nets; i++) {
-                //    json["ssids"][i][0] = global.ssids[i];
-                //    json["ssids"][i][1] = global.rssis[i];  
-                //}
-                //json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
-                //json["network"]["ch"] = WiFi.channel();
-                //json["network"]["sig"] = WiFi.RSSI();
-                //json["network"]["mac"] = WiFi.macAddress();
-                //json["network"]["ip"] = WiFi.localIP().toString();
-                //json["network"]["mask"] = WiFi.subnetMask().toString();
-                //json["network"]["gw"] = WiFi.gatewayIP().toString();
-                //json["network"]["dns1"] = WiFi.dnsIP().toString();
-                //json["network"]["dns2"] = WiFi.dnsIP().toString();
-
+                if(state.network.updated) {
+                    state.network.toJson(root);
+                    state.network.updated = false;
+                }
                 if(state.bme280.updated) {
                     state.bme280.toJson(root);
                     state.bme280.updated = false;

@@ -109,8 +109,8 @@ Comfort comfort;
 #include "src/websocket.hpp"
 WebSocket websocket(88, 1);
 
-#include "taskdisplay.hpp"
-#include "tasksensors.hpp"
+#include "taskDisplay.hpp"
+#include "taskSensors.hpp"
 #include "taskserver.hpp"
 
 /**

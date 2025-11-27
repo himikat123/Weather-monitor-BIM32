@@ -48,9 +48,9 @@ static struct {
     bool net_connected = false; // Is the device connected to the network?
     uint32_t disp_autoOff[2] = {0, 0}; // Displays auto off interval counter
     bool reduc[2] = {false, false};
-    char ssids[30][33]; // List of available networks
-    unsigned int rssis[30]; // List of signal strengths of available networks
-    unsigned int nets = 0; // Number of available networks
+    //char ssids[30][33]; // List of available networks
+    //unsigned int rssis[30]; // List of signal strengths of available networks
+    //unsigned int nets = 0; // Number of available networks
     bool apMode = false; // Access point mode
     bool display_btn_pressed[2] = {false, false}; // display (1, 2) button pressed flag
     uint8_t display_state[2] = {1, 1}; // display on/off: 0: nothing do, 1: turn on, 2: turn off
@@ -744,7 +744,7 @@ class Configuration {
         return String(_network_dns2);
     }
 
-    char* accessPoint_ssid() {
+    const char* accessPoint_ssid() {
         if(String(_accessPoint_ssid).length()) return _accessPoint_ssid;
         else return (char*) "BIM32";
     }

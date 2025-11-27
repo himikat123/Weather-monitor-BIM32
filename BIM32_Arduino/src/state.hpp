@@ -17,6 +17,7 @@ struct ESP32State {
 };
 
 struct NetworkState {
+    bool updated = false;
     char ssid[SSID_LEN] = "";
     unsigned int ch = 0;
     int sig = 0;
@@ -27,8 +28,9 @@ struct NetworkState {
     char dns1[IP_LEN] = "";
     char dns2[IP_LEN] = "";
 
-    char ssids[SSID_COUNT][SSID_LEN] = { 0 };
-    int rssis[SSID_COUNT] = { 0 };
+    unsigned int nets = 0; // Number of available networks
+    char ssids[SSID_COUNT][SSID_LEN] = { 0 }; // List of available networks
+    int rssis[SSID_COUNT] = { 0 }; // List of signal strengths of available networks
 
     void toJson(JsonObject o) const {
         o["network"]["ssid"] = ssid;
@@ -42,10 +44,10 @@ struct NetworkState {
         o["network"]["dns2"] = dns2;
 
         JsonArray a_ssids = o.createNestedArray("ssids");
-        for(int i=0; i<SSID_COUNT; i++) {
-            JsonArray entry = a_ssids.createNestedArray();
-            entry.add(ssids[i]);
-            entry.add(rssis[i]);
+        for(int i=0; i<nets; i++) {
+            JsonArray s = a_ssids.createNestedArray();
+            s.add(ssids[i]);
+            s.add(rssis[i]);
         }
     }
 };

@@ -137,10 +137,10 @@ void Network::runAccessPoint() {
  * Scan available networks
  */
 void Network::scanNetworks() {
-    global.nets = WiFi.scanNetworks();
-    if(global.nets > 29) global.nets = 29;
-    for(unsigned int i=0; i<global.nets; i++) {
-        WiFi.SSID(i).toCharArray(global.ssids[i], sizeof(global.ssids[i]));
-        global.rssis[i] = abs(WiFi.RSSI(i));
+    state.network.nets = WiFi.scanNetworks();
+    if(state.network.nets > 30) state.network.nets = 30;
+    for(unsigned int i=0; i< state.network.nets; i++) {
+        WiFi.SSID(i).toCharArray(state.network.ssids[i], sizeof(state.network.ssids[i]));
+        state.network.rssis[i] = abs(WiFi.RSSI(i));
     }
 }

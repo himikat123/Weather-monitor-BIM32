@@ -191,19 +191,19 @@ void web_sens() {
         json["cyd"] = 1;
     #endif
 
-    for(unsigned int i=0; i<global.nets; i++) {
-        json["ssids"][i][0] = global.ssids[i];
-        json["ssids"][i][1] = global.rssis[i];  
-    }
-    json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
-    json["network"]["ch"] = WiFi.channel();
-    json["network"]["sig"] = WiFi.RSSI();
-    json["network"]["mac"] = WiFi.macAddress();
-    json["network"]["ip"] = WiFi.localIP().toString();
-    json["network"]["mask"] = WiFi.subnetMask().toString();
-    json["network"]["gw"] = WiFi.gatewayIP().toString();
-    json["network"]["dns1"] = WiFi.dnsIP().toString();
-    json["network"]["dns2"] = WiFi.dnsIP().toString();
+    // for(unsigned int i=0; i<global.nets; i++) {
+    //     json["ssids"][i][0] = global.ssids[i];
+    //     json["ssids"][i][1] = global.rssis[i];  
+    // }
+    // json["network"]["ssid"] = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
+    // json["network"]["ch"] = WiFi.channel();
+    // json["network"]["sig"] = WiFi.RSSI();
+    // json["network"]["mac"] = WiFi.macAddress();
+    // json["network"]["ip"] = WiFi.localIP().toString();
+    // json["network"]["mask"] = WiFi.subnetMask().toString();
+    // json["network"]["gw"] = WiFi.gatewayIP().toString();
+    // json["network"]["dns1"] = WiFi.dnsIP().toString();
+    // json["network"]["dns2"] = WiFi.dnsIP().toString();
 
     // json["bme280"]["temp"] = sensors.get_bme280_temp(RAW);
     // json["bme280"]["hum"] = sensors.get_bme280_hum(RAW);
@@ -230,21 +230,21 @@ void web_sens() {
         json["thing"]["data"][i] = thingspeak.get_field(i);
     }
 
-    json["weather"]["temp"] = weather.get_currentTemp(RAW);
-    json["weather"]["hum"] = weather.get_currentHum(RAW);
-    json["weather"]["pres"] = weather.get_currentPres(RAW);
-    json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
-    json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
-    json["weather"]["descript"] = weather.get_description();
-    json["weather"]["time"] = weather.get_currentUpdated();
-    json["weather"]["icon"] = weather.get_currentIcon();
-    json["weather"]["isDay"] = weather.get_isDay();
-    for(uint8_t i=0; i<4; i++) {
-        json["weather"]["daily"]["tMax"][i] = weather.get_dailyDayTemp(i);
-        json["weather"]["daily"]["tMin"][i] = weather.get_dailyNightTemp(i);
-        json["weather"]["daily"]["wind"][i] = weather.get_dailyWindSpeed(i);
-        json["weather"]["daily"]["icon"][i] = weather.get_dailyIcon(i);
-    }
+    // json["weather"]["temp"] = weather.get_currentTemp(RAW);
+    // json["weather"]["hum"] = weather.get_currentHum(RAW);
+    // json["weather"]["pres"] = weather.get_currentPres(RAW);
+    // json["weather"]["wind"]["speed"] = weather.get_currentWindSpeed();
+    // json["weather"]["wind"]["dir"] = weather.get_currentWindDir();
+    // json["weather"]["descript"] = weather.get_description();
+    // json["weather"]["time"] = weather.get_currentUpdated();
+    // json["weather"]["icon"] = weather.get_currentIcon();
+    // json["weather"]["isDay"] = weather.get_isDay();
+    // for(uint8_t i=0; i<4; i++) {
+    //     json["weather"]["daily"]["tMax"][i] = weather.get_dailyDayTemp(i);
+    //     json["weather"]["daily"]["tMin"][i] = weather.get_dailyNightTemp(i);
+    //     json["weather"]["daily"]["wind"][i] = weather.get_dailyWindSpeed(i);
+    //     json["weather"]["daily"]["icon"][i] = weather.get_dailyIcon(i);
+    // }
 
     for(unsigned int i=0; i<WSENSORS; i++) {
         json["wsensor"]["time"][i] = wsensor.get_updated(i);
