@@ -300,6 +300,7 @@ struct FilesystemState {
     unsigned int free = 0;
     char list[2048] = "";
     bool updated = false;
+    bool fsInfoUpdate = true;
 
     void toJson(JsonObject obj) const {
         JsonObject o = obj.createNestedObject("fs");

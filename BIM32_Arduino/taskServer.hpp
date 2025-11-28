@@ -6,6 +6,41 @@ void updateIfNeeded(T& sensor, JsonObject& root) {
     }
 }
 
+/**
+ * Update filelist
+ */
+void appendToFsList(const char* text) {
+    strncat(state.filesystem.list, text, sizeof(state.filesystem.list) - strlen(state.filesystem.list) - 1);
+}
+void listAllFilesInDir(const char* dirname) {
+    File root = LittleFS.open(dirname);
+    if(!root) return;
+    if(!root.isDirectory()) return;
+
+    File file = root.openNextFile();
+    while(file) {
+        if(file.isDirectory()) {
+            char sub[128];
+            snprintf(sub, sizeof(sub), "%s/", file.path());
+            listAllFilesInDir(sub);
+        } 
+        else {
+            const char* filename = file.name();
+            if(strcmp(filename, "user.us") != 0) {
+                appendToFsList(dirname);
+                appendToFsList(filename);
+                appendToFsList(":");
+                char sizeBuf[16];
+                snprintf(sizeBuf, sizeof(sizeBuf), "%u", file.size());
+                appendToFsList(sizeBuf);
+                appendToFsList(",");
+            }
+        }
+        file = root.openNextFile();
+    }
+}
+
+
 void TaskServer(void *pvParameters) {
     (void) pvParameters;
     sensorsSemaphore = xSemaphoreCreateMutex();
@@ -87,21 +122,21 @@ void TaskServer(void *pvParameters) {
                 //    json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
                 //}
 
-                //if(global.fsInfoUpdate) {
-                //    web_filelist = String();
-                //    web_listAllFilesInDir("/");
-                //    fsTotal = LittleFS.totalBytes();
-                //    fsUsed = fsTotal - LittleFS.usedBytes();
-                //    global.fsInfoUpdate = false;
-                //}
-                //json["fs"]["list"] = web_filelist;
-                //json["fs"]["total"] = fsTotal;
-                //json["fs"]["free"] = fsUsed;
+                updateIfNeeded(state.filesystem, root);
 
                 String data = "";
                 serializeJson(root, data);
                 websocket.sendJson(data);
             }
+        }
+
+        if(state.filesystem.fsInfoUpdate) {
+            state.filesystem.list[0] = '\0';
+            listAllFilesInDir("/");
+            state.filesystem.total = LittleFS.totalBytes();
+            state.filesystem.free = state.filesystem.total - LittleFS.usedBytes();
+            state.filesystem.fsInfoUpdate = false;
+            state.filesystem.updated = true;
         }
 
         /**

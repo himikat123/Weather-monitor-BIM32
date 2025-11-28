@@ -56,7 +56,7 @@ static struct {
     uint8_t display_state[2] = {1, 1}; // display on/off: 0: nothing do, 1: turn on, 2: turn off
     bool alarm_but_pressed = false; // alarm button pressed flag
     bool mp3_busy = true; // mp3 player busy pin
-    bool fsInfoUpdate = true; // FS info update flag
+    //bool fsInfoUpdate = true; // FS info update flag
     unsigned int comfort = 0; // Comfort level code: 1-Comfortable, 2-Hot, 3-Cold, 4-Humid, 5-Dry, 6-Hot & Humid, 7-Hot & Dry, 8-Cold & Humid, 9-Cold & Dry
     unsigned int iaq_level = 0; // IAQ level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
     unsigned int co2_level = 0; // CO2 level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
