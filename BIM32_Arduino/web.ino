@@ -1,4 +1,3 @@
-RTC_DATA_ATTR double secretCode = esp_random();
 size_t content_len;
 File fsUploadFile;
 
@@ -20,7 +19,7 @@ bool web_isLogged(bool answer) {
     else {
         if(server.hasArg("code")) {
             String auth = server.arg("code");
-            if(auth == String(secretCode)) logged = true;
+            if(auth == String(state.secretCode)) logged = true;
             else logged = false;
         }
         else logged = false;
@@ -91,9 +90,9 @@ void web_login() {
     bool loged = false;
     if(user == config.account_name() and pass == config.account_pass()) {
         loged = true;
-        secretCode = esp_random();
+        state.secretCode = esp_random();
     }
-    server.send(200, "text/plain", loged ? ("OK:" + String(round(secretCode))) : "error:1");
+    server.send(200, "text/plain", loged ? ("OK:" + String(round(state.secretCode))) : "error:1");
 }
 
 /**

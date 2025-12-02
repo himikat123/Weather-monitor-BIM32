@@ -73,6 +73,15 @@ void TaskServer(void *pvParameters) {
                 JsonDocument doc;
                 JsonObject root = doc.to<JsonObject>();
 
+                if(websocket.available()) {
+                    String msg = websocket.read();
+                    if(msg.length()) {
+                        doc["state"] = (String(state.secretCode) == msg) ? "OK" : "LOGIN";
+                        Serial.println(String(state.secretCode));
+                        Serial.println(msg);
+                    }
+                }
+
                 doc["runtime"] = round(millis() / 1000);
                 doc["heap"] = ESP.getFreeHeap();
                 doc["time"] = now();

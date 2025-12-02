@@ -332,6 +332,7 @@ struct State {
     bool colorChanged = false; // timeslot color has been changed from web interface
     bool debugTouch = false;
     bool debugWether = false;
+    double secretCode = esp_random();
 
     ESP32State esp32core;
     NetworkState network;

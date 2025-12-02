@@ -3,6 +3,9 @@ class WebSocket {
         WebSocketsServer* wsServer;
         uint8_t _maxClients = 1;
         bool _active[6];
+        String _lastReceived = "";
+        bool _hasNewMessage = false;
+
         void _handleEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length);
 
     public:
@@ -12,6 +15,8 @@ class WebSocket {
         void sendText(String &msg);
         void sendJson(String &json);
         bool hasClient();
+        bool available();
+        String read();
 };
 
 void WebSocket::_handleEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
@@ -28,7 +33,8 @@ void WebSocket::_handleEvent(uint8_t num, WStype_t type, uint8_t * payload, size
         }
         case WStype_TEXT:
             Serial.printf("[WS %u] Received: %s\n", num, payload);
-            wsServer->sendTXT(num, String("{\"echo\": \"") + (char*)payload) + String("\"}");
+            _lastReceived = String((char*)payload);
+            _hasNewMessage = true;
             break;
         default: break;
     }
@@ -67,4 +73,13 @@ bool WebSocket::hasClient() {
     for(uint8_t i=0; i<_maxClients; i++)
         if(_active[i]) return true;
     return false;
+}
+
+bool WebSocket::available() {
+    return _hasNewMessage;
+}
+
+String WebSocket::read() {
+    _hasNewMessage = false;
+    return _lastReceived;
 }
