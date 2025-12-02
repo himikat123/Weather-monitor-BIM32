@@ -28,13 +28,12 @@ class AgregateLcdData {
 float AgregateLcdData::tempIn(float* tempSequence) {
     float temp = 40400.0;
     switch(config.display_source_tempIn_sens()) {
-        case 1: temp = weather.get_currentTemp(CORRECTED); break; /* temperature from weather forecast */
+        case 1: temp = weather.get_currentTemp(); break; /* temperature from weather forecast */
         case 2: { /* temperature from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_tempIn_wsensNum())) 
                 temp = wsensor.get_temperature(
                     config.display_source_tempIn_wsensNum(), 
-                    config.display_source_tempIn_temp(), 
-                    CORRECTED
+                    config.display_source_tempIn_temp()
                 );
         }; break;
         case 3: { /* temperature from thingspeak */
@@ -56,13 +55,12 @@ float AgregateLcdData::tempIn(float* tempSequence) {
 void AgregateLcdData::_tempSequence(float* tempSequence) {
     for(uint8_t i=0; i<4; i++) {
         switch(config.display_source_sequence_temp(i)) {
-            case 1: tempSequence[i] = weather.get_currentTemp(CORRECTED); break; /* Forecast */
+            case 1: tempSequence[i] = weather.get_currentTemp(); break; /* Forecast */
             case 2: { /* wireless sensor */
                 if(wsensor.dataRelevance(config.display_source_sequence_wsenstemp(i, 0)))
                     tempSequence[i] = wsensor.get_temperature(
                         config.display_source_sequence_wsenstemp(i, 0),
-                        config.display_source_sequence_wsenstemp(i, 1),
-                        CORRECTED
+                        config.display_source_sequence_wsenstemp(i, 1)
                     );
             }; break;
             case 3: { /* thingspeak */
@@ -89,13 +87,12 @@ void AgregateLcdData::sequenceNames(String* nameSequence) {
 float AgregateLcdData::tempOut() {
     float temp = 40400.0;;
     switch(config.display_source_tempOut_sens()) {
-        case 1: temp = weather.get_currentTemp(CORRECTED); break; /* temperature from weather forecast */
+        case 1: temp = weather.get_currentTemp(); break; /* temperature from weather forecast */
         case 2: { /* temperature from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_tempOut_wsensNum())) 
                 temp = wsensor.get_temperature(
                     config.display_source_tempOut_wsensNum(), 
-                    config.display_source_tempOut_temp(),
-                    CORRECTED
+                    config.display_source_tempOut_temp()
                 );
         }; break;
         case 3: { /* temperature from thingspeak */
@@ -116,10 +113,10 @@ float AgregateLcdData::tempOut() {
 float AgregateLcdData::humIn(float* humSequence) {
     float hum = 40400.0;
     switch(config.display_source_humIn_sens()) {
-        case 1: hum = weather.get_currentHum(CORRECTED); break; /* humudity from weather forecast */
+        case 1: hum = weather.get_currentHum(); break; /* humudity from weather forecast */
         case 2: { /* humidity from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_humIn_wsensNum()))
-                hum = wsensor.get_humidity(config.display_source_humIn_wsensNum(), CORRECTED);
+                hum = wsensor.get_humidity(config.display_source_humIn_wsensNum());
         }; break;
         case 3: { /* humidity from thingspeak */
             if(thingspeak.dataRelevance()) 
@@ -138,10 +135,10 @@ float AgregateLcdData::humIn(float* humSequence) {
 void AgregateLcdData::_humSequence(float* humSequence) {
     for(uint8_t i=0; i<4; i++) {
         switch(config.display_source_sequence_hum(i)) {
-            case 1: humSequence[i] = weather.get_currentHum(CORRECTED); break; /* Forecast */
+            case 1: humSequence[i] = weather.get_currentHum(); break; /* Forecast */
             case 2: { /* wireless sensor */
                 if(wsensor.dataRelevance(config.display_source_sequence_wsenshum(i)))
-                    humSequence[i] = wsensor.get_humidity(config.display_source_sequence_wsenshum(i), CORRECTED);
+                    humSequence[i] = wsensor.get_humidity(config.display_source_sequence_wsenshum(i));
             }; break;
             case 3: { /* thingspeak */
                 if(thingspeak.dataRelevance())
@@ -159,10 +156,10 @@ void AgregateLcdData::_humSequence(float* humSequence) {
 float AgregateLcdData::humOut() {
     float hum = 40400.0;
     switch(config.display_source_humOut_sens()) {
-        case 1: hum = weather.get_currentHum(CORRECTED); break; /* humudity from weather forecast */
+        case 1: hum = weather.get_currentHum(); break; /* humudity from weather forecast */
         case 2: { /* humidity from wireless sensor */
             if(wsensor.dataRelevance(config.display_source_humOut_wsensNum()))
-                hum = wsensor.get_humidity(config.display_source_humOut_wsensNum(), CORRECTED);
+                hum = wsensor.get_humidity(config.display_source_humOut_wsensNum());
         }; break;
         case 3: { /* humidity from thingspeak */
             if(thingspeak.dataRelevance()) 
@@ -180,10 +177,10 @@ float AgregateLcdData::humOut() {
 float AgregateLcdData::presOut() {
     float pres = 40400.0;
     switch(config.display_source_presOut_sens()) {
-        case 1: pres = weather.get_currentPres(CORRECTED); break; // pressure outside from weather forecast
+        case 1: pres = weather.get_currentPres(); break; // pressure outside from weather forecast
         case 2: { // presure outside from wireless sensor
             if(wsensor.dataRelevance(config.display_source_presOut_wsensNum()))
-                pres = wsensor.get_pressure(config.display_source_presOut_wsensNum(), CORRECTED);
+                pres = wsensor.get_pressure(config.display_source_presOut_wsensNum());
         }; break;
         case 3: { // presure outside from thingspeak
             if(thingspeak.dataRelevance()) 
@@ -202,7 +199,7 @@ float AgregateLcdData::windSpeed() {
         case 1: windSpeed = weather.get_currentWindSpeed(); break; // wind speed from weather forecast
         case 2: { // wind speed from wireless sensor
             if(wsensor.dataRelevance(config.display_source_wind_speed_wsensNum()))
-                windSpeed = wsensor.get_windSpeed(config.display_source_wind_speed_wsensNum(), CORRECTED);
+                windSpeed = wsensor.get_windSpeed(config.display_source_wind_speed_wsensNum());
         }; break;
         case 3: { // wind speed from thingspeak
             if(thingspeak.dataRelevance()) 
@@ -218,7 +215,7 @@ int AgregateLcdData::windDir() {
         case 1: windDir = weather.get_currentWindDir(); break; // wind directory from weather forecast
         case 2: { // wind directory from wireless sensor
             if(wsensor.dataRelevance(config.display_source_wind_dir_wsensNum()))
-                windDir = wsensor.get_windDir(config.display_source_wind_dir_wsensNum(), CORRECTED);
+                windDir = wsensor.get_windDir(config.display_source_wind_dir_wsensNum());
         }; break;
         case 3: { // wind directory from thingspeak
             if(thingspeak.dataRelevance()) 
@@ -243,8 +240,8 @@ String AgregateLcdData::voltage() {
         case 10: value = _dewPoint(sensors.get_dht22_temp(), sensors.get_dht22_hum()); break; // dew point from DHT22
         case 11: value = _absoluteHum(sensors.get_sht21_temp(), sensors.get_sht21_hum()); break; // absolute humidity from SHT21
         case 12: value = _dewPoint(sensors.get_sht21_temp(), sensors.get_sht21_hum()); break; // dew point from SHT21
-        case 13: value = _absoluteHum(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // absolute humidity from weather forecast
-        case 14: value = _dewPoint(weather.get_currentTemp(CORRECTED), weather.get_currentHum(CORRECTED)); break; // dew point from weather forecast
+        case 13: value = _absoluteHum(weather.get_currentTemp(), weather.get_currentHum()); break; // absolute humidity from weather forecast
+        case 14: value = _dewPoint(weather.get_currentTemp(), weather.get_currentHum()); break; // dew point from weather forecast
         default: ; break;
     }
     return value;
@@ -263,11 +260,11 @@ String AgregateLcdData::_voltageWsensor() {
                 if(validate.batPercent(prc)) value = String(prc, 0) + "%";
             }; break;
             case 2: { /* PZEM-004t voltage */
-                float hiVolt = wsensor.get_voltage(config.display_source_volt_wsensNum(), CORRECTED);
+                float hiVolt = wsensor.get_voltage(config.display_source_volt_wsensNum());
                 if(validate.volt(hiVolt)) value = String(round(hiVolt * 100) / 100) + lang.v();
             }; break;
             case 3: { /* SenseAir S8 CO2 level */
-                float co2 = wsensor.get_co2(config.display_source_volt_wsensNum(), CORRECTED);
+                float co2 = wsensor.get_co2(config.display_source_volt_wsensNum());
                 if(validate.co2(co2)) value = String((int)round(co2)) + "ppm";
             }; break;
             default: ; break;

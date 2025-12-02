@@ -9,10 +9,10 @@ class AgregateComfortData {
 float AgregateComfortData::temp() {
     float temp = 40400.0;
     switch(config.comfort_temp_source()) {
-        case 1: temp = weather.get_currentTemp(CORRECTED); break; // temperature from weather forecast
+        case 1: temp = weather.get_currentTemp(); break; // temperature from weather forecast
         case 2: // temperature from wireless sensor
             if(wsensor.dataRelevance(config.comfort_temp_wsensNum()))
-                temp = wsensor.get_temperature(config.comfort_temp_wsensNum(), config.comfort_temp_sens(), CORRECTED);
+                temp = wsensor.get_temperature(config.comfort_temp_wsensNum(), config.comfort_temp_sens());
             break;
         case 3: // temperature from thingspeak
             if(thingspeak.dataRelevance()) 
@@ -32,10 +32,10 @@ float AgregateComfortData::temp() {
 float AgregateComfortData::hum() {
     float hum = 40400.0;
     switch(config.comfort_hum_source()) {
-        case 1: hum = weather.get_currentHum(CORRECTED); break; // humidity from weather forecast
+        case 1: hum = weather.get_currentHum(); break; // humidity from weather forecast
         case 2: // humidity from wireless sensor
             if(wsensor.dataRelevance(config.comfort_hum_wsensNum()))
-                hum = wsensor.get_humidity(config.comfort_hum_wsensNum(), CORRECTED);
+                hum = wsensor.get_humidity(config.comfort_hum_wsensNum());
             break;
         case 3: // humidity from thingspeak
             if(thingspeak.dataRelevance())
@@ -62,7 +62,7 @@ float AgregateComfortData::co2() {
     int co2 = 40400.0;
     if(config.comfort_co2_source() == 1) {
         if(wsensor.dataRelevance(config.comfort_co2_wsensNum()))
-            co2 = wsensor.get_co2(config.comfort_co2_wsensNum(), CORRECTED);
+            co2 = wsensor.get_co2(config.comfort_co2_wsensNum());
     }
     return co2;
 }

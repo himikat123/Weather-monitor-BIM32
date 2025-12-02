@@ -268,26 +268,26 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
     String field = "&field" + String(fieldNum + 1) + "=";
 
     if(config.history_fields(fieldNum) == 1 and (fieldNum == 0 or fieldNum == 3)) { // Weather Temperature
-        if(validate.temp(weather.get_currentTemp(CORRECTED)))
-            fields = field + String(weather.get_currentTemp(CORRECTED));
+        if(validate.temp(weather.get_currentTemp()))
+            fields = field + String(weather.get_currentTemp());
     }
     if(config.history_fields(fieldNum) == 1 and (fieldNum == 1 or fieldNum == 4)) { // Weather Humidity
-        if(validate.hum(weather.get_currentHum(CORRECTED)))
-            fields = field + String(weather.get_currentHum(CORRECTED));
+        if(validate.hum(weather.get_currentHum()))
+            fields = field + String(weather.get_currentHum());
     }
     if(config.history_fields(fieldNum) == 1 and fieldNum == 2) {                    // Weather Pressure
-        if(validate.pres(weather.get_currentPres(CORRECTED))) 
-            fields = field + String(weather.get_currentPres(CORRECTED));
+        if(validate.pres(weather.get_currentPres())) 
+            fields = field + String(weather.get_currentPres());
     }
                                                                                     // Wireless sensor
     if((config.history_fields(fieldNum) == 2 and fieldNum <= 4) or (config.history_fields(fieldNum) == 1 and fieldNum == 6)) {
         unsigned int wsensNum = config.history_wSensors(fieldNum);
         unsigned int wsensType = config.history_wTypes(fieldNum);
         if(wsensor.dataRelevance(wsensNum)) {
-            float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
-            float hum = wsensor.get_humidity(wsensNum, CORRECTED);
-            float pres = wsensor.get_pressure(wsensNum, CORRECTED);
-            float co2 = wsensor.get_co2(wsensNum, CORRECTED);
+            float temp = wsensor.get_temperature(wsensNum, wsensType);
+            float hum = wsensor.get_humidity(wsensNum);
+            float pres = wsensor.get_pressure(wsensNum);
+            float co2 = wsensor.get_co2(wsensNum);
             if((fieldNum == 0 or fieldNum == 3) and validate.temp(temp)) fields = field + String(temp);
             if((fieldNum == 1 or fieldNum == 4) and validate.hum(hum)) fields = field + String(hum);
             if(fieldNum == 2 and validate.pres(pres)) fields = field + String(pres);

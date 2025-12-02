@@ -29,12 +29,8 @@
 #define AIR_HEAVILY_POLLUTED 3
 #define HC12                 0
 #define DFPlayer             1
-
-#define RAW                  false // raw data without correction
-#define CORRECTED            true  // corrected data
-
 #define LCD_DISPLAY          1
-#define NEOPIXEL_DISPLAY     2
+#define PIXEL_LEDS_DISPLAY   2
 #define SEGMENT_DISPLAY      3
 #define NUMITRON_DISPLAY     4
 #define D_NX4832K035         0

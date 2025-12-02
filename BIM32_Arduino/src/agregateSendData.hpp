@@ -7,9 +7,9 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
     float data = -40400.0;
     switch(field) {
         case 1: { // Weather
-            float t = weather.get_currentTemp(CORRECTED);
-            float h = weather.get_currentHum(CORRECTED);
-            float p = weather.get_currentPres(CORRECTED);
+            float t = weather.get_currentTemp();
+            float h = weather.get_currentHum();
+            float p = weather.get_currentPres();
             float ws = weather.get_currentWindSpeed();
             int wd = weather.get_currentWindDir();
             float ah = sensors.absoluteHum(t, h);
@@ -24,19 +24,19 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
         }; break;
         case 2: { // Wireless sensor
             if(wsensor.dataRelevance(wsensNum)) {
-                float t0 = wsensor.get_temperature(wsensNum, 0, CORRECTED);
-                float temp = wsensor.get_temperature(wsensNum, wsensType, CORRECTED);
-                float hum = wsensor.get_humidity(wsensNum, CORRECTED);
-                float pres = wsensor.get_pressure(wsensNum, CORRECTED);
-                float windSpeed = wsensor.get_windSpeed(wsensNum, CORRECTED);
-                int windDir = wsensor.get_windDir(wsensNum, CORRECTED);
-                float light = wsensor.get_light(wsensNum, CORRECTED);
-                float volt = wsensor.get_voltage(wsensNum, CORRECTED);
-                float cur = wsensor.get_current(wsensNum, CORRECTED);
-                float pwr = wsensor.get_power(wsensNum, CORRECTED);
-                float enrg = wsensor.get_energy(wsensNum, CORRECTED);
-                float freq = wsensor.get_frequency(wsensNum, CORRECTED);
-                float co2 = wsensor.get_co2(wsensNum, CORRECTED);
+                float t0 = wsensor.get_temperature(wsensNum, 0);
+                float temp = wsensor.get_temperature(wsensNum, wsensType);
+                float hum = wsensor.get_humidity(wsensNum);
+                float pres = wsensor.get_pressure(wsensNum);
+                float windSpeed = wsensor.get_windSpeed(wsensNum);
+                int windDir = wsensor.get_windDir(wsensNum);
+                float light = wsensor.get_light(wsensNum);
+                float volt = wsensor.get_voltage(wsensNum);
+                float cur = wsensor.get_current(wsensNum);
+                float pwr = wsensor.get_power(wsensNum);
+                float enrg = wsensor.get_energy(wsensNum);
+                float freq = wsensor.get_frequency(wsensNum);
+                float co2 = wsensor.get_co2(wsensNum);
                 float vbat = wsensor.get_batteryVoltage(wsensNum);
                 int batlvl = wsensor.get_batteryLevel(wsensNum);
                 float batprc = wsensor.get_batteryPercentage(wsensNum);

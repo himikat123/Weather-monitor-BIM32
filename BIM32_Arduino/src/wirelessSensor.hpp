@@ -13,18 +13,18 @@ class WirelessSensor {
         String get_windSpeedType();
         String get_windDirType();
 
-        float get_temperature(unsigned int num, unsigned int sensor, bool corr);
-        float get_humidity(unsigned int num, bool corr);
-        float get_pressure(unsigned int num, bool corr);
-        float get_windSpeed(unsigned int num, bool corr);
-        int get_windDir(unsigned int num, bool corr);
-        float get_light(unsigned int num, bool corr);
-        float get_voltage(unsigned int num, bool corr);
-        float get_current(unsigned int num, bool corr);
-        float get_power(unsigned int num, bool corr);
-        float get_energy(unsigned int num, bool corr);
-        float get_frequency(unsigned int num, bool corr);
-        float get_co2(unsigned int num, bool corr);
+        float get_temperature(unsigned int num, unsigned int sensor);
+        float get_humidity(unsigned int num);
+        float get_pressure(unsigned int num);
+        float get_windSpeed(unsigned int num);
+        int get_windDir(unsigned int num);
+        float get_light(unsigned int num);
+        float get_voltage(unsigned int num);
+        float get_current(unsigned int num);
+        float get_power(unsigned int num);
+        float get_energy(unsigned int num);
+        float get_frequency(unsigned int num);
+        float get_co2(unsigned int num);
         int get_batteryAdc(unsigned int num);
         float get_batteryVoltage(unsigned int num);
         int get_batteryLevel(unsigned int num);
@@ -214,64 +214,64 @@ String WirelessSensor::get_windDirType() {
     return "RS485";
 }
 
-float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor, bool corr) {
+float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor) {
     if(num >= WSENSORS or sensor > 4) return 40400.0;
-    return _temperature[num][sensor] + (corr ? config.wsensor_temp_corr(num, sensor) : 0.0);
+    return _temperature[num][sensor] + config.wsensor_temp_corr(num, sensor);
 }
 
-float WirelessSensor::get_humidity(unsigned int num, bool corr) {
+float WirelessSensor::get_humidity(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return _humidity[num] + (corr ? config.wsensor_hum_corr(num) : 0.0);
+    return _humidity[num] + config.wsensor_hum_corr(num);
 }
 
-float WirelessSensor::get_pressure(unsigned int num, bool corr) {
+float WirelessSensor::get_pressure(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return _pressure[num] + (corr ? config.wsensor_pres_corr(num) : 0.0);
+    return _pressure[num] + config.wsensor_pres_corr(num);
 }
 
-float WirelessSensor::get_windSpeed(unsigned int num, bool corr) {
+float WirelessSensor::get_windSpeed(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _windSpeed[num] + (corr ? config.wsensor_wind_speed_corr(num) : 0.0);
+    return _windSpeed[num] + config.wsensor_wind_speed_corr(num);
 }
 
-int WirelessSensor::get_windDir(unsigned int num, bool corr) {
+int WirelessSensor::get_windDir(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return _windDir[num] + (corr ? config.wsensor_wind_dir_corr(corr) : 0.0); 
+    return _windDir[num] + config.wsensor_wind_dir_corr(num); 
 }
 
-float WirelessSensor::get_light(unsigned int num, bool corr) {
+float WirelessSensor::get_light(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _light[num] + (corr ? config.wsensor_light_corr(num) : 0.0);
+    return _light[num] + config.wsensor_light_corr(num);
 }
 
-float WirelessSensor::get_voltage(unsigned int num, bool corr) {
+float WirelessSensor::get_voltage(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _voltage[num] + (corr ? config.wsensor_volt_corr(num) : 0.0);
+    return _voltage[num] + config.wsensor_volt_corr(num);
 }
 
-float WirelessSensor::get_current(unsigned int num, bool corr) {
+float WirelessSensor::get_current(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _current[num] + (corr ? config.wsensor_curr_corr(num) : 0.0);
+    return _current[num] + config.wsensor_curr_corr(num);
 }
 
-float WirelessSensor::get_power(unsigned int num, bool corr) {
+float WirelessSensor::get_power(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _power[num] + (corr ? config.wsensor_pow_corr(num) : 0.0);
+    return _power[num] + config.wsensor_pow_corr(num);
 }
 
-float WirelessSensor::get_energy(unsigned int num, bool corr) {
+float WirelessSensor::get_energy(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _energy[num] + (corr ? config.wsensor_enrg_corr(num) : 0.0);
+    return _energy[num] + config.wsensor_enrg_corr(num);
 }
 
-float WirelessSensor::get_frequency(unsigned int num, bool corr) {
+float WirelessSensor::get_frequency(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _frequency[num] + (corr ? config.wsensor_freq_corr(num) : 0.0);
+    return _frequency[num] + config.wsensor_freq_corr(num);
 }
 
-float WirelessSensor::get_co2(unsigned int num, bool corr) {
+float WirelessSensor::get_co2(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _co2[num] + (corr ? config.wsensor_co2_corr(num) : 0.0);
+    return _co2[num] + config.wsensor_co2_corr(num);
 }
 
 int WirelessSensor::get_batteryAdc(unsigned int num) {

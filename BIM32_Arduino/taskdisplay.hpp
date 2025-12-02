@@ -21,7 +21,7 @@ void TaskDisplay1(void *pvParameters) {
         }
 
         /* Initialize WS2812b display 1 */
-        if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+        if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
             ws2812b_1.init(DISPLAY_1, WS2812_1_DAT_PIN);
         }
 
@@ -83,7 +83,7 @@ void TaskDisplay1(void *pvParameters) {
                         }
                     }
 
-                    if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                    if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
                         ws2812b_1.displayToggle();
                     }
 
@@ -121,7 +121,7 @@ void TaskDisplay1(void *pvParameters) {
                     pcf8575_1.setDotFreq(dotFreq);
 
                     /* WS2812b brightness change */
-                    if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                    if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
                         ws2812b_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                     }
 
@@ -155,7 +155,7 @@ void TaskDisplay1(void *pvParameters) {
                                 if(ili9341.isDisplayOn()) ili9341.displayOff();
                             }
                         }
-                        if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                        if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
                             if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
                         }
                         if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
@@ -187,7 +187,7 @@ void TaskDisplay1(void *pvParameters) {
                                     if(ili9341.isDisplayOn()) ili9341.displayOff();
                                 }
                             }
-                            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                            if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
                                 if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
                             }
                             if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
@@ -211,7 +211,7 @@ void TaskDisplay1(void *pvParameters) {
                                     if(!ili9341.isDisplayOn()) ili9341.displayOn();
                                 }
                             }
-                            if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                            if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
                                 if(!ws2812b_1.isDisplayOn()) ws2812b_1.displayOn();
                             }
                             if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
@@ -230,7 +230,7 @@ void TaskDisplay1(void *pvParameters) {
                 }
 
                 /* WS2812b display 1 update */
-                if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
+                if(config.display_type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
                     ws2812b_1.refresh();
                 }
 
@@ -268,7 +268,7 @@ void TaskDisplay2(void *pvParameters) {
     unsigned int bright_update = 0;
 
     /* Initialize WS2812b display 2 */
-    if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+    if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
         ws2812b_2.init(DISPLAY_2, WS2812_2_DAT_PIN);
     }
 
@@ -291,7 +291,7 @@ void TaskDisplay2(void *pvParameters) {
             if(state.display_btn_pressed[DISPLAY_2]) {
                 state.display_btn_pressed[DISPLAY_2] = false;
                 state.disp_autoOff[DISPLAY_2] = millis();
-                if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+                if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
                     ws2812b_2.displayToggle();
                 }
                 if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
@@ -303,7 +303,7 @@ void TaskDisplay2(void *pvParameters) {
                 }
             }
 
-            if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+            if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
                 ws2812b_2.refresh();
             }
 
@@ -333,7 +333,7 @@ void TaskDisplay2(void *pvParameters) {
 
                 /* Check if need and it's time to turn off the display */
                 if(isTimeoutOffTime(DISPLAY_2)) {
-                    if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) { 
+                    if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) { 
                         if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
                     }
                     if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
@@ -357,7 +357,7 @@ void TaskDisplay2(void *pvParameters) {
                         state.display_state[DISPLAY_2] = 0;
                     }
                     if(itsOffTime) {
-                        if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+                        if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
                             if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
                         }
                         if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
@@ -373,7 +373,7 @@ void TaskDisplay2(void *pvParameters) {
                         }
                     }
                     else {
-                        if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
+                        if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
                             if(!ws2812b_2.isDisplayOn()) ws2812b_2.displayOn();
                         }
                         if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {

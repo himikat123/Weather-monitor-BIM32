@@ -84,15 +84,15 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
         case 9: { // Weather
             bool dataRelevant = (now() - weather.get_currentUpdated() < 1200);
             if(type == 0) {
-                data = dataRelevant ? weather.get_currentTemp(CORRECTED) : 40400.0;
+                data = dataRelevant ? weather.get_currentTemp() : 40400.0;
                 *dType = TEMP;
             }
             if(type == 1) {
-                data = dataRelevant ? weather.get_currentHum(CORRECTED) : 40400.0;
+                data = dataRelevant ? weather.get_currentHum() : 40400.0;
                 *dType = HUM;
             }
             if(type == 2) {
-                data = dataRelevant ? weather.get_currentPres(CORRECTED) : 40400.0;
+                data = dataRelevant ? weather.get_currentPres() : 40400.0;
                 *dType = PRES;
             }
         }; break;
@@ -101,25 +101,25 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
             unsigned int wsensType = config.display_timeSlot_wsensor_type(timeSlot, dispNum);
             if(wsensType <= 4) {
                 data = wsensor.dataRelevance(wsensNum)
-                    ? wsensor.get_temperature(wsensNum, wsensType, CORRECTED)
+                    ? wsensor.get_temperature(wsensNum, wsensType)
                     : 40400.0;
                 *dType = TEMP;
             }
             if(wsensType == 5) {
                 data = wsensor.dataRelevance(wsensNum)
-                    ? wsensor.get_humidity(wsensNum, CORRECTED)
+                    ? wsensor.get_humidity(wsensNum)
                     : 40400.0;
                 *dType = HUM;
             }
             if(wsensType == 6) {
                 data = wsensor.dataRelevance(wsensNum)
-                    ? wsensor.get_pressure(wsensNum, CORRECTED)
+                    ? wsensor.get_pressure(wsensNum)
                     : 40400.0;
                 *dType = PRES;
             }
             if(wsensType == 7) {
                 data = wsensor.dataRelevance(wsensNum)
-                    ? wsensor.get_co2(wsensNum, CORRECTED)
+                    ? wsensor.get_co2(wsensNum)
                     : 40400.0;
                 *dType = CO2;
             }

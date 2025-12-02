@@ -9,9 +9,9 @@ class Weather {
 
     public:
         void update();
-        float get_currentTemp(bool corr);
-        float get_currentHum(bool corr);
-        float get_currentPres(bool corr);
+        float get_currentTemp();
+        float get_currentHum();
+        float get_currentPres();
         float get_currentWindSpeed();
         int get_currentWindDir();
         unsigned int get_currentIcon();
@@ -33,27 +33,8 @@ class Weather {
         float get_hourlyPrec(unsigned int num); 
 
     private:
-        //unsigned int _currentDate = 0;
-        //float _currentWindSpeed = -1.0;
-        //String _country = "";
-        //String _city = "";
         float _lon = 0.0;
         float _lat = 0.0;
-
-        // float _dailyDayTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
-        // float _dailyNightTemp[DAYS] = {40400.0, 40400.0, 40400.0, 40400.0, 40400.0};
-        // float _dailyWindSpeed[DAYS] = {-1.0, -1.0, -1.0, -1.0, -1.0};
-        // unsigned int _dailyIcon[DAYS] = {0, 0, 0, 0, 0};
-        // unsigned int _dailyUpdated = 0;
-
-        // unsigned int _hourlyDate[DAYS * 8];
-        // unsigned int _hourlyIcon[DAYS * 8];
-        // float _hourlyTemp[DAYS * 8];
-        // float _hourlyPres[DAYS * 8];
-        // float _hourlyWindSpeed[DAYS * 8];
-        // int _hourlyWindDir[DAYS * 8];
-        // float _hourlyPrec[DAYS * 8];
-        // unsigned int _hourlyUpdated = 0;
 
         unsigned int _convertIcon(int code);
         const char* _openMeteoCode2Description(uint8_t code);
@@ -222,8 +203,6 @@ void Weather::update() {
             state.weather.icon       = atoi(weather["weather"][0]["icon"] | "0");
             String pod               = weather["weather"][0]["icon"] | "";
             state.weather.isDay      = (pod.substring(2) == "d") ? true : false;
-            //_country          = weather["sys"]["country"].as<String>();
-            //_city             = weather["name"].as<String>();
             state.weather.time       = weather["dt"] | 0;
             _lon                     = weather["coord"]["lon"] | 0.0;
             _lat                     = weather["coord"]["lat"] | 0.0;
@@ -238,8 +217,6 @@ void Weather::update() {
             state.weather.wind.dir   = weather["data"][0]["wind_dir"] | -1;
             const char* pod          = weather["data"][0]["pod"] | "";
             state.weather.isDay      = (String(pod) == String('d')) ? true : false;
-            //_country          = weather["data"][0]["country_code"].as<String>();
-            //_city             = weather["data"][0]["city_name"].as<String>();
             state.weather.icon       = _weatherbitIcon(weather["data"][0]["weather"]["code"].as<int>() | 0);
         }
 
@@ -551,16 +528,16 @@ void Weather::_calculateDaily(void) {
 /**
  * Getters 
  */
-float Weather::get_currentTemp(bool corr) {
-    return state.weather.temp + (corr ? config.weather_temp_corr() : 0.0);
+float Weather::get_currentTemp() {
+    return state.weather.temp + config.weather_temp_corr();
 }
 
-float Weather::get_currentHum(bool corr) {
-    return state.weather.hum + (corr ? config.weather_hum_corr() : 0.0);
+float Weather::get_currentHum() {
+    return state.weather.hum + config.weather_hum_corr();
 }
 
-float Weather::get_currentPres(bool corr) {
-    return state.weather.pres + (corr ? config.weather_pres_corr() : 0.0);
+float Weather::get_currentPres() {
+    return state.weather.pres + config.weather_pres_corr();
 }
 
 float Weather::get_currentWindSpeed() {
