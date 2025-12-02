@@ -277,7 +277,7 @@ void ILI9341::refresh() {
 
 void ILI9341::brightness(unsigned int bright) {
     if(_power) {
-        uint8_t brgt = global.reduc[0] ? round(bright / 2) : bright;
+        uint8_t brgt = state.reduc[0] ? round(bright / 2) : bright;
         if(brgt < config.display_brightness_min(0)) brgt = config.display_brightness_min(0);
         if(brgt > config.display_brightness_max(0)) brgt = config.display_brightness_max(0); 
         float r = 100 * log10(2) / log10(255);
@@ -873,10 +873,10 @@ void ILI9341::_networkPage() {
         _printText(sl, 214 + y, w, 12, lang.firmware(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
     }
 
-    String ssid = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();;
-    String rssi = global.apMode ? "100%" : String(_rssi) + "dBm";
-    String ip = global.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();;
-    String mac = global.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
+    String ssid = state.apMode ? config.accessPoint_ssid() : WiFi.SSID();;
+    String rssi = state.apMode ? "100%" : String(_rssi) + "dBm";
+    String ip = state.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();;
+    String mac = state.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
     float esp32Temp = sensors.get_esp32_temp();
     String fw = FW;
 
@@ -1376,9 +1376,9 @@ void ILI9341::_alarmPage() {
 }
 
 void ILI9341::getTouch() {
-    if(global.touch_calibrate) {
+    if(state.touch_calibrate) {
         _touch_calibrate();
-        global.touch_calibrate = false;
+        state.touch_calibrate = false;
     }
 
     bool pressed = false;
@@ -1393,7 +1393,7 @@ void ILI9341::getTouch() {
             _touchX = map(p.x, _calData[0], _calData[2], 0, 319);
             _touchY = map(p.y, _calData[1], _calData[3], 0, 239);
         #endif
-        if(global.debugTouch) {
+        if(state.debugTouch) {
             tft.drawPixel(_touchX, _touchY, 0xFFFF);
             #if defined(BIM32_CYD)
                 Serial.printf("raw X: %d, raw Y: %d\r\n", p.x, p.y);

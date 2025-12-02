@@ -84,18 +84,18 @@ void Comfort::calculate() {
     if(_iaqLevel > AIR_CLEAN or _co2Level > AIR_CLEAN) _purifier = true;
     else _purifier = false;
 
-    global.comfort = COMFORTABLE;
-    if(_tempLevel == TEMP_UNDEFINED && _humLevel == HUM_UNDEFINED) global.comfort = UNDEFINED;
-    if(_tempLevel == TEMP_TOO_HOT && _humLevel < HUM_TOO_HUMID) global.comfort = HOT;
-    if(_tempLevel == TEMP_TOO_COLD && _humLevel < HUM_TOO_HUMID) global.comfort = COLD;
-    if(_tempLevel < TEMP_TOO_HOT && _humLevel == HUM_TOO_HUMID) global.comfort = HUMID;
-    if(_tempLevel < TEMP_TOO_HOT && _humLevel == HUM_TOO_DRY) global.comfort = DRY;
-    if(_tempLevel == TEMP_TOO_HOT && _humLevel == HUM_TOO_HUMID) global.comfort = HOT_HUMID;
-    if(_tempLevel == TEMP_TOO_HOT && _humLevel == HUM_TOO_DRY) global.comfort = HOT_DRY;
-    if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_HUMID) global.comfort = COLD_HUMID;
-    if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_DRY) global.comfort = COLD_DRY;
-    global.iaq_level = _iaqLevel;
-    global.co2_level = _co2Level;
+    state.comfort = COMFORTABLE;
+    if(_tempLevel == TEMP_UNDEFINED && _humLevel == HUM_UNDEFINED) state.comfort = UNDEFINED;
+    if(_tempLevel == TEMP_TOO_HOT && _humLevel < HUM_TOO_HUMID) state.comfort = HOT;
+    if(_tempLevel == TEMP_TOO_COLD && _humLevel < HUM_TOO_HUMID) state.comfort = COLD;
+    if(_tempLevel < TEMP_TOO_HOT && _humLevel == HUM_TOO_HUMID) state.comfort = HUMID;
+    if(_tempLevel < TEMP_TOO_HOT && _humLevel == HUM_TOO_DRY) state.comfort = DRY;
+    if(_tempLevel == TEMP_TOO_HOT && _humLevel == HUM_TOO_HUMID) state.comfort = HOT_HUMID;
+    if(_tempLevel == TEMP_TOO_HOT && _humLevel == HUM_TOO_DRY) state.comfort = HOT_DRY;
+    if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_HUMID) state.comfort = COLD_HUMID;
+    if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_DRY) state.comfort = COLD_DRY;
+    state.iaq_level = _iaqLevel;
+    state.co2_level = _co2Level;
 }
 
 void Comfort::soundNotify() {

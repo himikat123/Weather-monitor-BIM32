@@ -151,9 +151,9 @@ void WirelessSensor::receive() {
                 unsigned int ch = wsensorStr.substring(rc + 5, rc + 8).toInt();
                 if(ch != config.wsensor_channel()) {
                     Serial.println("Changing channel number");
-                    if(global.uart2_tx != HC12) {
+                    if(state.uart2_tx != HC12) {
                         Serial2.setPins(HC12_RX_PIN, HC12_TX_PIN);
-                        global.uart2_tx = HC12;
+                        state.uart2_tx = HC12;
                     }
                     digitalWrite(HC12_SET_PIN, LOW);
                     delay(50);

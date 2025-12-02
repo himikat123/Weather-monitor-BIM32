@@ -303,10 +303,10 @@ uint8_t AgregateLcdData::voltageColor() {
     switch(config.display_source_volt_sens()) {
         case 1: { /* from wireless sensor */
             if(config.display_source_volt_volt() == 3) /* SenseAir S8 CO2 level */
-                type = global.co2_level;
+                type = state.co2_level;
         }; break; 
         case 4: { // iaq from BME680
-            type = global.iaq_level;
+            type = state.iaq_level;
         }; break;
         default: ; break;
     }
@@ -332,16 +332,16 @@ int AgregateLcdData::batteryLevel() {
 String AgregateLcdData::comfort() {
     String comfort = "";
     if(config.display_source_descr() == 1) {
-        comfort = lang.comfort(global.comfort);
+        comfort = lang.comfort(state.comfort);
 
-        if(global.iaq_level) {
+        if(state.iaq_level) {
             if(comfort.length()) comfort += ". ";
-            comfort += lang.airQuality(global.iaq_level);
+            comfort += lang.airQuality(state.iaq_level);
         }
 
-        else if(global.co2_level) {
+        else if(state.co2_level) {
             if(comfort.length()) comfort += ". ";
-            comfort += lang.airQuality(global.co2_level);
+            comfort += lang.airQuality(state.co2_level);
         }
     }
     return comfort;

@@ -311,6 +311,28 @@ struct FilesystemState {
 };
 
 struct State {
+    bool clockSynchronized = false; // Is the time synchronized with the ntp server?
+    bool clockSynchronize = false; // Should the display RTC be updated?
+    bool net_connected = false; // Is the device connected to the network?
+    uint32_t disp_autoOff[2] = {0, 0}; // Displays auto off interval counter
+    bool reduc[2] = {false, false};
+    bool apMode = false; // Access point mode
+    bool display_btn_pressed[2] = {false, false}; // display (1, 2) button pressed flag
+    uint8_t display_state[2] = {1, 1}; // display on/off: 0: nothing do, 1: turn on, 2: turn off
+    bool alarm_but_pressed = false; // alarm button pressed flag
+    bool mp3_busy = true; // mp3 player busy pin
+    unsigned int comfort = 0; // Comfort level code: 1-Comfortable, 2-Hot, 3-Cold, 4-Humid, 5-Dry, 6-Hot & Humid, 7-Hot & Dry, 8-Cold & Humid, 9-Cold & Dry
+    unsigned int iaq_level = 0; // IAQ level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
+    unsigned int co2_level = 0; // CO2 level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
+    bool clockPoints = false; // ILI9341 clock points state
+    uint8_t uart2_tx = 0; // What is UART2 connected to (HC12 or DFPlayer)
+    int8_t disp_night_state[2] = {-1, -1}; // state of displays night off: -1-undefined, 0-off, 1-on
+    unsigned int btnMillis[2] = {0, 0}; // contact debounce time variable
+    bool touch_calibrate = false; // touch calibrate modus
+    bool colorChanged = false; // timeslot color has been changed from web interface
+    bool debugTouch = false;
+    bool debugWether = false;
+
     ESP32State esp32core;
     NetworkState network;
     BME680State bme680;

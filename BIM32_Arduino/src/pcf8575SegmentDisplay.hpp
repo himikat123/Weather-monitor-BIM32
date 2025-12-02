@@ -116,9 +116,9 @@ void PCF8575_S::_print() {
         }
     }
 
-    if(updated || global.colorChanged) {
+    if(updated || state.colorChanged) {
         _sendToDisplay();
-        global.colorChanged = false;
+        state.colorChanged = false;
     }
 }
 

@@ -231,7 +231,7 @@ void web_dispToggle() {
     if(web_isLogged(true)) {
         if(server.hasArg("num")) {
             uint8_t dispNum = (server.arg("num")).toInt();
-            global.display_btn_pressed[dispNum] = true;
+            state.display_btn_pressed[dispNum] = true;
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -290,7 +290,7 @@ void web_color() {
             char color[7];
             server.arg("hex").toCharArray(color, 7);
             config.set_color(color, (server.arg("slot")).toInt(), (server.arg("num")).toInt());
-            global.colorChanged = true;
+            state.colorChanged = true;
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -318,7 +318,7 @@ void web_animation() {
  */
 void web_touch_calibrate() {
     if(web_isLogged(true)) {
-        global.touch_calibrate = true;
+        state.touch_calibrate = true;
         server.send(200, "text/plain", "OK");
     }
 }
@@ -329,7 +329,7 @@ void web_touch_calibrate() {
 void web_syncClock() {
     if(web_isLogged(true)) {
         if(server.hasArg("ntp")) {
-            global.clockSynchronized = false;
+            state.clockSynchronized = false;
             server.send(200, "text/plain", "OK");
         }
         else {
@@ -353,7 +353,7 @@ void web_syncClock() {
  */
 void web_syncdialog() {
     if(web_isLogged(true)) {
-        if(!global.clockSynchronized) server.send(200, "text/plain", ".");
+        if(!state.clockSynchronized) server.send(200, "text/plain", ".");
         else server.send(200, "text/plain", web_timeString(now()));
     }
 }
@@ -506,12 +506,12 @@ void web_fileRename() {
 }
 
 void web_debugTouch() {
-    global.debugTouch = true;
+    state.debugTouch = true;
     server.send(200, "text/plain", "OK");
 }
 
 void web_debugWeather() {
-    global.debugWether = true;
+    state.debugWether = true;
     server.send(200, "text/plain", "OK");
 }
 

@@ -139,7 +139,7 @@ void Weather::update() {
             url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
         }
         url += "&units=metric&lang=" + config.lang();
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println("OPENWEATHERMAP");
             Serial.println(url);
         }
@@ -169,7 +169,7 @@ void Weather::update() {
             url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
         }
         url += "&lang=" + config.lang();
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println("WEATHERBIT");
             Serial.println(url);
         }
@@ -187,7 +187,7 @@ void Weather::update() {
             url += "&current=temperature_2m,relative_humidity_2m,is_day,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m";
             url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto";
         }
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println("OPEN_METEO");
             Serial.println(url);
         }
@@ -204,7 +204,7 @@ void Weather::update() {
         String httpData = clientWeather.getString();
         JsonDocument weather;
         DeserializationError errorWeather = deserializeJson(weather, httpData);
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println(httpData);
         }
         if(errorWeather) {
@@ -325,14 +325,14 @@ void Weather::_updateWeatherbitDaily(void) {
     if(config.weather_citysearch() == 2) url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
     url += "&key=" + config.weather_appid(WEATHERBIT);
     HTTPClient clientDaily;
-    if(global.debugWether) {
+    if(state.debugWether) {
         Serial.println(url);
     }
     clientDaily.begin(url);
     int httpCode = clientDaily.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientDaily.getString();
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println(httpData);
         }
         JsonDocument forecast;
@@ -409,14 +409,14 @@ void Weather::_updateOpenMeteoDaily() {
     url += "&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max";
     url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=4";
     HTTPClient clientDaily;
-    if(global.debugWether) {
+    if(state.debugWether) {
         Serial.println(url);
     }
     clientDaily.begin(url);
     int httpCode = clientDaily.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientDaily.getString();
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println(httpData);
         }
         JsonDocument forecast;
@@ -453,14 +453,14 @@ void Weather::_updateOpenMeteoHourly() {
     url += "&hourly=temperature_2m,precipitation_probability,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m";
     url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=6";
     HTTPClient clientHourly;
-    if(global.debugWether) {
+    if(state.debugWether) {
         Serial.println(url);
     }
     clientHourly.begin(url);
     int httpCode = clientHourly.GET();
     if(httpCode == HTTP_CODE_OK) {
         String httpData = clientHourly.getString();
-        if(global.debugWether) {
+        if(state.debugWether) {
             Serial.println(httpData);
         }
         JsonDocument filter[7];

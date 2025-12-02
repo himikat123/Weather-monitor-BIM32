@@ -57,7 +57,7 @@ void TaskSensors(void *pvParameters) {
             comfort.calculate();
             comfort.devicesControl();
 
-            if(global.apMode) strlcpy(state.network.ssid, config.accessPoint_ssid(), sizeof(state.network.ssid));
+            if(state.apMode) strlcpy(state.network.ssid, config.accessPoint_ssid(), sizeof(state.network.ssid));
             else WiFi.SSID().toCharArray(state.network.ssid, sizeof(state.network.ssid));
             state.network.ch = WiFi.channel();
             state.network.sig = WiFi.RSSI();
@@ -83,24 +83,24 @@ void TaskSensors(void *pvParameters) {
          * Network connection if not connected and if not Access point mode
          */
         if(WiFi.localIP().toString() == "0.0.0.0" or !network.isConnected()) {
-            global.net_connected = false;
+            state.net_connected = false;
             network.connect();
             vTaskDelay(1000);
         }
-        else global.net_connected = true;
+        else state.net_connected = true;
         
-        if(!global.apMode) {
+        if(!state.apMode) {
             /**
              * Time synchronization with NTP server
              */
             if(config.clock_ntp_period() > 0) {
-                if((millis() - ntp_update) > config.clock_ntp_period() * 60000 or !global.clockSynchronized) {
+                if((millis() - ntp_update) > config.clock_ntp_period() * 60000 or !state.clockSynchronized) {
                     ntp_update = millis();
                     Serial.println(SEPARATOR);
                     Serial.println("NTP synchronization... ");
                     if(network.isConnected()) get_time();
                     else {
-                        global.clockSynchronized = false;
+                        state.clockSynchronized = false;
                         Serial.println("No internet connection");
                     }
                     vTaskDelay(100);
@@ -178,13 +178,13 @@ void TaskSensors(void *pvParameters) {
              * every 20 minutes, or every hour for weatherbit.io
              */
             uint32_t weatherUpd = config.weather_provider() == 1 ? 3600 : 1200;
-            if(global.debugWether || (now() - weather.get_currentUpdated() > weatherUpd)) {
+            if(state.debugWether || (now() - weather.get_currentUpdated() > weatherUpd)) {
                 Serial.println(SEPARATOR);
                 Serial.println("Current weather update... ");
                 if(network.isConnected()) weather.update();
                 else Serial.println("No internet connection");
                 sensors.get_ds3231_timeDate();
-                global.debugWether = false;
+                state.debugWether = false;
             }
 
             /**
@@ -218,9 +218,9 @@ void TaskSensors(void *pvParameters) {
  * Interrupt from display 1 button
  */
 void display1_toggle() {
-    if(millis() - global.btnMillis[0] > 500) {
-        global.btnMillis[0] = millis();
-        global.display_btn_pressed[0] = true;
+    if(millis() - state.btnMillis[0] > 500) {
+        state.btnMillis[0] = millis();
+        state.display_btn_pressed[0] = true;
     }
 }
 
@@ -228,9 +228,9 @@ void display1_toggle() {
  * Interrupt from display 2 button
  */
 void display2_toggle() {
-    if(millis() - global.btnMillis[1] > 500) {
-        global.btnMillis[1] = millis();
-        global.display_btn_pressed[1] = true;
+    if(millis() - state.btnMillis[1] > 500) {
+        state.btnMillis[1] = millis();
+        state.display_btn_pressed[1] = true;
     }
 }
 
@@ -238,7 +238,7 @@ void display2_toggle() {
  * Interrupt from alarm button
  */
 void alarm_button() {
-    global.alarm_but_pressed = true;
+    state.alarm_but_pressed = true;
     //sound.stopPlaying();
 }
 
@@ -246,14 +246,14 @@ void alarm_button() {
  * Interrupt from mp3 player busy pin
  */
 void mp3_busy() {
-    global.mp3_busy = false;
+    state.mp3_busy = false;
 }
 
 /**
  * Time synchronization with NTP server
  */
 void get_time(void) {
-    if(global.net_connected) {
+    if(state.net_connected) {
         configTime(config.clock_utc() * 3600, 0, config.clock_ntp());
         struct tm tmstruct;
         vTaskDelay(1000);
@@ -264,8 +264,8 @@ void get_time(void) {
             unsigned int summertime = config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
             unsigned int t = now() + summertime;
             setTime(t);
-            global.clockSynchronize = true;
-            global.clockSynchronized = true;
+            state.clockSynchronize = true;
+            state.clockSynchronized = true;
             nextion.setDisplayRTC();
             sensors.set_ds3231_timeDate();
             Serial.print("successful: ");
@@ -273,10 +273,10 @@ void get_time(void) {
         }
         else {
             Serial.println("failed");
-            global.clockSynchronized = false;
+            state.clockSynchronized = false;
         }
     }
-    else global.clockSynchronized = false;
+    else state.clockSynchronized = false;
 }
 
 /**

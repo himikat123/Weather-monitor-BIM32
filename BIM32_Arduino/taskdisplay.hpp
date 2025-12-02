@@ -51,11 +51,11 @@ void TaskDisplay1(void *pvParameters) {
                 }
 
                 uint8_t itsOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
-                if(global.disp_night_state[DISPLAY_1] != itsOffTime || global.display_state[DISPLAY_1]) {
-                    global.disp_night_state[DISPLAY_1] = itsOffTime;
-                    if(global.display_state[DISPLAY_1]) {
-                        itsOffTime = global.display_state[DISPLAY_1] - 1;
-                        global.display_state[DISPLAY_1] = 0;
+                if(state.disp_night_state[DISPLAY_1] != itsOffTime || state.display_state[DISPLAY_1]) {
+                    state.disp_night_state[DISPLAY_1] = itsOffTime;
+                    if(state.display_state[DISPLAY_1]) {
+                        itsOffTime = state.display_state[DISPLAY_1] - 1;
+                        state.display_state[DISPLAY_1] = 0;
                     }
                     if(itsOffTime) {
                         if(ili9341.isDisplayOn()) ili9341.displayOff();
@@ -70,9 +70,9 @@ void TaskDisplay1(void *pvParameters) {
         #else 
             if(config.display_type(DISPLAY_1)) {
                 /* Display 1 toogle if display button was pressed */
-                if(global.display_btn_pressed[DISPLAY_1]) {
-                    global.display_btn_pressed[DISPLAY_1] = false;
-                    global.disp_autoOff[DISPLAY_1] = millis();
+                if(state.display_btn_pressed[DISPLAY_1]) {
+                    state.display_btn_pressed[DISPLAY_1] = false;
+                    state.disp_autoOff[DISPLAY_1] = millis();
 
                     if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
                         if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
@@ -114,7 +114,7 @@ void TaskDisplay1(void *pvParameters) {
                     }
 
                     /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
-                    uint16_t dotFreq = global.net_connected ? 500 : 1000;
+                    uint16_t dotFreq = state.net_connected ? 500 : 1000;
                     ws2812b_1.setDotFreq(dotFreq);
                     tm1637_1.setDotFreq(dotFreq);
                     max7219_1.setDotFreq(dotFreq);
@@ -122,22 +122,22 @@ void TaskDisplay1(void *pvParameters) {
 
                     /* WS2812b brightness change */
                     if(config.display_type(DISPLAY_1) == NEOPIXEL_DISPLAY) {
-                        ws2812b_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                        ws2812b_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                     }
 
                     if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
                         /* tm1637 brightness change */
                         if(config.display_model(DISPLAY_1) <= 1) {
-                            tm1637_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                            tm1637_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                         }
                         /* max7219 brightness change */
                         if(config.display_model(DISPLAY_1) >= 2) {
-                            max7219_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                            max7219_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                         }
                     }
 
                     if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                        pcf8575_1.brightness(get_brightness(DISPLAY_1), global.reduc[DISPLAY_1]);
+                        pcf8575_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                     }
 
                     /* LCD/TFT display brightness change */
@@ -172,11 +172,11 @@ void TaskDisplay1(void *pvParameters) {
                     }
 
                     uint8_t itsOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
-                    if((global.disp_night_state[DISPLAY_1] != itsOffTime) || (global.display_state[DISPLAY_1] > 0)) {
-                        global.disp_night_state[DISPLAY_1] = itsOffTime;
-                        if(global.display_state[DISPLAY_1] > 0) {
-                            itsOffTime = global.display_state[DISPLAY_1] - 1;
-                            global.display_state[DISPLAY_1] = 0;
+                    if((state.disp_night_state[DISPLAY_1] != itsOffTime) || (state.display_state[DISPLAY_1] > 0)) {
+                        state.disp_night_state[DISPLAY_1] = itsOffTime;
+                        if(state.display_state[DISPLAY_1] > 0) {
+                            itsOffTime = state.display_state[DISPLAY_1] - 1;
+                            state.display_state[DISPLAY_1] = 0;
                         }
                         if(itsOffTime) {
                             if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
@@ -288,9 +288,9 @@ void TaskDisplay2(void *pvParameters) {
         if(config.display_type(DISPLAY_2)) {
 
             /* Display 2 toogle if display button was pressed */
-            if(global.display_btn_pressed[DISPLAY_2]) {
-                global.display_btn_pressed[DISPLAY_2] = false;
-                global.disp_autoOff[DISPLAY_2] = millis();
+            if(state.display_btn_pressed[DISPLAY_2]) {
+                state.display_btn_pressed[DISPLAY_2] = false;
+                state.disp_autoOff[DISPLAY_2] = millis();
                 if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
                     ws2812b_2.displayToggle();
                 }
@@ -319,13 +319,13 @@ void TaskDisplay2(void *pvParameters) {
             /* Brightness change once in 1 second */
             if((millis() - bright_update) > 1000) {
                 bright_update = millis();
-                ws2812b_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);
-                tm1637_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);
-                max7219_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);
-                pcf8575_2.brightness(get_brightness(DISPLAY_2), global.reduc[DISPLAY_2]);
+                ws2812b_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                tm1637_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                max7219_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                pcf8575_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
 
                 /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
-                uint16_t dotFreq = global.net_connected ? 500 : 1000;
+                uint16_t dotFreq = state.net_connected ? 500 : 1000;
                 ws2812b_2.setDotFreq(dotFreq);
                 tm1637_2.setDotFreq(dotFreq);
                 max7219_2.setDotFreq(dotFreq);
@@ -350,11 +350,11 @@ void TaskDisplay2(void *pvParameters) {
                 }
 
                 uint8_t itsOffTime = isNightOffTime(DISPLAY_2) ? 1 : 0;
-                if((global.disp_night_state[DISPLAY_2] != itsOffTime) || (global.display_state[DISPLAY_2] > 0)) {
-                    global.disp_night_state[DISPLAY_2] = itsOffTime;
-                    if(global.display_state[DISPLAY_2] > 0) {
-                        itsOffTime = global.display_state[DISPLAY_2] - 1;
-                        global.display_state[DISPLAY_2] = 0;
+                if((state.disp_night_state[DISPLAY_2] != itsOffTime) || (state.display_state[DISPLAY_2] > 0)) {
+                    state.disp_night_state[DISPLAY_2] = itsOffTime;
+                    if(state.display_state[DISPLAY_2] > 0) {
+                        itsOffTime = state.display_state[DISPLAY_2] - 1;
+                        state.display_state[DISPLAY_2] = 0;
                     }
                     if(itsOffTime) {
                         if(config.display_type(DISPLAY_2) == NEOPIXEL_DISPLAY) {
@@ -457,11 +457,11 @@ unsigned int get_brightness(unsigned int display_num) {
  * Check if need be and it's time to turn off display
  */
 bool isTimeoutOffTime(unsigned int dispNum) {
-    if(config.display_autoOff(dispNum) > 0 and ((millis() - global.disp_autoOff[dispNum]) > (config.display_autoOff(dispNum) * 60000))) {
-        global.reduc[dispNum] = true;
-        if((millis() - global.disp_autoOff[dispNum]) > ((config.display_autoOff(dispNum) * 60000) + 5000)) return true;
+    if(config.display_autoOff(dispNum) > 0 and ((millis() - state.disp_autoOff[dispNum]) > (config.display_autoOff(dispNum) * 60000))) {
+        state.reduc[dispNum] = true;
+        if((millis() - state.disp_autoOff[dispNum]) > ((config.display_autoOff(dispNum) * 60000) + 5000)) return true;
     }
-    else global.reduc[dispNum] = false;
+    else state.reduc[dispNum] = false;
     return false;
 }
 

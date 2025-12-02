@@ -51,7 +51,7 @@ void Network::connect() {
         if(String(config.network_ssid(i)) != "") anySSID = true;
     }
     if(anySSID) {
-        if(!global.apMode) WiFi.disconnect();
+        if(!state.apMode) WiFi.disconnect();
         WiFi.hostname("BIM32");
         if(WiFi.status() != WL_CONNECTED) {
             unsigned int numberOfNetworks = WiFi.scanNetworks();
@@ -117,8 +117,8 @@ void Network::_connecting(uint8_t num) {
  * Start Access point
  */
 void Network::runAccessPoint() {
-    if(!global.apMode) {
-        global.apMode = true;
+    if(!state.apMode) {
+        state.apMode = true;
         Serial.println();
         Serial.println(SEPARATOR);
         Serial.println("Start Access Point mode");

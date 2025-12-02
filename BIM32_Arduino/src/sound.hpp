@@ -38,8 +38,8 @@ void Sound::init(void) {
         time_t mils = millis();
         _reset();
         while(1) { 
-            if(!global.mp3_busy) {
-                global.mp3_busy = true;
+            if(!state.mp3_busy) {
+                state.mp3_busy = true;
                 _mp3_found = true;
                 break;
             }
@@ -171,9 +171,9 @@ void Sound::alarm() {
         if(minute() == 0 and second() >= 0 and second() <= 5) _alarm_rang = 60;
 
         // Stop alarm ringing if the alarm button was pressed
-        if(global.alarm_but_pressed) {
+        if(state.alarm_but_pressed) {
             stopPlaying();
-            global.alarm_but_pressed = false;
+            state.alarm_but_pressed = false;
         }
     }
 }
@@ -243,9 +243,9 @@ void Sound::_sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte) {
     uint16_t sum = _chckSum(sdata);
     sdata[7] = (uint8_t)(sum >> 8);
     sdata[8] = (uint8_t)(sum);
-    if(global.uart2_tx != DFPlayer) {
+    if(state.uart2_tx != DFPlayer) {
         Serial2.setPins(HC12_RX_PIN, MP3_TX_PIN);
-        global.uart2_tx = DFPlayer;
+        state.uart2_tx = DFPlayer;
     }
     Serial2.write(sdata, 10);
     Serial2.flush();

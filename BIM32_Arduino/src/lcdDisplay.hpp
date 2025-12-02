@@ -113,11 +113,11 @@ void LcdDisplay::_getData() {
     _tMonth = month();
     _tYear = year();
     _rssi = WiFi.RSSI();
-    _netLogo = global.apMode ? "Access Point" : "WiFi";
-    _netSsid = global.apMode ? config.accessPoint_ssid() : WiFi.SSID();
-    _netRssi = global.apMode ? "100%" : String(_rssi) + "dBm";
-    _netIp = global.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();
-    _netMac = global.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
+    _netLogo = state.apMode ? "Access Point" : "WiFi";
+    _netSsid = state.apMode ? config.accessPoint_ssid() : WiFi.SSID();
+    _netRssi = state.apMode ? "100%" : String(_rssi) + "dBm";
+    _netIp = state.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();
+    _netMac = state.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
     _netTemp = sensors.get_esp32_temp();
     _netFw = FW;
     _tempIn = agregateLcdData.tempIn(_tempSequence);
@@ -129,7 +129,7 @@ void LcdDisplay::_getData() {
     _volt = agregateLcdData.voltage();
     _voltColor = agregateLcdData.voltageColor();
     _batLevel = agregateLcdData.batteryLevel();
-    _isApMode = global.apMode;
+    _isApMode = state.apMode;
     _comfort = agregateLcdData.comfort();
     _comfortType = config.display_source_descr();
     _description = weather.get_description();

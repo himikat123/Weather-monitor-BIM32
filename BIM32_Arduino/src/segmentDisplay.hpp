@@ -417,7 +417,7 @@ void SegmentDisplay::_segAnimations() {
     _segGetData(segImg, _slot, true);
     String color = config.display_timeSlot_color(_slot, _dispNum);
     String prevColor = config.display_timeSlot_color(_prevSlot, _dispNum);
-    if(global.apMode) {
+    if(state.apMode) {
         color = "#FFFFFF";
         prevColor = "#FFFFFF";
     }
@@ -447,7 +447,7 @@ void SegmentDisplay::_segAnimations() {
 }
 
 void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
-    if(global.apMode) {
+    if(state.apMode) {
         _apMode(segImg);
     }
     else if(config.display_timeSlot_period(slot, _dispNum) > 0) {

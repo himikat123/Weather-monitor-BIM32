@@ -138,9 +138,9 @@ void Nextion::refresh() {
 
         if(config.display_model(0) == NX4832T035) _NX4832T035_timeDate();
         if(config.display_model(0) == NX4832K035) {
-            if(global.clockSynchronize) {
+            if(state.clockSynchronize) {
                 _NX4832K035_setRTC();
-                global.clockSynchronize = false;
+                state.clockSynchronize = false;
             }
         }
 
@@ -174,7 +174,7 @@ void Nextion::refresh() {
  * Change display brightness
  */
 void Nextion::brightness(unsigned int bright) {
-    uint8_t br = global.reduc[0] ? round(bright / 2) : bright;
+    uint8_t br = state.reduc[0] ? round(bright / 2) : bright;
     if(br < config.display_brightness_min(0)) br = config.display_brightness_min(0);
     if(br > config.display_brightness_max(0)) br = config.display_brightness_max(0); 
     if(_prevBright != br or _forced) {
@@ -790,7 +790,7 @@ void Nextion::dataReceive() {
     while(Serial1.available()) {
         char nextionChar = Serial1.read();
         if(nextionChar == '{' or nextionChar == '\x87') {
-            global.disp_autoOff[0] = millis();
+            state.disp_autoOff[0] = millis();
             if(!isDisplayOn()) displayOn();
         }
         if(nextionChar == '{') _customData = 1;

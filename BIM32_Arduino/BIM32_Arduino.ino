@@ -53,7 +53,7 @@ State state;
 #include "src/validate.hpp"
 Validate validate;
 #include "src/pinout.hpp"
-#include "src/globals.hpp"
+#include "src/config.hpp"
 Configuration config;
 #include "src/sensors.hpp"
 Sensors sensors;
