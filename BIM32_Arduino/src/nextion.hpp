@@ -255,12 +255,12 @@ void Nextion::_NX4832T035_timeDate() {
         _prevTMinute = _tMinute;
     }
     if(_prevTDay != _tDay or _prevTMonth != _tMonth or _prevTYear != _tYear or _forced) {
-        nex.writeStr("BigClock.date.txt", String(_tDay) + " " + lang.monthDay(_tMonth) + " " + String(_tYear));
-        String buf = "";
-        if(config.lang() == "en") buf = lang.monthDay(month()) + ", " + String(day()) + " " +  String(year());
-        else if(config.lang() == "de") buf = String(day()) + ". " + lang.monthDay(month()) + " " + String(year());
-        else if(config.lang() == "es") buf = String(day()) + " de " + lang.monthDay(month()) + " de " + String(year());
-        else buf = String(day()) + " " + lang.monthDay(month()) + " " + String(year());
+        char buf[32];
+        if(config.lang() == "en") snprintf(buf, sizeof(buf), "%s, %02d %04d", lang.monthDay(month()), day(), year());
+        else if(config.lang() == "de") snprintf(buf, sizeof(buf), "%02d. %s %04d", day(), lang.monthDay(month()), year());
+        else if(config.lang() == "es") snprintf(buf, sizeof(buf), "%02d de %s de %04d", day(), lang.monthDay(month()), year());
+        else snprintf(buf, sizeof(buf), "%02d %s %04d", day(), lang.monthDay(month()), year());
+        nex.writeStr("BigClock.date.txt", String(buf)); 
         _prevTDay = _tDay;
         _prevTMonth = _tMonth;
         _prevTYear = _tYear;

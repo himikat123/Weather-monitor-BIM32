@@ -825,18 +825,18 @@ void ILI9341::_dateWeekday() {
         _prevTWeekday = weekday();
     }
     if(_prevTDay != day() || _prevTMonth != month() || _prevTYear != year() || _forced) {
-        String buf = "";
-        if(config.lang() == "en") buf = lang.monthDay(month()) + ", " + String(day()) + " " +  String(year());
-        else if(config.lang() == "de") buf = String(day()) + ". " + lang.monthDay(month()) + " " + String(year());
+        char buf[32];
+        const char* monthDay = lang.monthDay(month());
+        int len = strlen(monthDay);
+        if(config.lang() == "en") snprintf(buf, sizeof(buf), "%s, %02d %04d", monthDay, day(), year());
+        else if(config.lang() == "de") snprintf(buf, sizeof(buf), "%02d. %s %04d", day(), monthDay, year());
         else if(config.lang() == "es") {
-            buf = String(day()) + " de ";
-            if(lang.monthDay(month()).length() > 7) buf += lang.monthShortName(month());
-            else buf += lang.monthDay(month());
-            buf += " de " + String(year());
+            snprintf(buf, sizeof(buf), "%02d de %s de %04d", day(), len > 7 ? lang.monthShortName(month()) : monthDay, year());
         }
-        else buf = String(day()) + " " + lang.monthDay(month()) + " " + String(year());
+        else snprintf(buf, sizeof(buf), "%02d %s %04d", day(), monthDay, year());
+
         tft.fillRect(0, 198, 319, 40, BG_COLOR);
-        _printText(0, 200, 319, 30, buf, FONT3, CENTER, TEMP_MIN_COLOR);
+        _printText(0, 200, 319, 30, String(buf), FONT3, CENTER, TEMP_MIN_COLOR);
         _prevTDay = day();
         _prevTMonth = month();
         _prevTYear = year();
@@ -1030,8 +1030,9 @@ void ILI9341::_calendarPage() {
     uint8_t daysInMonth = _numberOfDaysInMonth(month(shiftSeconds), year(shiftSeconds));
 
     if(_prevCalendarShiftSeconds != _calendarShiftSeconds || _prevTDay != day()) {
-        String mon = lang.monthFullName(month(shiftSeconds)) + " " + String(year(shiftSeconds));
-        _printText(30, 8, 260, 20, mon, FONT2, CENTER, MONTH_COLOR, BG_COLOR);
+        char mon[32];
+        sprintf(mon, "%s %04d", lang.monthFullName(month(shiftSeconds)), year(shiftSeconds));
+        _printText(30, 8, 260, 20, String(mon), FONT2, CENTER, MONTH_COLOR, BG_COLOR);
         uint8_t cday = 1;
         bool clndRun = false;
         for(uint8_t w=0; w<6; w++) {
@@ -1178,10 +1179,10 @@ void ILI9341::_hourlyPrec(uint8_t num, uint16_t y) {
     uint16_t x = num * 32 + 30;
     _showImg(x + 2, y, symb_drop, sizeof(symb_drop));
     float prec = _hrPrec[num];
-    String pr = "--";
-    if(config.weather_provider() == 0) pr = prec ? String(prec) : "0" + lang.mm();
-    if(config.weather_provider() == 2) pr = String((int)round(prec)) + '%';
-    _printText(x + 11, y + 2, 21, 12, pr, FONT_TINY, CENTER, TEXT_COLOR);
+    char pr[8];
+    if(config.weather_provider() == 0) sprintf(pr, "%f%s", prec ? prec : 0.0, lang.mm());
+    if(config.weather_provider() == 2) sprintf(pr, "%d%%", (int)round(prec));
+    _printText(x + 11, y + 2, 21, 12, String(pr), FONT_TINY, CENTER, TEXT_COLOR);
 }
 
 void ILI9341::_displayLcdHourlyCharts(uint8_t type) {
@@ -1350,8 +1351,9 @@ void ILI9341::_alarmPage() {
             for(uint8_t h=0; h<4; h++) {
                 uint16_t x = h * 72, y = v * 79 + 1;
                 // alarm number
-                String alarmNum = lang.alarm() + " " + String(alarmNr + 1);
-                _printText(x + 1, y + 5, 70, 11, alarmNum, FONT_TINY, CENTER, TEXT_COLOR);
+                char alarmNum[32];
+                sprintf(alarmNum, "%s %d", lang.alarm(), alarmNr + 1);
+                _printText(x + 1, y + 5, 70, 11, String(alarmNum), FONT_TINY, CENTER, TEXT_COLOR);
                 // weekdays
                 _printText(x + 1, y + 48, 19, 11, lang.weekdayShortName(2), FONT_TINY, RIGHT, TEXT_COLOR);
                 _printText(x + 16, y + 48, 40, 11, ". . . . . . . . .", FONT_TINY, CENTER, TEXT_COLOR);
