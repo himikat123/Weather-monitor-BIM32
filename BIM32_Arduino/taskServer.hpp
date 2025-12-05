@@ -82,7 +82,7 @@ void TaskServer(void *pvParameters) {
                     }
                 }
 
-                doc["runtime"] = round(millis() / 1000);
+                doc["runtime"] = esp_timer_get_time() / 1000ULL;
                 doc["heap"] = ESP.getFreeHeap();
                 doc["time"] = now();
                 
