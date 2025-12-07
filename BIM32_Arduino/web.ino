@@ -154,7 +154,7 @@ void web_sens() {
     state.toJson(json);
     json["state"] = web_isLogged(false) ? "OK" : "LOGIN";
     json["fw"] = FW;
-    json["runtime"] = round(millis() / 1000);
+    json["runtime"] = esp_timer_get_time() / 1000ULL;
     json["heap"] = ESP.getFreeHeap();
     json["time"] = now();
     #if defined(BIM32_CYD)
