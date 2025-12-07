@@ -153,7 +153,9 @@ struct AnalogState {
 
 struct ThingState {
     time_t time = 0;
+    unsigned int historyTime[24] = { 0 };
     float data[8] = { -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0 };
+    float historyData[7][24] = { 0 };
     bool updated = false;
 
     void toJson(JsonObject obj) const {
@@ -270,6 +272,24 @@ struct WSensorState {
         }
     };
 
+    struct BlockWind {
+        Block1D speed, dir;
+
+        void toJson(JsonObject o) const {
+            speed.toJson(o.createNestedObject("speed"));
+            dir.toJson(o.createNestedObject("dir"));
+        }
+    };
+
+    struct BlockBattery {
+        int adc[2] = {-1, -1};
+        float voltage[2] = {-1.0, -1.0};
+        int level[2] = {-1, -1};
+        float percentage[2] = {-1, -1};
+    };
+
+    BlockBattery battery;
+    BlockWind wind;
     Block2D temp;
     Block1D hum, pres, light, voltage, current, power, energy, freq, co2;
 
@@ -289,9 +309,10 @@ struct WSensorState {
         energy.toJson(o.createNestedObject("energy"));
         freq.toJson(o.createNestedObject("freq"));
         co2.toJson(o.createNestedObject("co2"));
+        wind.toJson(o.createNestedObject("wind")); 
 
         JsonArray b = o.createNestedArray("bat");
-        for(int i=0;i<2;i++) b.add(time[i]);
+        for(int i=0; i<2; i++) b.add(battery.adc[i]);
     }
 };
 

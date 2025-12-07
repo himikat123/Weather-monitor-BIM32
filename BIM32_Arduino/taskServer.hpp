@@ -51,18 +51,7 @@ void TaskServer(void *pvParameters) {
 
     while(1) {
         /**
-         * BME680 sensor update
-         * try as often as possible, the sensor will update when it decides
-         */
-        if(sensorsSemaphore != NULL) {
-            if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
-                sensors.BME680Read();
-                xSemaphoreGive(sensorsSemaphore);
-            }
-        }
-
-        /**
-         * Handle server
+         * Handle server & websockets
          */
         server.handleClient();
         websocket.loop();
@@ -85,6 +74,8 @@ void TaskServer(void *pvParameters) {
                 doc["runtime"] = esp_timer_get_time() / 1000ULL;
                 doc["heap"] = ESP.getFreeHeap();
                 doc["time"] = now();
+
+                if(state.wsensor.updated) doc["wsensRaw"] = String(wsensor.get_rawData());
                 
                 updateIfNeeded(state.network, root);
                 updateIfNeeded(state.bme280, root);
@@ -96,41 +87,9 @@ void TaskServer(void *pvParameters) {
                 updateIfNeeded(state.bh1750, root);
                 updateIfNeeded(state.analog, root);
                 updateIfNeeded(state.bme680, root);
-
-                //json["thing"]["time"] = thingspeak.get_updated();
-                //for(unsigned int i=0; i<THNG_FIELDS; i++) {
-                //    json["thing"]["data"][i] = thingspeak.get_field(i);
-                //}
-
+                updateIfNeeded(state.thing, root);
                 updateIfNeeded(state.weather, root);
-
-                //for(unsigned int i=0; i<WSENSORS; i++) {
-                //    json["wsensor"]["time"][i] = wsensor.get_updated(i);
-                //    for(unsigned int n=0; n<5; n++) {
-                //        json["wsensor"]["temp"]["data"][n][i] = wsensor.get_temperature(i, n, RAW);
-                //        json["wsensor"]["temp"]["name"][n][i] = wsensor.get_sensorType(i, n);
-                //    }
-                //    json["wsensor"]["hum"]["data"][i] = wsensor.get_humidity(i, RAW);
-                //    json["wsensor"]["hum"]["name"][i] = wsensor.get_sensorType(i, 0);
-                //    json["wsensor"]["pres"]["data"][i] = wsensor.get_pressure(i, RAW);
-                //    json["wsensor"]["pres"]["name"][i] = wsensor.get_sensorType(i, 0);
-                //    json["wsensor"]["light"]["data"][i] = wsensor.get_light(i, RAW);
-                //    json["wsensor"]["light"]["name"][i] = wsensor.get_lightType(i);
-                //    json["wsensor"]["voltage"]["data"][i] = wsensor.get_voltage(i, RAW);
-                //    json["wsensor"]["voltage"]["name"][i] = wsensor.get_energyType();
-                //    json["wsensor"]["current"]["data"][i] = wsensor.get_current(i, RAW);
-                //    json["wsensor"]["current"]["name"][i] = wsensor.get_energyType();
-                //    json["wsensor"]["power"]["data"][i] = wsensor.get_power(i, RAW);
-                //    json["wsensor"]["power"]["name"][i] = wsensor.get_energyType();
-                //    json["wsensor"]["energy"]["data"][i] = wsensor.get_energy(i, RAW);
-                //    json["wsensor"]["energy"]["name"][i] = wsensor.get_energyType();
-                //    json["wsensor"]["freq"]["data"][i] = wsensor.get_frequency(i, RAW);
-                //    json["wsensor"]["freq"]["name"][i] = wsensor.get_energyType();
-                //    json["wsensor"]["co2"]["data"][i] = wsensor.get_co2(i, RAW);
-                //    json["wsensor"]["co2"]["name"][i] = wsensor.get_co2Type();
-                //    json["wsensor"]["bat"][i] = wsensor.get_batteryAdc(i);
-                //}
-
+                updateIfNeeded(state.wsensor, root);
                 updateIfNeeded(state.filesystem, root);
 
                 String data = "";
@@ -146,6 +105,17 @@ void TaskServer(void *pvParameters) {
             state.filesystem.free = state.filesystem.total - LittleFS.usedBytes();
             state.filesystem.fsInfoUpdate = false;
             state.filesystem.updated = true;
+        }
+
+        /**
+         * BME680 sensor update
+         * try as often as possible, the sensor will update when it decides
+         */
+        if(sensorsSemaphore != NULL) {
+            if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
+                sensors.BME680Read();
+                xSemaphoreGive(sensorsSemaphore);
+            }
         }
 
         /**

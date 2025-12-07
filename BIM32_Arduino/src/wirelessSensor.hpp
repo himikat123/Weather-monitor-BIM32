@@ -5,14 +5,7 @@ class WirelessSensor {
         void handleReceive();
         void receive();
         bool dataRelevance(uint8_t wsensNum);
-        int get_updated(unsigned int num);
-        String get_sensorType(unsigned int num, unsigned int sensor);
-        String get_lightType(unsigned int num);
-        String get_energyType();
-        String get_co2Type();
-        String get_windSpeedType();
-        String get_windDirType();
-
+        time_t get_updated(unsigned int num);
         float get_temperature(unsigned int num, unsigned int sensor);
         float get_humidity(unsigned int num);
         float get_pressure(unsigned int num);
@@ -29,52 +22,31 @@ class WirelessSensor {
         float get_batteryVoltage(unsigned int num);
         int get_batteryLevel(unsigned int num);
         float get_batteryPercentage(unsigned int num);
+        char* get_rawData();
 
     private:
-        uint16_t receivedIndex = 0;
-        char receivedData[1024];
-        int _updated[WSENSORS] = {-1, -1};               // Last update timestamp
-        float _temperature[WSENSORS][5] = {              // Temperature
-            {40400.0, 40400.0, 40400.0, 40400.0, 40400.0}, 
-            {40400.0, 40400.0, 40400.0, 40400.0, 40400.0} 
-        };
-        float _humidity[WSENSORS] = {40400.0, 40400.0};  // Humidity
-        float _pressure[WSENSORS] = {40400.0, 40400.0};  // Pressure
-        char _sensorType[WSENSORS][20] = {"", ""};       // Temperature, Humidity, Pressure sensor type (name)
-        float _windSpeed[WSENSORS] = {-1, -1};           // Wind speed
-        int _windDir[WSENSORS] = {-1, -1};               // Wind direction
-        float _light[WSENSORS] = {-1.0, -1.0};           // Ambient light
-        char _lightType[WSENSORS][20] = {"", ""};        // Ambient light sensor type (name)
-        float _voltage[WSENSORS] = {-1.0, -1.0};         // Voltage
-        float _current[WSENSORS] = {-1.0, -1.0};         // Current
-        float _power[WSENSORS] = {-1.0, -1.0};           // Power
-        float _energy[WSENSORS] = {-1.0, -1.0};          // Energy
-        float _frequency[WSENSORS] = {-1.0, -1.0};       // Frequency
-        float _co2[WSENSORS] = {-1.0, -1.0};             // CO2
-        int _adc[WSENSORS] = {-1, -1};                   // Battery ADC raw data
-        float _batteryVoltage[WSENSORS] = {-1.0, -1.0};  // Battery voltage
-        int _batteryLevel[WSENSORS] = {-1, -1};          // Battery level
-        float _batteryPercentage[WSENSORS] = {-1, -1};   // Battery percentage
+        uint16_t _receivedIndex = 0;
+        char _receivedData[1024];
 };
 
 void WirelessSensor::handleReceive() {
     while(Serial2.available()) {
         char c = Serial2.read();
-        receivedData[receivedIndex] = c;
-        if(receivedIndex < 1023) receivedIndex++;
+        _receivedData[_receivedIndex] = c;
+        if(_receivedIndex < 1023) _receivedIndex++;
     }
 }
 
 void WirelessSensor::receive() {
     String wsensorStr = "";
-    char lastChar = receivedData[receivedIndex];
-    char last_char = receivedData[receivedIndex - 1];
+    char lastChar = _receivedData[_receivedIndex];
+    char last_char = _receivedData[_receivedIndex - 1];
     if(lastChar == '\n' or lastChar == '}' or last_char == '\n' or last_char == '}') {
-        receivedIndex = 0;
+        _receivedIndex = 0;
         Serial.println(SEPARATOR);
         Serial.println("Wireless sensor receive... ");
 
-        String received = String(receivedData);
+        String received = String(_receivedData);
         int index = received.indexOf('\n');
         wsensorStr = received.substring(0, index);
         Serial.println(wsensorStr);
@@ -92,58 +64,64 @@ void WirelessSensor::receive() {
                 }
                 int number = root["num"];
                 if(number >= 0 and number < WSENSORS) {
-                    _updated[number] = now();
-
-                    strlcpy(_sensorType[number], root["s"] | "", sizeof(_sensorType[number]));
-                    strlcpy(_lightType[number], root["a"] | "", sizeof(_lightType[number]));
-
-                    _temperature[number][0] = root["t"] | 40400.0;
-                    _temperature[number][1] = root["ds"][0] | 40400.0;
-                    _temperature[number][2] = root["ds"][1] | 40400.0;
-                    _temperature[number][3] = root["ds"][2] | 40400.0;
-                    _temperature[number][4] = root["ds"][3] | 40400.0;
-
-                    _humidity[number] = root["h"] | 40400.0;
-                    _pressure[number] = root["p"] | 40400.0;
-
-                    _windSpeed[number] = root["wind"][0] | -1;
-                    _windDir[number] = root["wind"][1] | -1;
-
-                    _light[number] = root["l"] | -1.0;
-
-                    _voltage[number] = root["pzem"][0] | -1.0;
-                    _current[number] = root["pzem"][1] | -1.0;
-                    _power[number] = root["pzem"][2] | -1.0;
-                    _energy[number] = root["pzem"][3] | -1.0;
-                    _frequency[number] = root["pzem"][4] | -1.0;
-
-                    _co2[number] = root["s8"] | -1.0;
-
-                    _adc[number] = root["b"] | -1;
-                    _batteryVoltage[number] = (float)_adc[number] / (300.0 - config.wsensor_bat_k(number));
-                    if(_batteryVoltage[number] > 0.0) {
+                    state.wsensor.time[number] = now();
+                    // temperature
+                    state.wsensor.temp.data[0][number] = root["t"] | 40400.0;
+                    strlcpy(state.wsensor.temp.name[0][number], root["s"] | "", sizeof(state.wsensor.temp.name[0][number]));
+                    for(int i=1; i<5; i++) {
+                        state.wsensor.temp.data[i][number] = root["ds"][i - 1] | 40400.0;
+                        strlcpy(state.wsensor.temp.name[i][number], "DS18B20", sizeof(state.wsensor.temp.name[i][number]));
+                    }
+                    // humidity
+                    state.wsensor.hum.data[number] = root["h"] | 40400.0;
+                    strlcpy(state.wsensor.hum.name[number], root["s"] | "", sizeof(state.wsensor.hum.name[number]));
+                    // pressure
+                    state.wsensor.pres.data[number] = root["p"] | 40400.0;
+                    strlcpy(state.wsensor.pres.name[number], root["s"] | "", sizeof(state.wsensor.pres.name[number]));
+                    // wind
+                    state.wsensor.wind.speed.data[number] = root["wind"][0] | -1;
+                    strlcpy(state.wsensor.wind.speed.name[number], "RS485", sizeof(state.wsensor.wind.speed.name[number]));
+                    state.wsensor.wind.dir.data[number] = root["wind"][1] | -1;
+                    strlcpy(state.wsensor.wind.dir.name[number], "RS485", sizeof(state.wsensor.wind.dir.name[number]));
+                    // ambient light
+                    state.wsensor.light.data[number] = root["l"] | -1.0;
+                    strlcpy(state.wsensor.light.name[number], root["a"] | "", sizeof(state.wsensor.light.name[number]));
+                    // PZEM-004t
+                    state.wsensor.voltage.data[number] = root["pzem"][0] | -1.0;
+                    strlcpy(state.wsensor.voltage.name[number], "PZEM-004t", sizeof(state.wsensor.voltage.name[number]));
+                    state.wsensor.current.data[number] = root["pzem"][1] | -1.0;
+                    strlcpy(state.wsensor.current.name[number], "PZEM-004t", sizeof(state.wsensor.current.name[number]));
+                    state.wsensor.power.data[number] = root["pzem"][2] | -1.0;
+                    strlcpy(state.wsensor.power.name[number], "PZEM-004t", sizeof(state.wsensor.power.name[number]));
+                    state.wsensor.energy.data[number] = root["pzem"][3] | -1.0;
+                    strlcpy(state.wsensor.energy.name[number], "PZEM-004t", sizeof(state.wsensor.energy.name[number]));
+                    state.wsensor.freq.data[number] = root["pzem"][4] | -1.0;
+                    strlcpy(state.wsensor.freq.name[number], "PZEM-004t", sizeof(state.wsensor.freq.name[number]));
+                    // Senseair S8
+                    state.wsensor.co2.data[number] = root["s8"] | -1.0;
+                    strlcpy(state.wsensor.co2.name[number], "Senseair S8", sizeof(state.wsensor.co2.name[number]));
+                    // Battery
+                    state.wsensor.battery.adc[number] = root["b"] | -1;
+                    state.wsensor.battery.voltage[number] = (float)state.wsensor.battery.adc[number] / (300.0 - config.wsensor_bat_k(number));
+                    if(state.wsensor.battery.voltage[number] > 0.0) {
                         float umin = 3.75;
                         float umax = 3.9;
                         if(config.wsensor_bat_type(number) == 0) umax = 4.5;
                         float stp = (umax - umin) / 4;
-                        if(_batteryVoltage[number] < (umin + stp)) _batteryLevel[number] = 1;
-                        else if(_batteryVoltage[number] < (umin + stp * 2)) _batteryLevel[number] = 2;
-                        else if(_batteryVoltage[number] < (umin + stp * 3)) _batteryLevel[number] = 3;
-                        else _batteryLevel[number] = 4;
-                        _batteryPercentage[number] = (_batteryVoltage[number] - umin) * 100.0 / (umax - umin); 
-                        if(_batteryPercentage[number] > 100.0) _batteryPercentage[number] = 100.0;
+                        if(state.wsensor.battery.voltage[number] < (umin + stp)) state.wsensor.battery.level[number] = 1;
+                        else if(state.wsensor.battery.voltage[number] < (umin + stp * 2)) state.wsensor.battery.level[number] = 2;
+                        else if(state.wsensor.battery.voltage[number] < (umin + stp * 3)) state.wsensor.battery.level[number] = 3;
+                        else state.wsensor.battery.level[number] = 4;
+                        state.wsensor.battery.percentage[number] = (state.wsensor.battery.voltage[number] - umin) * 100.0 / (umax - umin); 
+                        if(state.wsensor.battery.percentage[number] > 100.0) state.wsensor.battery.percentage[number] = 100.0;
                     }
 
                     Serial.printf("Sensor %d updated", number);
-                    if(_updated > 0)
-                        Serial.printf(
-                            " at: %d:%02d:%02d\r\n", 
-                            hour(_updated[number]), 
-                            minute(_updated[number]), 
-                            second(_updated[number])
-                        );
+                    time_t updTime = state.wsensor.time[number];
+                    if(updTime > 0) Serial.printf(" at: %d:%02d:%02d\r\n", hour(updTime), minute(updTime), second(updTime));
                     else Serial.println(": never");
                 }
+                state.wsensor.updated = true;
             }
 
             int rc = wsensorStr.indexOf("OK+RC");
@@ -174,122 +152,98 @@ void WirelessSensor::receive() {
  * check if data is not expired
  */
 bool WirelessSensor::dataRelevance(uint8_t wsensNum) {
-    return (now() - _updated[wsensNum]) < (config.wsensor_expire(wsensNum) * 60);
+    return (now() - state.wsensor.time[wsensNum]) < (config.wsensor_expire(wsensNum) * 60);
 }
 
 /*
  * Getters
  */
  
-int WirelessSensor::get_updated(unsigned int num) {
+time_t WirelessSensor::get_updated(unsigned int num) {
     if(num >= WSENSORS) return -1;
-    return _updated[num];
-}
-
-String WirelessSensor::get_sensorType(unsigned int num, unsigned int sensor) {
-    if(num >= WSENSORS or sensor > 4) return "";
-    if(sensor == 0) return String(_sensorType[num]);
-    else if(sensor >= 1 and sensor <= 4) return "DS18B20";
-    else return "";
-}
-
-String WirelessSensor::get_lightType(unsigned int num) {
-    if(num >= WSENSORS) return "";
-    return String(_lightType[num]);
-}
-
-String WirelessSensor::get_energyType() {
-    return "PZEM-004t";
-}
-
-String WirelessSensor::get_co2Type() {
-    return "Senseair S8";
-}
-
-String WirelessSensor::get_windSpeedType() {
-    return "RS485";
-}
-
-String WirelessSensor::get_windDirType() {
-    return "RS485";
+    return state.wsensor.time[num];
 }
 
 float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor) {
     if(num >= WSENSORS or sensor > 4) return 40400.0;
-    return _temperature[num][sensor] + config.wsensor_temp_corr(num, sensor);
+    return state.wsensor.temp.data[sensor][num] + config.wsensor_temp_corr(num, sensor);
 }
 
 float WirelessSensor::get_humidity(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return _humidity[num] + config.wsensor_hum_corr(num);
+    return state.wsensor.hum.data[num] + config.wsensor_hum_corr(num);
 }
 
 float WirelessSensor::get_pressure(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return _pressure[num] + config.wsensor_pres_corr(num);
+    return state.wsensor.pres.data[num] + config.wsensor_pres_corr(num);
 }
 
 float WirelessSensor::get_windSpeed(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _windSpeed[num] + config.wsensor_wind_speed_corr(num);
+    return state.wsensor.wind.speed.data[num] + config.wsensor_wind_speed_corr(num);
 }
 
 int WirelessSensor::get_windDir(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return _windDir[num] + config.wsensor_wind_dir_corr(num); 
+    return state.wsensor.wind.dir.data[num] + config.wsensor_wind_dir_corr(num); 
 }
 
 float WirelessSensor::get_light(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _light[num] + config.wsensor_light_corr(num);
+    return state.wsensor.light.data[num] + config.wsensor_light_corr(num);
 }
 
 float WirelessSensor::get_voltage(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _voltage[num] + config.wsensor_volt_corr(num);
+    return state.wsensor.voltage.data[num] + config.wsensor_volt_corr(num);
 }
 
 float WirelessSensor::get_current(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _current[num] + config.wsensor_curr_corr(num);
+    return state.wsensor.current.data[num] + config.wsensor_curr_corr(num);
 }
 
 float WirelessSensor::get_power(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _power[num] + config.wsensor_pow_corr(num);
+    return state.wsensor.power.data[num] + config.wsensor_pow_corr(num);
 }
 
 float WirelessSensor::get_energy(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _energy[num] + config.wsensor_enrg_corr(num);
+    return state.wsensor.energy.data[num] + config.wsensor_enrg_corr(num);
 }
 
 float WirelessSensor::get_frequency(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _frequency[num] + config.wsensor_freq_corr(num);
+    return state.wsensor.freq.data[num] + config.wsensor_freq_corr(num);
 }
 
 float WirelessSensor::get_co2(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _co2[num] + config.wsensor_co2_corr(num);
+    return state.wsensor.co2.data[num] + config.wsensor_co2_corr(num);
 }
 
 int WirelessSensor::get_batteryAdc(unsigned int num) {
     if(num >= WSENSORS) return -1;
-    return _adc[num];
+    return state.wsensor.battery.adc[num];
 }
 
 float WirelessSensor::get_batteryVoltage(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _batteryVoltage[num];
+    return state.wsensor.battery.voltage[num];
 }
 
 int WirelessSensor::get_batteryLevel(unsigned int num) {
     if(num >= WSENSORS) return -1;
-    return _batteryLevel[num];
+    return state.wsensor.battery.level[num];
 }
 
 float WirelessSensor::get_batteryPercentage(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return _batteryPercentage[num];
+    return state.wsensor.battery.percentage[num];
+}
+
+char* WirelessSensor::get_rawData() {
+    return _receivedData;
 }

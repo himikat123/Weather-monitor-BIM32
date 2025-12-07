@@ -6,19 +6,14 @@ class Thingspeak {
         void receiveHistory();
         bool dataRelevance();
         float get_field(unsigned int num);
-        int get_updated();
+        time_t get_updated();
         float get_historyField(unsigned int sensor, unsigned int slot);
-        unsigned int get_historyUpdated(unsigned int slot);
+        time_t get_historyUpdated(unsigned int slot);
 
     private:
         String _fieldPrepare(unsigned int field);
         String _historyFieldPrepare(unsigned int fieldNum);
         boolean _is_summertime();
-        
-        float _field[8] = {-40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0};
-        float _historyFields[7][24] = { 0 };
-        unsigned int _historyUpdated[24] = { 0 };
-        int _updated = -1;
 };
 
 /**
@@ -50,14 +45,14 @@ void Thingspeak::receive() {
             return;
         }
         String thing_tm  = root["feeds"][0]["created_at"];
-        _field[0] = root["feeds"][0]["field1"];
-        _field[1] = root["feeds"][0]["field2"];
-        _field[2] = root["feeds"][0]["field3"];
-        _field[3] = root["feeds"][0]["field4"];    
-        _field[4] = root["feeds"][0]["field5"];
-        _field[5] = root["feeds"][0]["field6"];
-        _field[6] = root["feeds"][0]["field7"];
-        _field[7] = root["feeds"][0]["field8"];
+        state.thing.data[0] = root["feeds"][0]["field1"];
+        state.thing.data[1] = root["feeds"][0]["field2"];
+        state.thing.data[2] = root["feeds"][0]["field3"];
+        state.thing.data[3] = root["feeds"][0]["field4"];    
+        state.thing.data[4] = root["feeds"][0]["field5"];
+        state.thing.data[5] = root["feeds"][0]["field6"];
+        state.thing.data[6] = root["feeds"][0]["field7"];
+        state.thing.data[7] = root["feeds"][0]["field8"];
         TimeElements tmth;
         char buf[22];
         thing_tm.toCharArray(buf, 22);
@@ -67,10 +62,11 @@ void Thingspeak::receive() {
         tmth.Hour = atoi(strtok(NULL, ":"));
         tmth.Minute = atoi(strtok(NULL, ":"));
         tmth.Second = atoi(strtok(NULL, ":"));
-        _updated = makeTime(tmth);
-        _updated += config.clock_utc() * 3600;
-        _updated += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
+        state.thing.time = makeTime(tmth);
+        state.thing.time += config.clock_utc() * 3600;
+        state.thing.time += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
         Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
+        state.thing.updated = true;
     }
     else Serial.println("error, code: " + String(httpCode));
     client.end();
@@ -164,13 +160,13 @@ void Thingspeak::receiveHistory() {
         }
         String thing_tm  = root["feeds"][0]["created_at"];
         for(int i=0; i<24; i++) {
-            _historyFields[0][i] = root["feeds"][i]["field1"].isNull() ? -99.0 : root["feeds"][i]["field1"];
-            _historyFields[1][i] = root["feeds"][i]["field2"].isNull() ? -99.0 : root["feeds"][i]["field2"];
-            _historyFields[2][i] = root["feeds"][i]["field3"].isNull() ? -99.0 : root["feeds"][i]["field3"];
-            _historyFields[3][i] = root["feeds"][i]["field4"].isNull() ? -99.0 : root["feeds"][i]["field4"];
-            _historyFields[4][i] = root["feeds"][i]["field5"].isNull() ? -99.0 : root["feeds"][i]["field5"];
-            _historyFields[5][i] = root["feeds"][i]["field6"].isNull() ? -99.0 : root["feeds"][i]["field6"];
-            _historyFields[6][i] = root["feeds"][i]["field7"].isNull() ? -99.0 : root["feeds"][i]["field7"];
+            state.thing.historyData[0][i] = root["feeds"][i]["field1"].isNull() ? -99.0 : root["feeds"][i]["field1"];
+            state.thing.historyData[1][i] = root["feeds"][i]["field2"].isNull() ? -99.0 : root["feeds"][i]["field2"];
+            state.thing.historyData[2][i] = root["feeds"][i]["field3"].isNull() ? -99.0 : root["feeds"][i]["field3"];
+            state.thing.historyData[3][i] = root["feeds"][i]["field4"].isNull() ? -99.0 : root["feeds"][i]["field4"];
+            state.thing.historyData[4][i] = root["feeds"][i]["field5"].isNull() ? -99.0 : root["feeds"][i]["field5"];
+            state.thing.historyData[5][i] = root["feeds"][i]["field6"].isNull() ? -99.0 : root["feeds"][i]["field6"];
+            state.thing.historyData[6][i] = root["feeds"][i]["field7"].isNull() ? -99.0 : root["feeds"][i]["field7"];
 
             String thing_tm  = root["feeds"][i]["created_at"];
             TimeElements tmth;
@@ -182,9 +178,9 @@ void Thingspeak::receiveHistory() {
             tmth.Hour = atoi(strtok(NULL, ":"));
             tmth.Minute = atoi(strtok(NULL, ":"));
             tmth.Second = atoi(strtok(NULL, ":"));
-            _historyUpdated[i] = makeTime(tmth);
-            _historyUpdated[i] += config.clock_utc() * 3600;
-            _historyUpdated[i] += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
+            state.thing.historyTime[i] = makeTime(tmth);
+            state.thing.historyTime[i] += config.clock_utc() * 3600;
+            state.thing.historyTime[i] += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
         }
         Serial.println("successfull");
     }
@@ -196,7 +192,7 @@ void Thingspeak::receiveHistory() {
  * check if data is not expired
  */
 bool Thingspeak::dataRelevance() {
-    return (now() - _updated) < (config.thingspeakReceive_expire() * 60);
+    return (now() - state.thing.time) < (config.thingspeakReceive_expire() * 60);
 }
 
 /**
@@ -206,15 +202,15 @@ bool Thingspeak::dataRelevance() {
  */
 float Thingspeak::get_field(unsigned int num) {
     if(num > 7) return -40400.0;
-    return _field[num];
+    return state.thing.data[num];
 }
 
 /**
  * Get timestamp of last update
  * @return timestamp
  */
-int Thingspeak::get_updated() {
-    return _updated;
+time_t Thingspeak::get_updated() {
+    return state.thing.time;
 }
 
 /**
@@ -226,16 +222,16 @@ int Thingspeak::get_updated() {
 float Thingspeak::get_historyField(unsigned int sensor, unsigned int slot) {
     if(sensor >= 7) return -99.0;
     if(slot >= 24) return -99.0;
-    return _historyFields[sensor][slot];
+    return state.thing.historyData[sensor][slot];
 }
 
 /**
  * Get timestamp of history repository timeslot update
  * @return timestamp
  */
-unsigned int Thingspeak::get_historyUpdated(unsigned int slot) {
+time_t Thingspeak::get_historyUpdated(unsigned int slot) {
     if(slot >= 24) return 0;
-    return _historyUpdated[slot];
+    return state.thing.historyTime[slot];
 }
 
 /**
