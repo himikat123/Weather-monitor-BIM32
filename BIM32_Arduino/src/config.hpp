@@ -63,16 +63,6 @@ class Config {
     // Touch calibration data
     uint16_t _calData[5] = { 0 };
 
-    //WiFi network
-    char _network_ssid[NETWORKS][33] = { "", "", "" }; // SSID list
-    char _network_pass[NETWORKS][33] = { "", "", "" }; // Password list
-    bool _network_type = false; // Connection type: false = dynamic IP, true = static IP
-    char _network_ip[16] = ""; // Static IP address
-    char _network_mask[16] = ""; // Static Subnet mask
-    char _network_gw[16] = ""; // Static default gateway
-    char _network_dns1[16] = ""; // Static DNS1 address
-    char _network_dns2[16] = ""; // Static DNS2 address
-
     // Access point
     char _accessPoint_ssid[33] = "BIM32"; // SSID
     char _accessPoint_pass[33] = "1234567890"; // Password
@@ -348,6 +338,37 @@ class Config {
             CO2 co2;
     }; Comfort comfort;
 
+    struct Network {
+        private:
+            char _ssid[NETWORKS][33] = { "", "", "" }; // SSID list
+            char _pass[NETWORKS][33] = { "", "", "" }; // Password list
+            bool _type = false; // Connection type: false = dynamic IP, true = static IP
+            char _ip[16] = ""; // Static IP address
+            char _mask[16] = ""; // Static Subnet mask
+            char _gw[16] = ""; // Static default gateway
+            char _dns1[16] = ""; // Static DNS1 address
+            char _dns2[16] = ""; // Static DNS2 address
+            friend class Config;
+
+        public:
+            const char* ssid(unsigned int num) const {
+                if(num >= NETWORKS) return (char*) "";
+                return _ssid[num];
+            }
+
+            const char* pass(unsigned int num) const {
+                if(num >= NETWORKS) return (char*) "";
+                return _pass[num];
+            }
+
+            const bool type() const { return _type; }
+            const char* ip() const { return _ip; }
+            const char* mask() const { return _mask; }
+            const char* gw() const { return _gw; }
+            const char* dns1() const { return _dns1; }
+            const char* dns2() const { return _dns2; }
+    }; Network network;
+
     struct Account {
         private:
             char _name[32] = ""; // Web interface username
@@ -379,15 +400,15 @@ class Config {
                 if(!error) {
                     //WiFi network
                     for(unsigned int i=0; i<NETWORKS; i++) {
-                        COPYSTR(conf["network"]["ssid"][i], _network_ssid[i]);
-                        COPYSTR(conf["network"]["pass"][i], _network_pass[i]);
+                        COPYSTR(conf["network"]["ssid"][i], network._ssid[i]);
+                        COPYSTR(conf["network"]["pass"][i], network._pass[i]);
                     }
-                    COPYBOOL(conf["network"]["type"], _network_type);
-                    COPYSTR(conf["network"]["ip"], _network_ip);
-                    COPYSTR(conf["network"]["mask"], _network_mask);
-                    COPYSTR(conf["network"]["gw"], _network_gw);
-                    COPYSTR(conf["network"]["dns1"], _network_dns1);
-                    COPYSTR(conf["network"]["dns2"], _network_dns2);
+                    COPYBOOL(conf["network"]["type"], network._type);
+                    COPYSTR(conf["network"]["ip"], network._ip);
+                    COPYSTR(conf["network"]["mask"], network._mask);
+                    COPYSTR(conf["network"]["gw"], network._gw);
+                    COPYSTR(conf["network"]["dns1"], network._dns1);
+                    COPYSTR(conf["network"]["dns2"], network._dns2);
 
                     // Access point
                     COPYSTR(conf["accessPoint"]["ssid"], _accessPoint_ssid);
@@ -707,40 +728,6 @@ class Config {
     uint16_t calData(uint8_t num) {
         if(num > 4) return 0;
         return _calData[num];
-    }
-
-    char* network_ssid(unsigned int num) {
-        if(num >= NETWORKS) return (char*) "";
-        return _network_ssid[num];
-    }
-
-    char* network_pass(unsigned int num) {
-        if(num >= NETWORKS) return (char*) "";
-        return _network_pass[num];
-    }
-
-    bool network_type() {
-        return _network_type;
-    }
-
-    String network_ip() {
-        return String(_network_ip);
-    }
-
-    String network_mask() {
-        return String(_network_mask);
-    }
-
-    String network_gw() {
-        return String(_network_gw);
-    }
-
-    String network_dns1() {
-        return String(_network_dns1);
-    }
-
-    String network_dns2() {
-        return String(_network_dns2);
     }
 
     const char* accessPoint_ssid() {

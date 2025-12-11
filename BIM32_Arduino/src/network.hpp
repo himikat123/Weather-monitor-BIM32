@@ -42,13 +42,13 @@ void Network::connect() {
     Serial.println("Connecting to WiFi...");
     Serial.println("Known networks:");
     for(unsigned int i=0; i<NETWORKS; i++) {
-        if(String(config.network_ssid(i)) != "") {
-            Serial.printf("\tNet%d: %s\r\n", i, config.network_ssid(i));
+        if(String(config.network.ssid(i)) != "") {
+            Serial.printf("\tNet%d: %s\r\n", i, config.network.ssid(i));
         }
     }
     bool anySSID = false;
     for(unsigned int i=0; i<NETWORKS; i++) {
-        if(String(config.network_ssid(i)) != "") anySSID = true;
+        if(String(config.network.ssid(i)) != "") anySSID = true;
     }
     if(anySSID) {
         if(!state.apMode) WiFi.disconnect();
@@ -58,14 +58,14 @@ void Network::connect() {
             int knownNetwork = -1;
             for(int i=0; i<numberOfNetworks; i++) {
                 for(int k=0; k<NETWORKS; k++) {
-                    if(WiFi.SSID(i) == config.network_ssid(k)) {
+                    if(WiFi.SSID(i) == config.network.ssid(k)) {
                         knownNetwork = k;
                         break;
                     }
                 }
             }
             if(knownNetwork >= 0) {
-                Serial.print("Connecting to "); Serial.println(config.network_ssid(knownNetwork));
+                Serial.print("Connecting to "); Serial.println(config.network.ssid(knownNetwork));
                 _connecting(knownNetwork);
             }
             else {
@@ -83,11 +83,14 @@ void Network::connect() {
             IPAddress gateway;
             IPAddress dns1;
             IPAddress dns2;
-            if(config.network_type()) {
+            if(config.network.type()) {
                 Serial.println("Configure static IP address");
-                if(ip.fromString(config.network_ip()) and 
-                    gateway.fromString(config.network_gw()) and subnet.fromString(config.network_mask()) and
-                    dns1.fromString(config.network_dns1()) and dns2.fromString(config.network_dns2())
+                if(
+                    ip.fromString(String(config.network.ip())) and 
+                    gateway.fromString(String(config.network.gw())) and 
+                    subnet.fromString(String(config.network.mask())) and
+                    dns1.fromString(String(config.network.dns1())) and 
+                    dns2.fromString(String(config.network.dns2()))
                 ) 
                     WiFi.config(ip, gateway, subnet, dns1, dns2);
                 else Serial.println("Error, switching back to dynamic IP");
@@ -102,7 +105,7 @@ void Network::connect() {
 }
 
 void Network::_connecting(uint8_t num) {
-    WiFi.begin(config.network_ssid(num), config.network_pass(num));
+    WiFi.begin(config.network.ssid(num), config.network.pass(num));
     unsigned int attempts = 0;
     while(WiFi.status() != WL_CONNECTED) {
         delay(500);
