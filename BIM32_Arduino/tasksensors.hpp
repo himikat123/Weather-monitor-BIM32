@@ -57,7 +57,7 @@ void TaskSensors(void *pvParameters) {
             comfort.calculate();
             comfort.devicesControl();
 
-            if(state.apMode) strlcpy(state.network.ssid, config.accessPoint_ssid(), sizeof(state.network.ssid));
+            if(state.apMode) strlcpy(state.network.ssid, config.accessPoint.ssid(), sizeof(state.network.ssid));
             else WiFi.SSID().toCharArray(state.network.ssid, sizeof(state.network.ssid));
             state.network.ch = WiFi.channel();
             state.network.sig = WiFi.RSSI();

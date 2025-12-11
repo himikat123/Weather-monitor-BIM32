@@ -873,9 +873,9 @@ void ILI9341::_networkPage() {
         _printText(sl, 214 + y, w, 12, lang.firmware(), FONT1, CENTER, TEXT_COLOR, GROUND_COLOR);
     }
 
-    String ssid = state.apMode ? config.accessPoint_ssid() : WiFi.SSID();;
+    String ssid = state.apMode ? config.accessPoint.ssid() : WiFi.SSID();;
     String rssi = state.apMode ? "100%" : String(_rssi) + "dBm";
-    String ip = state.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();;
+    String ip = state.apMode ? config.accessPoint.ip() : WiFi.localIP().toString();;
     String mac = state.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
     float esp32Temp = sensors.get_esp32_temp();
     String fw = FW;

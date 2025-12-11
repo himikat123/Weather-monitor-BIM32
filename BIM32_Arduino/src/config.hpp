@@ -63,13 +63,6 @@ class Config {
     // Touch calibration data
     uint16_t _calData[5] = { 0 };
 
-    // Access point
-    char _accessPoint_ssid[33] = "BIM32"; // SSID
-    char _accessPoint_pass[33] = "1234567890"; // Password
-    unsigned int _accessPoint_chnl = 1; // WiFi channel number 1...13
-    char _accessPoint_ip[33] = "192.168.4.1"; // IP address
-    char _accessPoint_mask[33] = "255.255.255.0"; // Subnet mask
-
     // Weather
     char _weather_appid[PROVIDERS][33] = { "", "" }; // [0] -> APPID openweathermap.org, [1] -> KEY weatherbit.io
     float _weather_lon = 0.0; // Longitude
@@ -369,6 +362,23 @@ class Config {
             const char* dns2() const { return _dns2; }
     }; Network network;
 
+    struct AccessPoint {
+        private:
+            char _ssid[33] = "BIM32"; // SSID
+            char _pass[33] = "1234567890"; // Password
+            unsigned int _chnl = 1; // WiFi channel number 1...13
+            char _ip[33] = "192.168.4.1"; // IP address
+            char _mask[33] = "255.255.255.0"; // Subnet mask
+
+        public:
+            const char* ssid() const { return _ssid; }
+            const char* pass() const { return _pass; }
+            const unsigned int chnl() const { if(_chnl < 1 or _chnl > 13) return 1; return _chnl; }
+            const char* ip() const { return _ip; }
+            const char* mask() const { return _mask; }
+            friend class Config;
+    }; AccessPoint accessPoint;
+
     struct Account {
         private:
             char _name[32] = ""; // Web interface username
@@ -411,11 +421,11 @@ class Config {
                     COPYSTR(conf["network"]["dns2"], network._dns2);
 
                     // Access point
-                    COPYSTR(conf["accessPoint"]["ssid"], _accessPoint_ssid);
-                    COPYSTR(conf["accessPoint"]["pass"], _accessPoint_pass);
-                    COPYNUM(conf["accessPoint"]["chnl"], _accessPoint_chnl);
-                    COPYSTR(conf["accessPoint"]["ip"], _accessPoint_ip);
-                    COPYSTR(conf["accessPoint"]["mask"], _accessPoint_mask);
+                    COPYSTR(conf["accessPoint"]["ssid"], accessPoint._ssid);
+                    COPYSTR(conf["accessPoint"]["pass"], accessPoint._pass);
+                    COPYNUM(conf["accessPoint"]["chnl"], accessPoint._chnl);
+                    COPYSTR(conf["accessPoint"]["ip"], accessPoint._ip);
+                    COPYSTR(conf["accessPoint"]["mask"], accessPoint._mask);
 
                     // Weather
                     for(unsigned int i=0; i<PROVIDERS; i++) COPYSTR(conf["weather"]["appid"][i], _weather_appid[i]);
@@ -728,28 +738,6 @@ class Config {
     uint16_t calData(uint8_t num) {
         if(num > 4) return 0;
         return _calData[num];
-    }
-
-    const char* accessPoint_ssid() {
-        if(String(_accessPoint_ssid).length()) return _accessPoint_ssid;
-        else return (char*) "BIM32";
-    }
-
-    char* accessPoint_pass() {
-        return _accessPoint_pass;
-    }
-
-    unsigned int accessPoint_chnl() {
-        if(_accessPoint_chnl < 1 or _accessPoint_chnl > 13) return 1;
-        return _accessPoint_chnl;
-    }
-
-    String accessPoint_ip() {
-        return String(_accessPoint_ip);
-    }
-
-    String accessPoint_mask() {
-        return String(_accessPoint_mask);
     }
 
     String weather_appid(unsigned int num) {

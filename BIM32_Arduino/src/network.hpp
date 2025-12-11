@@ -125,12 +125,12 @@ void Network::runAccessPoint() {
         Serial.println();
         Serial.println(SEPARATOR);
         Serial.println("Start Access Point mode");
-        Serial.print("Network: "); Serial.println(config.accessPoint_ssid());
-        Serial.print("Password: "); Serial.println(config.accessPoint_pass());
+        Serial.print("Network: "); Serial.println(config.accessPoint.ssid());
+        Serial.print("Password: "); Serial.println(config.accessPoint.pass());
         Serial.println("IP address: 192.168.4.1");
         WiFi.disconnect();
         WiFi.mode(WIFI_MODE_APSTA);
-        WiFi.softAP(config.accessPoint_ssid(), config.accessPoint_pass());
+        WiFi.softAP(config.accessPoint.ssid(), config.accessPoint.pass());
         Serial.println(SEPARATOR);
         Serial.println();
     }

@@ -114,9 +114,9 @@ void LcdDisplay::_getData() {
     _tYear = year();
     _rssi = WiFi.RSSI();
     _netLogo = state.apMode ? "Access Point" : "WiFi";
-    _netSsid = state.apMode ? config.accessPoint_ssid() : WiFi.SSID();
+    _netSsid = state.apMode ? config.accessPoint.ssid() : WiFi.SSID();
     _netRssi = state.apMode ? "100%" : String(_rssi) + "dBm";
-    _netIp = state.apMode ? config.accessPoint_ip() : WiFi.localIP().toString();
+    _netIp = state.apMode ? config.accessPoint.ip() : WiFi.localIP().toString();
     _netMac = state.apMode ? WiFi.softAPmacAddress() : WiFi.macAddress();
     _netTemp = sensors.get_esp32_temp();
     _netFw = FW;
