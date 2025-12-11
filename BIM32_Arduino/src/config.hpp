@@ -35,8 +35,10 @@
 #define NUMITRON_DISPLAY     4
 #define D_NX4832K035         0
 #define D_NX4832T035         1
-#define D_NX4827T043         2
+#define D_NX4827K043         2
 #define D_ILI9341            3
+#define D_TM1637             1
+#define D_MAX7219            2
 
 TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;

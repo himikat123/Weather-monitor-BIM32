@@ -16,7 +16,11 @@ void TaskDisplay1(void *pvParameters) {
     #else
         if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
             /* Initialize LCD display */
-            if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) nextion.init();
+            if(
+                config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                config.display_model(DISPLAY_1) == D_NX4832T035 or
+                config.display_model(DISPLAY_1) == D_NX4827K043
+            ) nextion.init();
             if(config.display_model(DISPLAY_1) == D_ILI9341) ili9341.showHomeScreen();
         }
 
@@ -28,15 +32,16 @@ void TaskDisplay1(void *pvParameters) {
         /* Initialize 7 segment display */
         if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
             /* Initialize TM1637 display 1 */
-            if(config.display_model(DISPLAY_1) <= 1) tm1637_1.init(DISPLAY_1, TM1637_1_CLK_PIN, TM1637_1_DAT_PIN);
+            if(config.display_model(DISPLAY_1) <= D_TM1637) 
+                tm1637_1.init(DISPLAY_1, TM1637_1_CLK_PIN, TM1637_1_DAT_PIN);
             /* Initialize MAX1637 display 1 */
-            if(config.display_model(DISPLAY_1) >= 2) max7219_1.init(DISPLAY_1, MAX7219_1_CLK_PIN, MAX7219_1_DAT_PIN, MAX7219_1_LOAD_PIN);
+            if(config.display_model(DISPLAY_1) >= D_MAX7219) 
+                max7219_1.init(DISPLAY_1, MAX7219_1_CLK_PIN, MAX7219_1_DAT_PIN, MAX7219_1_LOAD_PIN);
         }
 
         /* Initialize numitron display */
-        if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
+        if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY)
             pcf8575_1.init(DISPLAY_1, PCF8575_1_SCL_PIN, PCF8575_1_SDA_PIN, NUMITRON_1_PWM_PIN, WS2812_1_DAT_PIN);
-        }
     #endif
 
     while(1) {
@@ -57,12 +62,8 @@ void TaskDisplay1(void *pvParameters) {
                         itsOffTime = state.display_state[DISPLAY_1] - 1;
                         state.display_state[DISPLAY_1] = 0;
                     }
-                    if(itsOffTime) {
-                        if(ili9341.isDisplayOn()) ili9341.displayOff();
-                    }
-                    else {
-                        if(!ili9341.isDisplayOn()) ili9341.displayOn();
-                    }
+                    if(itsOffTime) if(ili9341.isDisplayOn()) ili9341.displayOff();
+                    else if(!ili9341.isDisplayOn()) ili9341.displayOn();
                 }
             }
 
@@ -75,7 +76,11 @@ void TaskDisplay1(void *pvParameters) {
                     state.disp_autoOff[DISPLAY_1] = millis();
 
                     if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                        if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                        if(
+                            config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                            config.display_model(DISPLAY_1) == D_NX4832T035 or
+                            config.display_model(DISPLAY_1) == D_NX4827K043
+                        ) {
                             nextion.displayToggle();
                         }
                         if(config.display_model(DISPLAY_1) == D_ILI9341) {
@@ -88,8 +93,8 @@ void TaskDisplay1(void *pvParameters) {
                     }
 
                     if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                        if(config.display_model(DISPLAY_1) <= 1) tm1637_1.displayToggle();
-                        if(config.display_model(DISPLAY_1) >= 2) max7219_1.displayToggle();
+                        if(config.display_model(DISPLAY_1) <= D_TM1637) tm1637_1.displayToggle();
+                        if(config.display_model(DISPLAY_1) >= D_MAX7219) max7219_1.displayToggle();
                     }
 
                     if(config.display_type(DISPLAY_1) == NUMITRON_DISPLAY) {
@@ -105,7 +110,11 @@ void TaskDisplay1(void *pvParameters) {
 
                     if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
                         /* LCD Display update */
-                        if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                        if(
+                            config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                            config.display_model(DISPLAY_1) == D_NX4832T035 or
+                            config.display_model(DISPLAY_1) == D_NX4827K043
+                        ) {
                             nextion.refresh();
                         }
                         if(config.display_model(DISPLAY_1) == D_ILI9341) {
@@ -127,11 +136,11 @@ void TaskDisplay1(void *pvParameters) {
 
                     if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
                         /* tm1637 brightness change */
-                        if(config.display_model(DISPLAY_1) <= 1) {
+                        if(config.display_model(DISPLAY_1) <= D_TM1637) {
                             tm1637_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                         }
                         /* max7219 brightness change */
-                        if(config.display_model(DISPLAY_1) >= 2) {
+                        if(config.display_model(DISPLAY_1) >= D_MAX7219) {
                             max7219_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
                         }
                     }
@@ -148,7 +157,11 @@ void TaskDisplay1(void *pvParameters) {
                     /* Check if need and it's time to turn off the display */
                     if(isTimeoutOffTime(DISPLAY_1)) {
                         if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                            if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                            if(
+                                config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                                config.display_model(DISPLAY_1) == D_NX4832T035 or
+                                config.display_model(DISPLAY_1) == D_NX4827K043
+                            ) {
                                 if(nextion.isDisplayOn()) nextion.displayOff();
                             }
                             if(config.display_model(DISPLAY_1) == D_ILI9341) {
@@ -159,10 +172,10 @@ void TaskDisplay1(void *pvParameters) {
                             if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
                         }
                         if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                            if(config.display_model(DISPLAY_1) <= 1) {
+                            if(config.display_model(DISPLAY_1) <= D_TM1637) {
                                 if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
                             }
-                            if(config.display_model(DISPLAY_1) >= 2) {
+                            if(config.display_model(DISPLAY_1) >= D_MAX7219) {
                                 if(max7219_1.isDisplayOn()) max7219_1.displayOff();
                             }
                         }
@@ -180,7 +193,11 @@ void TaskDisplay1(void *pvParameters) {
                         }
                         if(itsOffTime) {
                             if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                                if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                                if(
+                                    config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                                    config.display_model(DISPLAY_1) == D_NX4832T035 or
+                                    config.display_model(DISPLAY_1) == D_NX4827K043
+                                ) {
                                     if(nextion.isDisplayOn()) nextion.displayOff();
                                 }
                                 if(config.display_model(DISPLAY_1) == D_ILI9341) {
@@ -191,10 +208,10 @@ void TaskDisplay1(void *pvParameters) {
                                 if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
                             }
                             if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                                if(config.display_model(DISPLAY_1) <= 1) {
+                                if(config.display_model(DISPLAY_1) <= D_TM1637) {
                                     if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
                                 }
-                                if(config.display_model(DISPLAY_1) >= 2) {
+                                if(config.display_model(DISPLAY_1) >= D_MAX7219) {
                                     if(max7219_1.isDisplayOn()) max7219_1.displayOff();
                                 }
                             }
@@ -204,7 +221,11 @@ void TaskDisplay1(void *pvParameters) {
                         }
                         else {
                             if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
-                                if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                                if(
+                                    config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                                    config.display_model(DISPLAY_1) == D_NX4832T035 or
+                                    config.display_model(DISPLAY_1) == D_NX4827K043
+                                ) {
                                     if(!nextion.isDisplayOn()) nextion.displayOn(false);
                                 }
                                 if(config.display_model(DISPLAY_1) == D_ILI9341) {
@@ -215,10 +236,10 @@ void TaskDisplay1(void *pvParameters) {
                                 if(!ws2812b_1.isDisplayOn()) ws2812b_1.displayOn();
                             }
                             if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                                if(config.display_model(DISPLAY_1) <= 1) {
+                                if(config.display_model(DISPLAY_1) <= D_TM1637) {
                                     if(!tm1637_1.isDisplayOn()) tm1637_1.displayOn();
                                 }
-                                if(config.display_model(DISPLAY_1) >= 2) {
+                                if(config.display_model(DISPLAY_1) >= D_MAX7219) {
                                     if(!max7219_1.isDisplayOn()) max7219_1.displayOn();
                                 }
                             }
@@ -236,9 +257,9 @@ void TaskDisplay1(void *pvParameters) {
 
                 if(config.display_type(DISPLAY_1) == SEGMENT_DISPLAY) {
                     /* TM1637 display 1 update */
-                    if(config.display_model(DISPLAY_1) <= 1) tm1637_1.refresh();
+                    if(config.display_model(DISPLAY_1) <= D_TM1637) tm1637_1.refresh();
                     /* MAX7219 display 1 update */
-                    if(config.display_model(DISPLAY_1) >= 2) max7219_1.refresh();
+                    if(config.display_model(DISPLAY_1) >= D_MAX7219) max7219_1.refresh();
                 }
 
                 /* Numitron display 1 update */
@@ -248,7 +269,11 @@ void TaskDisplay1(void *pvParameters) {
 
                 if(config.display_type(DISPLAY_1) == LCD_DISPLAY) {
                     /* Receive data from Nextion */
-                    if(config.display_model(DISPLAY_1) == D_NX4832K035 or config.display_model(DISPLAY_1) == D_NX4832T035) {
+                    if(
+                        config.display_model(DISPLAY_1) == D_NX4832K035 or 
+                        config.display_model(DISPLAY_1) == D_NX4832T035 or
+                        config.display_model(DISPLAY_1) == D_NX4827K043
+                    ) {
                         nextion.dataReceive();
                     }
 
@@ -274,9 +299,11 @@ void TaskDisplay2(void *pvParameters) {
 
     if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
         /* Initialize TM1637 display 2 */
-        if(config.display_model(DISPLAY_2) <= 1) tm1637_2.init(DISPLAY_2, TM1637_2_CLK_PIN, TM1637_2_DAT_PIN);
+        if(config.display_model(DISPLAY_2) <= D_TM1637) 
+            tm1637_2.init(DISPLAY_2, TM1637_2_CLK_PIN, TM1637_2_DAT_PIN);
         /* Initialize MAX7219 display 2 */
-        if(config.display_model(DISPLAY_2) >= 2) max7219_2.init(DISPLAY_2, MAX7219_2_CLK_PIN, MAX7219_2_DAT_PIN, MAX7219_2_LOAD_PIN);
+        if(config.display_model(DISPLAY_2) >= D_MAX7219) 
+            max7219_2.init(DISPLAY_2, MAX7219_2_CLK_PIN, MAX7219_2_DAT_PIN, MAX7219_2_LOAD_PIN);
     }
 
     /* Initialize Numitron display 2 */
@@ -295,8 +322,8 @@ void TaskDisplay2(void *pvParameters) {
                     ws2812b_2.displayToggle();
                 }
                 if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                    if(config.display_model(DISPLAY_2) <= 1) tm1637_2.displayToggle();
-                    if(config.display_model(DISPLAY_2) >= 2) max7219_2.displayToggle();
+                    if(config.display_model(DISPLAY_2) <= D_TM1637) tm1637_2.displayToggle();
+                    if(config.display_model(DISPLAY_2) >= D_MAX7219) max7219_2.displayToggle();
                 }
                 if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
                     pcf8575_2.displayToggle();
@@ -308,8 +335,8 @@ void TaskDisplay2(void *pvParameters) {
             }
 
             if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                if(config.display_model(DISPLAY_2) <= 1) tm1637_2.refresh();
-                if(config.display_model(DISPLAY_2) >= 2) max7219_2.refresh();
+                if(config.display_model(DISPLAY_2) <= D_TM1637) tm1637_2.refresh();
+                if(config.display_model(DISPLAY_2) >= D_MAX7219) max7219_2.refresh();
             }
 
             if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
@@ -319,10 +346,6 @@ void TaskDisplay2(void *pvParameters) {
             /* Brightness change once in 1 second */
             if((millis() - bright_update) > 1000) {
                 bright_update = millis();
-                ws2812b_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                tm1637_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                max7219_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                pcf8575_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
 
                 /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
                 uint16_t dotFreq = state.net_connected ? 500 : 1000;
@@ -331,16 +354,37 @@ void TaskDisplay2(void *pvParameters) {
                 max7219_2.setDotFreq(dotFreq);
                 pcf8575_2.setDotFreq(dotFreq);
 
+                /* WS2812b brightness change */
+                if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
+                    ws2812b_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                }
+
+                if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
+                    /* tm1637 brightness change */
+                    if(config.display_model(DISPLAY_2) <= D_TM1637) {
+                        tm1637_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                    }
+                    /* max7219 brightness change */
+                    if(config.display_model(DISPLAY_2) >= D_MAX7219) {
+                        max7219_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                    }
+                }
+
+                /* PCF8575 brightness change */
+                if(config.display_type(DISPLAY_2) == NUMITRON_DISPLAY) {
+                    pcf8575_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
+                }
+
                 /* Check if need and it's time to turn off the display */
                 if(isTimeoutOffTime(DISPLAY_2)) {
                     if(config.display_type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) { 
                         if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
                     }
                     if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                        if(config.display_model(DISPLAY_2) <= 1) {
+                        if(config.display_model(DISPLAY_2) <= D_TM1637) {
                             if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
                         }
-                        if(config.display_model(DISPLAY_2) >= 2) {
+                        if(config.display_model(DISPLAY_2) >= D_MAX7219) {
                             if(max7219_2.isDisplayOn()) max7219_2.displayOff();
                         }
                     }
@@ -361,10 +405,10 @@ void TaskDisplay2(void *pvParameters) {
                             if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
                         }
                         if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                            if(config.display_model(DISPLAY_2) <= 1) {
+                            if(config.display_model(DISPLAY_2) <= D_TM1637) {
                                 if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
                             }
-                            if(config.display_model(DISPLAY_2) >= 2) {
+                            if(config.display_model(DISPLAY_2) >= D_MAX7219) {
                                 if(max7219_2.isDisplayOn()) max7219_2.displayOff();
                             }
                         }
@@ -377,10 +421,10 @@ void TaskDisplay2(void *pvParameters) {
                             if(!ws2812b_2.isDisplayOn()) ws2812b_2.displayOn();
                         }
                         if(config.display_type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                            if(config.display_model(DISPLAY_2) <= 1) {
+                            if(config.display_model(DISPLAY_2) <= D_TM1637) {
                                 if(!tm1637_2.isDisplayOn()) tm1637_2.displayOn();
                             }
-                            if(config.display_model(DISPLAY_2) >= 2) {
+                            if(config.display_model(DISPLAY_2) >= D_MAX7219) {
                                 if(!max7219_2.isDisplayOn()) max7219_2.displayOn();
                             }
                         }
