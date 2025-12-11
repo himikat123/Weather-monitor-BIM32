@@ -47,7 +47,7 @@ TaskHandle_t task_sensors_handle = NULL;
 
 SemaphoreHandle_t sensorsSemaphore = NULL;
 
-class Configuration {
+class Config {
     #define NETWORKS 3
     #define PROVIDERS 2
     #define DISPLAYS 2
@@ -61,31 +61,7 @@ class Configuration {
 
     private:
     // Touch calibration data
-    uint16_t _calData[5] = { 0, 0, 0, 0, 0 };
-
-    // Comfort
-    unsigned int _comfort_temp_source = 0; // Comfort temperature source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-SHT21, 7-DHT22, 8-DS18B20, 9-BME680
-    unsigned int _comfort_temp_wsensNum = 0; // Comfort temperature wireless sensor number
-    unsigned int _comfort_temp_sens = 0; // Comfort temperature wireless sensor temperature sensor number
-    unsigned int _comfort_temp_thing = 0; // Comfort temperature thingspeak field number
-    float _comfort_temp_min = 23.0; // Minimum comfort temperature
-    float _comfort_temp_max = 25.0; // Maximum comfort temperature
-    boolean _comfort_temp_sound = false; // Sound notification when the temperature goes beyond comfort limits
-    float _comfort_temp_min_hysteresis = 0.0; // Minimum comfort temperature hysteresis
-    float _comfort_temp_max_hysteresis = 0.0; // Maximum comfort temperature hysteresis
-    unsigned int _comfort_hum_source = 0; // Comfort humidity source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-SHT21, 6-DHT22, 7-BME680
-    unsigned int _comfort_hum_wsensNum = 0; // Comfort humidity wireless sensor number
-    unsigned int _comfort_hum_thing = 0; // Comfort humidity thingspeak field number
-    float _comfort_hum_min = 40.0; // Minimum comfort humidity
-    float _comfort_hum_max = 60.0; // Maximum comfort humidity
-    boolean _comfort_hum_sound = 0; // Sound notification when the humidity goes beyond comfort limits
-    float _comfort_hum_min_hysteresis = 0.0; // Minimum comfort humidity hysteresis
-    float _comfort_hum_max_hysteresis = 0.0; // Maximum comfort humidity hysteresis
-    unsigned int _comfort_iaq_source = 0; // Comfort IAQ source: 0-Nothing, 1-BME680
-    boolean _comfort_iaq_sound = false; // Sound notification when the IAQ goes beyond comfort limits
-    unsigned int _comfort_co2_source = 0; // Comfort CO2 source: 0-Nothing, 1-Wireless sensor
-    unsigned int _comfort_co2_wsensNum = 0; // Comfort CO2 wireless sensor number
-    boolean _comfort_co2_sound = false; // Sound notification when the CO2 goes beyond comfort limits
+    uint16_t _calData[5] = { 0 };
 
     //WiFi network
     char _network_ssid[NETWORKS][33] = { "", "", "" }; // SSID list
@@ -292,11 +268,6 @@ class Configuration {
     unsigned int _mqttSend_wtypes[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send via MQTT
     char _mqttSend_topics[12][17] = {"", "", "", "", "", "", "", "", "", "", "", ""}; // Topic names for sending via MQTT
 
-    // Account
-    char _account_name[32] = ""; // Web interface default username
-    char _account_pass[64] = ""; // Web interface default password
-    bool _account_required = false; // Require username and password to access the web interface
-
     // Alarm
     unsigned int _alarm_time[ALARMS][2] = { // Alarm time [hour, minute]
         {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}
@@ -330,6 +301,65 @@ class Configuration {
 
 
     public:
+
+    struct Comfort {
+        struct Iaq {
+            private:
+                unsigned int _source = 0;
+                bool _sound = false;
+                friend class Config;
+
+            public:
+                unsigned int source() const { return _source; }
+                bool sound() const { return _sound; }
+        };
+
+        struct CO2 : public Iaq {
+            private: unsigned int _wsensNum = 0; friend class Config;
+            public: unsigned int wsensNum() const { return _wsensNum; }
+        };
+
+        struct Hum : public CO2 {
+            private:
+                unsigned int _thing = 0;
+                float _min = 0.0;
+                float _max = 0.0;
+                float _minHysteresis = 0.0;
+                float _maxHysteresis = 0.0;
+                friend class Config;
+
+            public:
+                unsigned int thing() const { return _thing; }
+                float min() const { return _min; }
+                float max() const { return _max; }
+                float minHysteresis() const { return _minHysteresis; }
+                float maxHysteresis() const { return _maxHysteresis; }
+        };
+
+        struct Temp : public Hum {
+            private: unsigned int _sens = 0; friend class Config;
+            public: unsigned int sens() const  { return _sens; }
+        };
+
+        public:
+            Temp temp;
+            Hum hum;
+            Iaq iaq;
+            CO2 co2;
+    }; Comfort comfort;
+
+    struct Account {
+        private:
+            char _name[32] = ""; // Web interface username
+            char _pass[64] = ""; // Web interface password
+            bool _required = false; // Require username and password to access the web interface
+            friend class Config;
+
+        public:
+            const char* name() const { return _name; }
+            const char* pass() const { return _pass; }
+            bool required() const { return _required; }
+    }; Account account;
 
     void readConfig(void) {
         #define COPYSTR(from, to) strlcpy(to, from | to, sizeof(to))
@@ -574,32 +604,32 @@ class Configuration {
                     }
 
                     // Comfort
-                    COPYNUM(conf["comfort"]["temp"]["source"], _comfort_temp_source);
-                    COPYNUM(conf["comfort"]["temp"]["wsensNum"], _comfort_temp_wsensNum);
-                    COPYNUM(conf["comfort"]["temp"]["sens"], _comfort_temp_sens);
-                    COPYNUM(conf["comfort"]["temp"]["thing"], _comfort_temp_thing);
-                    COPYNUM(conf["comfort"]["temp"]["min"][0], _comfort_temp_min);
-                    COPYNUM(conf["comfort"]["temp"]["max"][0], _comfort_temp_max);
-                    COPYNUM(conf["comfort"]["temp"]["min"][1], _comfort_temp_min_hysteresis);
-                    COPYNUM(conf["comfort"]["temp"]["max"][1], _comfort_temp_max_hysteresis);
-                    COPYNUM(conf["comfort"]["hum"]["source"], _comfort_hum_source);
-                    COPYNUM(conf["comfort"]["hum"]["wsensNum"], _comfort_hum_wsensNum);
-                    COPYNUM(conf["comfort"]["hum"]["thing"], _comfort_hum_thing);
-                    COPYNUM(conf["comfort"]["hum"]["min"][0], _comfort_hum_min);
-                    COPYNUM(conf["comfort"]["hum"]["max"][0], _comfort_hum_max);
-                    COPYNUM(conf["comfort"]["hum"]["min"][1], _comfort_hum_min_hysteresis);
-                    COPYNUM(conf["comfort"]["hum"]["max"][1], _comfort_hum_max_hysteresis);
-                    COPYNUM(conf["comfort"]["iaq"]["source"], _comfort_iaq_source);
-                    COPYNUM(conf["comfort"]["co2"]["source"], _comfort_co2_source);
-                    COPYNUM(conf["comfort"]["co2"]["wsensNum"], _comfort_co2_wsensNum);
-                    COPYBOOL(conf["comfort"]["temp"]["sound"], _comfort_temp_sound);
-                    COPYBOOL(conf["comfort"]["hum"]["sound"], _comfort_hum_sound);
-                    COPYBOOL(conf["comfort"]["iaq"]["sound"], _comfort_iaq_sound);
-                    COPYBOOL(conf["comfort"]["co2"]["sound"], _comfort_co2_sound);
+                    COPYNUM(conf["comfort"]["temp"]["source"], comfort.temp._source);
+                    COPYNUM(conf["comfort"]["temp"]["wsensNum"], comfort.temp._wsensNum);
+                    COPYNUM(conf["comfort"]["temp"]["sens"], comfort.temp._sens);
+                    COPYNUM(conf["comfort"]["temp"]["thing"], comfort.temp._thing);
+                    COPYNUM(conf["comfort"]["temp"]["min"][0], comfort.temp._min);
+                    COPYNUM(conf["comfort"]["temp"]["max"][0], comfort.temp._max);
+                    COPYNUM(conf["comfort"]["temp"]["min"][1], comfort.temp._minHysteresis);
+                    COPYNUM(conf["comfort"]["temp"]["max"][1], comfort.temp._maxHysteresis);
+                    COPYBOOL(conf["comfort"]["temp"]["sound"], comfort.temp._sound);
+                    COPYNUM(conf["comfort"]["hum"]["source"], comfort.hum._source);
+                    COPYNUM(conf["comfort"]["hum"]["wsensNum"], comfort.hum._wsensNum);
+                    COPYNUM(conf["comfort"]["hum"]["thing"], comfort.hum._thing);
+                    COPYNUM(conf["comfort"]["hum"]["min"][0], comfort.hum._min);
+                    COPYNUM(conf["comfort"]["hum"]["max"][0], comfort.hum._max);
+                    COPYNUM(conf["comfort"]["hum"]["min"][1], comfort.hum._minHysteresis);
+                    COPYNUM(conf["comfort"]["hum"]["max"][1], comfort.hum._maxHysteresis);
+                    COPYBOOL(conf["comfort"]["hum"]["sound"], comfort.hum._sound);
+                    COPYNUM(conf["comfort"]["iaq"]["source"], comfort.iaq._source);
+                    COPYBOOL(conf["comfort"]["iaq"]["sound"], comfort.iaq._sound);
+                    COPYNUM(conf["comfort"]["co2"]["source"], comfort.co2._source);
+                    COPYNUM(conf["comfort"]["co2"]["wsensNum"], comfort.co2._wsensNum);
+                    COPYBOOL(conf["comfort"]["co2"]["sound"], comfort.co2._sound);
 
                     // Account
-                    COPYSTR(conf["account"]["name"], _account_name);
-                    COPYBOOL(conf["account"]["required"], _account_required);
+                    COPYSTR(conf["account"]["name"], account._name);
+                    COPYBOOL(conf["account"]["required"], account._required);
 
                     Serial.println("done");
                 }
@@ -642,7 +672,7 @@ class Configuration {
                 JsonDocument conf;
                 DeserializationError error = deserializeJson(conf, json);
                 if(!error) {
-                    strlcpy(_account_pass, conf["pass"] | _account_pass, sizeof(_account_pass));
+                    strlcpy(account._pass, conf["pass"] | account._pass, sizeof(account._pass));
                     Serial.println("done");
                 }
                 else Serial.println(" User file corrupted");
@@ -1529,106 +1559,6 @@ class Configuration {
     char* mqttSend_topics(unsigned int num) {
         if(num >= MQTT_TOPICS) return (char*) "";
         return _mqttSend_topics[num];
-    }
-
-    unsigned int comfort_temp_source() {
-        return _comfort_temp_source;
-    }
-  
-    unsigned int comfort_temp_wsensNum() {
-        return _comfort_temp_wsensNum;
-    }
-  
-    unsigned int comfort_temp_sens() {
-        return _comfort_temp_sens;
-    }
-  
-    unsigned int comfort_temp_thing() {
-        return _comfort_temp_thing;
-    }
-  
-    float comfort_temp_min() {
-        return _comfort_temp_min;
-    }
-  
-    float comfort_temp_max() {
-        return _comfort_temp_max;
-    }
-
-    float comfort_temp_min_hysteresis() {
-        return _comfort_temp_min_hysteresis;
-    }
-
-    float comfort_temp_max_hysteresis() {
-        return _comfort_temp_max_hysteresis;
-    }
-  
-    unsigned int comfort_hum_source() {
-        return _comfort_hum_source;
-    }
-
-    unsigned int comfort_hum_wsensNum() {
-        return _comfort_hum_wsensNum;
-    }
-
-    unsigned int comfort_hum_thing() {
-        return _comfort_hum_thing;
-    }
-
-    float comfort_hum_min() {
-        return _comfort_hum_min;
-    }
-
-    float comfort_hum_max() {
-        return _comfort_hum_max;
-    }
-
-    float comfort_hum_min_hysteresis() {
-        return _comfort_hum_min_hysteresis;
-    }
-
-    float comfort_hum_max_hysteresis() {
-        return _comfort_hum_max_hysteresis;
-    }
-
-    unsigned int comfort_iaq_source() {
-        return _comfort_iaq_source;
-    }
-
-    unsigned int comfort_co2_source() {
-        return _comfort_co2_source;
-    }
-
-    unsigned int comfort_co2_wsensNum() {
-        return _comfort_co2_wsensNum;
-    }
-
-    boolean comfort_temp_sound() {
-        return _comfort_temp_sound;
-    }
-  
-    boolean comfort_hum_sound() {
-        return _comfort_hum_sound;
-    }
- 
-    boolean comfort_iaq_sound() {
-        return _comfort_iaq_sound;
-    }
- 
-    boolean comfort_co2_sound() {
-        return _comfort_co2_sound;
-    } 
-  
-    String account_name() {
-        return String(_account_name);
-    }
-
-    String account_pass() {
-        return String(_account_pass);
-    }
-
-    bool account_required() {
-        return _account_required;
     }
 
     unsigned int alarm_time(unsigned int alarm_num, unsigned int level) {

@@ -8,15 +8,15 @@ class AgregateComfortData {
 
 float AgregateComfortData::temp() {
     float temp = 40400.0;
-    switch(config.comfort_temp_source()) {
+    switch(config.comfort.temp.source()) {
         case 1: temp = weather.get_currentTemp(); break; // temperature from weather forecast
         case 2: // temperature from wireless sensor
-            if(wsensor.dataRelevance(config.comfort_temp_wsensNum()))
-                temp = wsensor.get_temperature(config.comfort_temp_wsensNum(), config.comfort_temp_sens());
+            if(wsensor.dataRelevance(config.comfort.temp.wsensNum()))
+                temp = wsensor.get_temperature(config.comfort.temp.wsensNum(), config.comfort.temp.sens());
             break;
         case 3: // temperature from thingspeak
             if(thingspeak.dataRelevance()) 
-                temp = thingspeak.get_field(config.comfort_temp_thing());
+                temp = thingspeak.get_field(config.comfort.temp.thing());
             break;
         case 4: temp = sensors.get_bme280_temp(); break; // temperature from BME280
         case 5: temp = sensors.get_bmp180_temp(); break; // temperature from BMP180
@@ -31,15 +31,15 @@ float AgregateComfortData::temp() {
 
 float AgregateComfortData::hum() {
     float hum = 40400.0;
-    switch(config.comfort_hum_source()) {
+    switch(config.comfort.hum.source()) {
         case 1: hum = weather.get_currentHum(); break; // humidity from weather forecast
         case 2: // humidity from wireless sensor
-            if(wsensor.dataRelevance(config.comfort_hum_wsensNum()))
-                hum = wsensor.get_humidity(config.comfort_hum_wsensNum());
+            if(wsensor.dataRelevance(config.comfort.hum.wsensNum()))
+                hum = wsensor.get_humidity(config.comfort.hum.wsensNum());
             break;
         case 3: // humidity from thingspeak
             if(thingspeak.dataRelevance())
-                hum = thingspeak.get_field(config.comfort_hum_thing());
+                hum = thingspeak.get_field(config.comfort.hum.thing());
             break;
         case 4: hum = sensors.get_bme280_hum(); break; // humidity from BME280
         case 5: hum = sensors.get_sht21_hum(); break; // humidity from SHT21
@@ -52,7 +52,7 @@ float AgregateComfortData::hum() {
 
 float AgregateComfortData::iaq() {
     float iaq = 40400.0;
-    if(config.comfort_iaq_source() == 1) {
+    if(config.comfort.iaq.source() == 1) {
         iaq = sensors.get_bme680_iaq();
     }
     return iaq;
@@ -60,9 +60,9 @@ float AgregateComfortData::iaq() {
 
 float AgregateComfortData::co2() {
     int co2 = 40400.0;
-    if(config.comfort_co2_source() == 1) {
-        if(wsensor.dataRelevance(config.comfort_co2_wsensNum()))
-            co2 = wsensor.get_co2(config.comfort_co2_wsensNum());
+    if(config.comfort.co2.source() == 1) {
+        if(wsensor.dataRelevance(config.comfort.co2.wsensNum()))
+            co2 = wsensor.get_co2(config.comfort.co2.wsensNum());
     }
     return co2;
 }

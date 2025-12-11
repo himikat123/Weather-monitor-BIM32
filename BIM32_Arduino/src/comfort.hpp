@@ -30,11 +30,11 @@ void Comfort::calculate() {
     _co2 = agregateComfortData.co2();
 
     if(validate.temp(_temp)) {
-        if(_temp < (config.comfort_temp_min() - (config.comfort_temp_min_hysteresis() / 2))) _heater = true;
-        if(_temp > (config.comfort_temp_min() + (config.comfort_temp_min_hysteresis() / 2))) _heater = false;
+        if(_temp < (config.comfort.temp.min() - (config.comfort.temp.minHysteresis() / 2))) _heater = true;
+        if(_temp > (config.comfort.temp.min() + (config.comfort.temp.minHysteresis() / 2))) _heater = false;
 
-        if(_temp > (config.comfort_temp_max() + (config.comfort_temp_max_hysteresis() / 2))) _cooler = true;
-        if(_temp < (config.comfort_temp_max() - (config.comfort_temp_max_hysteresis() / 2))) _cooler = false;
+        if(_temp > (config.comfort.temp.max() + (config.comfort.temp.maxHysteresis() / 2))) _cooler = true;
+        if(_temp < (config.comfort.temp.max() - (config.comfort.temp.maxHysteresis() / 2))) _cooler = false;
 
         if(!_heater and !_cooler) _tempLevel = TEMP_COMFORTABLE;
         if(_heater and !_cooler) _tempLevel = TEMP_TOO_COLD;
@@ -47,11 +47,11 @@ void Comfort::calculate() {
     }
 
     if(validate.hum(_hum)) {
-        if(_hum < (config.comfort_hum_min() - config.comfort_hum_min_hysteresis())) _humidifier = true;
-        if(_hum > (config.comfort_hum_min() + config.comfort_hum_min_hysteresis())) _humidifier = false;
+        if(_hum < (config.comfort.hum.min() - config.comfort.hum.minHysteresis())) _humidifier = true;
+        if(_hum > (config.comfort.hum.min() + config.comfort.hum.minHysteresis())) _humidifier = false;
 
-        if(_hum > (config.comfort_hum_max() + config.comfort_hum_max_hysteresis())) _dehumidifier = true;
-        if(_hum < (config.comfort_hum_max() - config.comfort_hum_max_hysteresis())) _dehumidifier = false;
+        if(_hum > (config.comfort.hum.max() + config.comfort.hum.maxHysteresis())) _dehumidifier = true;
+        if(_hum < (config.comfort.hum.max() - config.comfort.hum.maxHysteresis())) _dehumidifier = false;
 
         if(!_humidifier and !_dehumidifier) _humLevel = HUM_COMFORTABLE;
         if(_humidifier and !_dehumidifier) _humLevel = HUM_TOO_DRY;
@@ -99,10 +99,10 @@ void Comfort::calculate() {
 }
 
 void Comfort::soundNotify() {
-    if(config.comfort_temp_sound()) sound.tempNotify(_tempLevel);
-    if(config.comfort_hum_sound()) sound.humNotify(_humLevel);
-    if(config.comfort_iaq_sound()) sound.airNotify(_iaqLevel);
-    else if(config.comfort_co2_sound()) sound.airNotify(_co2Level);
+    if(config.comfort.temp.sound()) sound.tempNotify(_tempLevel);
+    if(config.comfort.hum.sound()) sound.humNotify(_humLevel);
+    if(config.comfort.iaq.sound()) sound.airNotify(_iaqLevel);
+    else if(config.comfort.co2.sound()) sound.airNotify(_co2Level);
 }
 
 void Comfort::devicesControl() {

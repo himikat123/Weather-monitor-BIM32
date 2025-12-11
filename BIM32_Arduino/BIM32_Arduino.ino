@@ -54,7 +54,7 @@ State state;
 Validate validate;
 #include "src/pinout.hpp"
 #include "src/config.hpp"
-Configuration config;
+Config config;
 #include "src/sensors.hpp"
 Sensors sensors;
 #include "src/languages.hpp"

@@ -15,7 +15,7 @@ String web_timeString(unsigned int tm) {
  */
 bool web_isLogged(bool answer) {
     bool logged = false;
-    if(!config.account_required()) logged = true;
+    if(!config.account.required()) logged = true;
     else {
         if(server.hasArg("code")) {
             String auth = server.arg("code");
@@ -88,7 +88,10 @@ void web_login() {
     if(server.hasArg("name")) user = server.arg("name");
     if(server.hasArg("pass")) pass = server.arg("pass");
     bool loged = false;
-    if(user == config.account_name() and pass == config.account_pass()) {
+    if(
+        user == String(config.account.name()) and 
+        pass == String(config.account.pass())
+    ) {
         loged = true;
         state.secretCode = esp_random();
     }
@@ -442,7 +445,7 @@ void web_changePass() {
         String oldPass = (server.hasArg("oldPass")) ? server.arg("oldPass") : "";
         String newPass = (server.hasArg("newPass")) ? server.arg("newPass") : "";
         String res = "-";
-        if(oldPass == config.account_pass()) {
+        if(oldPass == config.account.pass()) {
             String json = "{\"pass\":\"";
             json += newPass;
             json += "\"}";
