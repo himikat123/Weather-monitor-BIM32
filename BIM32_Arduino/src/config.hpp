@@ -67,77 +67,6 @@ class Config {
     char _lang[3] = "en";
     uint8_t _units_pres = 0;
 
-    // Display
-    unsigned int _display_type[DISPLAYS] = {0, 0}; // Display type
-    unsigned int _display_model[DISPLAYS] = {0, 0}; // Display model
-    unsigned int _display_order[DISPLAYS][8] = { {1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 5, 6, 7, 8} }; // Digits order
-    unsigned int _display_animation_type[DISPLAYS] = {0, 0}; // Display animation number 0...9
-    unsigned int _display_animation_speed[DISPLAYS] = {10, 10}; // Display animation speed 1...30
-    unsigned int _display_animation_points[DISPLAYS] = {0, 0}; // Display animation clock points 0...4
-    char _display_dayTime[DISPLAYS][6] = {"07:00", "07:00"}; // Time to switch to day mode
-    char _display_nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
-    unsigned int _display_brightMethod[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
-    unsigned int _display_autoOff[DISPLAYS] = {0, 0}; // Display auto-off time 0...1440
-    bool _display_nightOff[DISPLAYS] = {false, false}; // Turn off display at night
-    char _display_nightOff_from[DISPLAYS][6] = {"23:00", "23:00"}; // The hour from which the display is turned off
-    char _display_nightOff_to[DISPLAYS][6] = {"07:00", "07:00"}; // The hour from which the display is turned on
-    unsigned int _display_brightness_day[DISPLAYS] = {50, 50}; // Day mode brightness 1...100
-    unsigned int _display_brightness_night[DISPLAYS] = {50, 50}; // Night mode brightness 1...100
-    unsigned int _display_brightness_min[DISPLAYS] = {1, 1}; // Minimum brightness limit 0...255
-    unsigned int _display_brightness_max[DISPLAYS] = {255, 255}; // Maximum brightness limit 0...255
-    unsigned int _display_lightSensor[DISPLAYS] = {1, 1}; // Sensor type for brightness adjust: 0-Analog input, 1-MAX44009, 2-BH1750
-    unsigned int _display_lightSensor_sensitivity[DISPLAYS] = {50, 50}; // Ambient light sensor sensibility 1...100
-    unsigned int _display_source_tempOut_sens = 0; // Outdoor temperature data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-SHT21, 7-DHT22, 8-DS18B20, 9-BME680
-    unsigned int _display_source_tempOut_wsensNum = 0; // Wireless sensor number for the outdoor temperature
-    unsigned int _display_source_tempOut_temp = 0; // Sensor number for the outdoor temperature
-    unsigned int _display_source_tempOut_thing = 0; // Thingspeak field number for the outdoor temperature
-    unsigned int _display_source_humOut_sens = 0; // Outdoor humidity data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-SHT21, 6-DHT22, 7-BME680
-    unsigned int _display_source_humOut_wsensNum = 0; // Wireless sensor number for the outdoor humidity
-    unsigned int _display_source_humOut_thing = 0; // Thingspeak field number for the outdoor humidity
-    unsigned int _display_source_presOut_sens = 0; // Outdoor pressure data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-BME280, 5-BMP180, 6-BME680
-    unsigned int _display_source_presOut_wsensNum = 0; // Wireless sensor number for the outdoor pressure
-    unsigned int _display_source_presOut_thing = 0; // Thingspeak field number for the outdoor pressure
-    unsigned int _display_source_tempIn_sens = 0; // Indoor temperature data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-Sequence, 5-BME280, 6-BMP180, 7-SHT21, 8-DHT22, 9-DS18B20, 10-BME680
-    unsigned int _display_source_tempIn_wsensNum = 0; // Wireless sensor number for the indoor temperature
-    unsigned int _display_source_tempIn_temp = 0; // Sensor number for the indoor temperature
-    unsigned int _display_source_tempIn_thing = 0; // Thingspeak field number for the intdoor temperature
-    unsigned int _display_source_humIn_sens = 0; // Indoor humidity data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak, 4-Sequence, 5-BME280, 6-SHT21, 7-DHT22, 8-BME680
-    unsigned int _display_source_humIn_wsensNum = 0; // Wireless sensor number for the indoor humidity
-    unsigned int _display_source_humIn_thing = 0; // Thingspeak field number for the outdoor humidity
-    unsigned int _display_source_volt_sens = 0; // Voltage data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak, 3-BME680-IAQ
-    unsigned int _display_source_volt_wsensNum = 0; // Wireless sensor number for the voltage
-    unsigned int _display_source_volt_volt = 0; // Sensor type for the voltage: 0-Wireless sensor battery voltage, 1-Wireless sensor battery percentage, 2-PZEM-004t voltage, 3-SenseAir-S8
-    unsigned int _display_source_volt_thing = 0; // Thingspeak field number for the voltage
-    unsigned int _display_source_volt_thingType = 0; // Thingspeak field voltage data type: 0-Battery voltage, 1-Battery percentage
-    unsigned int _display_source_bat_sens = 0; // Battery level data source: 0-Nothing, 1-Wireless sensor, 2-Thingspeak
-    unsigned int _display_source_bat_wsensNum = 0; // Wireless sensor number for the battery level:
-    unsigned int _display_source_bat_thing = 0; // Thingspeak field number for the battery level
-    unsigned int _display_source_descr = 0; // Additional description data source: 0-Nothing, 1-Comfort level, 2-Sequence
-    unsigned int _display_source_wind_speed_sens = 1; // Wind speed data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
-    unsigned int _display_source_wind_speed_wsensNum = 0; // Wireless sensor number for wind speed
-    unsigned int _display_source_wind_speed_thing = 0; // Thingspeak field number for wind speed
-    unsigned int _display_source_wind_dir_sens = 1; // Wind direction data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
-    unsigned int _display_source_wind_dir_wsensNum = 0; // Wireless sensor number for wind direction
-    unsigned int _display_source_wind_dir_thing = 0; // Thingspeak field number for wind direction
-    unsigned int _display_source_sequence_dur = 2; // Sequence data display duration (seconds)
-    char _display_source_sequence_name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
-    unsigned int _display_source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
-    unsigned int _display_source_sequence_thngtemp[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the temperature sequence
-    unsigned int _display_source_sequence_wsenstemp[SEQUENCES][WSENSORS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Wireless sensor number and its sensor for the temperature sequence
-    unsigned int _display_source_sequence_hum[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast, 7-BME680
-    unsigned int _display_source_sequence_thnghum[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the humidity sequence
-    unsigned int _display_source_sequence_wsenshum[SEQUENCES] =  {0, 0, 0, 0}; // Wireless sensor number for the humidity sequence
-    unsigned int _display_timeSlot_period[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot durations
-    unsigned int _display_timeSlot_sensor[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
-    unsigned int _display_timeSlot_data[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot sensors types
-    unsigned int _display_timeSlot_thing[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot thingspeak field number
-    unsigned int _display_timeSlot_wsensor_num[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor number
-    unsigned int _display_timeSlot_wsensor_type[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor type 
-    char _display_timeSlot_color[TIMESLOTS][DISPLAYS][8] = { // Segment display timeslot colors 
-        {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"},
-        {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}
-    };
-
     // Sound
     unsigned int _sound_vol = 15; // Sound volume
     unsigned int _sound_eq = 0; // Equalizer: 0-Normal, 1-Pop, 2-Rock, 3-Jazz, 4-Classic, 5-Bass
@@ -432,6 +361,139 @@ class Config {
             const bool dlst() const { return _dlst; }
     }; Clock clock;
 
+    struct Display {
+        struct Animation {
+            private:
+                unsigned int _type[DISPLAYS] = {0, 0}; // Display animation number 0...9
+                unsigned int _speed[DISPLAYS] = {10, 10}; // Display animation speed 1...30
+                unsigned int _points[DISPLAYS] = {0, 0}; // Display animation clock points 0...4
+                friend class Config;
+
+            public:
+                const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; return _type[num]; }
+                const unsigned int speed(unsigned int num) const { if(num >= DISPLAYS) return 0; return _speed[num]; }
+                const unsigned int points(unsigned int num) const { if(num >= DISPLAYS) return 0; return _points[num]; }
+        };
+
+        struct NightOff {
+            private:
+                bool _need[DISPLAYS] = {false, false}; // Turn off display at night
+                char _from[DISPLAYS][6] = {"23:00", "23:00"}; // The hour from which the display is turned off
+                char _to[DISPLAYS][6] = {"07:00", "07:00"}; // The hour from which the display is turned on
+                friend class Config;
+
+            public:
+                const bool need(unsigned int num) const { if(num >= DISPLAYS) return false; return _need[num]; }
+                const unsigned int from(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return _get_time(level, _from[num]); }
+                const unsigned int to(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return _get_time(level, _to[num]); }
+        };
+
+        struct Brightness {
+            private:
+                unsigned int _method[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
+                unsigned int _day[DISPLAYS] = {50, 50}; // Day mode brightness 1...100
+                unsigned int _night[DISPLAYS] = {50, 50}; // Night mode brightness 1...100
+                unsigned int _min[DISPLAYS] = {1, 1}; // Minimum brightness limit 0...255
+                unsigned int _max[DISPLAYS] = {255, 255}; // Maximum brightness limit 0...255
+                friend class Config;
+
+            public:
+                const unsigned int method(unsigned int num) const { if(num >= DISPLAYS) return 3; if(_method[num] > 3) return 3; return _method[num]; }
+                const unsigned int day(unsigned int num) const { if(num >= DISPLAYS) return 100; if(_day[num] < 1 or _day[num] > 100) return 100; return _day[num]; }
+                const unsigned int night(unsigned int num) const { if(num >= DISPLAYS) return 100; if(_night[num] < 1 or _night[num] > 100) return 100; return _night[num]; }
+                const unsigned int min(unsigned int num) const { if(num >= DISPLAYS) return 1; return _min[num]; }
+                const unsigned int max(unsigned int num) const { if(num >= DISPLAYS) return 255; return _max[num]; }
+        };
+
+        struct LightSensor {
+            private:
+                unsigned int _type[DISPLAYS] = {1, 1}; // Sensor type for brightness adjust: 0-Analog input, 1-MAX44009, 2-BH1750
+                unsigned int _sensitivity[DISPLAYS] = {50, 50}; // Ambient light sensor sensibility 1...100
+                friend class Config;
+
+            public:
+                const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; if(_type[num] > 2) return 0; return _type[num]; }
+                const unsigned int sensitivity(unsigned int num) const { if(num >= DISPLAYS) return 50; if(_sensitivity[num] < 1 or _sensitivity[num] > 100) return 50; return _sensitivity[num]; }
+        };
+
+        struct Source {
+            struct BaseSensor {
+                private:
+                    unsigned int _sens = 0;
+                    unsigned int _wsensNum = 0;
+                    unsigned int _thing = 0;
+                    friend class Config;
+
+                public:
+                    const unsigned int sens() const { return _sens; }
+                    const unsigned int wsensNum() const { return _wsensNum; }
+                    const unsigned int thing() const { return _thing; }
+            };
+
+            struct TempSensor : public BaseSensor {
+                private: unsigned int _temp = 0; friend class Config;
+                public: const unsigned int temp() const { return _temp }
+            };
+
+            struct VoltSensor : public BaseSensor {
+                private:
+                    unsigned int _volt = 0;
+                    unsigned int _thingType = 0;
+                    friend class Config;
+
+                public:
+                    const unsigned int volt() const { return _volt; }
+                    const unsigned int thingType() const { return _thingType; }
+            };
+
+            public:
+                BaseSensor bat;
+                BaseSensor humOut;
+                BaseSensor humIn;
+                BaseSensor presOut;
+                TempSensor tempOut;
+                TempSensor tempIn;
+                VoltSensor volt;
+        };
+
+    unsigned int _type[DISPLAYS] = {0, 0}; // Display type
+    unsigned int _model[DISPLAYS] = {0, 0}; // Display model
+    unsigned int _order[DISPLAYS][8] = { {1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 5, 6, 7, 8} }; // Digits order
+    char _dayTime[DISPLAYS][6] = {"07:00", "07:00"}; // Time to switch to day mode
+    char _nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
+    unsigned int _autoOff[DISPLAYS] = {0, 0}; // Display auto-off time 0...1440
+    unsigned int _source_descr = 0; // Additional description data source: 0-Nothing, 1-Comfort level, 2-Sequence
+    unsigned int _source_wind_speed_sens = 1; // Wind speed data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
+    unsigned int _source_wind_speed_wsensNum = 0; // Wireless sensor number for wind speed
+    unsigned int _source_wind_speed_thing = 0; // Thingspeak field number for wind speed
+    unsigned int _source_wind_dir_sens = 1; // Wind direction data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
+    unsigned int _source_wind_dir_wsensNum = 0; // Wireless sensor number for wind direction
+    unsigned int _source_wind_dir_thing = 0; // Thingspeak field number for wind direction
+    unsigned int _source_sequence_dur = 2; // Sequence data display duration (seconds)
+    char _source_sequence_name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
+    unsigned int _source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
+    unsigned int _source_sequence_thngtemp[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the temperature sequence
+    unsigned int _source_sequence_wsenstemp[SEQUENCES][WSENSORS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Wireless sensor number and its sensor for the temperature sequence
+    unsigned int _source_sequence_hum[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast, 7-BME680
+    unsigned int _source_sequence_thnghum[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the humidity sequence
+    unsigned int _source_sequence_wsenshum[SEQUENCES] =  {0, 0, 0, 0}; // Wireless sensor number for the humidity sequence
+    unsigned int _timeSlot_period[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot durations
+    unsigned int _timeSlot_sensor[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
+    unsigned int _timeSlot_data[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot sensors types
+    unsigned int _timeSlot_thing[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot thingspeak field number
+    unsigned int _timeSlot_wsensor_num[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor number
+    unsigned int _timeSlot_wsensor_type[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor type 
+    char _timeSlot_color[TIMESLOTS][DISPLAYS][8] = { // Segment display timeslot colors 
+        {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"},
+        {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}
+    };
+        public:
+            Animation animation;
+            NightOff nightOff;
+            Brightness brightness;
+            LightSensor lightSensor;
+    }; Display display;
+
     struct Account {
         private:
             char _name[32] = ""; // Web interface username
@@ -512,20 +574,20 @@ class Config {
                         }
                         COPYSTR(conf["display"]["dayTime"][i], _display_dayTime[i]);
                         COPYSTR(conf["display"]["nightTime"][i], _display_nightTime[i]);
-                        COPYNUM(conf["display"]["brightMethod"][i], _display_brightMethod[i]);
                         COPYNUM(conf["display"]["autoOff"][i], _display_autoOff[i]);
-                        COPYBOOL(conf["display"]["nightOff"]["need"][i], _display_nightOff[i]);
-                        COPYSTR(conf["display"]["nightOff"]["from"][i], _display_nightOff_from[i]);
-                        COPYSTR(conf["display"]["nightOff"]["to"][i], _display_nightOff_to[i]);
-                        COPYNUM(conf["display"]["brightness"]["day"][i], _display_brightness_day[i]);
-                        COPYNUM(conf["display"]["brightness"]["night"][i], _display_brightness_night[i]);
-                        COPYNUM(conf["display"]["brightness"]["min"][i], _display_brightness_min[i]);
-                        COPYNUM(conf["display"]["brightness"]["max"][i], _display_brightness_max[i]);
-                        COPYNUM(conf["display"]["lightSensor"][i], _display_lightSensor[i]);
-                        COPYNUM(conf["display"]["lightSensor_sensitivity"][i], _display_lightSensor_sensitivity[i]);
-                        COPYNUM(conf["display"]["animation"]["type"][i], _display_animation_type[i]);
-                        COPYNUM(conf["display"]["animation"]["speed"][i], _display_animation_speed[i]);
-                        COPYNUM(conf["display"]["animation"]["points"][i], _display_animation_points[i]);
+                        COPYBOOL(conf["display"]["nightOff"]["need"][i], display.nightOff._need[i]);
+                        COPYSTR(conf["display"]["nightOff"]["from"][i], display.nightOff._from[i]);
+                        COPYSTR(conf["display"]["nightOff"]["to"][i], display.nightOff._to[i]);
+                        COPYNUM(conf["display"]["brightMethod"][i], display.brightness._method[i]);
+                        COPYNUM(conf["display"]["brightness"]["day"][i], display.brightness._day[i]);
+                        COPYNUM(conf["display"]["brightness"]["night"][i], display.brightness._night[i]);
+                        COPYNUM(conf["display"]["brightness"]["min"][i], display.brightness._min[i]);
+                        COPYNUM(conf["display"]["brightness"]["max"][i], display.brightness._max[i]);
+                        COPYNUM(conf["display"]["lightSensor"][i], display.lightSensor._type[i]);
+                        COPYNUM(conf["display"]["lightSensor_sensitivity"][i], display.lightSensor._sensitivity[i]);
+                        COPYNUM(conf["display"]["animation"]["type"][i], display.animation._type[i]);
+                        COPYNUM(conf["display"]["animation"]["speed"][i], display.animation._speed[i]);
+                        COPYNUM(conf["display"]["animation"]["points"][i], display.animation._points[i]);
                         for(unsigned int t=0; t<TIMESLOTS; t++) {
                             COPYNUM(conf["display"]["timeSlot"]["period"][t][i], _display_timeSlot_period[t][i]);
                             COPYNUM(conf["display"]["timeSlot"]["sensor"][t][i], _display_timeSlot_sensor[t][i]);
@@ -817,21 +879,6 @@ class Config {
         return _display_order[num][dig];
     }
 
-    unsigned int display_animation_type(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        return _display_animation_type[num];
-    }
-
-    unsigned int display_animation_speed(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        return _display_animation_speed[num];
-    }
-
-    unsigned int display_animation_points(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        return _display_animation_points[num];
-    }
-
     unsigned int display_dayTime(unsigned int num, bool level) {
         if(num >= DISPLAYS) return 0;
         return _get_time(level, _display_dayTime[num]); 
@@ -842,65 +889,10 @@ class Config {
         return _get_time(level, _display_nightTime[num]);
     }
 
-    unsigned int display_brightMethod(unsigned int num) {
-        if(num >= DISPLAYS) return 3;
-        if(_display_brightMethod[num] > 3) return 3;
-        return _display_brightMethod[num];
-    }
-
     unsigned int display_autoOff(unsigned int num) {
         if(num >= DISPLAYS) return 0;
         if(_display_autoOff[num] > 1440) return 0; 
         return _display_autoOff[num];
-    }
-
-    bool display_nightOff(unsigned int num) {
-        if(num >= DISPLAYS) return false;
-        return _display_nightOff[num];
-    }
-
-    unsigned int display_nightOff_from(unsigned int num, bool level) {
-        if(num >= DISPLAYS) return 0;
-        return _get_time(level, _display_nightOff_from[num]);
-    }
-
-    unsigned int display_nightOff_to(unsigned int num, bool level) {
-        if(num >= DISPLAYS) return 0;
-        return _get_time(level, _display_nightOff_to[num]);
-    }
-
-    unsigned int display_brightness_day(unsigned int num) {
-        if(num >= DISPLAYS) return 100;
-        if(_display_brightness_day[num] < 1 or _display_brightness_day[num] > 100) return 100;
-        return _display_brightness_day[num];
-    }
-
-    unsigned int display_brightness_night(unsigned int num) {
-        if(num >= DISPLAYS) return 100;
-        if(_display_brightness_night[num] < 1 or _display_brightness_night[num] > 100) return 100;
-        return _display_brightness_night[num];
-    }
-
-    unsigned int display_brightness_min(unsigned int num) {
-        if(num >= DISPLAYS) return 1;
-        return _display_brightness_min[num];
-    }
-
-    unsigned int display_brightness_max(unsigned int num) {
-        if(num >= DISPLAYS) return 255;
-        return _display_brightness_max[num];
-    }
-
-    unsigned int display_lightSensor(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        if(_display_lightSensor[num] > 2) return 0;
-        return _display_lightSensor[num];
-    }
-
-    unsigned int display_lightSensor_sensitivity(unsigned int num) {
-        if(num >= DISPLAYS) return 50;
-        if(_display_lightSensor_sensitivity[num] < 1 or _display_lightSensor_sensitivity[num] > 100) return 50;
-        return _display_lightSensor_sensitivity[num];
     }
 
     unsigned int display_source_tempOut_sens() {
