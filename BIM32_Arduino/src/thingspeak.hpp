@@ -63,8 +63,8 @@ void Thingspeak::receive() {
         tmth.Minute = atoi(strtok(NULL, ":"));
         tmth.Second = atoi(strtok(NULL, ":"));
         state.thing.time = makeTime(tmth);
-        state.thing.time += config.clock_utc() * 3600;
-        state.thing.time += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
+        state.thing.time += config.clock.utc() * 3600;
+        state.thing.time += config.clock.dlst() ? _is_summertime() ? 3600 : 0 : 0;
         Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
         state.thing.updated = true;
     }
@@ -179,8 +179,8 @@ void Thingspeak::receiveHistory() {
             tmth.Minute = atoi(strtok(NULL, ":"));
             tmth.Second = atoi(strtok(NULL, ":"));
             state.thing.historyTime[i] = makeTime(tmth);
-            state.thing.historyTime[i] += config.clock_utc() * 3600;
-            state.thing.historyTime[i] += config.clock_dlst() ? _is_summertime() ? 3600 : 0 : 0;
+            state.thing.historyTime[i] += config.clock.utc() * 3600;
+            state.thing.historyTime[i] += config.clock.dlst() ? _is_summertime() ? 3600 : 0 : 0;
         }
         Serial.println("successfull");
     }

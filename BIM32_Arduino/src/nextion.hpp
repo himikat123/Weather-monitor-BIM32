@@ -64,7 +64,7 @@ void Nextion::init() {
     nex.writeStr("Network.MACADDRESS.txt", lang.macAddr());
     nex.writeStr("Network.ESP32TEMP.txt", lang.esp32Temp());
     nex.writeStr("Network.FIRMWARE.txt", lang.firmware());
-    nex.writeNum("BigClock.clockFormat.val", config.clock_format());
+    nex.writeNum("BigClock.clockFormat.val", config.clock.format());
 
     for(unsigned int i=0; i<4; i++) {
         nex.writeStr("Main.nameSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
@@ -85,7 +85,7 @@ void Nextion::init() {
         if(config.lang() == "bg") langCode = 5;
         if(config.lang() == "es") langCode = 6;
         nex.writeNum("Main.lang.val", langCode);
-        nex.writeNum("Main.weather.val", config.weather_provider());
+        nex.writeNum("Main.weather.val", config.weather.provider());
 
         // texts
         String monthFullName[12] = {"JAN_", "FEB_", "MAR_", "APR_", "MAY_", "JUN_", "JUL_", "AUG_", "SEP_", "OCT_", "NOV_", "DEC_"};
@@ -125,7 +125,7 @@ void Nextion::refresh() {
     if(millis() - _prevForced > 10000) {
         _forced = true;
         _prevForced = millis();
-        nex.writeNum("BigClock.clockFormat.val", config.clock_format());
+        nex.writeNum("BigClock.clockFormat.val", config.clock.format());
     }
 
     if(_prevPower != _power or _forced) {
@@ -243,7 +243,7 @@ void Nextion::_NX4832K035_setRTC() {
 void Nextion::_NX4832T035_timeDate() {
     if(_prevTHour != _tHour or _forced) {
         char buf[4];
-        if(config.clock_format() % 2 == 0) sprintf(buf, "%d", _tHour);
+        if(config.clock.format() % 2 == 0) sprintf(buf, "%d", _tHour);
         else sprintf(buf, "%02d", _tHour);
         nex.writeStr("BigClock.hour.txt", String(buf));
         _prevTHour = _tHour;
@@ -536,8 +536,8 @@ void Nextion::_showUpdated() {
     if(_prevWeatherUpdated != _weatherUpdated or _forced) {
         time_t t = _weatherUpdated;
         char buf[32] = "";
-        unsigned int hr = config.clock_format() > 1 ? hour(t) : hourFormat12(t);
-        if(config.clock_format() % 2 == 0) sprintf(buf, "⭮ %02d.%02d.%d %d:%02d:%02d", day(t), month(t), year(t), hr, minute(t), second(t)); 
+        unsigned int hr = config.clock.format() > 1 ? hour(t) : hourFormat12(t);
+        if(config.clock.format() % 2 == 0) sprintf(buf, "⭮ %02d.%02d.%d %d:%02d:%02d", day(t), month(t), year(t), hr, minute(t), second(t)); 
         else sprintf(buf, "⭮ %02d.%02d.%d %02d:%02d:%02d", day(t), month(t), year(t), hr, minute(t), second(t));
         nex.writeStr("Main.updatedTime.txt", t > 0 ? buf : "--");
         _prevWeatherUpdated = _weatherUpdated;
@@ -607,7 +607,7 @@ void Nextion::_hourlyData() {
             sprintf(buf, "%02d", month(weather.get_hourlyDate(i)) - 1);
             for(uint8_t k=0; k<2; k++) dat[13 + k] = buf[k];
             // hour
-            unsigned int hr = config.clock_format() > 1 
+            unsigned int hr = config.clock.format() > 1 
                 ? hour(weather.get_hourlyDate(i)) 
                 : hourFormat12(weather.get_hourlyDate(i));
             sprintf(buf, "%02d", hr);
@@ -623,7 +623,7 @@ void Nextion::_hourlyData() {
             dat[19] = buf[0];
             // precipitation
             int pr = 0;
-            if(config.weather_provider() == OPEN_METEO) pr = weather.get_hourlyPrec(i);
+            if(config.weather.provider() == OPEN_METEO) pr = weather.get_hourlyPrec(i);
             else pr = round(weather.get_hourlyPrec(i) * 100);
             sprintf(buf, "%03d", pr);
             for(uint8_t k=0; k<3; k++) dat[20 + k] = buf[k];
@@ -683,7 +683,7 @@ void Nextion::_historyOut() {
             sprintf(buf, "%02d", month(thingspeak.get_historyUpdated(i)) - 1);
             for(uint8_t k=0; k<2; k++) dat[12 + k] = buf[k];
             // hour
-            unsigned int hr = config.clock_format() > 1 
+            unsigned int hr = config.clock.format() > 1 
                 ? hour(thingspeak.get_historyUpdated(i)) 
                 : hourFormat12(thingspeak.get_historyUpdated(i));
             sprintf(buf, "%02d", hr);
@@ -728,7 +728,7 @@ void Nextion::_historyIn() {
             sprintf(buf, "%02d", month(thingspeak.get_historyUpdated(i)) - 1);
             for(uint8_t k=0; k<2; k++) dat[9 + k] = buf[k];
             // hour
-            unsigned int hr = config.clock_format() > 1 
+            unsigned int hr = config.clock.format() > 1 
                 ? hour(thingspeak.get_historyUpdated(i)) 
                 : hourFormat12(thingspeak.get_historyUpdated(i));
             sprintf(buf, "%02d", hr);

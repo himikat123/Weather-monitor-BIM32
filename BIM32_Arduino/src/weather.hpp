@@ -92,32 +92,34 @@ const char* Weather::_openMeteoCode2Description(uint8_t code) {
  */
 void Weather::update() {
     String url = "";
-    if(config.weather_provider() == OPENWEATHERMAP) {
-        if(config.weather_appid(OPENWEATHERMAP) == "") {
+    if(config.weather.provider() == OPENWEATHERMAP) {
+        String appid = String(config.weather.appid(OPENWEATHERMAP));
+        if(appid == "") {
             Serial.println("No APPID");
             return;
         }
-        url = "http://api.openweathermap.org/data/2.5/weather?appid=" + config.weather_appid(OPENWEATHERMAP);
-        if(config.weather_citysearch() == 0) {
-            if(config.weather_city() == "") {
+        url = "http://api.openweathermap.org/data/2.5/weather?appid=" + appid;
+        if(config.weather.citysearch() == 0) {
+            String city = String(config.weather.city());
+            if(city == "") {
                 Serial.println("No Cityname");
                 return;
             }
-            url += "&q=" + config.weather_city();
+            url += "&q=" + city;
         }
-        if(config.weather_citysearch() == 1) {
-            if(config.weather_cityid() == "") {
-                Serial.println("No City ID");
-                return;
-            }
-            url += "&id=" + config.weather_cityid();
+        if(config.weather.citysearch() == 1) {
+            //if(config.weather.cityid() == "") {
+            //    Serial.println("No City ID");
+            //    return;
+            //}
+            url += "&id=" + String(config.weather.cityid());
         }
-        if(config.weather_citysearch() == 2) {
-            if(config.weather_lat() == "" || config.weather_lon() == "") {
-                Serial.println("No Coordinates");
-                return;
-            }
-            url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
+        if(config.weather.citysearch() == 2) {
+            //if(config.weather.lat() == "" || config.weather.lon() == "") {
+            //    Serial.println("No Coordinates");
+            //    return;
+            //}
+            url += "&lat=" + String(config.weather.lat()) + "&lon=" + String(config.weather.lon());
         }
         url += "&units=metric&lang=" + config.lang();
         if(state.debugWether) {
@@ -126,28 +128,29 @@ void Weather::update() {
         }
     }
 
-    else if(config.weather_provider() == WEATHERBIT) {
-        url = "http://api.weatherbit.io/v2.0/current?key=" + config.weather_appid(WEATHERBIT);
-        if(config.weather_citysearch() == 0) {
-            if(config.weather_city() == "") {
+    else if(config.weather.provider() == WEATHERBIT) {
+        url = "http://api.weatherbit.io/v2.0/current?key=" + String(config.weather.appid(WEATHERBIT));
+        if(config.weather.citysearch() == 0) {
+            String city = String(config.weather.city());
+            if(city == "") {
                 Serial.println("No Cityname");
                 return;
             }
-            url += "&city=" + config.weather_city();
+            url += "&city=" + city;
         }
-        if(config.weather_citysearch() == 1) {
-            if(config.weather_cityid() == "") {
-                Serial.println("No City ID");
-                return;
-            }
-            url += "&city_id=" + config.weather_cityid();
+        if(config.weather.citysearch() == 1) {
+            //if(config.weather.cityid() == "") {
+            //    Serial.println("No City ID");
+            //    return;
+            //}
+            url += "&city_id=" + String(config.weather.cityid());
         }
-        if(config.weather_citysearch() == 2) {
-            if(config.weather_lat() == "" || config.weather_lon() == "") {
-                Serial.println("No Coordinates");
-                return;
-            }
-            url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
+        if(config.weather.citysearch() == 2) {
+            //if(config.weather.lat() == "" || config.weather.lon() == "") {
+            //    Serial.println("No Coordinates");
+            //    return;
+            //}
+            url += "&lat=" + String(config.weather.lat()) + "&lon=" + String(config.weather.lon());
         }
         url += "&lang=" + config.lang();
         if(state.debugWether) {
@@ -156,15 +159,15 @@ void Weather::update() {
         }
     }
 
-    else if(config.weather_provider() == OPEN_METEO) {
-        if(config.weather_citysearch() == 2) {
-            if(config.weather_lat() == "" || config.weather_lon() == "") {
-                Serial.println("No Coordinates");
-                return;
-            }
+    else if(config.weather.provider() == OPEN_METEO) {
+        if(config.weather.citysearch() == 2) {
+            //if(config.weather.lat() == "" || config.weather.lon() == "") {
+            //    Serial.println("No Coordinates");
+            //    return;
+            //}
             url = "http://api.open-meteo.com/v1/forecast";
-            url += "?latitude=" + config.weather_lat();
-            url += "&longitude=" + config.weather_lon();
+            url += "?latitude=" + String(config.weather.lat());
+            url += "&longitude=" + String(config.weather.lon());
             url += "&current=temperature_2m,relative_humidity_2m,is_day,weather_code,pressure_msl,wind_speed_10m,wind_direction_10m";
             url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto";
         }
@@ -193,7 +196,7 @@ void Weather::update() {
             return;
         }
 
-        if(config.weather_provider() == OPENWEATHERMAP) {
+        if(config.weather.provider() == OPENWEATHERMAP) {
             strlcpy(state.weather.descript, weather["weather"][0]["description"] | "", sizeof(state.weather.descript));
             state.weather.temp       = weather["main"]["temp"] | 40400.0;
             state.weather.hum        = weather["main"]["humidity"] | 40400.0;
@@ -208,7 +211,7 @@ void Weather::update() {
             _lat                     = weather["coord"]["lat"] | 0.0;
         }
 
-        if(config.weather_provider() == WEATHERBIT) {
+        if(config.weather.provider() == WEATHERBIT) {
             strlcpy(state.weather.descript, weather["data"][0]["weather"]["description"] | "", sizeof(state.weather.descript));
             state.weather.temp       = weather["data"][0]["temp"] | 40400.0;
             state.weather.hum        = weather["data"][0]["rh"] | 40400.0;
@@ -220,7 +223,7 @@ void Weather::update() {
             state.weather.icon       = _weatherbitIcon(weather["data"][0]["weather"]["code"].as<int>() | 0);
         }
 
-        if(config.weather_provider() == OPEN_METEO) {
+        if(config.weather.provider() == OPEN_METEO) {
             const char* descr              = _openMeteoCode2Description(weather["current"]["weather_code"] | 0);
             strlcpy(state.weather.descript, descr, sizeof(state.weather.descript));
             state.weather.temp       = weather["current"]["temperature_2m"] | 40400.0;
@@ -243,9 +246,9 @@ void Weather::update() {
     #if !defined(BIM32_CYD)
         if(config.display_type(0) == 1) {
     #endif
-            if(config.weather_provider() == WEATHERBIT) _updateWeatherbitDaily();
-            if(config.weather_provider() == OPENWEATHERMAP) _updateOpenweathermapHourly();
-            if(config.weather_provider() == OPEN_METEO) {
+            if(config.weather.provider() == WEATHERBIT) _updateWeatherbitDaily();
+            if(config.weather.provider() == OPENWEATHERMAP) _updateOpenweathermapHourly();
+            if(config.weather.provider() == OPEN_METEO) {
                 _updateOpenMeteoDaily();
                 if(config.display_model(0) == 0 || config.display_model(0) == 2) _updateOpenMeteoHourly();
             }
@@ -297,10 +300,10 @@ void Weather::_updateWeatherbitDaily(void) {
     Serial.println("Weatherbit.io: daily forecast update... ");
   
     String url = "http://api.weatherbit.io/v2.0/forecast/daily?days=4";
-    if(config.weather_citysearch() == 0) url += "&city=" + config.weather_city();
-    if(config.weather_citysearch() == 1) url += "&city_id=" + config.weather_cityid();
-    if(config.weather_citysearch() == 2) url += "&lat=" + config.weather_lat() + "&lon=" + config.weather_lon();
-    url += "&key=" + config.weather_appid(WEATHERBIT);
+    if(config.weather.citysearch() == 0) url += "&city=" + String(config.weather.city());
+    if(config.weather.citysearch() == 1) url += "&city_id=" + String(config.weather.cityid());
+    if(config.weather.citysearch() == 2) url += "&lat=" + String(config.weather.lat()) + "&lon=" + String(config.weather.lon());
+    url += "&key=" + String(config.weather.appid(WEATHERBIT));
     HTTPClient clientDaily;
     if(state.debugWether) {
         Serial.println(url);
@@ -345,7 +348,7 @@ void Weather::_updateOpenweathermapHourly(void) {
     forecast = new OW_forecast;
     bool parsed = ow.getForecast(
         forecast, 
-        config.weather_appid(OPENWEATHERMAP), 
+        String(config.weather.appid(OPENWEATHERMAP)), 
         String(_lat), 
         String(_lon), 
         "metric", "en", false
@@ -381,8 +384,8 @@ void Weather::_updateOpenMeteoDaily() {
     Serial.println("Open-meteo.com: daily forecast update... ");
   
     String url = "http://api.open-meteo.com/v1/forecast";
-    url += "?latitude=" + config.weather_lat();
-    url += "&longitude=" + config.weather_lon();
+    url += "?latitude=" + String(config.weather.lat());
+    url += "&longitude=" + String(config.weather.lon());
     url += "&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max";
     url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=4";
     HTTPClient clientDaily;
@@ -425,8 +428,8 @@ void Weather::_updateOpenMeteoHourly() {
     Serial.println("Open-meteo.com: hourly forecast update... ");
   
     String url = "http://api.open-meteo.com/v1/forecast";
-    url += "?latitude=" + config.weather_lat();
-    url += "&longitude=" + config.weather_lon();
+    url += "?latitude=" + String(config.weather.lat());
+    url += "&longitude=" + String(config.weather.lon());
     url += "&hourly=temperature_2m,precipitation_probability,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m";
     url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=6";
     HTTPClient clientHourly;
@@ -529,15 +532,15 @@ void Weather::_calculateDaily(void) {
  * Getters 
  */
 float Weather::get_currentTemp() {
-    return state.weather.temp + config.weather_temp_corr();
+    return state.weather.temp + config.weather.tempCorr();
 }
 
 float Weather::get_currentHum() {
-    return state.weather.hum + config.weather_hum_corr();
+    return state.weather.hum + config.weather.humCorr();
 }
 
 float Weather::get_currentPres() {
-    return state.weather.pres + config.weather_pres_corr();
+    return state.weather.pres + config.weather.presCorr();
 }
 
 float Weather::get_currentWindSpeed() {

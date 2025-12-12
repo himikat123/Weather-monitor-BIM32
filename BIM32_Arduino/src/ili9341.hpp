@@ -448,7 +448,7 @@ void ILI9341::_showTime() {
     if(_prevTHour != _tHour || _prevTMinute != _tMinute || _forced) {
         if(_tHour > 9) _showImg(0, 0, _number_picture(_tHour / 10), _number_picture_size(_tHour / 10));
         else {
-            if(config.clock_format() % 2 == 0) tft.fillRect(0, 0, 32, 78, BG_COLOR);
+            if(config.clock.format() % 2 == 0) tft.fillRect(0, 0, 32, 78, BG_COLOR);
             else _showImg(0, 0, _number_picture(0), _number_picture_size(0));
         }
         _showImg(33, 0, _number_picture(_tHour % 10), _number_picture_size(_tHour % 10));
@@ -713,8 +713,8 @@ void ILI9341::_showUpdTime() {
     if(_prevWeatherUpdated != _weatherUpdated || _forced) {
         time_t t = _weatherUpdated;
         char buf[32] = "";
-        unsigned int hr = config.clock_format() > 1 ? hour(t) : hourFormat12(t);
-        if(config.clock_format() % 2 == 0) sprintf(buf, "%02d.%02d.%d %d:%02d", day(t), month(t), year(t), hr, minute(t));
+        unsigned int hr = config.clock.format() > 1 ? hour(t) : hourFormat12(t);
+        if(config.clock.format() % 2 == 0) sprintf(buf, "%02d.%02d.%d %d:%02d", day(t), month(t), year(t), hr, minute(t));
         else sprintf(buf, "%02d.%02d.%d %02d:%02d", day(t), month(t), year(t), hr, minute(t));
         _printText(176, 148, 117, 16, t > 0 ? buf : " ", FONT1, LEFT, TEXT_COLOR);
         if(t > 0) {
@@ -917,9 +917,9 @@ void ILI9341::_bigClockPage() {
     }
     if(_prevTHour != hour() || _forced) {
         tft.fillRect(0, 66, 160, 124, BG_COLOR);
-        unsigned int hr = config.clock_format() > 1 ? hour() : hourFormat12();
+        unsigned int hr = config.clock.format() > 1 ? hour() : hourFormat12();
         char buf[3];
-        if(config.clock_format() % 2 == 0) sprintf(buf, "%02d", hr);
+        if(config.clock.format() % 2 == 0) sprintf(buf, "%02d", hr);
         else sprintf(buf, "%d", hr);
         _printText(0, 68, 155, 120, String(buf), FONT_SEGMENTS_BIG, RIGHT, CLOCK_COLOR);
         _prevTHour = hour();
@@ -952,9 +952,9 @@ void ILI9341::_smallClockPage() {
     }
     if(_prevTHour != hour() || _forced) {
         tft.fillRect(1, 80, 106, 2, BG_COLOR);
-        unsigned int hr = config.clock_format() > 1 ? hour() : hourFormat12();
+        unsigned int hr = config.clock.format() > 1 ? hour() : hourFormat12();
         char buf[3];
-        if(config.clock_format() % 2 == 0) sprintf(buf, "%02d", hr);
+        if(config.clock.format() % 2 == 0) sprintf(buf, "%02d", hr);
         else sprintf(buf, "%d", hr);
         _printText(1, 82, 106, 96, String(buf), FONT_SEGMENTS_SML, RIGHT, CLOCK_COLOR);
         _prevTHour = hour();
@@ -1180,8 +1180,8 @@ void ILI9341::_hourlyPrec(uint8_t num, uint16_t y) {
     _showImg(x + 2, y, symb_drop, sizeof(symb_drop));
     float prec = _hrPrec[num];
     char pr[8];
-    if(config.weather_provider() == 0) sprintf(pr, "%f%s", prec ? prec : 0.0, lang.mm());
-    if(config.weather_provider() == 2) sprintf(pr, "%d%%", (int)round(prec));
+    if(config.weather.provider() == 0) sprintf(pr, "%f%s", prec ? prec : 0.0, lang.mm());
+    if(config.weather.provider() == 2) sprintf(pr, "%d%%", (int)round(prec));
     _printText(x + 11, y + 2, 21, 12, String(pr), FONT_TINY, CENTER, TEXT_COLOR);
 }
 

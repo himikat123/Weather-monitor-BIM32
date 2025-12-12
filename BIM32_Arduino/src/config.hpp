@@ -63,28 +63,9 @@ class Config {
     // Touch calibration data
     uint16_t _calData[5] = { 0 };
 
-    // Weather
-    char _weather_appid[PROVIDERS][33] = { "", "" }; // [0] -> APPID openweathermap.org, [1] -> KEY weatherbit.io
-    float _weather_lon = 0.0; // Longitude
-    float _weather_lat = 0.0; // Latitude
-    uint8_t _weather_provider = 0; // Weather forecast provider. 0: openweathermap.org, 1: weatherbit.io, 2: open-meteo.com 
-    char _weather_city[41] = ""; // City name
-    unsigned int _weather_cityid = 0; // City ID
-    unsigned int _weather_citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
-    float _weather_temp_corr = 0; // Weather temperature correction
-    float _weather_hum_corr = 0; // Weather humidity correction
-    float _weather_pres_corr = 0; // Weather pressure correction
-
     // Localization
     char _lang[3] = "en";
     uint8_t _units_pres = 0;
-
-    // Clock
-    unsigned int _clock_format = 0; // Clock format: 0 = 12 hour wo leading zero, 1 = 12 hour with leading zero, 2 = 24 hour wo leading zero, 3 = 24 hour with leading zero
-    char _clock_ntp[65] = "time.nist.gov"; // NTP server address
-    int _clock_utc = 0; // Timezone -12...13
-    bool _clock_dlst = false; // Auto daylight saving time
-    unsigned int _clock_ntp_period = 15; // NTP update period (minutes) 0...90000
 
     // Display
     unsigned int _display_type[DISPLAYS] = {0, 0}; // Display type
@@ -369,6 +350,7 @@ class Config {
             unsigned int _chnl = 1; // WiFi channel number 1...13
             char _ip[33] = "192.168.4.1"; // IP address
             char _mask[33] = "255.255.255.0"; // Subnet mask
+            friend class Config;
 
         public:
             const char* ssid() const { return _ssid; }
@@ -376,8 +358,79 @@ class Config {
             const unsigned int chnl() const { if(_chnl < 1 or _chnl > 13) return 1; return _chnl; }
             const char* ip() const { return _ip; }
             const char* mask() const { return _mask; }
-            friend class Config;
     }; AccessPoint accessPoint;
+
+    struct Weather {
+        private:
+            char _appid[PROVIDERS][33] = { "", "" }; // [0] -> APPID openweathermap.org, [1] -> KEY weatherbit.io
+            float _lon = 0.0; // Longitude
+            float _lat = 0.0; // Latitude
+            unsigned int _provider = 0; // Weather forecast provider. 0: openweathermap.org, 1: weatherbit.io, 2: open-meteo.com 
+            char _city[41] = ""; // City name
+            unsigned int _cityid = 0; // City ID
+            unsigned int _citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
+            float _tempCorr = 0; // Weather temperature correction
+            float _humCorr = 0; // Weather humidity correction
+            float _presCorr = 0; // Weather pressure correction
+            friend class Config;
+
+        public:
+            const char* appid(unsigned int num) const {
+                if(num >= PROVIDERS) return (char*) "";
+                return _appid[num];
+            }
+
+            unsigned int provider() const {
+                if(_provider > 2) return 0;
+                return _provider;
+            }
+
+            unsigned int citysearch() const {
+                if(_citysearch > 2) return 0;
+                return _citysearch;
+            }
+
+            const char* city() const { return _city; }
+            unsigned int cityid() const { return _cityid; }
+            float lon() const { return _lon; }
+            float lat() const { return _lat; }
+            float tempCorr() const { return _tempCorr; }
+            float humCorr() const { return _humCorr; }
+            float presCorr() const { return _presCorr; }
+    }; Weather weather;
+
+    struct Clock {
+        private:
+            unsigned int _format = 0; // Clock format: 0 = 12 hour wo leading zero, 1 = 12 hour with leading zero, 2 = 24 hour wo leading zero, 3 = 24 hour with leading zero
+            char _ntp[65] = "time.nist.gov"; // NTP server address
+            int _utc = 0; // Timezone -12...13
+            bool _dlst = false; // Auto daylight saving time
+            unsigned int _ntpPeriod = 15; // NTP update period (minutes) 0...90000
+            friend class Config;
+
+        public:
+            unsigned int format() const {
+                if(_format > 3) return 0;
+                return _format;
+            }
+
+            const char* ntp() const {
+                if(String(_ntp) == "") return (char*) "time.nist.gov";
+                return _ntp;
+            }
+
+            const int utc() const {
+                if(_utc < -12 or _utc > 13) return 0;
+                return _utc;
+            }
+
+            const unsigned int ntpPeriod() const {
+                if(_ntpPeriod > 90000) return 15;
+                return _ntpPeriod;
+            }
+
+            const bool dlst() const { return _dlst; }
+    }; Clock clock;
 
     struct Account {
         private:
@@ -428,27 +481,27 @@ class Config {
                     COPYSTR(conf["accessPoint"]["mask"], accessPoint._mask);
 
                     // Weather
-                    for(unsigned int i=0; i<PROVIDERS; i++) COPYSTR(conf["weather"]["appid"][i], _weather_appid[i]);
-                    COPYSTR(conf["weather"]["city"], _weather_city);
-                    COPYNUM(conf["weather"]["cityid"], _weather_cityid);
-                    COPYNUM(conf["weather"]["lon"], _weather_lon);
-                    COPYNUM(conf["weather"]["lat"], _weather_lat);
-                    COPYNUM(conf["weather"]["provider"], _weather_provider);
-                    COPYNUM(conf["weather"]["citysearch"], _weather_citysearch);
-                    COPYNUM(conf["weather"]["corr"]["t"], _weather_temp_corr);
-                    COPYNUM(conf["weather"]["corr"]["h"], _weather_hum_corr);
-                    COPYNUM(conf["weather"]["corr"]["p"], _weather_pres_corr);
+                    for(unsigned int i=0; i<PROVIDERS; i++) COPYSTR(conf["weather"]["appid"][i], weather._appid[i]);
+                    COPYSTR(conf["weather"]["city"], weather._city);
+                    COPYNUM(conf["weather"]["cityid"], weather._cityid);
+                    COPYNUM(conf["weather"]["lon"], weather._lon);
+                    COPYNUM(conf["weather"]["lat"], weather._lat);
+                    COPYNUM(conf["weather"]["provider"], weather._provider);
+                    COPYNUM(conf["weather"]["citysearch"], weather._citysearch);
+                    COPYNUM(conf["weather"]["corr"]["t"], weather._tempCorr);
+                    COPYNUM(conf["weather"]["corr"]["h"], weather._humCorr);
+                    COPYNUM(conf["weather"]["corr"]["p"], weather._presCorr);
 
                     // Localization 
                     COPYSTR(conf["lang"], _lang);
                     COPYNUM(conf["units"]["pres"], _units_pres);
 
                     // Clock
-                    COPYNUM(conf["clock"]["format"], _clock_format);
-                    COPYSTR(conf["clock"]["ntp"], _clock_ntp);
-                    COPYNUM(conf["clock"]["utc"], _clock_utc);
-                    COPYBOOL(conf["clock"]["dlst"], _clock_dlst);
-                    COPYNUM(conf["clock"]["ntp_period"], _clock_ntp_period);
+                    COPYNUM(conf["clock"]["format"], clock._format);
+                    COPYSTR(conf["clock"]["ntp"], clock._ntp);
+                    COPYNUM(conf["clock"]["utc"], clock._utc);
+                    COPYBOOL(conf["clock"]["dlst"], clock._dlst);
+                    COPYNUM(conf["clock"]["ntp_period"], clock._ntpPeriod);
 
                     // Display
                     for(unsigned int i=0; i<DISPLAYS; i++) {
@@ -740,49 +793,6 @@ class Config {
         return _calData[num];
     }
 
-    String weather_appid(unsigned int num) {
-        if(num >= PROVIDERS) return "";
-        return String(_weather_appid[num]);
-    }
-
-    String weather_city() {
-        return String(_weather_city);
-    }
-
-    String weather_cityid() {
-        return String(_weather_cityid);
-    }
-
-    String weather_lon() {
-        return String(_weather_lon);
-    }
-
-    String weather_lat() {
-        return String(_weather_lat);
-    }
-
-    uint8_t weather_provider() {
-        if(_weather_provider > 2) return 0;
-        return _weather_provider;
-    }
-
-    unsigned int weather_citysearch() {
-        if(_weather_citysearch > 2) return 0;
-        return _weather_citysearch;
-    }
-
-    float weather_temp_corr() {
-        return _weather_temp_corr;
-    }
-
-    float weather_hum_corr() {
-        return _weather_hum_corr;
-    }
-
-    float weather_pres_corr() {
-        return _weather_pres_corr;
-    }
-
     String lang() {
         if(String(_lang) == "") return "en";
         return String(_lang);
@@ -790,30 +800,6 @@ class Config {
 
     uint8_t units_pres() {
         return _units_pres ? 1 : 0;
-    }
-
-    unsigned int clock_format() {
-        if(_clock_format > 3) return 0;
-        return _clock_format;
-    }
-
-    char* clock_ntp() {
-        if(String(_clock_ntp) == "") return (char*) "time.nist.gov";
-        return _clock_ntp;
-    }
-
-    int clock_utc() {
-        if(_clock_utc < -12 or _clock_utc > 13) return 0;
-        return _clock_utc;
-    }
-
-    bool clock_dlst() {
-        return _clock_dlst;
-    }
-
-    unsigned int clock_ntp_period(){
-        if(_clock_ntp_period > 90000) return 15;
-        return _clock_ntp_period;
     }
 
     unsigned int display_type(unsigned int num) {

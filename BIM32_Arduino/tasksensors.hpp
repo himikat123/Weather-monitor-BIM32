@@ -93,8 +93,8 @@ void TaskSensors(void *pvParameters) {
             /**
              * Time synchronization with NTP server
              */
-            if(config.clock_ntp_period() > 0) {
-                if((millis() - ntp_update) > config.clock_ntp_period() * 60000 or !state.clockSynchronized) {
+            if(config.clock.ntpPeriod() > 0) {
+                if((millis() - ntp_update) > config.clock.ntpPeriod() * 60000 or !state.clockSynchronized) {
                     ntp_update = millis();
                     Serial.println(SEPARATOR);
                     Serial.println("NTP synchronization... ");
@@ -177,7 +177,7 @@ void TaskSensors(void *pvParameters) {
              * Weather update
              * every 20 minutes, or every hour for weatherbit.io
              */
-            uint32_t weatherUpd = config.weather_provider() == 1 ? 3600 : 1200;
+            uint32_t weatherUpd = config.weather.provider() == 1 ? 3600 : 1200;
             if(state.debugWether || (now() - weather.get_currentUpdated() > weatherUpd)) {
                 Serial.println(SEPARATOR);
                 Serial.println("Current weather update... ");
@@ -254,14 +254,14 @@ void mp3_busy() {
  */
 void get_time(void) {
     if(state.net_connected) {
-        configTime(config.clock_utc() * 3600, 0, config.clock_ntp());
+        configTime(config.clock.utc() * 3600, 0, config.clock.ntp());
         struct tm tmstruct;
         vTaskDelay(1000);
         tmstruct.tm_year = 0;
         getLocalTime(&tmstruct);
         if(tmstruct.tm_year >= 121) {
             setTime(tmstruct.tm_hour, tmstruct.tm_min, tmstruct.tm_sec, tmstruct.tm_mday, tmstruct.tm_mon + 1, tmstruct.tm_year + 1900);
-            unsigned int summertime = config.clock_dlst() ? is_summertime() ? 3600 : 0 : 0;
+            unsigned int summertime = config.clock.dlst() ? is_summertime() ? 3600 : 0 : 0;
             unsigned int t = now() + summertime;
             setTime(t);
             state.clockSynchronize = true;
