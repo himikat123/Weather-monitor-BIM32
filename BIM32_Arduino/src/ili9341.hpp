@@ -278,8 +278,8 @@ void ILI9341::refresh() {
 void ILI9341::brightness(unsigned int bright) {
     if(_power) {
         uint8_t brgt = state.reduc[0] ? round(bright / 2) : bright;
-        if(brgt < config.display_brightness_min(0)) brgt = config.display_brightness_min(0);
-        if(brgt > config.display_brightness_max(0)) brgt = config.display_brightness_max(0); 
+        if(brgt < config.display.brightness.min(0)) brgt = config.display.brightness.min(0);
+        if(brgt > config.display.brightness.max(0)) brgt = config.display.brightness.max(0); 
         float r = 100 * log10(2) / log10(255);
         uint16_t br = round(pow(2, (brgt / r)));
         if(br < 1023) analogWrite(TFT_BACKLIGHT, br);
@@ -507,7 +507,7 @@ void ILI9341::_showAntenna() {
 
 void ILI9341::_sequenceSlotSkip() {
     for(uint8_t i=0; i<4; i++) {
-        if(config.display_source_sequence_name(_sequenceSlot) == "") {
+        if(config.display.source.sequence.name(_sequenceSlot) == "") {
             if(_sequenceSlot < 3) _sequenceSlot++;
             else _sequenceSlot = 0;
         }
@@ -516,7 +516,7 @@ void ILI9341::_sequenceSlotSkip() {
 }
 
 void ILI9341::_sequenceSlotNext() {
-    if(millis() - _sequenceMillis > config.display_source_sequence_dur() * 1000) {
+    if(millis() - _sequenceMillis > config.display.source.sequence.dur() * 1000) {
         _sequenceMillis = millis();
         if(_sequenceSlot < 3) _sequenceSlot++;
         else _sequenceSlot = 0;
@@ -527,7 +527,7 @@ void ILI9341::_sequenceSlotNext() {
  * Display temperature inside
  */
 void ILI9341::_showTemperatureInside() {
-    if(config.display_source_tempIn_sens() == 4) _tempIn = _tempSequence[_sequenceSlot];
+    if(config.display.source.tempIn.sens() == 4) _tempIn = _tempSequence[_sequenceSlot];
     if(_prevTempIn != _tempIn || _forced) {
         _showTemperature(_tempIn, 173, 53, FONT3, TEMPERATURE_COLOR);
         _prevTempIn = _tempIn;
@@ -557,7 +557,7 @@ void ILI9341::_showThermometer() {
  * Display humidity inside
  */
 void ILI9341::_showHumidityInside() {
-    if(config.display_source_humIn_sens() == 4) _humIn = _humSequence[_sequenceSlot];
+    if(config.display.source.humIn.sens() == 4) _humIn = _humSequence[_sequenceSlot];
     if(_prevHumIn != _humIn || _forced) {
         _showHumidity(int(round(_humIn)), 264, 58);
         _prevHumIn = _humIn;
@@ -578,7 +578,7 @@ void ILI9341::_showHumidityOutside() {
  * Display comfort level
  */
 void ILI9341::_showComfort() {
-    if(config.display_source_descr() == 2) _comfort = _nameSequence[_sequenceSlot];
+    if(config.display.source.descr() == 2) _comfort = _nameSequence[_sequenceSlot];
     else {
         if(_comfort.indexOf(".") > 0) {
             char buf[255];

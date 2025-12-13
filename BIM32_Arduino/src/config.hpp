@@ -184,12 +184,14 @@ class Config {
 
 
     // Division of time into hours and minutes
-    unsigned int _get_time(bool level, String time) {
-        unsigned int hour = time.substring(0, 2).toInt();
-        unsigned int minute = time.substring(3, 5).toInt();
-        if(hour > 23) hour = 0;
+    static unsigned int _get_time(bool level, const char* time) {
+        if (!time || time[2] != ':') return 0;
+        unsigned int hour = (time[0] - '0') * 10 + (time[1] - '0');
+        unsigned int minute = (time[3] - '0') * 10 + (time[4] - '0');
+        if(hour > 23)   hour = 0;
         if(minute > 59) minute = 0;
-        return level ? minute : hour; 
+
+        return level ? minute : hour;
     }
 
 
@@ -198,13 +200,13 @@ class Config {
     struct Comfort {
         struct Iaq {
             private:
-                unsigned int _source = 0;
-                bool _sound = false;
-                friend class Config;
+            unsigned int _source = 0;
+            bool _sound = false;
+            friend class Config;
 
             public:
-                unsigned int source() const { return _source; }
-                bool sound() const { return _sound; }
+            unsigned int source() const { return _source; }
+            bool sound() const { return _sound; }
         };
 
         struct CO2 : public Iaq {
@@ -214,19 +216,19 @@ class Config {
 
         struct Hum : public CO2 {
             private:
-                unsigned int _thing = 0;
-                float _min = 0.0;
-                float _max = 0.0;
-                float _minHysteresis = 0.0;
-                float _maxHysteresis = 0.0;
-                friend class Config;
+            unsigned int _thing = 0;
+            float _min = 0.0;
+            float _max = 0.0;
+            float _minHysteresis = 0.0;
+            float _maxHysteresis = 0.0;
+            friend class Config;
 
             public:
-                unsigned int thing() const { return _thing; }
-                float min() const { return _min; }
-                float max() const { return _max; }
-                float minHysteresis() const { return _minHysteresis; }
-                float maxHysteresis() const { return _maxHysteresis; }
+            unsigned int thing() const { return _thing; }
+            float min() const { return _min; }
+            float max() const { return _max; }
+            float minHysteresis() const { return _minHysteresis; }
+            float maxHysteresis() const { return _maxHysteresis; }
         };
 
         struct Temp : public Hum {
@@ -235,263 +237,293 @@ class Config {
         };
 
         public:
-            Temp temp;
-            Hum hum;
-            Iaq iaq;
-            CO2 co2;
+        Temp temp;
+        Hum hum;
+        Iaq iaq;
+        CO2 co2;
     }; Comfort comfort;
 
     struct Network {
         private:
-            char _ssid[NETWORKS][33] = { "", "", "" }; // SSID list
-            char _pass[NETWORKS][33] = { "", "", "" }; // Password list
-            bool _type = false; // Connection type: false = dynamic IP, true = static IP
-            char _ip[16] = ""; // Static IP address
-            char _mask[16] = ""; // Static Subnet mask
-            char _gw[16] = ""; // Static default gateway
-            char _dns1[16] = ""; // Static DNS1 address
-            char _dns2[16] = ""; // Static DNS2 address
-            friend class Config;
+        char _ssid[NETWORKS][33] = { "", "", "" }; // SSID list
+        char _pass[NETWORKS][33] = { "", "", "" }; // Password list
+        bool _type = false; // Connection type: false = dynamic IP, true = static IP
+        char _ip[16] = ""; // Static IP address
+        char _mask[16] = ""; // Static Subnet mask
+        char _gw[16] = ""; // Static default gateway
+        char _dns1[16] = ""; // Static DNS1 address
+        char _dns2[16] = ""; // Static DNS2 address
+        friend class Config;
 
         public:
-            const char* ssid(unsigned int num) const {
-                if(num >= NETWORKS) return (char*) "";
-                return _ssid[num];
-            }
-
-            const char* pass(unsigned int num) const {
-                if(num >= NETWORKS) return (char*) "";
-                return _pass[num];
-            }
-
-            const bool type() const { return _type; }
-            const char* ip() const { return _ip; }
-            const char* mask() const { return _mask; }
-            const char* gw() const { return _gw; }
-            const char* dns1() const { return _dns1; }
-            const char* dns2() const { return _dns2; }
+        const char* ssid(unsigned int num) const { if(num >= NETWORKS) return (char*) ""; return _ssid[num]; }
+        const char* pass(unsigned int num) const { if(num >= NETWORKS) return (char*) ""; return _pass[num]; }
+        const bool type() const { return _type; }
+        const char* ip() const { return _ip; }
+        const char* mask() const { return _mask; }
+        const char* gw() const { return _gw; }
+        const char* dns1() const { return _dns1; }
+        const char* dns2() const { return _dns2; }
     }; Network network;
 
     struct AccessPoint {
         private:
-            char _ssid[33] = "BIM32"; // SSID
-            char _pass[33] = "1234567890"; // Password
-            unsigned int _chnl = 1; // WiFi channel number 1...13
-            char _ip[33] = "192.168.4.1"; // IP address
-            char _mask[33] = "255.255.255.0"; // Subnet mask
-            friend class Config;
+        char _ssid[33] = "BIM32"; // SSID
+        char _pass[33] = "1234567890"; // Password
+        unsigned int _chnl = 1; // WiFi channel number 1...13
+        char _ip[33] = "192.168.4.1"; // IP address
+        char _mask[33] = "255.255.255.0"; // Subnet mask
+        friend class Config;
 
         public:
-            const char* ssid() const { return _ssid; }
-            const char* pass() const { return _pass; }
-            const unsigned int chnl() const { if(_chnl < 1 or _chnl > 13) return 1; return _chnl; }
-            const char* ip() const { return _ip; }
-            const char* mask() const { return _mask; }
+        const char* ssid() const { return _ssid; }
+        const char* pass() const { return _pass; }
+        const unsigned int chnl() const { if(_chnl < 1 or _chnl > 13) return 1; return _chnl; }
+        const char* ip() const { return _ip; }
+        const char* mask() const { return _mask; }
     }; AccessPoint accessPoint;
 
     struct Weather {
         private:
-            char _appid[PROVIDERS][33] = { "", "" }; // [0] -> APPID openweathermap.org, [1] -> KEY weatherbit.io
-            float _lon = 0.0; // Longitude
-            float _lat = 0.0; // Latitude
-            unsigned int _provider = 0; // Weather forecast provider. 0: openweathermap.org, 1: weatherbit.io, 2: open-meteo.com 
-            char _city[41] = ""; // City name
-            unsigned int _cityid = 0; // City ID
-            unsigned int _citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
-            float _tempCorr = 0; // Weather temperature correction
-            float _humCorr = 0; // Weather humidity correction
-            float _presCorr = 0; // Weather pressure correction
-            friend class Config;
+        char _appid[PROVIDERS][33] = { "", "" }; // [0] -> APPID openweathermap.org, [1] -> KEY weatherbit.io
+        float _lon = 0.0; // Longitude
+        float _lat = 0.0; // Latitude
+        unsigned int _provider = 0; // Weather forecast provider. 0: openweathermap.org, 1: weatherbit.io, 2: open-meteo.com 
+        char _city[41] = ""; // City name
+        unsigned int _cityid = 0; // City ID
+        unsigned int _citysearch = 0; // The way to recognize a city. 0 = by name, 1 = by ID, 2 = by coordinates
+        float _tempCorr = 0; // Weather temperature correction
+        float _humCorr = 0; // Weather humidity correction
+        float _presCorr = 0; // Weather pressure correction
+        friend class Config;
 
         public:
-            const char* appid(unsigned int num) const {
-                if(num >= PROVIDERS) return (char*) "";
-                return _appid[num];
-            }
-
-            unsigned int provider() const {
-                if(_provider > 2) return 0;
-                return _provider;
-            }
-
-            unsigned int citysearch() const {
-                if(_citysearch > 2) return 0;
-                return _citysearch;
-            }
-
-            const char* city() const { return _city; }
-            unsigned int cityid() const { return _cityid; }
-            float lon() const { return _lon; }
-            float lat() const { return _lat; }
-            float tempCorr() const { return _tempCorr; }
-            float humCorr() const { return _humCorr; }
-            float presCorr() const { return _presCorr; }
+        const char* appid(unsigned int num) const { if(num >= PROVIDERS) return (char*) ""; return _appid[num]; }
+        unsigned int provider() const { if(_provider > 2) return 0; return _provider; }
+        unsigned int citysearch() const { if(_citysearch > 2) return 0; return _citysearch; }
+        const char* city() const { return _city; }
+        unsigned int cityid() const { return _cityid; }
+        float lon() const { return _lon; }
+        float lat() const { return _lat; }
+        float tempCorr() const { return _tempCorr; }
+        float humCorr() const { return _humCorr; }
+        float presCorr() const { return _presCorr; }
     }; Weather weather;
 
     struct Clock {
         private:
-            unsigned int _format = 0; // Clock format: 0 = 12 hour wo leading zero, 1 = 12 hour with leading zero, 2 = 24 hour wo leading zero, 3 = 24 hour with leading zero
-            char _ntp[65] = "time.nist.gov"; // NTP server address
-            int _utc = 0; // Timezone -12...13
-            bool _dlst = false; // Auto daylight saving time
-            unsigned int _ntpPeriod = 15; // NTP update period (minutes) 0...90000
-            friend class Config;
+        unsigned int _format = 0; // Clock format: 0 = 12 hour wo leading zero, 1 = 12 hour with leading zero, 2 = 24 hour wo leading zero, 3 = 24 hour with leading zero
+        char _ntp[65] = "time.nist.gov"; // NTP server address
+        int _utc = 0; // Timezone -12...13
+        bool _dlst = false; // Auto daylight saving time
+        unsigned int _ntpPeriod = 15; // NTP update period (minutes) 0...90000
+        friend class Config;
 
         public:
-            unsigned int format() const {
-                if(_format > 3) return 0;
-                return _format;
-            }
-
-            const char* ntp() const {
-                if(String(_ntp) == "") return (char*) "time.nist.gov";
-                return _ntp;
-            }
-
-            const int utc() const {
-                if(_utc < -12 or _utc > 13) return 0;
-                return _utc;
-            }
-
-            const unsigned int ntpPeriod() const {
-                if(_ntpPeriod > 90000) return 15;
-                return _ntpPeriod;
-            }
-
-            const bool dlst() const { return _dlst; }
+        unsigned int format() const { if(_format > 3) return 0; return _format; }
+        const char* ntp() const { if(String(_ntp) == "") return (char*) "time.nist.gov"; return _ntp; }
+        const int utc() const { if(_utc < -12 or _utc > 13) return 0; return _utc; }
+        const unsigned int ntpPeriod() const { if(_ntpPeriod > 90000) return 15; return _ntpPeriod; }
+        const bool dlst() const { return _dlst; }
     }; Clock clock;
 
     struct Display {
         struct Animation {
             private:
-                unsigned int _type[DISPLAYS] = {0, 0}; // Display animation number 0...9
-                unsigned int _speed[DISPLAYS] = {10, 10}; // Display animation speed 1...30
-                unsigned int _points[DISPLAYS] = {0, 0}; // Display animation clock points 0...4
-                friend class Config;
+            unsigned int _type[DISPLAYS] = { 0 }; // Display animation number 0...9
+            unsigned int _speed[DISPLAYS] = { 10, 10 }; // Display animation speed 1...30
+            unsigned int _points[DISPLAYS] = { 0 }; // Display animation clock points 0...4
+            friend class Config;
 
             public:
-                const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; return _type[num]; }
-                const unsigned int speed(unsigned int num) const { if(num >= DISPLAYS) return 0; return _speed[num]; }
-                const unsigned int points(unsigned int num) const { if(num >= DISPLAYS) return 0; return _points[num]; }
+            const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; return _type[num]; }
+            const unsigned int speed(unsigned int num) const { if(num >= DISPLAYS) return 0; return _speed[num]; }
+            const unsigned int points(unsigned int num) const { if(num >= DISPLAYS) return 0; return _points[num]; }
+            void setType(unsigned int type, unsigned int displayNum) { if(type <= 9 and displayNum < DISPLAYS) _type[displayNum] = type; }
+            void setSpeed(unsigned int speed, unsigned int displayNum) { if(speed >= 1 and speed <= 30 and displayNum < DISPLAYS) _speed[displayNum] = speed; }
+            void setPoints(unsigned int points, unsigned int displayNum) { if(points <= 7 and displayNum < DISPLAYS) _points[displayNum] = points; }
         };
 
         struct NightOff {
             private:
-                bool _need[DISPLAYS] = {false, false}; // Turn off display at night
-                char _from[DISPLAYS][6] = {"23:00", "23:00"}; // The hour from which the display is turned off
-                char _to[DISPLAYS][6] = {"07:00", "07:00"}; // The hour from which the display is turned on
-                friend class Config;
+            bool _need[DISPLAYS] = {false, false}; // Turn off display at night
+            char _from[DISPLAYS][6] = {"23:00", "23:00"}; // The hour from which the display is turned off
+            char _to[DISPLAYS][6] = {"07:00", "07:00"}; // The hour from which the display is turned on
+            friend class Config;
 
             public:
-                const bool need(unsigned int num) const { if(num >= DISPLAYS) return false; return _need[num]; }
-                const unsigned int from(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return _get_time(level, _from[num]); }
-                const unsigned int to(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return _get_time(level, _to[num]); }
+            const bool need(unsigned int num) const { if(num >= DISPLAYS) return false; return _need[num]; }
+            const unsigned int from(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return Config::_get_time(level, _from[num]); }
+            const unsigned int to(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return Config::_get_time(level, _to[num]); }
         };
 
         struct Brightness {
             private:
-                unsigned int _method[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
-                unsigned int _day[DISPLAYS] = {50, 50}; // Day mode brightness 1...100
-                unsigned int _night[DISPLAYS] = {50, 50}; // Night mode brightness 1...100
-                unsigned int _min[DISPLAYS] = {1, 1}; // Minimum brightness limit 0...255
-                unsigned int _max[DISPLAYS] = {255, 255}; // Maximum brightness limit 0...255
-                friend class Config;
+            unsigned int _method[DISPLAYS] = {3, 3}; // Display brightness adjustment method: 0-Auto, 1-By light sensor, 2-By time, 3-Constant
+            unsigned int _day[DISPLAYS] = {50, 50}; // Day mode brightness 1...100
+            unsigned int _night[DISPLAYS] = {50, 50}; // Night mode brightness 1...100
+            unsigned int _min[DISPLAYS] = {1, 1}; // Minimum brightness limit 0...255
+            unsigned int _max[DISPLAYS] = {255, 255}; // Maximum brightness limit 0...255
+            friend class Config;
 
             public:
-                const unsigned int method(unsigned int num) const { if(num >= DISPLAYS) return 3; if(_method[num] > 3) return 3; return _method[num]; }
-                const unsigned int day(unsigned int num) const { if(num >= DISPLAYS) return 100; if(_day[num] < 1 or _day[num] > 100) return 100; return _day[num]; }
-                const unsigned int night(unsigned int num) const { if(num >= DISPLAYS) return 100; if(_night[num] < 1 or _night[num] > 100) return 100; return _night[num]; }
-                const unsigned int min(unsigned int num) const { if(num >= DISPLAYS) return 1; return _min[num]; }
-                const unsigned int max(unsigned int num) const { if(num >= DISPLAYS) return 255; return _max[num]; }
+            const unsigned int method(unsigned int num) const { if(num >= DISPLAYS) return 3; if(_method[num] > 3) return 3; return _method[num]; }
+            const unsigned int day(unsigned int num) const { if(num >= DISPLAYS) return 100; if(_day[num] < 1 or _day[num] > 100) return 100; return _day[num]; }
+            const unsigned int night(unsigned int num) const { if(num >= DISPLAYS) return 100; if(_night[num] < 1 or _night[num] > 100) return 100; return _night[num]; }
+            const unsigned int min(unsigned int num) const { if(num >= DISPLAYS) return 1; return _min[num]; }
+            const unsigned int max(unsigned int num) const { if(num >= DISPLAYS) return 255; return _max[num]; }
+            void setBrightLimit(unsigned int min, unsigned int max, unsigned int num) { if(num >= DISPLAYS) return; if(min <= 255) _min[num] = min; if(max <= 255) _max[num] = max; }
+            void setBright(int bright, unsigned int num) { if(num >= DISPLAYS) return; if(bright >= 0 and bright <= 255) { _day[num] = bright; _night[num] = bright; } }
         };
 
         struct LightSensor {
             private:
-                unsigned int _type[DISPLAYS] = {1, 1}; // Sensor type for brightness adjust: 0-Analog input, 1-MAX44009, 2-BH1750
-                unsigned int _sensitivity[DISPLAYS] = {50, 50}; // Ambient light sensor sensibility 1...100
-                friend class Config;
+            unsigned int _type[DISPLAYS] = {1, 1}; // Sensor type for brightness adjust: 0-Analog input, 1-MAX44009, 2-BH1750
+            unsigned int _sensitivity[DISPLAYS] = {50, 50}; // Ambient light sensor sensibility 1...100
+            friend class Config;
 
             public:
-                const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; if(_type[num] > 2) return 0; return _type[num]; }
-                const unsigned int sensitivity(unsigned int num) const { if(num >= DISPLAYS) return 50; if(_sensitivity[num] < 1 or _sensitivity[num] > 100) return 50; return _sensitivity[num]; }
+            const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; if(_type[num] > 2) return 0; return _type[num]; }
+            const unsigned int sensitivity(unsigned int num) const { if(num >= DISPLAYS) return 50; if(_sensitivity[num] < 1 or _sensitivity[num] > 100) return 50; return _sensitivity[num]; }
+            void setSensitivity(int snstv, unsigned int num) { if(num >= DISPLAYS) return; if(snstv >= 1 and snstv <= 200) _sensitivity[num] = snstv; }
         };
 
         struct Source {
             struct BaseSensor {
                 private:
-                    unsigned int _sens = 0;
-                    unsigned int _wsensNum = 0;
-                    unsigned int _thing = 0;
-                    friend class Config;
+                unsigned int _sens = 0;
+                unsigned int _wsensNum = 0;
+                unsigned int _thing = 0;
+                friend class Config;
 
                 public:
-                    const unsigned int sens() const { return _sens; }
-                    const unsigned int wsensNum() const { return _wsensNum; }
-                    const unsigned int thing() const { return _thing; }
+                const unsigned int sens() const { return _sens; }
+                const unsigned int wsensNum() const { if(_wsensNum >= WSENSORS) return 0; return _wsensNum; }
+                const unsigned int thing() const { if(_thing >= THNG_FIELDS) return 0; return _thing; }
             };
 
             struct TempSensor : public BaseSensor {
                 private: unsigned int _temp = 0; friend class Config;
-                public: const unsigned int temp() const { return _temp }
+                public: const unsigned int temp() const { if(_temp >= WSENSOR_TEMPS) return 0; return _temp; }
             };
 
             struct VoltSensor : public BaseSensor {
                 private:
-                    unsigned int _volt = 0;
-                    unsigned int _thingType = 0;
-                    friend class Config;
+                unsigned int _volt = 0;
+                unsigned int _thingType = 0;
+                friend class Config;
 
                 public:
-                    const unsigned int volt() const { return _volt; }
-                    const unsigned int thingType() const { return _thingType; }
+                const unsigned int volt() const { if(_volt > 3) return 0; return _volt; }
+                const unsigned int thingType() const { return _thingType; }
             };
 
+            struct Wind {
+                BaseSensor speed;
+                BaseSensor dir;
+            };
+
+            struct Sequence {
+                private:
+                unsigned int _dur = 2; // Sequence data display duration (seconds)
+                char _name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
+                unsigned int _temp[SEQUENCES] = { 0 }; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
+                unsigned int _thngtemp[SEQUENCES] = { 0 }; // Thingspeak field number for the temperature sequence
+                unsigned int _wsenstemp[SEQUENCES][WSENSORS] = { 0 }; // Wireless sensor number and its sensor for the temperature sequence
+                unsigned int _hum[SEQUENCES] = { 0 }; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast, 7-BME680
+                unsigned int _thnghum[SEQUENCES] = { 0 }; // Thingspeak field number for the humidity sequence
+                unsigned int _wsenshum[SEQUENCES] =  { 0 }; // Wireless sensor number for the humidity sequence
+                friend class Config;
+
+                public:
+                const unsigned int dur() const { return _dur; }
+                const char* name(unsigned int slot) const { if(slot >= SEQUENCES) return ""; return _name[slot]; }
+                const unsigned int temp(unsigned int slot) const { if(slot >= SEQUENCES) return 0; if(_temp[slot] > 10) return 0; return _temp[slot]; }
+                const unsigned int thngtemp(unsigned int slot) const { if(slot >= SEQUENCES) return 0; if(_thngtemp[slot] >= THNG_FIELDS) return 0; return _thngtemp[slot]; }
+                const unsigned int wsenstemp(unsigned int slot, unsigned int ws) const { if(slot >= SEQUENCES) return 0; if(ws > 1) return 0; if(ws == 0 and _wsenstemp[slot][0] >= WSENSORS) return 0; if(ws == 1 and _wsenstemp[slot][1] >= WSENSOR_TEMPS) return 0; return _wsenstemp[slot][ws]; }
+                const unsigned int hum(unsigned int slot) const { if(slot >= SEQUENCES) return 0; if(_hum[slot] > 7) return 0; return _hum[slot]; }
+                const unsigned int thnghum(unsigned int slot) const { if(slot >= SEQUENCES) return 0; if(_thnghum[slot] >= THNG_FIELDS) return 0; return _thnghum[slot]; }
+                const unsigned int wsenshum(unsigned int slot) const { if(slot >= SEQUENCES) return 0; if(_wsenshum[slot] >= WSENSORS) return 0; return _wsenshum[slot]; }
+            };
+
+            private:
+            unsigned int _descr = 0; // Additional description data source: 0-Nothing, 1-Comfort level, 2-Sequence
+            friend class Config;
+
             public:
-                BaseSensor bat;
-                BaseSensor humOut;
-                BaseSensor humIn;
-                BaseSensor presOut;
-                TempSensor tempOut;
-                TempSensor tempIn;
-                VoltSensor volt;
+            BaseSensor bat;
+            BaseSensor humOut;
+            BaseSensor humIn;
+            BaseSensor presOut;
+            TempSensor tempOut;
+            TempSensor tempIn;
+            VoltSensor volt;
+            Wind wind;
+            Sequence sequence;
+            const unsigned int descr() const { if(_descr > 2) return 0; return _descr; }
         };
 
-    unsigned int _type[DISPLAYS] = {0, 0}; // Display type
-    unsigned int _model[DISPLAYS] = {0, 0}; // Display model
-    unsigned int _order[DISPLAYS][8] = { {1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 5, 6, 7, 8} }; // Digits order
-    char _dayTime[DISPLAYS][6] = {"07:00", "07:00"}; // Time to switch to day mode
-    char _nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
-    unsigned int _autoOff[DISPLAYS] = {0, 0}; // Display auto-off time 0...1440
-    unsigned int _source_descr = 0; // Additional description data source: 0-Nothing, 1-Comfort level, 2-Sequence
-    unsigned int _source_wind_speed_sens = 1; // Wind speed data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
-    unsigned int _source_wind_speed_wsensNum = 0; // Wireless sensor number for wind speed
-    unsigned int _source_wind_speed_thing = 0; // Thingspeak field number for wind speed
-    unsigned int _source_wind_dir_sens = 1; // Wind direction data source: 0-Nothing, 1-Forecast, 2-Wireless sensor, 3-Thingspeak
-    unsigned int _source_wind_dir_wsensNum = 0; // Wireless sensor number for wind direction
-    unsigned int _source_wind_dir_thing = 0; // Thingspeak field number for wind direction
-    unsigned int _source_sequence_dur = 2; // Sequence data display duration (seconds)
-    char _source_sequence_name[SEQUENCES][33] = {"", "", "", ""}; // Sequence data names
-    unsigned int _source_sequence_temp[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the temperature sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-BMP180, 5-SHT21, 6-DHT22, 7-DS18B20, 8-ESP32, 9-Forecast, 10-BME680
-    unsigned int _source_sequence_thngtemp[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the temperature sequence
-    unsigned int _source_sequence_wsenstemp[SEQUENCES][WSENSORS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Wireless sensor number and its sensor for the temperature sequence
-    unsigned int _source_sequence_hum[SEQUENCES] = {0, 0, 0, 0}; // Sequence data sources for the humidity sequence: 0-Nothing, 1-Thingspeak, 2-Wireless sensor, 3-BME280, 4-SHT21, 5-DHT22, 6-Forecast, 7-BME680
-    unsigned int _source_sequence_thnghum[SEQUENCES] = {0, 0, 0, 0}; // Thingspeak field number for the humidity sequence
-    unsigned int _source_sequence_wsenshum[SEQUENCES] =  {0, 0, 0, 0}; // Wireless sensor number for the humidity sequence
-    unsigned int _timeSlot_period[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot durations
-    unsigned int _timeSlot_sensor[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
-    unsigned int _timeSlot_data[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot sensors types
-    unsigned int _timeSlot_thing[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot thingspeak field number
-    unsigned int _timeSlot_wsensor_num[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor number
-    unsigned int _timeSlot_wsensor_type[TIMESLOTS][DISPLAYS] = { {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0} }; // Segment display timeslot wireless sensor type 
-    char _timeSlot_color[TIMESLOTS][DISPLAYS][8] = { // Segment display timeslot colors 
-        {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"},
-        {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}
-    };
+        struct TimeSlot {
+            struct Wsensor {
+                private:
+                unsigned int _num[TIMESLOTS][DISPLAYS] = { 0 }; // Segment display timeslot wireless sensor number
+                unsigned int _type[TIMESLOTS][DISPLAYS] = { 0 }; // Segment display timeslot wireless sensor type 
+                friend class Config;
+
+                public:
+                const unsigned int num(unsigned int slot, unsigned int displayNum) const { if(slot >= TIMESLOTS) return 0; if(displayNum >= DISPLAYS) return 0; return _num[slot][displayNum]; }
+                const unsigned int type(unsigned int slot, unsigned int displayNum) { if(slot >= TIMESLOTS) return 0; if(displayNum >= DISPLAYS) return 0; return _type[slot][displayNum]; }
+            };
+
+            private:
+            unsigned int _period[TIMESLOTS][DISPLAYS] = { 0 }; // Segment display timeslot durations
+            unsigned int _sensor[TIMESLOTS][DISPLAYS] = { 0 }; // Segment display timeslot data sources: 0-Time, 1-Date, 2-BME280, 3-BMP180, 4-SHT21, 5-DHT22, 6-DS18B20, 7-ESP32, 8-Thingspeak, 9-Weather forecast, 10-Wireless sensor, 11-BME680 
+            unsigned int _data[TIMESLOTS][DISPLAYS] = { 0 }; // Segment display timeslot sensors types
+            unsigned int _thing[TIMESLOTS][DISPLAYS] = { 0 }; // Segment display timeslot thingspeak field number
+            char _color[TIMESLOTS][DISPLAYS][8] = { // Segment display timeslot colors 
+                {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"},
+                {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}, {"#FFFFFF", "#FFFFFF"}
+            };
+            friend class Config;
+
+            public:
+            Wsensor wsensor;
+            const unsigned int period(unsigned int slot, unsigned int displayNum) const { if(slot >= TIMESLOTS) return 0; if(displayNum >= DISPLAYS) return 0; if(_period[slot][displayNum] > 99) return 0; return _period[slot][displayNum]; }
+            const unsigned int sensor(unsigned int slot, unsigned int displayNum) const { if(slot >= TIMESLOTS) return 0; if(displayNum >= DISPLAYS) return 0; if(_sensor[slot][displayNum] > 11) return 0; return _sensor[slot][displayNum]; }
+            const unsigned int data(unsigned int slot, unsigned int displayNum) const { if(slot >= TIMESLOTS) return 0; if(displayNum >= DISPLAYS) return 0; if(_data[slot][displayNum] > 4) return 0; return _data[slot][displayNum]; }
+            const unsigned int thing(unsigned int slot, unsigned int displayNum) const { if(slot >= TIMESLOTS) return 0; if(displayNum >= DISPLAYS) return 0; if(_thing[slot][displayNum] > 7) return 0; return _thing[slot][displayNum]; }
+            const char* color(unsigned int slot, unsigned int displayNum) const { if(slot >= TIMESLOTS) return (char*) ""; if(displayNum >= DISPLAYS) return (char*) ""; return _color[slot][displayNum]; }
+            void setColor(char color[6], unsigned int slotNum, unsigned int displayNum) {
+                if(slotNum >= TIMESLOTS) return;
+                if(displayNum >= DISPLAYS) return;
+                _color[slotNum][displayNum][0] = '#';
+                for(unsigned int i=1; i<7; i++) _color[slotNum][displayNum][i] = color[i - 1];
+                _color[slotNum][displayNum][7] = '\0';
+            }
+        };
+
+        private:
+        unsigned int _type[DISPLAYS] = { 0 }; // Display type
+        unsigned int _model[DISPLAYS] = { 0 }; // Display model
+        unsigned int _order[DISPLAYS][8] = { {1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 5, 6, 7, 8} }; // Digits order
+        char _dayTime[DISPLAYS][6] = {"07:00", "07:00"}; // Time to switch to day mode
+        char _nightTime[DISPLAYS][6] = {"21:00", "21:00"}; // Time to switch to night mode
+        unsigned int _autoOff[DISPLAYS] = { 0 }; // Display auto-off time 0...1440
+        friend class Config;
+
         public:
-            Animation animation;
-            NightOff nightOff;
-            Brightness brightness;
-            LightSensor lightSensor;
+        Animation animation;
+        NightOff nightOff;
+        Brightness brightness;
+        LightSensor lightSensor;
+        Source source;
+        TimeSlot timeSlot;
+        const unsigned int type(unsigned int num) const { if(num >= DISPLAYS) return 0; return _type[num]; }
+        const unsigned int model(unsigned int num) const { if(num >= DISPLAYS) return 0; return _model[num]; }
+        const unsigned int order(unsigned int num, unsigned int dig) const { if(num >= DISPLAYS || dig > 7) return 0; return _order[num][dig]; }
+        const unsigned int dayTime(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return Config::_get_time(level, _dayTime[num]); }
+        const unsigned int nightTime(unsigned int num, bool level) const { if(num >= DISPLAYS) return 0; return Config::_get_time(level, _nightTime[num]); }
+        const unsigned int autoOff(unsigned int num) const { if(num >= DISPLAYS) return 0; if(_autoOff[num] > 1440) return 0; return _autoOff[num]; }
     }; Display display;
 
     struct Account {
@@ -567,14 +599,14 @@ class Config {
 
                     // Display
                     for(unsigned int i=0; i<DISPLAYS; i++) {
-                        COPYNUM(conf["display"]["type"][i], _display_type[i]);
-                        COPYNUM(conf["display"]["model"][i], _display_model[i]);
+                        COPYNUM(conf["display"]["type"][i], display._type[i]);
+                        COPYNUM(conf["display"]["model"][i], display._model[i]);
                         for(unsigned int o=0; o<8; o++) {
-                            COPYNUM(conf["display"]["order"][i][o], _display_order[i][o]);
+                            COPYNUM(conf["display"]["order"][i][o], display._order[i][o]);
                         }
-                        COPYSTR(conf["display"]["dayTime"][i], _display_dayTime[i]);
-                        COPYSTR(conf["display"]["nightTime"][i], _display_nightTime[i]);
-                        COPYNUM(conf["display"]["autoOff"][i], _display_autoOff[i]);
+                        COPYSTR(conf["display"]["dayTime"][i], display._dayTime[i]);
+                        COPYSTR(conf["display"]["nightTime"][i], display._nightTime[i]);
+                        COPYNUM(conf["display"]["autoOff"][i], display._autoOff[i]);
                         COPYBOOL(conf["display"]["nightOff"]["need"][i], display.nightOff._need[i]);
                         COPYSTR(conf["display"]["nightOff"]["from"][i], display.nightOff._from[i]);
                         COPYSTR(conf["display"]["nightOff"]["to"][i], display.nightOff._to[i]);
@@ -589,57 +621,57 @@ class Config {
                         COPYNUM(conf["display"]["animation"]["speed"][i], display.animation._speed[i]);
                         COPYNUM(conf["display"]["animation"]["points"][i], display.animation._points[i]);
                         for(unsigned int t=0; t<TIMESLOTS; t++) {
-                            COPYNUM(conf["display"]["timeSlot"]["period"][t][i], _display_timeSlot_period[t][i]);
-                            COPYNUM(conf["display"]["timeSlot"]["sensor"][t][i], _display_timeSlot_sensor[t][i]);
-                            COPYNUM(conf["display"]["timeSlot"]["data"][t][i], _display_timeSlot_data[t][i]);
-                            COPYNUM(conf["display"]["timeSlot"]["thing"][t][i], _display_timeSlot_thing[t][i]);
-                            COPYSTR(conf["display"]["timeSlot"]["color"][t][i], _display_timeSlot_color[t][i]);
-                            COPYNUM(conf["display"]["timeSlot"]["wsensor"]["num"][t][i], _display_timeSlot_wsensor_num[t][i]);
-                            COPYNUM(conf["display"]["timeSlot"]["wsensor"]["type"][t][i], _display_timeSlot_wsensor_type[t][i]); 
+                            COPYNUM(conf["display"]["timeSlot"]["period"][t][i], display.timeSlot._period[t][i]);
+                            COPYNUM(conf["display"]["timeSlot"]["sensor"][t][i], display.timeSlot._sensor[t][i]);
+                            COPYNUM(conf["display"]["timeSlot"]["data"][t][i], display.timeSlot._data[t][i]);
+                            COPYNUM(conf["display"]["timeSlot"]["thing"][t][i], display.timeSlot._thing[t][i]);
+                            COPYSTR(conf["display"]["timeSlot"]["color"][t][i], display.timeSlot._color[t][i]);
+                            COPYNUM(conf["display"]["timeSlot"]["wsensor"]["num"][t][i], display.timeSlot.wsensor._num[t][i]);
+                            COPYNUM(conf["display"]["timeSlot"]["wsensor"]["type"][t][i], display.timeSlot.wsensor._type[t][i]); 
                         }
                     }
-                    COPYNUM(conf["display"]["source"]["tempOut"]["sens"], _display_source_tempOut_sens);
-                    COPYNUM(conf["display"]["source"]["tempOut"]["wsensNum"], _display_source_tempOut_wsensNum);
-                    COPYNUM(conf["display"]["source"]["tempOut"]["temp"], _display_source_tempOut_temp);
-                    COPYNUM(conf["display"]["source"]["tempOut"]["thing"], _display_source_tempOut_thing);
-                    COPYNUM(conf["display"]["source"]["humOut"]["sens"], _display_source_humOut_sens);
-                    COPYNUM(conf["display"]["source"]["humOut"]["wsensNum"], _display_source_humOut_wsensNum);
-                    COPYNUM(conf["display"]["source"]["humOut"]["thing"], _display_source_humOut_thing);
-                    COPYNUM(conf["display"]["source"]["presOut"]["sens"], _display_source_presOut_sens);
-                    COPYNUM(conf["display"]["source"]["presOut"]["wsensNum"], _display_source_presOut_wsensNum);
-                    COPYNUM(conf["display"]["source"]["presOut"]["thing"], _display_source_presOut_thing);
-                    COPYNUM(conf["display"]["source"]["tempIn"]["sens"], _display_source_tempIn_sens);
-                    COPYNUM(conf["display"]["source"]["tempIn"]["wsensNum"], _display_source_tempIn_wsensNum);
-                    COPYNUM(conf["display"]["source"]["tempIn"]["temp"], _display_source_tempIn_temp);
-                    COPYNUM(conf["display"]["source"]["tempIn"]["thing"], _display_source_tempIn_thing);
-                    COPYNUM(conf["display"]["source"]["humIn"]["sens"], _display_source_humIn_sens);
-                    COPYNUM(conf["display"]["source"]["humIn"]["wsensNum"], _display_source_humIn_wsensNum);
-                    COPYNUM(conf["display"]["source"]["humIn"]["thing"], _display_source_humIn_thing);
-                    COPYNUM(conf["display"]["source"]["volt"]["sens"], _display_source_volt_sens);
-                    COPYNUM(conf["display"]["source"]["volt"]["wsensNum"], _display_source_volt_wsensNum);
-                    COPYNUM(conf["display"]["source"]["volt"]["volt"], _display_source_volt_volt);
-                    COPYNUM(conf["display"]["source"]["volt"]["thing"], _display_source_volt_thing);
-                    COPYNUM(conf["display"]["source"]["volt"]["thingType"], _display_source_volt_thingType);
-                    COPYNUM(conf["display"]["source"]["bat"]["sens"], _display_source_bat_sens);
-                    COPYNUM(conf["display"]["source"]["bat"]["wsensNum"], _display_source_bat_wsensNum);
-                    COPYNUM(conf["display"]["source"]["bat"]["thing"], _display_source_bat_thing);
-                    COPYNUM(conf["display"]["source"]["descr"], _display_source_descr);
-                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["sens"], _display_source_wind_speed_sens);
-                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["wsensNum"], _display_source_wind_speed_wsensNum);
-                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["thing"], _display_source_wind_speed_thing);
-                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["sens"], _display_source_wind_dir_sens);
-                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["wsensNum"], _display_source_wind_dir_wsensNum);
-                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["thing"], _display_source_wind_dir_thing);
-                    COPYNUM(conf["display"]["source"]["sequence"]["dur"], _display_source_sequence_dur);
+                    COPYNUM(conf["display"]["source"]["tempOut"]["sens"], display.source.tempOut._sens);
+                    COPYNUM(conf["display"]["source"]["tempOut"]["wsensNum"], display.source.tempOut._wsensNum);
+                    COPYNUM(conf["display"]["source"]["tempOut"]["temp"], display.source.tempOut._temp);
+                    COPYNUM(conf["display"]["source"]["tempOut"]["thing"], display.source.tempOut._thing);
+                    COPYNUM(conf["display"]["source"]["humOut"]["sens"], display.source.humOut._sens);
+                    COPYNUM(conf["display"]["source"]["humOut"]["wsensNum"], display.source.humOut._wsensNum);
+                    COPYNUM(conf["display"]["source"]["humOut"]["thing"], display.source.humOut._thing);
+                    COPYNUM(conf["display"]["source"]["presOut"]["sens"], display.source.presOut._sens);
+                    COPYNUM(conf["display"]["source"]["presOut"]["wsensNum"], display.source.presOut._wsensNum);
+                    COPYNUM(conf["display"]["source"]["presOut"]["thing"], display.source.presOut._thing);
+                    COPYNUM(conf["display"]["source"]["tempIn"]["sens"], display.source.tempIn._sens);
+                    COPYNUM(conf["display"]["source"]["tempIn"]["wsensNum"], display.source.tempIn._wsensNum);
+                    COPYNUM(conf["display"]["source"]["tempIn"]["temp"], display.source.tempIn._temp);
+                    COPYNUM(conf["display"]["source"]["tempIn"]["thing"], display.source.tempIn._thing);
+                    COPYNUM(conf["display"]["source"]["humIn"]["sens"], display.source.humIn._sens);
+                    COPYNUM(conf["display"]["source"]["humIn"]["wsensNum"], display.source.humIn._wsensNum);
+                    COPYNUM(conf["display"]["source"]["humIn"]["thing"], display.source.humIn._thing);
+                    COPYNUM(conf["display"]["source"]["volt"]["sens"], display.source.volt._sens);
+                    COPYNUM(conf["display"]["source"]["volt"]["wsensNum"], display.source.volt._wsensNum);
+                    COPYNUM(conf["display"]["source"]["volt"]["volt"], display.source.volt._volt);
+                    COPYNUM(conf["display"]["source"]["volt"]["thing"], display.source.volt._thing);
+                    COPYNUM(conf["display"]["source"]["volt"]["thingType"], display.source.volt._thingType);
+                    COPYNUM(conf["display"]["source"]["bat"]["sens"], display.source.bat._sens);
+                    COPYNUM(conf["display"]["source"]["bat"]["wsensNum"], display.source.bat._wsensNum);
+                    COPYNUM(conf["display"]["source"]["bat"]["thing"], display.source.bat._thing);
+                    COPYNUM(conf["display"]["source"]["descr"], display.source._descr);
+                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["sens"], display.source.wind.speed._sens);
+                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["wsensNum"], display.source.wind.speed._wsensNum);
+                    COPYNUM(conf["display"]["source"]["wind"]["speed"]["thing"], display.source.wind.speed._thing);
+                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["sens"], display.source.wind.dir._sens);
+                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["wsensNum"], display.source.wind.dir._wsensNum);
+                    COPYNUM(conf["display"]["source"]["wind"]["dir"]["thing"], display.source.wind.dir._thing);
+                    COPYNUM(conf["display"]["source"]["sequence"]["dur"], display.source.sequence._dur);
                     for(unsigned int i=0; i<SEQUENCES; i++) {
-                        COPYSTR(conf["display"]["source"]["sequence"]["name"][i], _display_source_sequence_name[i]);
-                        COPYNUM(conf["display"]["source"]["sequence"]["temp"][i], _display_source_sequence_temp[i]);
-                        COPYNUM(conf["display"]["source"]["sequence"]["thngtemp"][i], _display_source_sequence_thngtemp[i]);
-                        COPYNUM(conf["display"]["source"]["sequence"]["hum"][i], _display_source_sequence_hum[i]);
-                        COPYNUM(conf["display"]["source"]["sequence"]["thnghum"][i], _display_source_sequence_thnghum[i]);
-                        COPYNUM(conf["display"]["source"]["sequence"]["wsenshum"][i], _display_source_sequence_wsenshum[i]);
+                        COPYSTR(conf["display"]["source"]["sequence"]["name"][i], display.source.sequence._name[i]);
+                        COPYNUM(conf["display"]["source"]["sequence"]["temp"][i], display.source.sequence._temp[i]);
+                        COPYNUM(conf["display"]["source"]["sequence"]["thngtemp"][i], display.source.sequence._thngtemp[i]);
+                        COPYNUM(conf["display"]["source"]["sequence"]["hum"][i], display.source.sequence._hum[i]);
+                        COPYNUM(conf["display"]["source"]["sequence"]["thnghum"][i], display.source.sequence._thnghum[i]);
+                        COPYNUM(conf["display"]["source"]["sequence"]["wsenshum"][i], display.source.sequence._wsenshum[i]);
                         for(unsigned int k=0; k<WSENSORS; k++) {
-                            COPYNUM(conf["display"]["source"]["sequence"]["wsenstemp"][i][k], _display_source_sequence_wsenstemp[i][k]);
+                            COPYNUM(conf["display"]["source"]["sequence"]["wsenstemp"][i][k], display.source.sequence._wsenstemp[i][k]);
                         }
                     }
 
@@ -864,288 +896,6 @@ class Config {
         return _units_pres ? 1 : 0;
     }
 
-    unsigned int display_type(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        return _display_type[num];
-    }
-
-    unsigned int display_model(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        return _display_model[num];
-    }
-
-    unsigned int display_order(unsigned int num, unsigned int dig) {
-        if(num >= DISPLAYS || dig > 7) return 0;
-        return _display_order[num][dig];
-    }
-
-    unsigned int display_dayTime(unsigned int num, bool level) {
-        if(num >= DISPLAYS) return 0;
-        return _get_time(level, _display_dayTime[num]); 
-    }
-
-    unsigned int display_nightTime(unsigned int num, bool level) {
-        if(num >= DISPLAYS) return 0;
-        return _get_time(level, _display_nightTime[num]);
-    }
-
-    unsigned int display_autoOff(unsigned int num) {
-        if(num >= DISPLAYS) return 0;
-        if(_display_autoOff[num] > 1440) return 0; 
-        return _display_autoOff[num];
-    }
-
-    unsigned int display_source_tempOut_sens() {
-        if(_display_source_tempOut_sens > 9) return 0;
-        return _display_source_tempOut_sens;
-    }
-
-    unsigned int display_source_tempOut_wsensNum() {
-        if(_display_source_tempOut_wsensNum >= WSENSORS) return 0;
-        return _display_source_tempOut_wsensNum;
-    }
-
-    unsigned int display_source_tempOut_temp() {
-        if(_display_source_tempOut_temp >= WSENSOR_TEMPS) return 0;
-        return _display_source_tempOut_temp; 
-    }
-
-    unsigned int display_source_tempOut_thing() {
-        if(_display_source_tempOut_thing >= THNG_FIELDS) return 0;
-        return _display_source_tempOut_thing; 
-    }
-
-    unsigned int display_source_humOut_sens() {
-        if(_display_source_humOut_sens > 7) return 0;
-        return _display_source_humOut_sens; 
-    }
-
-    unsigned int display_source_humOut_wsensNum() {
-        if(_display_source_humOut_wsensNum >= WSENSORS) return 0;
-        return _display_source_humOut_wsensNum; 
-    }
-
-    unsigned int display_source_humOut_thing() {
-        if(_display_source_humOut_thing >= THNG_FIELDS) return 0;
-        return _display_source_humOut_thing; 
-    }
-
-    unsigned int display_source_presOut_sens() {
-        if(_display_source_presOut_sens > 6) return 0;
-        return _display_source_presOut_sens;
-    }
-
-    unsigned int display_source_presOut_wsensNum() {
-        if(_display_source_presOut_wsensNum >= WSENSORS) return 0;
-        return _display_source_presOut_wsensNum;
-    }
-
-    unsigned int display_source_presOut_thing() {
-        if(_display_source_presOut_thing >= THNG_FIELDS) return 0;
-        return _display_source_presOut_thing; 
-    }
-
-    unsigned int display_source_tempIn_sens() {
-        if(_display_source_tempIn_sens > 10) return 0;
-        return _display_source_tempIn_sens; 
-    }
-
-    unsigned int display_source_tempIn_wsensNum() {
-        if(_display_source_tempIn_wsensNum >= WSENSORS) return 0;
-        return _display_source_tempIn_wsensNum;
-    }
-
-    unsigned int display_source_tempIn_temp() {
-        if(_display_source_tempIn_temp >= WSENSOR_TEMPS) return 0;
-        return _display_source_tempIn_temp; 
-    }
-
-    unsigned int display_source_tempIn_thing() {
-        if(_display_source_tempIn_thing >= THNG_FIELDS) return 0;
-        return _display_source_tempIn_thing;
-    }
-
-    unsigned int display_source_humIn_sens() {
-        if(_display_source_humIn_sens > 8) return 0;
-        return _display_source_humIn_sens; 
-    }
-
-    unsigned int display_source_humIn_wsensNum() {
-        if(_display_source_humIn_wsensNum >= WSENSORS) return 0;
-        return _display_source_humIn_wsensNum; 
-    }
-
-    unsigned int display_source_humIn_thing() {
-        if(_display_source_humIn_thing >= THNG_FIELDS) return 0;
-        return _display_source_humIn_thing; 
-    }
-
-    unsigned int display_source_volt_sens() {
-        if(_display_source_volt_sens > 13) return 0;
-        return _display_source_volt_sens; 
-    }
-
-    unsigned int display_source_volt_wsensNum() {
-        if(_display_source_volt_wsensNum >= WSENSORS) return 0;
-        return _display_source_volt_wsensNum;
-    }
-
-    unsigned int display_source_volt_volt() {
-        if(_display_source_volt_volt > 3) return 0;
-        return _display_source_volt_volt; 
-    }
-
-    unsigned int display_source_volt_thing() {
-        if(_display_source_volt_thing >= THNG_FIELDS) return 0;
-        return _display_source_volt_thing;
-    }
-
-    unsigned int display_source_volt_thingType() {
-        return _display_source_volt_thingType;
-    }
-
-    unsigned int display_source_bat_sens() {
-        if(_display_source_bat_sens > 2) return 0;
-        return _display_source_bat_sens;
-    }
-
-    unsigned int display_source_bat_wsensNum() {
-        if(_display_source_bat_wsensNum >= WSENSORS) return 0;
-        return _display_source_bat_wsensNum; 
-    }
-
-    unsigned int display_source_bat_thing() {
-        if(_display_source_bat_thing >= THNG_FIELDS) return 0;
-        return _display_source_bat_thing;
-    }
-
-    unsigned int display_source_descr() {
-        if(_display_source_descr > 2) return 0;
-        return _display_source_descr; 
-    }
-
-    unsigned int display_source_wind_speed_sens() {
-        if(_display_source_wind_speed_sens > 3) return 0;
-        return _display_source_wind_speed_sens;
-    }
-
-    unsigned int display_source_wind_speed_wsensNum() {
-        if(_display_source_wind_speed_wsensNum >= WSENSORS) return 0;
-        return _display_source_wind_speed_wsensNum; 
-    }
-
-    unsigned int display_source_wind_speed_thing() {
-        if(_display_source_wind_speed_thing >= THNG_FIELDS) return 0;
-        return _display_source_wind_speed_thing;
-    }
-
-    unsigned int display_source_wind_dir_sens() {
-        if(_display_source_wind_dir_sens > 3) return 0;
-        return _display_source_wind_dir_sens;
-    }
-
-    unsigned int display_source_wind_dir_wsensNum() {
-        if(_display_source_wind_dir_wsensNum >= WSENSORS) return 0;
-        return _display_source_wind_dir_wsensNum; 
-    }
-
-    unsigned int display_source_wind_dir_thing() {
-        if(_display_source_wind_dir_thing >= THNG_FIELDS) return 0;
-        return _display_source_wind_dir_thing;
-    }
-
-    unsigned int display_source_sequence_dur() {
-        return _display_source_sequence_dur;
-    }
-
-    String display_source_sequence_name(unsigned int slot) {
-        if(slot >= SEQUENCES) return "";
-        return String(_display_source_sequence_name[slot]);
-    }
-
-    unsigned int display_source_sequence_temp(unsigned int slot) {
-        if(slot >= SEQUENCES) return 0;
-        if(_display_source_sequence_temp[slot] > 10) return 0;
-        return _display_source_sequence_temp[slot];
-    }
-
-    unsigned int display_source_sequence_thngtemp(unsigned int slot) {
-        if(slot >= SEQUENCES) return 0;
-        if(_display_source_sequence_thngtemp[slot] >= THNG_FIELDS) return 0;
-        return _display_source_sequence_thngtemp[slot];
-    }
-
-    unsigned int display_source_sequence_wsenstemp(unsigned int slot, unsigned int ws) {
-        if(slot >= SEQUENCES) return 0;
-        if(ws > 1) return 0;
-        if(ws == 0 and _display_source_sequence_wsenstemp[slot][0] >= WSENSORS) return 0;
-        if(ws == 1 and _display_source_sequence_wsenstemp[slot][1] >= WSENSOR_TEMPS) return 0;
-        return _display_source_sequence_wsenstemp[slot][ws];
-    }
-
-    unsigned int display_source_sequence_hum(unsigned int slot) {
-        if(slot >= SEQUENCES) return 0;
-        if(_display_source_sequence_hum[slot] > 7) return 0;
-        return _display_source_sequence_hum[slot];
-    }
-
-    unsigned int display_source_sequence_thnghum(unsigned int slot) {
-        if(slot >= SEQUENCES) return 0;
-        if(_display_source_sequence_thnghum[slot] >= THNG_FIELDS) return 0;
-        return _display_source_sequence_thnghum[slot];
-    }
-
-    unsigned int display_source_sequence_wsenshum(unsigned int slot) {
-        if(slot >= SEQUENCES) return 0;
-        if(_display_source_sequence_wsenshum[slot] >= WSENSORS) return 0;
-        return _display_source_sequence_wsenshum[slot];
-    }
-
-    unsigned int display_timeSlot_period(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return 0;
-        if(displayNum >= DISPLAYS) return 0;
-        if(_display_timeSlot_period[slot][displayNum] > 99) return 0;
-        return _display_timeSlot_period[slot][displayNum];
-    }
-
-    unsigned int display_timeSlot_sensor(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return 0;
-        if(displayNum >= DISPLAYS) return 0;
-        if(_display_timeSlot_sensor[slot][displayNum] > 11) return 0;
-        return _display_timeSlot_sensor[slot][displayNum];
-    }
-
-    unsigned int display_timeSlot_data(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return 0;
-        if(displayNum >= DISPLAYS) return 0;
-        if(_display_timeSlot_data[slot][displayNum] > 4) return 0;
-        return _display_timeSlot_data[slot][displayNum];
-    }
-
-    unsigned int display_timeSlot_thing(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return 0;
-        if(displayNum >= DISPLAYS) return 0;
-        if(_display_timeSlot_thing[slot][displayNum] > 7) return 0;
-        return _display_timeSlot_thing[slot][displayNum];
-    }
-
-    String display_timeSlot_color(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return "";
-        if(displayNum >= DISPLAYS) return "";
-        return String(_display_timeSlot_color[slot][displayNum]);
-    }
-
-    unsigned int display_timeSlot_wsensor_num(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return 0;
-        if(displayNum >= DISPLAYS) return 0;
-        return _display_timeSlot_wsensor_num[slot][displayNum];
-    }
-  
-    unsigned int display_timeSlot_wsensor_type(unsigned int slot, unsigned int displayNum) {
-        if(slot >= TIMESLOTS) return 0;
-        if(displayNum >= DISPLAYS) return 0;
-        return _display_timeSlot_wsensor_type[slot][displayNum];
-    }
 
     unsigned int sound_vol() {
         return _sound_vol;
@@ -1538,47 +1288,6 @@ class Config {
     /* 
      * Setters
      */
-
-    void set_brightLimit(unsigned int min, unsigned int max, unsigned int num) {
-        if(num >= DISPLAYS) return;
-        if(min <= 255) _display_brightness_min[num] = min;
-        if(max <= 255) _display_brightness_max[num] = max;
-    }
-
-    void set_bright(int bright, unsigned int num) {
-        if(num >= DISPLAYS) return;
-        if(bright >= 0 and bright <= 255) {
-            _display_brightness_day[num] = bright;
-            _display_brightness_night[num] = bright;
-        }
-    }
-
-    void set_sensitivity(int sensitivity, unsigned int num) {
-        if(num >= DISPLAYS) return;
-        if(sensitivity >= 1 and sensitivity <= 200) _display_lightSensor_sensitivity[num] = sensitivity;
-    }
-
-    void set_animation_type(unsigned int type, unsigned int displayNum) {
-        if(type <= 9 and displayNum < DISPLAYS) _display_animation_type[displayNum] = type;
-    }
-
-    void set_animation_speed(unsigned int speed, unsigned int displayNum) {
-        if(speed >= 1 and speed <= 30 and displayNum < DISPLAYS) _display_animation_speed[displayNum] = speed;
-    }
-
-    void set_animation_points(unsigned int points, unsigned int displayNum) {
-        if(points <= 7 and displayNum < DISPLAYS) _display_animation_points[displayNum] = points;
-    }
-  
-    void set_color(char color[6], unsigned int slotNum, unsigned int displayNum) {
-        if(slotNum >= TIMESLOTS) return;
-        if(displayNum >= DISPLAYS) return;
-        _display_timeSlot_color[slotNum][displayNum][0] = '#';
-        for(unsigned int i=1; i<7; i++) {
-            _display_timeSlot_color[slotNum][displayNum][i] = color[i - 1];
-        }
-        _display_timeSlot_color[slotNum][displayNum][7] = '\0';
-    }
 
     void set_vol(unsigned int vol) {
         _sound_vol = vol;

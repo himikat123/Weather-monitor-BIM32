@@ -37,7 +37,7 @@ void TM1637::init(uint8_t dispNum, int8_t clk, int8_t dat) {
     pinMode(dat, OUTPUT);
     digitalWrite(clk, HIGH);
     digitalWrite(dat, HIGH);
-    _setModel(config.display_model(dispNum));
+    _setModel(config.display.model(dispNum));
     _clearDisplay();
 }
 
@@ -77,7 +77,7 @@ void TM1637::_sendToDisplay() {
     bright = constrain(bright, 0, 7);
     byte seg[6] = { 0, 0, 0, 0, 0, 0 };
     if(_power) {
-        for(uint8_t i=0; i<6; i++) seg[i] = _pixels[config.display_order(_dispNum, i) - 1];
+        for(uint8_t i=0; i<6; i++) seg[i] = _pixels[config.display.order(_dispNum, i) - 1];
     }
     _start();
     _writeByte(0x40);

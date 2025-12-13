@@ -37,7 +37,7 @@ class WS2812b : public SegmentDisplay {
 void WS2812b::init(uint8_t dispNum, uint8_t pin) {
     _dispNum = dispNum;
  
-    switch(config.display_model(dispNum)) {
+    switch(config.display.model(dispNum)) {
         case 0: _pixelCount = 4 * 7 * 1 + 2 + 1; break; // 4 digits, 7 segments, 1 led per segment, 2 clock points, 1 sacrificial led
         case 1: _pixelCount = 4 * 7 * 2 + 2 + 1; break;
         case 2: _pixelCount = 4 * 7 * 3 + 2 + 1; break;
@@ -50,7 +50,7 @@ void WS2812b::init(uint8_t dispNum, uint8_t pin) {
     _strip = dispNum == 0 ? &strip_1 : &strip_2;
     _strip->begin(pin, _pixelCount);
     _strip->clear(true);
-    _setModel(config.display_model(dispNum));
+    _setModel(config.display.model(dispNum));
 }
 
 /**
@@ -103,8 +103,8 @@ void WS2812b::_print() {
 void WS2812b::_sendToDisplay() {
     uint8_t bright = (uint8_t)map(_brightness, 0, 100, 0, 255);
     bright = constrain(bright, 0, 255);
-    if(bright < config.display_brightness_min(_dispNum)) bright = config.display_brightness_min(_dispNum);
-    if(bright > config.display_brightness_max(_dispNum)) bright = config.display_brightness_max(_dispNum);  
+    if(bright < config.display.brightness.min(_dispNum)) bright = config.display.brightness.min(_dispNum);
+    if(bright > config.display.brightness.max(_dispNum)) bright = config.display.brightness.max(_dispNum);  
     _strip->brightness(bright, false);
 
     rgb_t black = { .r = 0, .g = 0, .b = 0 };
@@ -115,7 +115,7 @@ void WS2812b::_sendToDisplay() {
     _strip->setPixel(lastPixel++, (_power && _points[1] && !_animIsRunnung) ? dotsColor : black, false);
     lastPixel = _sendTwoDigits(black, 2, lastPixel++);
 
-    if(config.display_model(_dispNum) > 2) {
+    if(config.display.model(_dispNum) > 2) {
         _strip->setPixel(lastPixel++, (_power && _points[2] && !_animIsRunnung) ? dotsColor : black, false);
         _strip->setPixel(lastPixel++, (_power && _points[3] && !_animIsRunnung) ? dotsColor : black, false);
         lastPixel = _sendTwoDigits(black, 4, lastPixel++);
@@ -128,7 +128,7 @@ void WS2812b::_sendToDisplay() {
 uint8_t WS2812b::_sendTwoDigits(rgb_t black, uint8_t digShift, uint8_t pixelNr) {
     uint8_t repeats = 1;
 
-    switch(config.display_model(_dispNum)) {
+    switch(config.display.model(_dispNum)) {
         case 1: 
         case 4: repeats = 2; break;
         case 2:

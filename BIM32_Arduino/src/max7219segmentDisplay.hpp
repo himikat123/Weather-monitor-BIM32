@@ -43,7 +43,7 @@ void MAX7219_S::init(uint8_t dispNum, int8_t clk, int8_t dat, int8_t load) {
     pinMode(load, OUTPUT);
     digitalWrite(load, HIGH);
     max7219.init(clk, dat, load, 0);
-    _setModel(config.display_model(dispNum));
+    _setModel(config.display.model(dispNum));
 }
 
 /**
@@ -80,7 +80,7 @@ void MAX7219_S::_print() {
 void MAX7219_S::_sendToDisplay() {
     byte seg[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     if(_power) {
-        for(uint8_t i=0; i<8; i++) seg[i] = _pixels[config.display_order(_dispNum, i) - 1];
+        for(uint8_t i=0; i<8; i++) seg[i] = _pixels[config.display.order(_dispNum, i) - 1];
     }
     max7219.print(seg);
 }

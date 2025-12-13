@@ -75,7 +75,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
         }; break;
         case 8: { // Thingspeak
             data = thingspeak.dataRelevance()
-                ? thingspeak.get_field(config.display_timeSlot_thing(timeSlot, dispNum))
+                ? thingspeak.get_field(config.display.timeSlot.thing(timeSlot, dispNum))
                 : 40400.0;
             if(type == 0) *dType = TEMP;
             if(type == 1) *dType = HUM;
@@ -97,8 +97,8 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
             }
         }; break;
         case 10: { // Wireless sensor
-            unsigned int wsensNum = config.display_timeSlot_wsensor_num(timeSlot, dispNum);
-            unsigned int wsensType = config.display_timeSlot_wsensor_type(timeSlot, dispNum);
+            unsigned int wsensNum = config.display.timeSlot.wsensor.num(timeSlot, dispNum);
+            unsigned int wsensType = config.display.timeSlot.wsensor.type(timeSlot, dispNum);
             if(wsensType <= 4) {
                 data = wsensor.dataRelevance(wsensNum)
                     ? wsensor.get_temperature(wsensNum, wsensType)

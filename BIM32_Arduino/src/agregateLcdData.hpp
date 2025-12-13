@@ -27,18 +27,18 @@ class AgregateLcdData {
 
 float AgregateLcdData::tempIn(float* tempSequence) {
     float temp = 40400.0;
-    switch(config.display_source_tempIn_sens()) {
+    switch(config.display.source.tempIn.sens()) {
         case 1: temp = weather.get_currentTemp(); break; /* temperature from weather forecast */
         case 2: { /* temperature from wireless sensor */
-            if(wsensor.dataRelevance(config.display_source_tempIn_wsensNum())) 
+            if(wsensor.dataRelevance(config.display.source.tempIn.wsensNum())) 
                 temp = wsensor.get_temperature(
-                    config.display_source_tempIn_wsensNum(), 
-                    config.display_source_tempIn_temp()
+                    config.display.source.tempIn.wsensNum(), 
+                    config.display.source.tempIn.temp()
                 );
         }; break;
         case 3: { /* temperature from thingspeak */
             if(thingspeak.dataRelevance())
-                temp = thingspeak.get_field(config.display_source_tempIn_thing());
+                temp = thingspeak.get_field(config.display.source.tempIn.thing());
         }; break;
         case 4: _tempSequence(tempSequence); break;
         case 5: temp = sensors.get_bme280_temp(); break; /* temperature from BME280 */
@@ -54,18 +54,18 @@ float AgregateLcdData::tempIn(float* tempSequence) {
 
 void AgregateLcdData::_tempSequence(float* tempSequence) {
     for(uint8_t i=0; i<4; i++) {
-        switch(config.display_source_sequence_temp(i)) {
+        switch(config.display.source.sequence.temp(i)) {
             case 1: tempSequence[i] = weather.get_currentTemp(); break; /* Forecast */
             case 2: { /* wireless sensor */
-                if(wsensor.dataRelevance(config.display_source_sequence_wsenstemp(i, 0)))
+                if(wsensor.dataRelevance(config.display.source.sequence.wsenstemp(i, 0)))
                     tempSequence[i] = wsensor.get_temperature(
-                        config.display_source_sequence_wsenstemp(i, 0),
-                        config.display_source_sequence_wsenstemp(i, 1)
+                        config.display.source.sequence.wsenstemp(i, 0),
+                        config.display.source.sequence.wsenstemp(i, 1)
                     );
             }; break;
             case 3: { /* thingspeak */
                 if(thingspeak.dataRelevance())
-                    tempSequence[i] = thingspeak.get_field(config.display_source_sequence_thngtemp(i));
+                    tempSequence[i] = thingspeak.get_field(config.display.source.sequence.thngtemp(i));
             }; break;
             case 4: tempSequence[i] = sensors.get_bme280_temp(); break; /* BME280 */
             case 5: tempSequence[i] = sensors.get_bmp180_temp(); break; /* BMP180 */
@@ -80,24 +80,24 @@ void AgregateLcdData::_tempSequence(float* tempSequence) {
 
 void AgregateLcdData::sequenceNames(String* nameSequence) {
     for(uint8_t i=0; i<4; i++) {
-        nameSequence[i] = config.display_source_sequence_name(i);
+        nameSequence[i] = config.display.source.sequence.name(i);
     }
 }
 
 float AgregateLcdData::tempOut() {
     float temp = 40400.0;;
-    switch(config.display_source_tempOut_sens()) {
+    switch(config.display.source.tempOut.sens()) {
         case 1: temp = weather.get_currentTemp(); break; /* temperature from weather forecast */
         case 2: { /* temperature from wireless sensor */
-            if(wsensor.dataRelevance(config.display_source_tempOut_wsensNum())) 
+            if(wsensor.dataRelevance(config.display.source.tempOut.wsensNum())) 
                 temp = wsensor.get_temperature(
-                    config.display_source_tempOut_wsensNum(), 
-                    config.display_source_tempOut_temp()
+                    config.display.source.tempOut.wsensNum(), 
+                    config.display.source.tempOut.temp()
                 );
         }; break;
         case 3: { /* temperature from thingspeak */
             if(thingspeak.dataRelevance())
-                temp = thingspeak.get_field(config.display_source_tempOut_thing());
+                temp = thingspeak.get_field(config.display.source.tempOut.thing());
         }; break;
         case 4: temp = sensors.get_bme280_temp(); break; /* temperature from BME280 */
         case 5: temp = sensors.get_bmp180_temp(); break; /* temperature from BMP180 */
@@ -112,15 +112,15 @@ float AgregateLcdData::tempOut() {
 
 float AgregateLcdData::humIn(float* humSequence) {
     float hum = 40400.0;
-    switch(config.display_source_humIn_sens()) {
+    switch(config.display.source.humIn.sens()) {
         case 1: hum = weather.get_currentHum(); break; /* humudity from weather forecast */
         case 2: { /* humidity from wireless sensor */
-            if(wsensor.dataRelevance(config.display_source_humIn_wsensNum()))
-                hum = wsensor.get_humidity(config.display_source_humIn_wsensNum());
+            if(wsensor.dataRelevance(config.display.source.humIn.wsensNum()))
+                hum = wsensor.get_humidity(config.display.source.humIn.wsensNum());
         }; break;
         case 3: { /* humidity from thingspeak */
             if(thingspeak.dataRelevance()) 
-                hum = thingspeak.get_field(config.display_source_humIn_thing());
+                hum = thingspeak.get_field(config.display.source.humIn.thing());
         }; break;
         case 4: _humSequence(humSequence); break;
         case 5: hum = sensors.get_bme280_hum(); break; /* humidity from BME280 */
@@ -134,15 +134,15 @@ float AgregateLcdData::humIn(float* humSequence) {
 
 void AgregateLcdData::_humSequence(float* humSequence) {
     for(uint8_t i=0; i<4; i++) {
-        switch(config.display_source_sequence_hum(i)) {
+        switch(config.display.source.sequence.hum(i)) {
             case 1: humSequence[i] = weather.get_currentHum(); break; /* Forecast */
             case 2: { /* wireless sensor */
-                if(wsensor.dataRelevance(config.display_source_sequence_wsenshum(i)))
-                    humSequence[i] = wsensor.get_humidity(config.display_source_sequence_wsenshum(i));
+                if(wsensor.dataRelevance(config.display.source.sequence.wsenshum(i)))
+                    humSequence[i] = wsensor.get_humidity(config.display.source.sequence.wsenshum(i));
             }; break;
             case 3: { /* thingspeak */
                 if(thingspeak.dataRelevance())
-                    humSequence[i] = thingspeak.get_field(config.display_source_sequence_thnghum(i));
+                    humSequence[i] = thingspeak.get_field(config.display.source.sequence.thnghum(i));
             }; break;
             case 4: humSequence[i] = sensors.get_bme280_hum(); break; /* BME280 */
             case 5: humSequence[i] = sensors.get_sht21_hum(); break; /* SHT21 */
@@ -155,15 +155,15 @@ void AgregateLcdData::_humSequence(float* humSequence) {
 
 float AgregateLcdData::humOut() {
     float hum = 40400.0;
-    switch(config.display_source_humOut_sens()) {
+    switch(config.display.source.humOut.sens()) {
         case 1: hum = weather.get_currentHum(); break; /* humudity from weather forecast */
         case 2: { /* humidity from wireless sensor */
-            if(wsensor.dataRelevance(config.display_source_humOut_wsensNum()))
-                hum = wsensor.get_humidity(config.display_source_humOut_wsensNum());
+            if(wsensor.dataRelevance(config.display.source.humOut.wsensNum()))
+                hum = wsensor.get_humidity(config.display.source.humOut.wsensNum());
         }; break;
         case 3: { /* humidity from thingspeak */
             if(thingspeak.dataRelevance()) 
-                hum = thingspeak.get_field(config.display_source_humOut_thing());
+                hum = thingspeak.get_field(config.display.source.humOut.thing());
         }; break;
         case 4: hum = sensors.get_bme280_hum(); break; /* humidity from BME280 */
         case 5: hum = sensors.get_sht21_hum(); break; /* humidity from SHT21 */
@@ -176,15 +176,15 @@ float AgregateLcdData::humOut() {
 
 float AgregateLcdData::presOut() {
     float pres = 40400.0;
-    switch(config.display_source_presOut_sens()) {
+    switch(config.display.source.presOut.sens()) {
         case 1: pres = weather.get_currentPres(); break; // pressure outside from weather forecast
         case 2: { // presure outside from wireless sensor
-            if(wsensor.dataRelevance(config.display_source_presOut_wsensNum()))
-                pres = wsensor.get_pressure(config.display_source_presOut_wsensNum());
+            if(wsensor.dataRelevance(config.display.source.presOut.wsensNum()))
+                pres = wsensor.get_pressure(config.display.source.presOut.wsensNum());
         }; break;
         case 3: { // presure outside from thingspeak
             if(thingspeak.dataRelevance()) 
-                pres = thingspeak.get_field(config.display_source_presOut_thing());
+                pres = thingspeak.get_field(config.display.source.presOut.thing());
         }; break;
         case 4: pres = sensors.get_bme280_pres(); break; // pressure outside from BME280
         case 5: pres = sensors.get_bmp180_pres(); break; // pressure outside from BMP180
@@ -195,15 +195,15 @@ float AgregateLcdData::presOut() {
 
 float AgregateLcdData::windSpeed() {
     float windSpeed = -1;
-    switch(config.display_source_wind_speed_sens()) {
+    switch(config.display.source.wind.speed.sens()) {
         case 1: windSpeed = weather.get_currentWindSpeed(); break; // wind speed from weather forecast
         case 2: { // wind speed from wireless sensor
-            if(wsensor.dataRelevance(config.display_source_wind_speed_wsensNum()))
-                windSpeed = wsensor.get_windSpeed(config.display_source_wind_speed_wsensNum());
+            if(wsensor.dataRelevance(config.display.source.wind.speed.wsensNum()))
+                windSpeed = wsensor.get_windSpeed(config.display.source.wind.speed.wsensNum());
         }; break;
         case 3: { // wind speed from thingspeak
             if(thingspeak.dataRelevance()) 
-                windSpeed = thingspeak.get_field(config.display_source_wind_speed_thing());
+                windSpeed = thingspeak.get_field(config.display.source.wind.speed.thing());
         }; break;
     }
     return windSpeed;
@@ -211,15 +211,15 @@ float AgregateLcdData::windSpeed() {
 
 int AgregateLcdData::windDir() {
     int windDir = -1;
-    switch(config.display_source_wind_dir_sens()) {
+    switch(config.display.source.wind.dir.sens()) {
         case 1: windDir = weather.get_currentWindDir(); break; // wind directory from weather forecast
         case 2: { // wind directory from wireless sensor
-            if(wsensor.dataRelevance(config.display_source_wind_dir_wsensNum()))
-                windDir = wsensor.get_windDir(config.display_source_wind_dir_wsensNum());
+            if(wsensor.dataRelevance(config.display.source.wind.dir.wsensNum()))
+                windDir = wsensor.get_windDir(config.display.source.wind.dir.wsensNum());
         }; break;
         case 3: { // wind directory from thingspeak
             if(thingspeak.dataRelevance()) 
-                windDir = round(thingspeak.get_field(config.display_source_wind_dir_thing()));
+                windDir = round(thingspeak.get_field(config.display.source.wind.dir.thing()));
         }; break;
     }
     return windDir;
@@ -227,7 +227,7 @@ int AgregateLcdData::windDir() {
 
 String AgregateLcdData::voltage() {
     String value = "";
-    switch(config.display_source_volt_sens()) {
+    switch(config.display.source.volt.sens()) {
         case 1: value = _voltageWsensor(); break; /* from wireless sensor */
         case 2: value = _voltageThingspeak(); break; /* from thingspeak */
         case 3: value = localDate(); break; /* date */
@@ -249,22 +249,22 @@ String AgregateLcdData::voltage() {
 
 String AgregateLcdData::_voltageWsensor() {
     String value = "--";
-    if(wsensor.dataRelevance(config.display_source_volt_wsensNum())) {
-        switch(config.display_source_volt_volt()) {
+    if(wsensor.dataRelevance(config.display.source.volt.wsensNum())) {
+        switch(config.display.source.volt.volt()) {
             case 0: { /* battery voltage */
-                float volt = wsensor.get_batteryVoltage(config.display_source_volt_wsensNum());
+                float volt = wsensor.get_batteryVoltage(config.display.source.volt.wsensNum());
                 if(validate.batVolt(volt)) value = String(round(volt * 100) / 100) + lang.v();
             }; break;
             case 1: { /* battery percentage */
-                float prc = wsensor.get_batteryPercentage(config.display_source_volt_wsensNum());
+                float prc = wsensor.get_batteryPercentage(config.display.source.volt.wsensNum());
                 if(validate.batPercent(prc)) value = String(prc, 0) + "%";
             }; break;
             case 2: { /* PZEM-004t voltage */
-                float hiVolt = wsensor.get_voltage(config.display_source_volt_wsensNum());
+                float hiVolt = wsensor.get_voltage(config.display.source.volt.wsensNum());
                 if(validate.volt(hiVolt)) value = String(round(hiVolt * 100) / 100) + lang.v();
             }; break;
             case 3: { /* SenseAir S8 CO2 level */
-                float co2 = wsensor.get_co2(config.display_source_volt_wsensNum());
+                float co2 = wsensor.get_co2(config.display.source.volt.wsensNum());
                 if(validate.co2(co2)) value = String((int)round(co2)) + "ppm";
             }; break;
             default: ; break;
@@ -276,13 +276,13 @@ String AgregateLcdData::_voltageWsensor() {
 String AgregateLcdData::_voltageThingspeak() {
     String value = "--";
     if(thingspeak.dataRelevance()) {
-        switch(config.display_source_volt_thingType()) {
+        switch(config.display.source.volt.thingType()) {
             case 0: { /* battery voltage */
-                float volt = thingspeak.get_field(config.display_source_volt_thing());
+                float volt = thingspeak.get_field(config.display.source.volt.thing());
                 if(validate.thingVolt(volt)) value = String(round(volt * 100) / 100) + lang.v();
             }; break;
             case 1: { /* battery percentage */
-                float prc = thingspeak.get_field(config.display_source_volt_thing());
+                float prc = thingspeak.get_field(config.display.source.volt.thing());
                 if(validate.batPercent(prc)) value = String(prc, 0) + "%";
             }; break;
             default: ; break;
@@ -297,9 +297,9 @@ String AgregateLcdData::_voltageThingspeak() {
  */
 uint8_t AgregateLcdData::voltageColor() {
     uint8_t type = 0;
-    switch(config.display_source_volt_sens()) {
+    switch(config.display.source.volt.sens()) {
         case 1: { /* from wireless sensor */
-            if(config.display_source_volt_volt() == 3) /* SenseAir S8 CO2 level */
+            if(config.display.source.volt.volt() == 3) /* SenseAir S8 CO2 level */
                 type = state.co2_level;
         }; break; 
         case 4: { // iaq from BME680
@@ -312,14 +312,14 @@ uint8_t AgregateLcdData::voltageColor() {
 
 int AgregateLcdData::batteryLevel() {
     int level = -1;
-    if(config.display_source_bat_sens() == 1) { // battery symbol from wireless sensor
-        if(wsensor.dataRelevance(config.display_source_bat_wsensNum())) {
-            level = wsensor.get_batteryLevel(config.display_source_bat_wsensNum());
+    if(config.display.source.bat.sens() == 1) { // battery symbol from wireless sensor
+        if(wsensor.dataRelevance(config.display.source.bat.wsensNum())) {
+            level = wsensor.get_batteryLevel(config.display.source.bat.wsensNum());
         }
     }
-    else if(config.display_source_bat_sens() == 2) { // battery symbol from thingspeak
+    else if(config.display.source.bat.sens() == 2) { // battery symbol from thingspeak
         if(thingspeak.dataRelevance()) {
-            level = thingspeak.get_field(config.display_source_bat_thing());
+            level = thingspeak.get_field(config.display.source.bat.thing());
             if(level == 5) level = 4;
         }
     }
@@ -328,7 +328,7 @@ int AgregateLcdData::batteryLevel() {
 
 String AgregateLcdData::comfort() {
     String comfort = "";
-    if(config.display_source_descr() == 1) {
+    if(config.display.source.descr() == 1) {
         comfort = lang.comfort(state.comfort);
 
         if(state.iaq_level) {

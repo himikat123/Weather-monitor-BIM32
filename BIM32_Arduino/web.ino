@@ -246,7 +246,7 @@ void web_dispToggle() {
 void web_brightLimit() {
     if(web_isLogged(true)) {
         if(server.hasArg("min") and server.hasArg("max") and server.hasArg("num")) {
-            config.set_brightLimit(
+            config.display.brightness.setBrightLimit(
                 (server.arg("min")).toInt(), 
                 (server.arg("max")).toInt(), 
                 (server.arg("num")).toInt()
@@ -263,7 +263,7 @@ void web_brightLimit() {
 void web_bright() {
     if(web_isLogged(true)) {
         if(server.hasArg("bright") and server.hasArg("num")) {
-            config.set_bright((server.arg("bright")).toInt(), (server.arg("num")).toInt());
+            config.display.brightness.setBright((server.arg("bright")).toInt(), (server.arg("num")).toInt());
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -276,7 +276,7 @@ void web_bright() {
 void web_sensitivity() {
     if(web_isLogged(true)) {
         if(server.hasArg("bright") and server.hasArg("num")) {
-            config.set_sensitivity((server.arg("bright")).toInt(), (server.arg("num")).toInt());
+            config.display.lightSensor.setSensitivity((server.arg("bright")).toInt(), (server.arg("num")).toInt());
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -291,7 +291,7 @@ void web_color() {
         if(server.hasArg("hex") and server.hasArg("slot") and server.hasArg("num")) {
             char color[7];
             server.arg("hex").toCharArray(color, 7);
-            config.set_color(color, (server.arg("slot")).toInt(), (server.arg("num")).toInt());
+            config.display.timeSlot.setColor(color, (server.arg("slot")).toInt(), (server.arg("num")).toInt());
             state.colorChanged = true;
             server.send(200, "text/plain", "OK");
         }
@@ -306,9 +306,9 @@ void web_animation() {
     if(web_isLogged(true)) {
         if(server.hasArg("num")) {
             int dispNum = server.arg("num").toInt();
-            if(server.hasArg("type")) config.set_animation_type(server.arg("type").toInt(), dispNum);
-            if(server.hasArg("speed")) config.set_animation_speed(server.arg("speed").toInt(), dispNum);
-            if(server.hasArg("points")) config.set_animation_points(server.arg("points").toInt(), dispNum);
+            if(server.hasArg("type")) config.display.animation.setType(server.arg("type").toInt(), dispNum);
+            if(server.hasArg("speed")) config.display.animation.setSpeed(server.arg("speed").toInt(), dispNum);
+            if(server.hasArg("points")) config.display.animation.setPoints(server.arg("points").toInt(), dispNum);
             server.send(200, "text/plain", "OK");
         }
         server.send(200, "text/plain", "ERROR");

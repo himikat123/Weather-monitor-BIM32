@@ -131,7 +131,7 @@ void LcdDisplay::_getData() {
     _batLevel = agregateLcdData.batteryLevel();
     _isApMode = state.apMode;
     _comfort = agregateLcdData.comfort();
-    _comfortType = config.display_source_descr();
+    _comfortType = config.display.source.descr();
     _description = weather.get_description();
     _currIcon = weather.get_currentIcon();
     _isDay = weather.get_isDay();

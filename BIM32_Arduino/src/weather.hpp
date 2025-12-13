@@ -91,6 +91,8 @@ const char* Weather::_openMeteoCode2Description(uint8_t code) {
  * Weather update
  */
 void Weather::update() {
+    #define DISPLAY_1     0
+
     String url = "";
     if(config.weather.provider() == OPENWEATHERMAP) {
         String appid = String(config.weather.appid(OPENWEATHERMAP));
@@ -244,13 +246,13 @@ void Weather::update() {
     clientWeather.end();
 
     #if !defined(BIM32_CYD)
-        if(config.display_type(0) == 1) {
+        if(config.display.type(DISPLAY_1) == 1) {
     #endif
             if(config.weather.provider() == WEATHERBIT) _updateWeatherbitDaily();
             if(config.weather.provider() == OPENWEATHERMAP) _updateOpenweathermapHourly();
             if(config.weather.provider() == OPEN_METEO) {
                 _updateOpenMeteoDaily();
-                if(config.display_model(0) == 0 || config.display_model(0) == 2) _updateOpenMeteoHourly();
+                if(config.display.model(DISPLAY_1) == 0 || config.display.model(DISPLAY_1) == 2) _updateOpenMeteoHourly();
             }
     #if !defined(BIM32_CYD)
         }

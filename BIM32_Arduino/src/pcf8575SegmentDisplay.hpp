@@ -41,7 +41,7 @@ void PCF8575_S::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t
     pinMode(pwm, OUTPUT);
     brightness(100, false);
 
-    _setModel(config.display_model(dispNum));
+    _setModel(config.display.model(dispNum));
 
     _wire = dispNum == 0 ? &Wire_1 : &Wire_2;
     _clearDisplay();

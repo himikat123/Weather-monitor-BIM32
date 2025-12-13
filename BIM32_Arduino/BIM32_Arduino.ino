@@ -146,12 +146,12 @@ void setup() {
         ili9341.init();
         ili9341.showLogo();
     #else
-        if(config.display_type(0) == LCD_DISPLAY) {
-            if(config.display_model(0) == D_NX4832K035 or config.display_model(0) == D_NX4832T035) {
+        if(config.display.type(DISPLAY_1) == LCD_DISPLAY) {
+            if(config.display.model(DISPLAY_1) == D_NX4832K035 or config.display.model(0) == D_NX4832T035) {
                 Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
                 nextion.showLogo();
             }
-            if(config.display_model(DISPLAY_1) == D_ILI9341) {
+            if(config.display.model(DISPLAY_1) == D_ILI9341) {
                 ili9341.init();
                 ili9341.showLogo();
             }

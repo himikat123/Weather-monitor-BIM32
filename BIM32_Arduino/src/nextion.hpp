@@ -67,15 +67,15 @@ void Nextion::init() {
     nex.writeNum("BigClock.clockFormat.val", config.clock.format());
 
     for(unsigned int i=0; i<4; i++) {
-        nex.writeStr("Main.nameSeq" + String(i) + ".txt", config.display_source_sequence_name(i));
+        nex.writeStr("Main.nameSeq" + String(i) + ".txt", config.display.source.sequence.name(i));
     }
-    nex.writeNum("Main.sequence.tim", config.display_source_sequence_dur() * 1000);
+    nex.writeNum("Main.sequence.tim", config.display.source.sequence.dur() * 1000);
 
     /* Alarm */
     nex.writeStr("Texts.ALARM.txt", lang.alarm());
     
     /* Initialize NX4832K035 display  */
-    if(config.display_model(0) == NX4832K035) {
+    if(config.display.model(0) == NX4832K035) {
         // config
         unsigned int langCode = 0;
         if(config.lang() == "de") langCode = 1;
@@ -136,8 +136,8 @@ void Nextion::refresh() {
     if(_power) {
         _getData();
 
-        if(config.display_model(0) == NX4832T035) _NX4832T035_timeDate();
-        if(config.display_model(0) == NX4832K035) {
+        if(config.display.model(DISPLAY_1) == NX4832T035) _NX4832T035_timeDate();
+        if(config.display.model(DISPLAY_1) == NX4832K035) {
             if(state.clockSynchronize) {
                 _NX4832K035_setRTC();
                 state.clockSynchronize = false;
@@ -175,8 +175,8 @@ void Nextion::refresh() {
  */
 void Nextion::brightness(unsigned int bright) {
     uint8_t br = state.reduc[0] ? round(bright / 2) : bright;
-    if(br < config.display_brightness_min(0)) br = config.display_brightness_min(0);
-    if(br > config.display_brightness_max(0)) br = config.display_brightness_max(0); 
+    if(br < config.display.brightness.min(DISPLAY_1)) br = config.display.brightness.min(DISPLAY_1);
+    if(br > config.display.brightness.max(DISPLAY_1)) br = config.display.brightness.max(DISPLAY_1); 
     if(_prevBright != br or _forced) {
         if(_power) nex.writeNum("dim", br);
         _prevBright = br;
@@ -220,7 +220,7 @@ bool Nextion::isDisplayOn() {
  * Set the time and date of the display with built-in RTC
  */
 void Nextion::setDisplayRTC() {
-    if(config.display_model(0) == NX4832K035) _NX4832K035_setRTC();
+    if(config.display.model(DISPLAY_1) == NX4832K035) _NX4832K035_setRTC();
 }
 
 /**
@@ -364,7 +364,7 @@ void Nextion::_showAntenna() {
  */
 void Nextion::_showTempIn() {
     if(_prevTempIn != _tempIn or _forced) {
-        if(config.display_source_tempIn_sens() != 4) {
+        if(config.display.source.tempIn.sens() != 4) {
             String buf = validate.temp(_tempIn) ? String((int)round(_tempIn)) : "--";
             buf += "°C";
             nex.writeStr("Main.tempInside.txt", buf);
@@ -391,7 +391,7 @@ void Nextion::_showTempOut() {
  */
 void Nextion::_showHumIn() {
     if(_prevHumIn != _humIn or _forced) {
-        if(config.display_source_humIn_sens() != 4) {
+        if(config.display.source.humIn.sens() != 4) {
             nex.writeStr("Main.humInside.txt", validate.hum(_humIn) 
                 ? (String(int(round(_humIn))) + "%") : "--"
             );
@@ -430,7 +430,7 @@ void Nextion::_showPres() {
  * Display sequence
  */
 void Nextion::_showSequence() {
-    if(_forced) nex.writeNum("Main.sequence.en", config.display_source_tempIn_sens() == 4 ? 1 : 0);
+    if(_forced) nex.writeNum("Main.sequence.en", config.display.source.tempIn.sens() == 4 ? 1 : 0);
     for(unsigned int i=0; i<4; i++) {
         if(_prevTempSequence[i] != _tempSequence[i] or _forced) {
             nex.writeStr("Main.tempSeq" + String(i) + ".txt", validate.temp(_tempSequence[i]) 
@@ -460,7 +460,7 @@ void Nextion::_showComfortLevel() {
         _prevComfortType = _comfortType;
     }
     if(_prevComfort != _comfort or _forced) {
-        if(config.display_source_tempIn_sens() != 4) {
+        if(config.display.source.tempIn.sens() != 4) {
             nex.writeStr("Main.comfort.txt", _comfort);
         }
         _prevComfort = _comfort;

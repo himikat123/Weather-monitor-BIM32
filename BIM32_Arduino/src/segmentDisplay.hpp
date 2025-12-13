@@ -53,7 +53,7 @@ class SegmentDisplay {
  * Set display model
  */
 void SegmentDisplay::_setModel(uint8_t model) {
-    switch(config.display_type(_dispNum)) {
+    switch(config.display.type(_dispNum)) {
         case 2: _dispLength = model < 3 ? 4 : 6; break;
         case 3: _dispLength = (model == 0 || model == 2) ? 4 : (model == 1 || model == 3) ? 6 : 8; break;
         case 4: _dispLength = model == 0 ? 4 : model == 1 ? 6 : 8; break;
@@ -125,11 +125,11 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
     int pendulum = _pendulumPattern(second() * 1000 + (ml % 1000), _dispLength - 1);
     bool point1 = false, point2 = false;
 
-    switch(config.display_animation_points(_dispNum)) {
+    switch(config.display.animation.points(_dispNum)) {
         case 0: point1 = point2 = _pointsState; break;
         case 1: {
-            point1 = config.display_type(_dispNum) == 2 ? _pointsState : false; 
-            point2 = config.display_type(_dispNum) == 2 ? !point1 : false; 
+            point1 = config.display.type(_dispNum) == 2 ? _pointsState : false; 
+            point2 = config.display.type(_dispNum) == 2 ? !point1 : false; 
         } break;
         case 2: point1 = point2 = true; break;
         case 3: point1 = point2 = false; break;
@@ -137,19 +137,19 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
     }
 
     int disp4Img[8] = {
-        config.display_type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
+        config.display.type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
         point2 ? (hrL + DOT) : hrL, 
         mnH, mnL, 
         SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
     };
     int disp6Img[3][8] = {
         {
-            SYMB_SPACE, SYMB_SPACE, config.display_type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
+            SYMB_SPACE, SYMB_SPACE, config.display.type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
             point2 ? (hrL + DOT) : hrL, mnH, mnL, SYMB_SPACE, SYMB_SPACE
         },
         {
-            config.display_type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, point2 ? (hrL + DOT) : hrL, 
-            config.display_type(_dispNum) == 2 && point1 ? (mnH + DOT) : mnH, point2 ? (mnL + DOT) : mnL, 
+            config.display.type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, point2 ? (hrL + DOT) : hrL, 
+            config.display.type(_dispNum) == 2 && point1 ? (mnH + DOT) : mnH, point2 ? (mnL + DOT) : mnL, 
             scH, scL, SYMB_SPACE, SYMB_SPACE
         },
         {SYMB_SPACE, hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL}
@@ -162,12 +162,12 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
         {hrH, point1 ? hrL + DOT : hrL, mnH, point1 ? mnL + DOT : mnL, scH, point1 ? scL + DOT : scL, msH, msL}
     };
 
-    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
+    uint8_t sens = config.display.timeSlot.data(slot, _dispNum);
     for(uint8_t i=0; i<8; i++) {
         segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[sens][i] : disp8Img[sens][i];
     }
 
-    if(config.display_animation_points(_dispNum) == 1 && config.display_type(_dispNum) != 2) {
+    if(config.display.animation.points(_dispNum) == 1 && config.display.type(_dispNum) != 2) {
         for(uint8_t i=0; i<_dispLength; i++) {
             segImg[i] = pendulum == i ? segImg[i] + DOT : segImg[i];
         }
@@ -195,7 +195,7 @@ void SegmentDisplay::_date(int* segImg, uint8_t slot) {
         {dtH, dtL + DOT, mtH, mtL + DOT, yr1, yr2, yr3, yr4}
     };
 
-    uint8_t sens = config.display_timeSlot_data(slot, _dispNum);
+    uint8_t sens = config.display.timeSlot.data(slot, _dispNum);
     for(uint8_t i=0; i<8; i++) {
         segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[sens][i] : disp8Img[sens][i];
     }
@@ -381,14 +381,14 @@ void SegmentDisplay::_apMode(int* segImg) {
 }
 
 void SegmentDisplay::_slotSwitch() {
-    unsigned int period = config.display_timeSlot_period(_slot, _dispNum);
+    unsigned int period = config.display.timeSlot.period(_slot, _dispNum);
     if((millis() - _prevSlotMillis) > (period * 1000) or period == 0) {
         _prevSlot = _slot;
         _slot++;
         _animSlot = 0;
         _animMillis = millis();
         for(uint8_t i=_slot; i<8; i++) {
-            if(config.display_timeSlot_period(_slot, _dispNum) == 0) {
+            if(config.display.timeSlot.period(_slot, _dispNum) == 0) {
                 _slot++;
                 _animSlot = 0;
                 _animMillis = millis();
@@ -415,15 +415,15 @@ void SegmentDisplay::_segAnimations() {
 
     _segGetData(segImgPrev, _prevSlot, false);
     _segGetData(segImg, _slot, true);
-    String color = config.display_timeSlot_color(_slot, _dispNum);
-    String prevColor = config.display_timeSlot_color(_prevSlot, _dispNum);
+    String color = config.display.timeSlot.color(_slot, _dispNum);
+    String prevColor = config.display.timeSlot.color(_prevSlot, _dispNum);
     if(state.apMode) {
         color = "#FFFFFF";
         prevColor = "#FFFFFF";
     }
 
     _animIsRunnung = true;
-    unsigned int type = config.display_animation_type(_dispNum);
+    unsigned int type = config.display.animation.type(_dispNum);
     uint8_t dl = _dispLength == 4 ? 0 : _dispLength == 6 ? 1 : 2;
 
     for(uint8_t i=0; i<(_dispLength); i++) {
@@ -438,7 +438,7 @@ void SegmentDisplay::_segAnimations() {
         else color.toCharArray(_dispColors[i], 8);
     }
 
-    if(millis() - _animMillis > 1000 / config.display_animation_speed(_dispNum)) {
+    if(millis() - _animMillis > 1000 / config.display.animation.speed(_dispNum)) {
         _animMillis = millis();
         if(_animSlot < FRAMES[dl][type] - 1) _animSlot++;
     }
@@ -450,11 +450,11 @@ void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
     if(state.apMode) {
         _apMode(segImg);
     }
-    else if(config.display_timeSlot_period(slot, _dispNum) > 0) {
+    else if(config.display.timeSlot.period(slot, _dispNum) > 0) {
         uint8_t dType = 0;
         float data = agregateSegmentData.slotData(
-            config.display_timeSlot_sensor(slot, _dispNum),
-            config.display_timeSlot_data(slot, _dispNum),
+            config.display.timeSlot.sensor(slot, _dispNum),
+            config.display.timeSlot.data(slot, _dispNum),
             slot, _dispNum, &dType
         );
 
