@@ -69,9 +69,9 @@ void Sound::equalizer(unsigned int eq) {
  * @param track number
  */
 void Sound::play(unsigned int folder, unsigned int track) {
-    equalizer(config.sound_eq());
+    equalizer(config.sound.eq());
     vTaskDelay(100);
-    volume(config.sound_vol());
+    volume(config.sound.vol());
     vTaskDelay(100);
 
     if(folder==2 and track<=20) {
@@ -117,7 +117,7 @@ void Sound::stopPlaying(void) {
  */
 bool Sound::_isAllowed() {
     if(_mp3_found and digitalRead(MP3_BUSY_PIN)) {
-        switch(config.sound_hourly()) {
+        switch(config.sound.hourly()) {
             case 0: return true;
             case 2: if(weather.get_isDay()) return true;
             case 3: return _hourlyCheck();
@@ -128,8 +128,8 @@ bool Sound::_isAllowed() {
 }
 
 bool Sound::_hourlyCheck() {
-    uint16_t fromM = config.sound_hour_from(false) * 60 + config.sound_hour_from(true);
-    uint16_t toM = config.sound_hour_to(false) * 60 + config.sound_hour_to(false);
+    uint16_t fromM = config.sound.hourFrom(false) * 60 + config.sound.hourFrom(true);
+    uint16_t toM = config.sound.hourTo(false) * 60 + config.sound.hourTo(false);
     uint16_t nowM = hour() * 60 + minute();
 
     if(fromM < toM) return (fromM <= nowM && nowM < toM);
@@ -224,9 +224,9 @@ void Sound::_reset() {
     _sendCommand(0x0C, 0x00, 0x00);
     _sendCommand(0x09, 0x00, 0x02);
     vTaskDelay(200);
-    equalizer(config.sound_eq());
+    equalizer(config.sound.eq());
     vTaskDelay(100);
-    volume(config.sound_vol());
+    volume(config.sound.vol());
     vTaskDelay(100);
 }
 

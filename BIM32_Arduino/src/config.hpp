@@ -67,51 +67,6 @@ class Config {
     char _lang[3] = "en";
     uint8_t _units_pres = 0;
 
-    // Sound
-    unsigned int _sound_vol = 15; // Sound volume
-    unsigned int _sound_eq = 0; // Equalizer: 0-Normal, 1-Pop, 2-Rock, 3-Jazz, 4-Classic, 5-Bass
-    unsigned int _sound_hourly = 2; // Hourly signal: 0-Always ON, 1-Always OFF, 2-On from dawn to dusk, 3-Enabled by time
-    char _sound_hour_from[6] = "07:00"; // The hour from which the hourly signal is turned on
-    char _sound_hour_to[6] = "22:00"; // The hour from which the hourly signal is turned off
-
-    // Sensors
-    float _bme280_temp_corr = 0.0; // BME280 temperature correction
-    float _bme280_hum_corr = 0.0; // BME280 humidity correction
-    float _bme280_pres_corr = 0.0; // BME280 pressure correction
-    float _bmp180_temp_corr = 0.0; // BMP180 temperature correction
-    float _bmp180_pres_corr = 0.0; // BMP180 pressure correction
-    float _sht21_temp_corr = 0.0; // SHT21 temperature correction
-    float _sht21_hum_corr = 0.0; // SHT21 humidity correction
-    float _dht22_temp_corr = 0.0; // DHT22 temperature correction
-    float _dht22_hum_corr = 0.0; // DHT22 humidity correction
-    float _ds18b20_temp_corr = 0.0; // DS18B20 temperature correction
-    float _esp32_temp_corr = 0.0; // ESP32 temperature correction
-    float _max44009_light_corr = 0.0; // MAX44009 ambient light correction
-    float _bh1750_light_corr = 0.0; // BH1750 ambient light correction
-    float _analog_voltage_corr = 0.0; // Analog ambient light sensor voltage correction
-    float _bme680_temp_corr = 0.0; // BME680 temperature correction
-    float _bme680_hum_corr = 0.0; // BME680 humidity correction
-    float _bme680_pres_corr = 0.0; // BME680 pressure correction
-    float _bme680_iaq_corr = 0.0; // BME680 IAQ correction
-
-    // Wireless sensors
-    float _wsensor_temp_corr[WSENSORS][WSENSOR_TEMPS] = { {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0} }; // Wireless sensor temperature correction
-    float _wsensor_hum_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor humidity correction
-    float _wsensor_pres_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor pressure correction
-    float _wsensor_wind_speed_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor wind speed correction
-    float _wsensor_wind_dir_corr[WSENSORS]= {0.0, 0.0}; // Wireless sensor wind direction correction
-    float _wsensor_light_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor ambient light correction
-    float _wsensor_volt_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t voltage correction
-    float _wsensor_curr_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t current correction
-    float _wsensor_pow_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t power correction
-    float _wsensor_enrg_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t energy correction
-    float _wsensor_freq_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor PZEM-004t frequency correction
-    float _wsensor_co2_corr[WSENSORS] = {0.0, 0.0}; // Wireless sensor SenseAir S8 CO2 correction
-    float _wsensor_bat_k[WSENSORS] = {125, 125}; // Wireless sensor battery voltage ADC division factor
-    unsigned int _wsensor_bat_type[WSENSORS] = {0, 0}; // Wireless sensor battery type: 0 - 3x Batteries (4.5V), 1 - LiIon battery (3.7V) 
-    unsigned int _wsensor_expire[WSENSORS] = {10, 10}; // Wireless sensor data expire (minutes) 1...100
-    unsigned int _wsensor_channel = 1; // Wireless sensors channel number 1...100
-
     // Weather history repository
     unsigned int _history_period = 0; // Period data update (minutes) 0...999
     char _history_channelID[11] = ""; // Weather repository channel ID
@@ -526,6 +481,113 @@ class Config {
         const unsigned int autoOff(unsigned int num) const { if(num >= DISPLAYS) return 0; if(_autoOff[num] > 1440) return 0; return _autoOff[num]; }
     }; Display display;
 
+    struct Sound {
+        private:
+        unsigned int _vol = 15; // Sound volume
+        unsigned int _eq = 0; // Equalizer: 0-Normal, 1-Pop, 2-Rock, 3-Jazz, 4-Classic, 5-Bass
+        unsigned int _hourly = 2; // Hourly signal: 0-Always ON, 1-Always OFF, 2-On from dawn to dusk, 3-Enabled by time
+        char _hourFrom[6] = "07:00"; // The hour from which the hourly signal is turned on
+        char _hourTo[6] = "22:00"; // The hour from which the hourly signal is turned off
+        friend class Config;
+
+        public:
+        const unsigned int vol() const { return _vol; }
+        const unsigned int eq() const { return _eq; }
+        const unsigned int hourly() const { return _hourly; }
+        const unsigned int hourFrom(bool level) const { return Config::_get_time(level, _hourFrom); }
+        const unsigned int hourTo(bool level) { return Config::_get_time(level, _hourTo); }
+        void setVol(unsigned int vol) { _vol = vol; }
+        void setEq(unsigned int eq) { _eq = eq; }
+    }; Sound sound;
+
+    struct Sensors {
+        struct Temp {
+            private: float _tempCorr = 0.0; friend class Config;
+            public: const float tempCorr() const { return _tempCorr; }
+        };
+
+        struct Light {
+            private: float _lightCorr = 0.0; friend class Config;
+            public: const float lightCorr() const { return _lightCorr; }
+        };
+
+        struct Voltage {
+            private: float _voltageCorr = 0.0; friend class Config;
+            public: const float voltageCorr() const { return _voltageCorr; }
+        };
+
+        struct TempHum : public Temp {
+            private: float _humCorr = 0.0; friend class Config;
+            public: const float humCorr() const { return _humCorr; }
+        };
+
+        struct TempPres : public Temp {
+            private: float _presCorr = 0.0; friend class Config;
+            public: const float presCorr() const { return _presCorr; }
+        };
+
+        struct TempHumPres : public TempHum {
+            private: float _presCorr = 0.0; friend class Config;
+            public: const float presCorr() const { return _presCorr; }
+        };
+
+        struct TempHumPresIaq : public TempHumPres {
+            private: float _iaqCorr = 0.0; friend class Config;
+            public: const float iaqCorr() const { return _iaqCorr; }
+        };
+
+        public:
+        TempHumPres bme280;
+        TempPres bmp180;
+        TempHum sht21;
+        TempHum dht22;
+        Temp ds18b20;
+        Temp esp32;
+        Light max44009;
+        Light bh1750;
+        Voltage analog;
+        TempHumPresIaq bme680;
+    }; Sensors sensors;
+
+    struct Wsensor {
+        private:
+        float _tempCorr[WSENSORS][WSENSOR_TEMPS] = { 0 }; // Wireless sensor temperature correction
+        float _humCorr[WSENSORS] = { 0 }; // Wireless sensor humidity correction
+        float _presCorr[WSENSORS] = { 0 }; // Wireless sensor pressure correction
+        float _windSpeedCorr[WSENSORS] = { 0 }; // Wireless sensor wind speed correction
+        float _windDirCorr[WSENSORS]= { 0 }; // Wireless sensor wind direction correction
+        float _lightCorr[WSENSORS] = { 0 }; // Wireless sensor ambient light correction
+        float _voltCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t voltage correction
+        float _currCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t current correction
+        float _powCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t power correction
+        float _enrgCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t energy correction
+        float _freqCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t frequency correction
+        float _co2Corr[WSENSORS] = { 0 }; // Wireless sensor SenseAir S8 CO2 correction
+        float _batK[WSENSORS] = { 125.0, 125.0 }; // Wireless sensor battery voltage ADC division factor
+        unsigned int _batType[WSENSORS] = { 0 }; // Wireless sensor battery type: 0 - 3x Batteries (4.5V), 1 - LiIon battery (3.7V) 
+        unsigned int _expire[WSENSORS] = { 10, 10 }; // Wireless sensor data expire (minutes) 1...100
+        unsigned int _channel = 1; // Wireless sensors channel number 1...100
+        friend class Config;
+
+        public:
+            const float tempCorr(unsigned int num, unsigned int sens) const { if(num >= WSENSORS) return 0.0; if(sens >= WSENSOR_TEMPS) return 0.0; return _tempCorr[num][sens]; }
+            const float humCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _humCorr[num]; }
+            const float presCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _presCorr[num]; }
+            const float windSpeedCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _windSpeedCorr[num]; }
+            const float windDirCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _windDirCorr[num]; }
+            const float lightCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _lightCorr[num]; }
+            const float voltCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _voltCorr[num]; }
+            const float currCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _currCorr[num]; }
+            const float powCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _powCorr[num]; }
+            const float enrgCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _enrgCorr[num]; }
+            const float freqCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _freqCorr[num]; }
+            const float co2Corr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _co2Corr[num]; }
+            const float batK(unsigned int num) const { if(num >= WSENSORS) return 0.0; if(_batK[num] < 10.0 or _batK[num] > 250.0) return 125.0; return _batK[num]; }
+            const unsigned int batType(unsigned int num) const { if(num >= WSENSORS) return 0; if(_batType[num] > 1) return 0; return _batType[num]; }
+            const unsigned int channel() const { if(_channel < 1 or _channel > 100) return 1; return _channel; }
+            const unsigned int expire(unsigned int num) const { if(num >= WSENSORS) return 0; if(_expire[num] < 1 or _expire[num] > 100) return 10; return _expire[num]; }
+    }; Wsensor wsensor;
+
     struct Account {
         private:
             char _name[32] = ""; // Web interface username
@@ -676,53 +738,53 @@ class Config {
                     }
 
                     // Sound
-                    COPYNUM(conf["sound"]["vol"], _sound_vol);
-                    COPYNUM(conf["sound"]["eq"], _sound_eq);
-                    COPYNUM(conf["sound"]["hourly"], _sound_hourly);
-                    COPYSTR(conf["sound"]["hour"]["from"], _sound_hour_from);
-                    COPYSTR(conf["sound"]["hour"]["to"], _sound_hour_to);
+                    COPYNUM(conf["sound"]["vol"], sound._vol);
+                    COPYNUM(conf["sound"]["eq"], sound._eq);
+                    COPYNUM(conf["sound"]["hourly"], sound._hourly);
+                    COPYSTR(conf["sound"]["hour"]["from"], sound._hourFrom);
+                    COPYSTR(conf["sound"]["hour"]["to"], sound._hourTo);
 
                     // Sensors
-                    COPYNUM(conf["sensors"]["bme280"]["t"], _bme280_temp_corr);
-                    COPYNUM(conf["sensors"]["bme280"]["h"], _bme280_hum_corr);
-                    COPYNUM(conf["sensors"]["bme280"]["p"], _bme280_pres_corr);
-                    COPYNUM(conf["sensors"]["bmp180"]["t"], _bmp180_temp_corr);
-                    COPYNUM(conf["sensors"]["bmp180"]["p"], _bmp180_pres_corr);
-                    COPYNUM(conf["sensors"]["sht21"]["t"], _sht21_temp_corr);
-                    COPYNUM(conf["sensors"]["sht21"]["h"], _sht21_hum_corr);
-                    COPYNUM(conf["sensors"]["dht22"]["t"], _dht22_temp_corr);
-                    COPYNUM(conf["sensors"]["dht22"]["h"], _dht22_hum_corr);
-                    COPYNUM(conf["sensors"]["ds18b20"]["t"], _ds18b20_temp_corr);
-                    COPYNUM(conf["sensors"]["esp32"]["t"], _esp32_temp_corr);
-                    COPYNUM(conf["sensors"]["max44009"]["l"], _max44009_light_corr);
-                    COPYNUM(conf["sensors"]["bh1750"]["l"], _bh1750_light_corr);
-                    COPYNUM(conf["sensors"]["analog"]["v"], _analog_voltage_corr);
-                    COPYNUM(conf["sensors"]["bme680"]["t"], _bme680_temp_corr);
-                    COPYNUM(conf["sensors"]["bme680"]["h"], _bme680_hum_corr);
-                    COPYNUM(conf["sensors"]["bme680"]["p"], _bme680_pres_corr);
-                    COPYNUM(conf["sensors"]["bme680"]["i"], _bme680_iaq_corr);
+                    COPYNUM(conf["sensors"]["bme280"]["t"], sensors.bme280._tempCorr);
+                    COPYNUM(conf["sensors"]["bme280"]["h"], sensors.bme280._humCorr);
+                    COPYNUM(conf["sensors"]["bme280"]["p"], sensors.bme280._presCorr);
+                    COPYNUM(conf["sensors"]["bmp180"]["t"], sensors.bmp180._tempCorr);
+                    COPYNUM(conf["sensors"]["bmp180"]["p"], sensors.bmp180._presCorr);
+                    COPYNUM(conf["sensors"]["sht21"]["t"], sensors.sht21._tempCorr);
+                    COPYNUM(conf["sensors"]["sht21"]["h"], sensors.sht21._humCorr);
+                    COPYNUM(conf["sensors"]["dht22"]["t"], sensors.dht22._tempCorr);
+                    COPYNUM(conf["sensors"]["dht22"]["h"], sensors.dht22._humCorr);
+                    COPYNUM(conf["sensors"]["ds18b20"]["t"], sensors.ds18b20._tempCorr);
+                    COPYNUM(conf["sensors"]["esp32"]["t"], sensors.esp32._tempCorr);
+                    COPYNUM(conf["sensors"]["max44009"]["l"], sensors.max44009._lightCorr);
+                    COPYNUM(conf["sensors"]["bh1750"]["l"], sensors.bh1750._lightCorr);
+                    COPYNUM(conf["sensors"]["analog"]["v"], sensors.analog._voltageCorr);
+                    COPYNUM(conf["sensors"]["bme680"]["t"], sensors.bme680._tempCorr);
+                    COPYNUM(conf["sensors"]["bme680"]["h"], sensors.bme680._humCorr);
+                    COPYNUM(conf["sensors"]["bme680"]["p"], sensors.bme680._presCorr);
+                    COPYNUM(conf["sensors"]["bme680"]["i"], sensors.bme680._iaqCorr);
 
                     // Wireless sensors
                     for(unsigned int i=0; i<WSENSORS; i++) {
                         for(unsigned int k=0; k<WSENSOR_TEMPS; k++) {
-                            COPYNUM(conf["wsensor"]["temp"][i][k], _wsensor_temp_corr[i][k]);
+                            COPYNUM(conf["wsensor"]["temp"][i][k], wsensor._tempCorr[i][k]);
                         }
-                        COPYNUM(conf["wsensor"]["hum"][i], _wsensor_hum_corr[i]);
-                        COPYNUM(conf["wsensor"]["pres"][i], _wsensor_pres_corr[i]);
-                        COPYNUM(conf["wsensor"]["wind"]["speed"], _wsensor_wind_speed_corr[i]);
-                        COPYNUM(conf["wsensor"]["wind"]["dir"], _wsensor_wind_dir_corr[i]);
-                        COPYNUM(conf["wsensor"]["light"][i], _wsensor_light_corr[i]);
-                        COPYNUM(conf["wsensor"]["volt"][i], _wsensor_volt_corr[i]);
-                        COPYNUM(conf["wsensor"]["curr"][i], _wsensor_curr_corr[i]);
-                        COPYNUM(conf["wsensor"]["pow"][i], _wsensor_pow_corr[i]);
-                        COPYNUM(conf["wsensor"]["enrg"][i], _wsensor_enrg_corr[i]);
-                        COPYNUM(conf["wsensor"]["freq"][i], _wsensor_freq_corr[i]);
-                        COPYNUM(conf["wsensor"]["co2"][i], _wsensor_co2_corr[i]);
-                        COPYNUM(conf["wsensor"]["bat"]["k"][i], _wsensor_bat_k[i]);
-                        COPYNUM(conf["wsensor"]["bat"]["type"][i], _wsensor_bat_type[i]);
-                        COPYNUM(conf["wsensor"]["expire"][i], _wsensor_expire[i]); 
+                        COPYNUM(conf["wsensor"]["hum"][i], wsensor._humCorr[i]);
+                        COPYNUM(conf["wsensor"]["pres"][i], wsensor._presCorr[i]);
+                        COPYNUM(conf["wsensor"]["wind"]["speed"], wsensor._windSpeedCorr[i]);
+                        COPYNUM(conf["wsensor"]["wind"]["dir"], wsensor._windDirCorr[i]);
+                        COPYNUM(conf["wsensor"]["light"][i], wsensor._lightCorr[i]);
+                        COPYNUM(conf["wsensor"]["volt"][i], wsensor._voltCorr[i]);
+                        COPYNUM(conf["wsensor"]["curr"][i], wsensor._currCorr[i]);
+                        COPYNUM(conf["wsensor"]["pow"][i], wsensor._powCorr[i]);
+                        COPYNUM(conf["wsensor"]["enrg"][i], wsensor._enrgCorr[i]);
+                        COPYNUM(conf["wsensor"]["freq"][i], wsensor._freqCorr[i]);
+                        COPYNUM(conf["wsensor"]["co2"][i], wsensor._co2Corr[i]);
+                        COPYNUM(conf["wsensor"]["bat"]["k"][i], wsensor._batK[i]);
+                        COPYNUM(conf["wsensor"]["bat"]["type"][i], wsensor._batType[i]);
+                        COPYNUM(conf["wsensor"]["expire"][i], wsensor._expire[i]); 
                     }
-                    COPYNUM(conf["wsensor"]["channel"], _wsensor_channel);
+                    COPYNUM(conf["wsensor"]["channel"], wsensor._channel);
 
                     // Weather history repository
                     COPYNUM(conf["history"]["period"], _history_period);
@@ -894,183 +956,6 @@ class Config {
 
     uint8_t units_pres() {
         return _units_pres ? 1 : 0;
-    }
-
-
-    unsigned int sound_vol() {
-        return _sound_vol;
-    }
-  
-    unsigned int sound_eq() {
-        return _sound_eq;
-    }
-  
-    unsigned int sound_hourly() {
-        return _sound_hourly;
-    }
-  
-    unsigned int sound_hour_from(bool level) {
-        return _get_time(level, _sound_hour_from);
-    }
-  
-    unsigned int sound_hour_to(bool level) {
-        return _get_time(level, _sound_hour_to);
-    }
-
-    float bme280_temp_corr() {
-        return _bme280_temp_corr;
-    }
-
-    float bme280_hum_corr() {
-        return _bme280_hum_corr;
-    }
-
-    float bme280_pres_corr() {
-        return _bme280_pres_corr;
-    }
-
-    float bmp180_temp_corr() {
-        return _bmp180_temp_corr;
-    }
-
-    float bmp180_pres_corr() {
-        return _bmp180_pres_corr;
-    }
-
-    float sht21_temp_corr() {
-        return _sht21_temp_corr;
-    }
-
-    float sht21_hum_corr() {
-        return _sht21_hum_corr;
-    }
-
-    float dht22_temp_corr() {
-        return _dht22_temp_corr;
-    }
-
-    float dht22_hum_corr() {
-        return _dht22_hum_corr;
-    }
-
-    float ds18b20_temp_corr() {
-        return _ds18b20_temp_corr;
-    }
-
-    float esp32_temp_corr() {
-        return _esp32_temp_corr;
-    }
-
-    float max44009_light_corr() {
-        return _max44009_light_corr;
-    }
-
-    float bh1750_light_corr() {
-        return _bh1750_light_corr;
-    }
-
-    float analog_voltage_corr() {
-        return _analog_voltage_corr;
-    }
-
-    float bme680_temp_corr() {
-        return _bme680_temp_corr;
-    }
-
-    float bme680_hum_corr() {
-        return _bme680_hum_corr;
-    }
-
-    float bme680_pres_corr() {
-        return _bme680_pres_corr;
-    }
-
-    float bme680_iaq_corr() {
-        return _bme680_iaq_corr;
-    }
-
-    float wsensor_temp_corr(unsigned int num, unsigned int sens) {
-        if(num >= WSENSORS) return 0.0;
-        if(sens >= WSENSOR_TEMPS) return 0.0;
-        return _wsensor_temp_corr[num][sens];
-    }
-
-    float wsensor_hum_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0.0;
-        return _wsensor_hum_corr[num];
-    }
-
-    float wsensor_pres_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0.0;
-        return _wsensor_pres_corr[num];
-    }
-
-    float wsensor_wind_speed_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0.0;
-        return _wsensor_wind_speed_corr[num];
-    }
-
-    float wsensor_wind_dir_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0.0;
-        return _wsensor_wind_dir_corr[num];
-    }
-
-    float wsensor_light_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_light_corr[num];
-    }
-
-    float wsensor_volt_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_volt_corr[num];
-    }
-
-    float wsensor_curr_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_curr_corr[num];
-    }
-
-    float wsensor_pow_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_pow_corr[num];
-    }
-
-    float wsensor_enrg_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_enrg_corr[num];
-    }
-
-    float wsensor_freq_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_freq_corr[num];
-    }
-
-    float wsensor_co2_corr(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        return _wsensor_co2_corr[num];
-    }
-
-    float wsensor_bat_k(unsigned int num) {
-        if(num >= WSENSORS) return 0.0;
-        if(_wsensor_bat_k[num] < 10.0 or _wsensor_bat_k[num] > 250.0) return 120.0;
-        return _wsensor_bat_k[num];
-    };
-
-    unsigned int wsensor_bat_type(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        if(_wsensor_bat_type[num] > 1) return 0;
-        return _wsensor_bat_type[num];
-    };
-
-    unsigned int wsensor_channel() {
-        if(_wsensor_channel < 1 or _wsensor_channel > 100) return 1;
-        return _wsensor_channel;
-    };
-
-    unsigned int wsensor_expire(unsigned int num) {
-        if(num >= WSENSORS) return 0;
-        if(_wsensor_expire[num] < 1 or _wsensor_expire[num] > 100) return 10;
-        return _wsensor_expire[num];
     }
 
     unsigned int history_period() {
@@ -1288,14 +1173,6 @@ class Config {
     /* 
      * Setters
      */
-
-    void set_vol(unsigned int vol) {
-        _sound_vol = vol;
-    }
-
-    void set_eq(unsigned int eq) {
-        _sound_eq = eq;
-    }
 
     void set_lang(String lng) {
         lng.toCharArray(_lang, 3);

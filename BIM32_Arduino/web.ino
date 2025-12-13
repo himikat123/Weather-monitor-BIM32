@@ -366,8 +366,8 @@ void web_syncdialog() {
 void web_soundVolume() {
     if(web_isLogged(true)) {
         if(server.hasArg("vol")) {
-            config.set_vol(server.arg("vol").toInt());
-            sound.volume(config.sound_vol());
+            config.sound.setVol(server.arg("vol").toInt());
+            sound.volume(config.sound.vol());
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");
@@ -380,8 +380,8 @@ void web_soundVolume() {
 void web_soundEqualizer() {
     if(web_isLogged(true)) {
         if(server.hasArg("eq")) {
-            config.set_eq(server.arg("eq").toInt());
-            sound.equalizer(config.sound_eq());
+            config.sound.setEq(server.arg("eq").toInt());
+            sound.equalizer(config.sound.eq());
             server.send(200, "text/plain", "OK");
         }
         else server.send(200, "text/plain", "ERROR");

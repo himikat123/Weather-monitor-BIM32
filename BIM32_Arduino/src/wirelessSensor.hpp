@@ -102,11 +102,11 @@ void WirelessSensor::receive() {
                     strlcpy(state.wsensor.co2.name[number], "Senseair S8", sizeof(state.wsensor.co2.name[number]));
                     // Battery
                     state.wsensor.battery.adc[number] = root["b"] | -1;
-                    state.wsensor.battery.voltage[number] = (float)state.wsensor.battery.adc[number] / (300.0 - config.wsensor_bat_k(number));
+                    state.wsensor.battery.voltage[number] = (float)state.wsensor.battery.adc[number] / (300.0 - config.wsensor.batK(number));
                     if(state.wsensor.battery.voltage[number] > 0.0) {
                         float umin = 3.75;
                         float umax = 3.9;
-                        if(config.wsensor_bat_type(number) == 0) umax = 4.5;
+                        if(config.wsensor.batType(number) == 0) umax = 4.5;
                         float stp = (umax - umin) / 4;
                         if(state.wsensor.battery.voltage[number] < (umin + stp)) state.wsensor.battery.level[number] = 1;
                         else if(state.wsensor.battery.voltage[number] < (umin + stp * 2)) state.wsensor.battery.level[number] = 2;
@@ -127,7 +127,7 @@ void WirelessSensor::receive() {
             int rc = wsensorStr.indexOf("OK+RC");
             if(rc != -1) {
                 unsigned int ch = wsensorStr.substring(rc + 5, rc + 8).toInt();
-                if(ch != config.wsensor_channel()) {
+                if(ch != config.wsensor.channel()) {
                     Serial.println("Changing channel number");
                     if(state.uart2_tx != HC12) {
                         Serial2.setPins(HC12_RX_PIN, HC12_TX_PIN);
@@ -135,7 +135,7 @@ void WirelessSensor::receive() {
                     }
                     digitalWrite(HC12_SET_PIN, LOW);
                     delay(50);
-                    Serial2.printf("AT+C%03d\r\n", config.wsensor_channel());
+                    Serial2.printf("AT+C%03d\r\n", config.wsensor.channel());
                     Serial2.flush();
                     vTaskDelay(100);
                     digitalWrite(HC12_SET_PIN, HIGH);
@@ -152,7 +152,7 @@ void WirelessSensor::receive() {
  * check if data is not expired
  */
 bool WirelessSensor::dataRelevance(uint8_t wsensNum) {
-    return (now() - state.wsensor.time[wsensNum]) < (config.wsensor_expire(wsensNum) * 60);
+    return (now() - state.wsensor.time[wsensNum]) < (config.wsensor.expire(wsensNum) * 60);
 }
 
 /*
@@ -166,62 +166,62 @@ time_t WirelessSensor::get_updated(unsigned int num) {
 
 float WirelessSensor::get_temperature(unsigned int num, unsigned int sensor) {
     if(num >= WSENSORS or sensor > 4) return 40400.0;
-    return state.wsensor.temp.data[sensor][num] + config.wsensor_temp_corr(num, sensor);
+    return state.wsensor.temp.data[sensor][num] + config.wsensor.tempCorr(num, sensor);
 }
 
 float WirelessSensor::get_humidity(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return state.wsensor.hum.data[num] + config.wsensor_hum_corr(num);
+    return state.wsensor.hum.data[num] + config.wsensor.humCorr(num);
 }
 
 float WirelessSensor::get_pressure(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return state.wsensor.pres.data[num] + config.wsensor_pres_corr(num);
+    return state.wsensor.pres.data[num] + config.wsensor.presCorr(num);
 }
 
 float WirelessSensor::get_windSpeed(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.wind.speed.data[num] + config.wsensor_wind_speed_corr(num);
+    return state.wsensor.wind.speed.data[num] + config.wsensor.windSpeedCorr(num);
 }
 
 int WirelessSensor::get_windDir(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return state.wsensor.wind.dir.data[num] + config.wsensor_wind_dir_corr(num); 
+    return state.wsensor.wind.dir.data[num] + config.wsensor.windDirCorr(num); 
 }
 
 float WirelessSensor::get_light(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.light.data[num] + config.wsensor_light_corr(num);
+    return state.wsensor.light.data[num] + config.wsensor.lightCorr(num);
 }
 
 float WirelessSensor::get_voltage(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.voltage.data[num] + config.wsensor_volt_corr(num);
+    return state.wsensor.voltage.data[num] + config.wsensor.voltCorr(num);
 }
 
 float WirelessSensor::get_current(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.current.data[num] + config.wsensor_curr_corr(num);
+    return state.wsensor.current.data[num] + config.wsensor.currCorr(num);
 }
 
 float WirelessSensor::get_power(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.power.data[num] + config.wsensor_pow_corr(num);
+    return state.wsensor.power.data[num] + config.wsensor.powCorr(num);
 }
 
 float WirelessSensor::get_energy(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.energy.data[num] + config.wsensor_enrg_corr(num);
+    return state.wsensor.energy.data[num] + config.wsensor.enrgCorr(num);
 }
 
 float WirelessSensor::get_frequency(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.freq.data[num] + config.wsensor_freq_corr(num);
+    return state.wsensor.freq.data[num] + config.wsensor.freqCorr(num);
 }
 
 float WirelessSensor::get_co2(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
-    return state.wsensor.co2.data[num] + config.wsensor_co2_corr(num);
+    return state.wsensor.co2.data[num] + config.wsensor.co2Corr(num);
 }
 
 int WirelessSensor::get_batteryAdc(unsigned int num) {

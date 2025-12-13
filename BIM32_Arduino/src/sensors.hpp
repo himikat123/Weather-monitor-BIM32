@@ -162,78 +162,78 @@ void Sensors::read(void) {
  * Getters
  */
 float Sensors::get_esp32_temp() {
-    return state.esp32core.temp + config.esp32_temp_corr();
+    return state.esp32core.temp + config.sensors.esp32.tempCorr();
 }
 
 float Sensors::get_bme280_temp() {
-    return state.bme280.temp + config.bme280_temp_corr();
+    return state.bme280.temp + config.sensors.bme280.tempCorr();
 }
 
 float Sensors::get_bme280_hum() {
-    return state.bme280.hum + config.bme280_hum_corr();
+    return state.bme280.hum + config.sensors.bme280.humCorr();
 }
 
 float Sensors::get_bme280_pres() {
     float pres = state.bme280.pres;
-    return (config.units_pres() ? pres : mmHg(pres)) + config.bme280_pres_corr();
+    return (config.units_pres() ? pres : mmHg(pres)) + config.sensors.bme280.presCorr();
 }
 
 float Sensors::get_bmp180_temp() {
-    return state.bmp180.temp + config.bmp180_temp_corr();
+    return state.bmp180.temp + config.sensors.bmp180.tempCorr();
 }
 
 float Sensors::get_bmp180_pres() {
     float pres = state.bmp180.pres;
-    return (config.units_pres() ? pres : mmHg(pres)) + config.bmp180_pres_corr();
+    return (config.units_pres() ? pres : mmHg(pres)) + config.sensors.bmp180.presCorr();
 }
 
 float Sensors::get_sht21_temp() {
-    return state.sht21.temp + config.sht21_temp_corr();
+    return state.sht21.temp + config.sensors.sht21.tempCorr();
 }
 
 float Sensors::get_sht21_hum() {
-    return state.sht21.hum + config.sht21_hum_corr();
+    return state.sht21.hum + config.sensors.sht21.humCorr();
 }
 
 float Sensors::get_dht22_temp() {
-    return state.dht22.temp + config.dht22_temp_corr();
+    return state.dht22.temp + config.sensors.dht22.tempCorr();
 }
 
 float Sensors::get_dht22_hum() {
-    return state.dht22.hum + config.dht22_hum_corr();
+    return state.dht22.hum + config.sensors.dht22.humCorr();
 }
 
 float Sensors::get_ds18b20_temp() {
-    return state.ds18b20.temp + config.ds18b20_temp_corr();
+    return state.ds18b20.temp + config.sensors.ds18b20.tempCorr();
 }
 
 float Sensors::get_max44009_light() {
-    return state.max44009.light + config.max44009_light_corr();
+    return state.max44009.light + config.sensors.max44009.lightCorr();
 }
 
 float Sensors::get_bh1750_light() {
-    return state.bh1750.light + config.bh1750_light_corr();
+    return state.bh1750.light + config.sensors.bh1750.lightCorr();
 }
 
 float Sensors::get_analog_voltage() {
-    return state.analog.volt + config.analog_voltage_corr();
+    return state.analog.volt + config.sensors.analog.voltageCorr();
 }
 
 float Sensors::get_bme680_temp() {
-    return state.bme680.temp + config.bme680_temp_corr();
+    return state.bme680.temp + config.sensors.bme680.tempCorr();
 }
 
 float Sensors::get_bme680_hum() {
-    return state.bme680.hum + config.bme680_hum_corr();
+    return state.bme680.hum + config.sensors.bme680.humCorr();
 }
 
 float Sensors::get_bme680_pres() {
     float pres = state.bme680.pres;
-    return (config.units_pres() ? pres : mmHg(pres)) + config.bme680_pres_corr();
+    return (config.units_pres() ? pres : mmHg(pres)) + config.sensors.bme680.presCorr();
 }
 
 float Sensors::get_bme680_iaq() {
-    return state.bme680.iaq + config.bme680_iaq_corr();
+    return state.bme680.iaq + config.sensors.bme680.iaqCorr();
 }
 
 unsigned int Sensors::get_bme680_iaq_accuracy() {
