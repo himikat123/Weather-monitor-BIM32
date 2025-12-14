@@ -110,8 +110,8 @@ void TaskSensors(void *pvParameters) {
             /**
              * Receive data from thingspeak
              */
-            if(config.thingspeakReceive_period() > 0) {
-                if((millis() - thingspeakReceive) > (config.thingspeakReceive_period() * 60000) or thingspeakReceive == 0) {
+            if(config.cloud.thingspeakReceive.period() > 0) {
+                if((millis() - thingspeakReceive) > (config.cloud.thingspeakReceive.period() * 60000) or thingspeakReceive == 0) {
                     thingspeakReceive = millis();
                     Serial.println(SEPARATOR);
                     Serial.println("Receive data from thingspeak.com... ");
@@ -126,8 +126,8 @@ void TaskSensors(void *pvParameters) {
             /**
              * Send data to thingspeak
              */
-            if(config.thingspeakSend_period() > 0) {
-                if((millis() - thingspeakSend) > (config.thingspeakSend_period() * 60000) or thingspeakSend == 0) {
+            if(config.cloud.thingspeakSend.period() > 0) {
+                if((millis() - thingspeakSend) > (config.cloud.thingspeakSend.period() * 60000) or thingspeakSend == 0) {
                     thingspeakSend = millis();
                     Serial.println(SEPARATOR);
                     Serial.println("Send data to thingspeak.com... ");
@@ -142,8 +142,8 @@ void TaskSensors(void *pvParameters) {
             /**
              * Send data to narodmon
              */
-            if(config.narodmonSend_period() > 0) {
-                if((millis() - narodmonSend) > (config.narodmonSend_period() * 60000) or narodmonSend == 0) {
+            if(config.cloud.narodmonSend.period() > 0) {
+                if((millis() - narodmonSend) > (config.cloud.narodmonSend.period() * 60000) or narodmonSend == 0) {
                     narodmonSend = millis();
                     Serial.println(SEPARATOR);
                     Serial.println("Send data to narodmon.ru... ");
@@ -158,9 +158,9 @@ void TaskSensors(void *pvParameters) {
             /**
              * Send data via MQTT
              */
-            if(config.mqttSend_period() > 0 and network.isConnected()) {
+            if(config.cloud.mqttSend.period() > 0 and network.isConnected()) {
                 if(mqtt.loop()) {
-                    if((millis() - mqttSend) > (config.mqttSend_period() * 1000) or mqttSend == 0) {
+                    if((millis() - mqttSend) > (config.cloud.mqttSend.period() * 1000) or mqttSend == 0) {
                         mqttSend = millis();
                         Serial.println(SEPARATOR);
                         Serial.println("Send data via MQTT...");
@@ -190,8 +190,8 @@ void TaskSensors(void *pvParameters) {
             /**
              * Update history repository
              */
-            if(config.history_period() > 0) {
-                if(now() - historyUpdate > config.history_period() * 60) {
+            if(config.cloud.history.period() > 0) {
+                if(now() - historyUpdate > config.cloud.history.period() * 60) {
                     historyUpdate = now();
                     Serial.println(SEPARATOR);
                     Serial.println("Send data to weather history repository... ");

@@ -20,16 +20,16 @@ class Thingspeak {
  * Receive data from thingspeak
  */
 void Thingspeak::receive() {
-    if(config.thingspeakReceive_channelID() == "") {
+    if(config.cloud.thingspeakReceive.channelID() == "") {
         Serial.println("No Channel ID");
         return;
     }
-    if(config.thingspeakReceive_rdkey() == "") {
+    if(config.cloud.thingspeakReceive.rdkey() == "") {
         Serial.println("No Read API Key");
         return;
     }
-    String url = "http://api.thingspeak.com/channels/" + config.thingspeakReceive_channelID();
-    url += "/feeds.json?api_key=" + config.thingspeakReceive_rdkey() + "&results=1";
+    String url = "http://api.thingspeak.com/channels/" + String(config.cloud.thingspeakReceive.channelID());
+    url += "/feeds.json?api_key=" + String(config.cloud.thingspeakReceive.rdkey()) + "&results=1";
     String httpData = "";
     HTTPClient client;
     //Serial.println(url);
@@ -76,12 +76,12 @@ void Thingspeak::receive() {
  * Send data to thingspeak
  */
 void Thingspeak::send() {
-    if(config.thingspeakSend_wrkey() == "") {
+    if(config.cloud.thingspeakSend.wrkey() == "") {
         Serial.println("No Write API Key");
         return;
     }
 
-    String url = "http://api.thingspeak.com/update?api_key=" + config.thingspeakSend_wrkey();
+    String url = "http://api.thingspeak.com/update?api_key=" + String(config.cloud.thingspeakSend.wrkey());
     for(unsigned int i=0; i<8; i++) {
         url += _fieldPrepare(i);
     }
@@ -105,12 +105,12 @@ void Thingspeak::send() {
  * Send data to weather history repository
  */
 void Thingspeak::sendHistory() {
-    if(config.history_wrkey() == "") {
+    if(config.cloud.history.wrkey() == "") {
         Serial.println("No Write API Key");
         return;
     }
 
-    String url = "http://api.thingspeak.com/update?api_key=" + config.history_wrkey();
+    String url = "http://api.thingspeak.com/update?api_key=" + String(config.cloud.history.wrkey());
     for(unsigned int i=0; i<7; i++) {
         url += _historyFieldPrepare(i);
     }
@@ -134,16 +134,16 @@ void Thingspeak::sendHistory() {
  * Receive data from weather history repository
  */
 void Thingspeak::receiveHistory() {
-    if(config.history_channelID() == "") {
+    if(config.cloud.history.channelID() == "") {
         Serial.println("No Channel ID");
         return;
     }
-    if(config.history_rdkey() == "") {
+    if(config.cloud.history.rdkey() == "") {
         Serial.println("No Read API Key");
         return;
     }
-    String url = "http://api.thingspeak.com/channels/" + config.history_channelID();
-    url += "/feeds.json?api_key=" + config.history_rdkey() + "&results=24";
+    String url = "http://api.thingspeak.com/channels/" + String(config.cloud.history.channelID());
+    url += "/feeds.json?api_key=" + String(config.cloud.history.rdkey()) + "&results=24";
     String httpData = "";
     HTTPClient client;
     //Serial.println(url);
@@ -192,7 +192,7 @@ void Thingspeak::receiveHistory() {
  * check if data is not expired
  */
 bool Thingspeak::dataRelevance() {
-    return (now() - state.thing.time) < (config.thingspeakReceive_expire() * 60);
+    return (now() - state.thing.time) < (config.cloud.thingspeakReceive.expire() * 60);
 }
 
 /**
@@ -241,10 +241,10 @@ time_t Thingspeak::get_historyUpdated(unsigned int slot) {
  */
 String Thingspeak::_fieldPrepare(unsigned int fieldNum) {
     float data = agregateSendData.sendingData(
-        config.thingspeakSend_fields(fieldNum),
-        config.thingspeakSend_types(fieldNum),
-        config.thingspeakSend_wsensors(fieldNum),
-        config.thingspeakSend_wtypes(fieldNum)
+        config.cloud.thingspeakSend.fields(fieldNum),
+        config.cloud.thingspeakSend.types(fieldNum),
+        config.cloud.thingspeakSend.wsensors(fieldNum),
+        config.cloud.thingspeakSend.wtypes(fieldNum)
     );
 
     if(data != -40400.0) {
@@ -263,22 +263,22 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
     String fields = "";
     String field = "&field" + String(fieldNum + 1) + "=";
 
-    if(config.history_fields(fieldNum) == 1 and (fieldNum == 0 or fieldNum == 3)) { // Weather Temperature
+    if(config.cloud.history.fields(fieldNum) == 1 and (fieldNum == 0 or fieldNum == 3)) { // Weather Temperature
         if(validate.temp(weather.get_currentTemp()))
             fields = field + String(weather.get_currentTemp());
     }
-    if(config.history_fields(fieldNum) == 1 and (fieldNum == 1 or fieldNum == 4)) { // Weather Humidity
+    if(config.cloud.history.fields(fieldNum) == 1 and (fieldNum == 1 or fieldNum == 4)) { // Weather Humidity
         if(validate.hum(weather.get_currentHum()))
             fields = field + String(weather.get_currentHum());
     }
-    if(config.history_fields(fieldNum) == 1 and fieldNum == 2) {                    // Weather Pressure
+    if(config.cloud.history.fields(fieldNum) == 1 and fieldNum == 2) {                    // Weather Pressure
         if(validate.pres(weather.get_currentPres())) 
             fields = field + String(weather.get_currentPres());
     }
                                                                                     // Wireless sensor
-    if((config.history_fields(fieldNum) == 2 and fieldNum <= 4) or (config.history_fields(fieldNum) == 1 and fieldNum == 6)) {
-        unsigned int wsensNum = config.history_wSensors(fieldNum);
-        unsigned int wsensType = config.history_wTypes(fieldNum);
+    if((config.cloud.history.fields(fieldNum) == 2 and fieldNum <= 4) or (config.cloud.history.fields(fieldNum) == 1 and fieldNum == 6)) {
+        unsigned int wsensNum = config.cloud.history.wsensors(fieldNum);
+        unsigned int wsensType = config.cloud.history.wtypes(fieldNum);
         if(wsensor.dataRelevance(wsensNum)) {
             float temp = wsensor.get_temperature(wsensNum, wsensType);
             float hum = wsensor.get_humidity(wsensNum);
@@ -291,71 +291,77 @@ String Thingspeak::_historyFieldPrepare(unsigned int fieldNum) {
         }
     }
 
-    if(config.history_fields(fieldNum) == 3) {                                      // Thingspeak
-        float value = get_field(config.history_tFields(fieldNum));
+    if(config.cloud.history.fields(fieldNum) == 3) {                                      // Thingspeak
+        float value = get_field(config.cloud.history.types(fieldNum));
         if(value >= -50.0 and value <= 1200.0) fields = field + String(value);
     }
-    
-    if(config.history_fields(fieldNum) == 4 and (fieldNum == 0 or fieldNum == 3)) { // BME280 Temperature
+
+    if(config.cloud.history.fields(fieldNum) == 4 and (fieldNum == 0 or fieldNum == 3)) { // BME280 Temperature
         if(validate.temp(sensors.get_bme280_temp())) 
             fields = field + String(sensors.get_bme280_temp());
     }
-    if(config.history_fields(fieldNum) == 4 and (fieldNum == 1 or fieldNum == 4)) { // BME280 Humidity 
+
+    if(config.cloud.history.fields(fieldNum) == 4 and (fieldNum == 1 or fieldNum == 4)) { // BME280 Humidity 
         if(validate.hum(sensors.get_bme280_hum()))
             fields = field + String(sensors.get_bme280_hum());
     }
-    if(config.history_fields(fieldNum) == 4 and fieldNum == 2) {                    // BME280 Pressure
+
+    if(config.cloud.history.fields(fieldNum) == 4 and fieldNum == 2) {                    // BME280 Pressure
         if(validate.pres(sensors.get_bme280_pres()))
             fields = field + String(sensors.get_bme280_pres());
     }
 
-    if(config.history_fields(fieldNum) == 5 and (fieldNum == 0 or fieldNum == 3)) { // BMP180 Temperature
+    if(config.cloud.history.fields(fieldNum) == 5 and (fieldNum == 0 or fieldNum == 3)) { // BMP180 Temperature
         if(validate.temp(sensors.get_bmp180_temp())) 
             fields = field + String(sensors.get_bmp180_temp());
     }
-    if(config.history_fields(fieldNum) == 5 and fieldNum == 2) {                    // BMP180 Pressure
+
+    if(config.cloud.history.fields(fieldNum) == 5 and fieldNum == 2) {                    // BMP180 Pressure
         if(validate.pres(sensors.get_bmp180_pres())) 
             fields = field + String(sensors.get_bmp180_pres());
     }
 
-    if(config.history_fields(fieldNum) == 5 and (fieldNum == 1 or fieldNum == 4)) { // SHT21 Humidity
+    if(config.cloud.history.fields(fieldNum) == 5 and (fieldNum == 1 or fieldNum == 4)) { // SHT21 Humidity
         if(validate.hum(sensors.get_sht21_hum()))
             fields = field + String(sensors.get_sht21_hum());
     }
 
-    if(config.history_fields(fieldNum) == 6 and (fieldNum == 0 or fieldNum == 3)) { // SHT21 Temperature
+    if(config.cloud.history.fields(fieldNum) == 6 and (fieldNum == 0 or fieldNum == 3)) { // SHT21 Temperature
         if(validate.temp(sensors.get_sht21_temp())) 
             fields = field + String(sensors.get_sht21_temp());
     }
 
-    if(config.history_fields(fieldNum) == 6 and (fieldNum == 1 or fieldNum == 4)) { // DHT22 Humidity
+    if(config.cloud.history.fields(fieldNum) == 6 and (fieldNum == 1 or fieldNum == 4)) { // DHT22 Humidity
         if(validate.hum(sensors.get_dht22_hum())) 
             fields = field + String(sensors.get_dht22_hum());
     }
 
-    if(config.history_fields(fieldNum) == 7 and (fieldNum == 0 or fieldNum == 3)) { // DHT22 Temperature
+    if(config.cloud.history.fields(fieldNum) == 7 and (fieldNum == 0 or fieldNum == 3)) { // DHT22 Temperature
         if(validate.temp(sensors.get_dht22_temp())) 
             fields = field + String(sensors.get_dht22_temp());
     }
   
-    if(config.history_fields(fieldNum) == 8 and (fieldNum == 0 or fieldNum == 3)) { // DS18B20 Temperature
+    if(config.cloud.history.fields(fieldNum) == 8 and (fieldNum == 0 or fieldNum == 3)) { // DS18B20 Temperature
         if(validate.temp(sensors.get_ds18b20_temp()))
             fields = field + String(sensors.get_ds18b20_temp());
     }
 
-    if(config.history_fields(fieldNum) == 9 and (fieldNum == 0 or fieldNum == 3)) { // BME680 Temperature
+    if(config.cloud.history.fields(fieldNum) == 9 and (fieldNum == 0 or fieldNum == 3)) { // BME680 Temperature
         if(validate.temp(sensors.get_bme680_temp())) 
             fields = field + String(sensors.get_bme680_temp());
     }
-    if(config.history_fields(fieldNum) == 7 and (fieldNum == 1 or fieldNum == 4)) { // BME680 Humidity 
+
+    if(config.cloud.history.fields(fieldNum) == 7 and (fieldNum == 1 or fieldNum == 4)) { // BME680 Humidity 
         if(validate.hum(sensors.get_bme680_hum()))
             fields = field + String(sensors.get_bme680_hum());
     }
-    if(config.history_fields(fieldNum) == 6 and fieldNum == 2) {                    // BME680 Pressure
+
+    if(config.cloud.history.fields(fieldNum) == 6 and fieldNum == 2) {                    // BME680 Pressure
         if(validate.pres(sensors.get_bme680_pres()))
             fields = field + String(sensors.get_bme680_pres());
     }
-    if(config.history_fields(fieldNum) == 1 and fieldNum == 5) {                    // BME680 IAQ
+
+    if(config.cloud.history.fields(fieldNum) == 1 and fieldNum == 5) {                    // BME680 IAQ
         if(validate.iaq(sensors.get_bme680_iaq())) 
             fields = field + String(sensors.get_bme680_iaq());
     }

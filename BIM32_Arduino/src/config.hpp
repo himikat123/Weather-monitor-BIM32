@@ -67,55 +67,6 @@ class Config {
     char _lang[3] = "en";
     uint8_t _units_pres = 0;
 
-    // Weather history repository
-    unsigned int _history_period = 0; // Period data update (minutes) 0...999
-    char _history_channelID[11] = ""; // Weather repository channel ID
-    char _history_wrkey[17] = ""; // Weather repository Write API Key
-    char _history_rdkey[17] = ""; // Weather repository Read API Key
-    unsigned int _history_fields[7] = {0,0,0,0,0,0,0}; // Weather repository fields data sources 
-    unsigned int _history_wSensors[7] = {0,0,0,0,0,0,0}; // Weather repository wireless sensor numbers
-    unsigned int _history_wTypes[7] = {0,0,0,0,0,0,0}; // Weather repository wireless sensor temperature sensor numbers
-    unsigned int _history_tFields[7] = {0,0,0,0,0,0,0}; // Weather repository thingspeak field numbers
-
-    // Thingspeak send
-    unsigned int _thingspeakSend_period = 0; // Period for sending data to Thingspeak (minutes) 0...999
-    char _thingspeakSend_channelID[11] = ""; // Channel ID for sending data to Thingspeak
-    char _thingspeakSend_wrkey[17] = ""; // Write API Key for sending data to Thingspeak
-    char _thingspeakSend_rdkey[17] = ""; // Read API Key for sending data to Thingspeak
-    unsigned int _thingspeakSend_fields[THNG_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Data sources to send to Thingspeak fields
-    unsigned int _thingspeakSend_types[THNG_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send to Thingspeak
-    unsigned int _thingspeakSend_wsensors[THNG_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send to Thingspeak
-    unsigned int _thingspeakSend_wtypes[THNG_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Thingspeak
-
-    // Thingspeak receive
-    unsigned int _thingspeakReceive_period = 0; // Period for receiving data from Thingspeak (minutes) 0...999
-    char _thingspeakReceive_channelID[11] = ""; // Channel ID for receiving data from Thingspeak
-    char _thingspeakReceive_rdkey[17] = ""; // Read API Key for receiving data from Thingspeak
-    unsigned int _thingspeakReceive_expire = 10; // Thingspeak data expire (minutes) 1...100
-
-    // Narodmon send
-    unsigned int _narodmonSend_period = 0; // Period for sending data to Narodmon (minutes) 0...999
-    char _narodmonSend_lon[11] = ""; // Longitude for Narodmon
-    char _narodmonSend_lat[11] = ""; // Latitude for Narodmon
-    char _narodmonSend_name[17] = "BIM"; // Sensor name
-    unsigned int _narodmonSend_sensors[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Data sources to send to Narodmon fields
-    char _narodmonSend_metrics[NAROD_FIELDS][17] {"", "", "", "", "", "", "", "", "", "", "", ""}; // Sensor metrics to send to Narodmon fields
-    unsigned int _narodmonSend_types[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send to Narodmon
-    unsigned int _narodmonSend_wsensors[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send to Narodmon
-    unsigned int _narodmonSend_wtypes[NAROD_FIELDS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send to Narodmon
-
-    // MQTT send
-    unsigned int _mqttSend_period = 0; // Period for sending data via MQTT (seconds) 0...999
-    char _mqttSend_broker[33] = ""; // MQTT broker address
-    unsigned int _mqttSend_port = 1883; // MQTT port
-    char _mqttSend_user[33] = ""; // MQTT username
-    char _mqttSend_pass[33] = ""; // MQTT password
-    unsigned int _mqttSend_sensors[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Data sources to send via MQTT
-    unsigned int _mqttSend_types[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wired sensor data types to send via MQTT
-    unsigned int _mqttSend_wsensors[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor numbers to send via MQTT
-    unsigned int _mqttSend_wtypes[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Wireless sensor data types to send via MQTT
-    char _mqttSend_topics[12][17] = {"", "", "", "", "", "", "", "", "", "", "", ""}; // Topic names for sending via MQTT
-
     // Alarm
     unsigned int _alarm_time[ALARMS][2] = { // Alarm time [hour, minute]
         {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}
@@ -140,10 +91,10 @@ class Config {
 
     // Division of time into hours and minutes
     static unsigned int _get_time(bool level, const char* time) {
-        if (!time || time[2] != ':') return 0;
+        if(!time || time[2] != ':') return 0;
         unsigned int hour = (time[0] - '0') * 10 + (time[1] - '0');
         unsigned int minute = (time[3] - '0') * 10 + (time[4] - '0');
-        if(hour > 23)   hour = 0;
+        if(hour > 23) hour = 0;
         if(minute > 59) minute = 0;
 
         return level ? minute : hour;
@@ -588,6 +539,99 @@ class Config {
             const unsigned int expire(unsigned int num) const { if(num >= WSENSORS) return 0; if(_expire[num] < 1 or _expire[num] > 100) return 10; return _expire[num]; }
     }; Wsensor wsensor;
 
+    struct Cloud {
+        struct ThingBase {
+            private:
+            unsigned int _period = 0; // Period data update (minutes) 0...999
+            char _channelID[11] = ""; // channel ID
+            char _rdkey[17] = ""; // Read API Key
+            friend class Config;
+
+            public:
+            const unsigned int period() const { return _period; }
+            const char* channelID() const { return _channelID; }
+            const char* rdkey() const { return _rdkey; }
+        };
+
+        struct ThinspeakReceive : public ThingBase {
+            private: unsigned int _expire = 10; friend class Config; // Thingspeak data expire (minutes) 1...100
+            public: const unsigned int expire() const { return _expire; }
+        };
+
+        struct ThingspeakSend : public ThingBase {
+            private:
+            char _wrkey[17] = ""; // Write API Key
+            unsigned int _fields[THNG_FIELDS] = { 0 }; // Data sources
+            unsigned int _types[THNG_FIELDS] = { 0 };
+            unsigned int _wsensors[THNG_FIELDS] = { 0 }; // Wireless sensor numbers
+            unsigned int _wtypes[THNG_FIELDS] = { 0 }; // Wireless sensor data types
+            friend class Config;
+
+            public:
+            const char* wrkey() const { return _wrkey; }
+            const unsigned int fields(unsigned int num) const { return (num >= THNG_FIELDS) ? 0 : _fields[num]; }
+            const unsigned int types(unsigned int num) const { return (num >= THNG_FIELDS) ? 0 : _types[num]; }
+            const unsigned int wsensors(unsigned int num) const { return (num >= THNG_FIELDS or _wsensors[num] >= WSENSORS) ? 0 : _wsensors[num]; }
+            const unsigned int wtypes(unsigned int num) const { return (num >= THNG_FIELDS) ? 0 : _wtypes[num]; }
+        };
+
+        struct NarodmonMqttBase {
+            private:
+            unsigned int _period = 0; // Period for data sending (minutes) 0...999
+            unsigned int _sensors[NAROD_FIELDS] = { 0 }; // Data sources to send
+            unsigned int _types[NAROD_FIELDS] = { 0 }; // Wired sensor data types to send
+            unsigned int _wsensors[NAROD_FIELDS] = { 0 }; // Wireless sensor numbers
+            unsigned int _wtypes[NAROD_FIELDS] = { 0 }; // Wireless sensor data types
+            friend class Config;
+
+            public:
+            const unsigned int period() const { return (_period > 999) ? 5 : _period; }
+            const unsigned int sensors(unsigned int num) const { return (num >= NAROD_FIELDS) ? 0 : _sensors[num]; }
+            const unsigned int types(unsigned int num) const { return (num >= NAROD_FIELDS) ? 0 : _types[num]; }
+            const unsigned int wsensors(unsigned int num) const { return (num >= NAROD_FIELDS or _wsensors[num] >= WSENSORS) ? 0 : _wsensors[num]; }
+            const unsigned int wtypes(unsigned int num) const { return (num >= NAROD_FIELDS) ? 0 : _wtypes[num]; }
+        };
+
+        struct NarodmonSend : public NarodmonMqttBase {
+            private:
+            char _lon[11] = ""; // Longitude for Narodmon
+            char _lat[11] = ""; // Latitude for Narodmon
+            char _name[17] = "BIM"; // Sensor name
+            char _metrics[NAROD_FIELDS][17] { 0 }; // Sensor metrics to send to Narodmon fields
+            friend class Config;
+
+            public:
+            const char* lon() const { return _lon; }
+            const char* lat() const { return _lat; }
+            const char* name() const { return _name; }
+            const char* metrics(unsigned int num) const { return (num >= NAROD_FIELDS) ? (char*) "" : _metrics[num]; }
+        };
+
+        struct MQTTSend : public NarodmonMqttBase{
+            private:
+            char _broker[33] = ""; // MQTT broker address
+            unsigned int _port = 1883; // MQTT port
+            char _user[33] = ""; // MQTT username
+            char _pass[33] = ""; // MQTT password
+            char _topics[12][17] = { 0 }; // Topics for sending via MQTT
+            friend class Config;
+
+            public:
+            const char* broker() const { return _broker; }
+            const unsigned int port() const { return (_port > 65535) ? 1883 : _port; }
+            const char* user() const { return _user; }
+            const char* pass() const { return _pass; }
+            const char* topics(unsigned int num) const { return (num >= MQTT_TOPICS) ? (char*) "" : _topics[num]; }
+        };
+
+        public:
+        ThinspeakReceive thingspeakReceive;
+        ThingspeakSend thingspeakSend;
+        ThingspeakSend history;
+        NarodmonSend narodmonSend;
+        MQTTSend mqttSend;
+    }; Cloud cloud;
+
     struct Account {
         private:
             char _name[32] = ""; // Web interface username
@@ -787,60 +831,60 @@ class Config {
                     COPYNUM(conf["wsensor"]["channel"], wsensor._channel);
 
                     // Weather history repository
-                    COPYNUM(conf["history"]["period"], _history_period);
-                    COPYSTR(conf["history"]["channelID"], _history_channelID);
-                    COPYSTR(conf["history"]["wrkey"], _history_wrkey);
-                    COPYSTR(conf["history"]["rdkey"], _history_rdkey);
+                    COPYNUM(conf["history"]["period"], cloud.history._period);
+                    COPYSTR(conf["history"]["channelID"], cloud.history._channelID);
+                    COPYSTR(conf["history"]["wrkey"], cloud.history._wrkey);
+                    COPYSTR(conf["history"]["rdkey"], cloud.history._rdkey);
                     for(unsigned int i=0; i<7; i++) {
-                        COPYNUM(conf["history"]["fields"][i], _history_fields[i]);
-                        COPYNUM(conf["history"]["wSensors"][i], _history_wSensors[i]);
-                        COPYNUM(conf["history"]["wTypes"][i], _history_wTypes[i]);
-                        COPYNUM(conf["history"]["tFields"][i], _history_tFields[i]);
+                        COPYNUM(conf["history"]["fields"][i], cloud.history._fields[i]);
+                        COPYNUM(conf["history"]["wSensors"][i], cloud.history._wsensors[i]);
+                        COPYNUM(conf["history"]["wTypes"][i], cloud.history._wtypes[i]);
+                        COPYNUM(conf["history"]["tFields"][i], cloud.history._types[i]);
                     }
 
                     // Thingspeak send
-                    COPYNUM(conf["thingspeakSend"]["period"], _thingspeakSend_period);
-                    COPYSTR(conf["thingspeakSend"]["channelID"], _thingspeakSend_channelID);
-                    COPYSTR(conf["thingspeakSend"]["wrkey"], _thingspeakSend_wrkey);
-                    COPYSTR(conf["thingspeakSend"]["rdkey"], _thingspeakSend_rdkey);
+                    COPYNUM(conf["thingspeakSend"]["period"], cloud.thingspeakSend._period);
+                    COPYSTR(conf["thingspeakSend"]["channelID"], cloud.thingspeakSend._channelID);
+                    COPYSTR(conf["thingspeakSend"]["wrkey"], cloud.thingspeakSend._wrkey);
+                    COPYSTR(conf["thingspeakSend"]["rdkey"], cloud.thingspeakSend._rdkey);
                     for(unsigned int i=0; i<THNG_FIELDS; i++) {
-                        COPYNUM(conf["thingspeakSend"]["fields"][i], _thingspeakSend_fields[i]);
-                        COPYNUM(conf["thingspeakSend"]["types"][i], _thingspeakSend_types[i]);
-                        COPYNUM(conf["thingspeakSend"]["wsensors"][i], _thingspeakSend_wsensors[i]);
-                        COPYNUM(conf["thingspeakSend"]["wtypes"][i], _thingspeakSend_wtypes[i]);
+                        COPYNUM(conf["thingspeakSend"]["fields"][i], cloud.thingspeakSend._fields[i]);
+                        COPYNUM(conf["thingspeakSend"]["types"][i], cloud.thingspeakSend._types[i]);
+                        COPYNUM(conf["thingspeakSend"]["wsensors"][i], cloud.thingspeakSend._wsensors[i]);
+                        COPYNUM(conf["thingspeakSend"]["wtypes"][i], cloud.thingspeakSend._wtypes[i]);
                     }
 
                     // Thingspeak receive
-                    COPYNUM(conf["thingspeakReceive"]["period"], _thingspeakReceive_period);
-                    COPYSTR(conf["thingspeakReceive"]["channelID"], _thingspeakReceive_channelID);
-                    COPYSTR(conf["thingspeakReceive"]["rdkey"], _thingspeakReceive_rdkey);
-                    COPYNUM(conf["thingspeakReceive"]["expire"], _thingspeakReceive_expire);
+                    COPYNUM(conf["thingspeakReceive"]["period"], cloud.thingspeakReceive._period);
+                    COPYSTR(conf["thingspeakReceive"]["channelID"], cloud.thingspeakReceive._channelID);
+                    COPYSTR(conf["thingspeakReceive"]["rdkey"], cloud.thingspeakReceive._rdkey);
+                    COPYNUM(conf["thingspeakReceive"]["expire"], cloud.thingspeakReceive._expire);
 
                     // Narodmon send
-                    COPYNUM(conf["narodmonSend"]["period"], _narodmonSend_period);
-                    COPYSTR(conf["narodmonSend"]["lon"], _narodmonSend_lon);
-                    COPYSTR(conf["narodmonSend"]["lat"], _narodmonSend_lat);
-                    COPYSTR(conf["narodmonSend"]["name"], _narodmonSend_name);
+                    COPYNUM(conf["narodmonSend"]["period"], cloud.narodmonSend._period);
+                    COPYSTR(conf["narodmonSend"]["lon"], cloud.narodmonSend._lon);
+                    COPYSTR(conf["narodmonSend"]["lat"], cloud.narodmonSend._lat);
+                    COPYSTR(conf["narodmonSend"]["name"], cloud.narodmonSend._name);
                     for(unsigned int i=0; i<NAROD_FIELDS; i++) {
-                        COPYNUM(conf["narodmonSend"]["sensors"][i], _narodmonSend_sensors[i]);
-                        COPYSTR(conf["narodmonSend"]["metrics"][i], _narodmonSend_metrics[i]);
-                        COPYNUM(conf["narodmonSend"]["types"][i], _narodmonSend_types[i]);
-                        COPYNUM(conf["narodmonSend"]["wsensors"][i], _narodmonSend_wsensors[i]);
-                        COPYNUM(conf["narodmonSend"]["wtypes"][i], _narodmonSend_wtypes[i]);
+                        COPYNUM(conf["narodmonSend"]["sensors"][i], cloud.narodmonSend._sensors[i]);
+                        COPYSTR(conf["narodmonSend"]["metrics"][i], cloud.narodmonSend._metrics[i]);
+                        COPYNUM(conf["narodmonSend"]["types"][i], cloud.narodmonSend._types[i]);
+                        COPYNUM(conf["narodmonSend"]["wsensors"][i], cloud.narodmonSend._wsensors[i]);
+                        COPYNUM(conf["narodmonSend"]["wtypes"][i], cloud.narodmonSend._wtypes[i]);
                     }
 
                     // MQTT send
-                    COPYNUM(conf["mqttSend"]["period"], _mqttSend_period);
-                    COPYSTR(conf["mqttSend"]["broker"], _mqttSend_broker);
-                    COPYNUM(conf["mqttSend"]["port"], _mqttSend_port);
-                    COPYSTR(conf["mqttSend"]["user"], _mqttSend_user);
-                    COPYSTR(conf["mqttSend"]["pass"], _mqttSend_pass);
+                    COPYNUM(conf["mqttSend"]["period"], cloud.mqttSend._period);
+                    COPYSTR(conf["mqttSend"]["broker"], cloud.mqttSend._broker);
+                    COPYNUM(conf["mqttSend"]["port"], cloud.mqttSend._port);
+                    COPYSTR(conf["mqttSend"]["user"], cloud.mqttSend._user);
+                    COPYSTR(conf["mqttSend"]["pass"], cloud.mqttSend._pass);
                     for(unsigned int i=0; i<MQTT_TOPICS; i++) {
-                        COPYNUM(conf["mqttSend"]["sensors"][i], _mqttSend_sensors[i]);
-                        COPYNUM(conf["mqttSend"]["types"][i], _mqttSend_types[i]);
-                        COPYNUM(conf["mqttSend"]["wsensors"][i], _mqttSend_wsensors[i]);
-                        COPYNUM(conf["mqttSend"]["wtypes"][i], _mqttSend_wtypes[i]);
-                        COPYSTR(conf["mqttSend"]["topics"][i], _mqttSend_topics[i]);
+                        COPYNUM(conf["mqttSend"]["sensors"][i], cloud.mqttSend._sensors[i]);
+                        COPYNUM(conf["mqttSend"]["types"][i], cloud.mqttSend._types[i]);
+                        COPYNUM(conf["mqttSend"]["wsensors"][i], cloud.mqttSend._wsensors[i]);
+                        COPYNUM(conf["mqttSend"]["wtypes"][i], cloud.mqttSend._wtypes[i]);
+                        COPYSTR(conf["mqttSend"]["topics"][i], cloud.mqttSend._topics[i]);
                     }
 
                     // Comfort
@@ -956,197 +1000,6 @@ class Config {
 
     uint8_t units_pres() {
         return _units_pres ? 1 : 0;
-    }
-
-    unsigned int history_period() {
-        return _history_period;
-    }
-  
-    String history_channelID() {
-        return _history_channelID;
-    }
-  
-    String history_wrkey() {
-        return _history_wrkey;
-    }
-  
-    String history_rdkey() {
-        return _history_rdkey;
-    }
-  
-    unsigned int history_fields(unsigned int sensType) {
-        if(sensType >= 7) return 0;
-        return _history_fields[sensType];
-    }
-  
-    unsigned int history_wSensors(unsigned int sensType) {
-        if(sensType >= 7) return 0;
-        return _history_wSensors[sensType];
-    }
-  
-    unsigned int history_wTypes(unsigned int sensType) {
-        if(sensType >= 7) return 0;
-        return _history_wTypes[sensType];
-    }
-  
-    unsigned int history_tFields(unsigned int sensType) {
-        if(sensType >= 7) return 0;
-        return _history_tFields[sensType];
-    }
-
-    unsigned int thingspeakSend_period() {
-        if(_thingspeakSend_period > 999) return 5;
-        return _thingspeakSend_period;
-    }
-
-    String thingspeakSend_channelID() {
-        return String(_thingspeakSend_channelID);
-    }
-
-    String thingspeakSend_wrkey() {
-        return String(_thingspeakSend_wrkey);
-    }
-
-    String thingspeakSend_rdkey() {
-        return String(_thingspeakSend_rdkey);
-    }
-
-    unsigned int thingspeakSend_fields(unsigned int num) {
-        if(num >= THNG_FIELDS) return 0;
-        if(_thingspeakSend_fields[num] > 12) return 0;
-        return _thingspeakSend_fields[num];
-    }
-
-    unsigned int thingspeakSend_types(unsigned int num) {
-        if(num >= THNG_FIELDS) return 0;
-        if(_thingspeakSend_types[num] > 5) return 0;
-        return _thingspeakSend_types[num];
-    }
-
-    unsigned int thingspeakSend_wsensors(unsigned int num) {
-        if(num >= THNG_FIELDS) return 0;
-        if(_thingspeakSend_wsensors[num] >= WSENSORS) return 0;
-        return _thingspeakSend_wsensors[num];
-    }
-
-    unsigned int thingspeakSend_wtypes(unsigned int num) {
-        if(num >= THNG_FIELDS) return 0;
-        if(_thingspeakSend_wtypes[num] > 18) return 0;
-        return _thingspeakSend_wtypes[num];
-    }
-
-    unsigned int thingspeakReceive_period() {
-        if(_thingspeakReceive_period > 999) return 5;
-        return _thingspeakReceive_period;
-    }
-
-    String thingspeakReceive_channelID() {
-        return String(_thingspeakReceive_channelID);
-    }
-
-    String thingspeakReceive_rdkey() {
-        return String(_thingspeakReceive_rdkey);
-    }
-
-    unsigned int thingspeakReceive_expire() {
-        return _thingspeakReceive_expire;
-    }
-
-    unsigned int narodmonSend_period() {
-        if(_narodmonSend_period > 999) return 5;
-        return _narodmonSend_period;
-    }
-
-    String narodmonSend_lon() {
-        return String(_narodmonSend_lon);
-    }
-
-    String narodmonSend_lat() {
-        return String(_narodmonSend_lat);
-    }
-
-    String narodmonSend_name() {
-        return String(_narodmonSend_name);
-    }
-
-    unsigned int narodmonSend_sensors(unsigned int num) {
-        if(num >= NAROD_FIELDS) return 0;
-        if(_narodmonSend_sensors[num] > 13) return 0;
-        return _narodmonSend_sensors[num];
-    }
-
-    String narodmonSend_metrics(unsigned int num) {
-        if(num >= NAROD_FIELDS) return "";
-        return String(_narodmonSend_metrics[num]);
-    }
-
-    unsigned int narodmonSend_types(unsigned int num) {
-        if(num >= NAROD_FIELDS) return 0;
-        if(_narodmonSend_types[num] > 13) return 0;
-        return _narodmonSend_types[num];
-    }
-
-    unsigned int narodmonSend_wsensors(unsigned int num) {
-        if(num >= NAROD_FIELDS) return 0;
-        if(_narodmonSend_wsensors[num] >= WSENSORS) return 0;
-        return _narodmonSend_wsensors[num];
-    }
-
-    unsigned int narodmonSend_wtypes(unsigned int num) {
-        if(num >= NAROD_FIELDS) return 0;
-        if(_narodmonSend_wtypes[num] > 18) return 0;
-        return _narodmonSend_wtypes[num];
-    }
-
-    unsigned int mqttSend_period() {
-        if(_mqttSend_period > 999) return 60;
-        return _mqttSend_period;
-    }
-
-    char* mqttSend_broker() {
-        return _mqttSend_broker;
-    }
-
-    unsigned int mqttSend_port() {
-        if(_mqttSend_port > 65535) return 1883;
-        return _mqttSend_port;
-    }
-
-    char* mqttSend_user() {
-        return _mqttSend_user;
-    }
-
-    char* mqttSend_pass() {
-        return _mqttSend_pass;
-    };
-
-    unsigned int mqttSend_sensors(unsigned int num) {
-        if(num >= MQTT_TOPICS) return 0;
-        if(_mqttSend_sensors[num] > 13) return 0;
-        return _mqttSend_sensors[num];
-    }
-
-    unsigned int mqttSend_types(unsigned int num) {
-        if(num >= MQTT_TOPICS) return 0;
-        if(_mqttSend_types[num] > 13) return 0;
-        return _mqttSend_types[num];
-    }
-
-    unsigned int mqttSend_wsensors(unsigned int num) {
-        if(num >= MQTT_TOPICS) return 0;
-        if(_mqttSend_wsensors[num] >= WSENSORS) return 0;
-        return _mqttSend_wsensors[num];
-    }
-
-    unsigned int mqttSend_wtypes(unsigned int num) {
-        if(num >= MQTT_TOPICS) return 0;
-        if(_mqttSend_wtypes[num] > 18) return 0;
-        return _mqttSend_wtypes[num];
-    }
-
-    char* mqttSend_topics(unsigned int num) {
-        if(num >= MQTT_TOPICS) return (char*) "";
-        return _mqttSend_topics[num];
     }
 
     unsigned int alarm_time(unsigned int alarm_num, unsigned int level) {

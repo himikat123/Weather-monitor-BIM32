@@ -15,7 +15,7 @@ class MQTT {
  * Initialize MQTT client
  */
 void MQTT::init() {
-    mqttClient.setServer(config.mqttSend_broker(), config.mqttSend_port());
+    mqttClient.setServer(config.cloud.mqttSend.broker(), config.cloud.mqttSend.port());
 }
 
 /**
@@ -37,8 +37,8 @@ void MQTT::_reconnect() {
     Serial.print("Attempting MQTT connection...");
     if(mqttClient.connect(
         ("BIM32_" + WiFi.macAddress()).c_str(), 
-        config.mqttSend_user(), 
-        config.mqttSend_pass())
+        config.cloud.mqttSend.user(), 
+        config.cloud.mqttSend.pass())
     ) Serial.println("connected");
     else {
         Serial.print("failed, rc="); 
@@ -63,16 +63,16 @@ void MQTT::send() {
  */
 bool MQTT::_sendSensorData(unsigned int sensNum) {
     float data = agregateSendData.sendingData(
-        config.mqttSend_sensors(sensNum),
-        config.mqttSend_types(sensNum),
-        config.mqttSend_wsensors(sensNum),
-        config.mqttSend_wtypes(sensNum)
+        config.cloud.mqttSend.sensors(sensNum),
+        config.cloud.mqttSend.types(sensNum),
+        config.cloud.mqttSend.wsensors(sensNum),
+        config.cloud.mqttSend.wtypes(sensNum)
     );
 
     if(data != -40400.0) {
         char cData[12] = "";
         snprintf(cData, 12, "%.2f", data);
-        return mqttClient.publish(config.mqttSend_topics(sensNum), cData);
+        return mqttClient.publish(config.cloud.mqttSend.topics(sensNum), cData);
     }
     return false;
 }
