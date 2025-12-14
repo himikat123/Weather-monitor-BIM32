@@ -1,10 +1,10 @@
-#define ALARMS                 12 // Number of alarms
-
-#define SEPARATOR "**********************************************************************"
-
 #define FW "v6.0a"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
+#define ALARMS                 12 // Number of alarms
+
+#define SEPARATOR "**********************************************************************"
+#define UNDEFINED_FLOAT  -40400.0
 #define UNDEFINED            0
 #define COMFORTABLE          1
 #define HOT                  2

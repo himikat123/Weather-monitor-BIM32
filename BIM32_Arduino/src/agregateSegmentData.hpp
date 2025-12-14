@@ -7,21 +7,35 @@
 #define IAQ 6
 
 class AgregateSegmentData {
+    private:
+        static constexpr int CLOCK_SOURCE   = 0;
+        static constexpr int DATE_SOURCE    = 1;
+        static constexpr int BME280_SOURCE  = 2;
+        static constexpr int BMP180_SOURCE  = 3;
+        static constexpr int SHT21_SOURCE   = 4;
+        static constexpr int DHT22_SOURCE   = 5;
+        static constexpr int DS18B20_SOURCE = 6;
+        static constexpr int ESP32_SOURCE   = 7;
+        static constexpr int THING_SOURCE   = 8;
+        static constexpr int WEATHER_SOURCE = 9;
+        static constexpr int WSENSOR_SOURCE = 10;
+        static constexpr int BME680_SOURCE  = 11;
+
     public:
         float slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType);
 };
 
 float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType) {
-    float data = -40400.0;
+    float data = UNDEFINED_FLOAT;
 
     switch(sensor) {
-        case 0: { // Clock
+        case CLOCK_SOURCE: { // Clock
             *dType = CLOCK;
         }; break;
-        case 1: { // Date
+        case DATE_SOURCE: { // Date
             *dType = DATE;
         }; break;
-        case 2: { // BME280
+        case BME280_SOURCE: { // BME280
             if(type == 0) {
                 data = sensors.get_bme280_temp();
                 *dType = TEMP;
@@ -35,7 +49,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
                 *dType = PRES;
             }
         }; break;
-        case 3: {// BMP180
+        case BMP180_SOURCE: {// BMP180
             if(type == 0) {
                 data = sensors.get_bmp180_temp();
                 *dType = TEMP;
@@ -45,7 +59,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
                 *dType = PRES;
             }
         }; break;
-        case 4: {// SHT21
+        case SHT21_SOURCE: {// SHT21
             if(type == 0) {
                 data = sensors.get_sht21_temp();
                 *dType = TEMP;
@@ -55,7 +69,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
                 *dType = HUM;
             }
         }; break;
-        case 5: { // DHT22
+        case DHT22_SOURCE: { // DHT22
             if(type == 0) {
                 data = sensors.get_dht22_temp();
                 *dType = TEMP;
@@ -65,15 +79,15 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
                 *dType = HUM;
             }
         }; break;
-        case 6: { // DS18B20
+        case DS18B20_SOURCE: { // DS18B20
             data = sensors.get_ds18b20_temp();
             *dType = TEMP;
         }; break;
-        case 7: { // ESP32
+        case ESP32_SOURCE: { // ESP32
             data = sensors.get_esp32_temp();
             *dType = TEMP;
         }; break;
-        case 8: { // Thingspeak
+        case THING_SOURCE: { // Thingspeak
             data = thingspeak.dataRelevance()
                 ? thingspeak.get_field(config.display.timeSlot.thing(timeSlot, dispNum))
                 : 40400.0;
@@ -81,7 +95,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
             if(type == 1) *dType = HUM;
             if(type == 2) *dType = PRES;
         }; break;
-        case 9: { // Weather
+        case WEATHER_SOURCE: { // Weather
             bool dataRelevant = (now() - weather.get_currentUpdated() < 1200);
             if(type == 0) {
                 data = dataRelevant ? weather.get_currentTemp() : 40400.0;
@@ -96,7 +110,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
                 *dType = PRES;
             }
         }; break;
-        case 10: { // Wireless sensor
+        case WSENSOR_SOURCE: { // Wireless sensor
             unsigned int wsensNum = config.display.timeSlot.wsensor.num(timeSlot, dispNum);
             unsigned int wsensType = config.display.timeSlot.wsensor.type(timeSlot, dispNum);
             if(wsensType <= 4) {
@@ -124,7 +138,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
                 *dType = CO2;
             }
         }; break;
-        case 11: { // BME680
+        case BME680_SOURCE: { // BME680
             if(type == 0) {
                 data = sensors.get_bme680_temp();
                 *dType = TEMP;
