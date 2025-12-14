@@ -1009,34 +1009,26 @@ class Config {
     }
 
     void saveAlarmFile() {
-        String json = "{\"alarm\":{\"time\":[";
+        JsonDocument doc;
+        JsonObject alarmObj = doc["alarm"].to<JsonObject>();
+        JsonArray timeArr = alarmObj["time"].to<JsonArray>();
         for(uint8_t i=0; i<ALARMS; i++) {
-            json += "[" + String(alarm._time[i][0]) + "," + String(alarm._time[i][1]) + "]";
-            if(i < ALARMS - 1) json += ",";
+            JsonArray t = timeArr.add<JsonArray>();
+            t.add(alarm._time[i][0]);
+            t.add(alarm._time[i][1]);
         }
-        json += "],\"weekdays\":[";
+        JsonArray weekdaysArr = alarmObj["weekdays"].to<JsonArray>();
         for(uint8_t i=0; i<ALARMS; i++) {
-            json += "[";
-            for(uint8_t n=0; n<7; n++) {
-                json += String(alarm._weekdays[i][n]);
-                if(n < 6) json += ",";
-            }
-            json += "]";
-            if(i < ALARMS - 1) json += ","; 
+            JsonArray w = weekdaysArr.add<JsonArray>();
+            for(uint8_t n=0; n<7; n++) w.add(alarm._weekdays[i][n]);
         }
-        json += "],\"states\":[";
-        for(uint8_t i=0; i<ALARMS; i++) {
-            json += String(alarm._states[i]);
-            if(i < ALARMS - 1) json += ",";
-        }
-        json += "],\"melodies\":[";
-        for(uint8_t i=0; i<ALARMS; i++) {
-            json += String(alarm._melodies[i]);
-            if(i < ALARMS - 1) json += ",";
-        }
-        json += "]}}";
+        JsonArray statesArr = alarmObj["states"].to<JsonArray>();
+        for(uint8_t i=0; i<ALARMS; i++) statesArr.add(alarm._states[i]);
+        JsonArray melodiesArr = alarmObj["melodies"].to<JsonArray>();
+        for(uint8_t i=0; i<ALARMS; i++) melodiesArr.add(alarm._melodies[i]);
         File file = LittleFS.open("/alarm.json", "w");
-        if(file) file.print(json);
+        if(!file) return;
+        serializeJson(doc, file);
         file.close();
     }
 };
