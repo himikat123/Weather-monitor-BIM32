@@ -176,11 +176,11 @@ void LcdDisplay::_getData() {
 
     crc.reset();
     for(uint8_t i=0; i<12; i++) {
-        crc.update(config.alarm_time(i, 0));
-        crc.update(config.alarm_time(i, 1));
-        crc.update(config.alarm_state(i));
+        crc.update(config.alarm.time(i, 0));
+        crc.update(config.alarm.time(i, 1));
+        crc.update(config.alarm.state(i));
         for(uint8_t w=0; w<7; w++) {
-            crc.update(config.alarm_weekday(i, w));
+            crc.update(config.alarm.weekday(i, w));
         }
     }
     _alarmChecksum = crc.finalize();

@@ -161,9 +161,9 @@ void Sound::_playHourlySignal() {
 void Sound::alarm() {
     if(_mp3_found) {
         for(int i=0; i<ALARMS; i++) {
-            if(config.alarm_state(i) and config.alarm_weekday(i, weekday() == 1 ? 6 : weekday() - 2)) {
-                if(config.alarm_time(i, 0) == hour() and config.alarm_time(i, 1) == minute() and _alarm_rang != minute()) { 
-                    play(2, config.alarm_melodie(i));
+            if(config.alarm.state(i) and config.alarm.weekday(i, weekday() == 1 ? 6 : weekday() - 2)) {
+                if(config.alarm.time(i, 0) == hour() and config.alarm.time(i, 1) == minute() and _alarm_rang != minute()) { 
+                    play(2, config.alarm.melodie(i));
                     _alarm_rang = minute();
                 }
             }

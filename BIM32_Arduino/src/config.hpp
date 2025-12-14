@@ -67,28 +67,6 @@ class Config {
     char _lang[3] = "en";
     uint8_t _units_pres = 0;
 
-    // Alarm
-    unsigned int _alarm_time[ALARMS][2] = { // Alarm time [hour, minute]
-        {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}
-    };
-    unsigned int _alarm_weekdays[ALARMS][7] = { // Alarm days of the week [mo, tu, we, th, fr, sa, su]
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0},
-        {0, 0, 0, 0, 0, 0, 0}
-    };
-    unsigned int _alarm_states[ALARMS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // Alarm state (0-Off, 1-On)
-    unsigned int _alarm_melodies[ALARMS] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}; // Alarm selected melody (1...20)
-
-
     // Division of time into hours and minutes
     static unsigned int _get_time(bool level, const char* time) {
         if(!time || time[2] != ':') return 0;
@@ -632,6 +610,26 @@ class Config {
         MQTTSend mqttSend;
     }; Cloud cloud;
 
+    struct Alarm {
+        private:
+        unsigned int _time[ALARMS][2] = { // Alarm time [hour, minute]
+            {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}, {7, 0}
+        };
+        unsigned int _weekdays[ALARMS][7] = { 0 }; // Alarm days of the week [mo, tu, we, th, fr, sa, su]
+        unsigned int _states[ALARMS] = { 0 }; // Alarm state (0-Off, 1-On)
+        unsigned int _melodies[ALARMS] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }; // Alarm selected melody (1...20)
+        friend class Config;
+
+        public:
+        const unsigned int time(unsigned int num, unsigned int level) const {return (num > ALARMS or level > 1) ? 7 : _time[num][level]; }  
+        const unsigned int weekday(unsigned int num, unsigned int day) const { return (num > ALARMS or day > 6) ? 0 : _weekdays[num][day]; }
+        const unsigned int state(unsigned int num) const { return (num > ALARMS) ? 0 : _states[num]; }
+        const unsigned int melodie(unsigned int num) const { return (num > ALARMS) ? 0 : _melodies[num]; }
+        void setState(uint8_t num, uint8_t state) { if(num > ALARMS) return; _states[num] = state ? 1 : 0; }
+        void setTime(uint8_t num, uint8_t level, uint8_t val) { if(num > ALARMS or level > 1 or val > (level == 0 ? 23 : 59)) return; _time[num][level] = val; }
+        void setWeekday(uint8_t num, uint8_t day, uint8_t val) { if(num > ALARMS or day > 6) return; _weekdays[num][day] = val ? 1 : 0; };
+    }; Alarm alarm;
+
     struct Account {
         private:
             char _name[32] = ""; // Web interface username
@@ -934,10 +932,10 @@ class Config {
                 if(!error) {
                     // Alarm
                     for(unsigned int i=0; i<ALARMS; i++) {
-                        COPYNUM(alarms["alarm"]["states"][i], _alarm_states[i]);
-                        COPYNUM(alarms["alarm"]["melodies"][i], _alarm_melodies[i]);
-                        for(unsigned int k=0; k<2; k++) COPYNUM(alarms["alarm"]["time"][i][k], _alarm_time[i][k]);
-                        for(unsigned int k=0; k<7; k++) COPYNUM(alarms["alarm"]["weekdays"][i][k], _alarm_weekdays[i][k]);
+                        COPYNUM(alarms["alarm"]["states"][i], alarm._states[i]);
+                        COPYNUM(alarms["alarm"]["melodies"][i], alarm._melodies[i]);
+                        for(unsigned int k=0; k<2; k++) COPYNUM(alarms["alarm"]["time"][i][k], alarm._time[i][k]);
+                        for(unsigned int k=0; k<7; k++) COPYNUM(alarms["alarm"]["weekdays"][i][k], alarm._weekdays[i][k]);
                     }
 
                     Serial.println("done");
@@ -1002,27 +1000,6 @@ class Config {
         return _units_pres ? 1 : 0;
     }
 
-    unsigned int alarm_time(unsigned int alarm_num, unsigned int level) {
-        if(alarm_num > ALARMS or level > 1) return 7;
-        return _alarm_time[alarm_num][level];
-    }
-  
-    unsigned int alarm_weekday(unsigned int alarm_num, unsigned int week_day) {
-        if(alarm_num > ALARMS or week_day > 6) return 0;
-        return _alarm_weekdays[alarm_num][week_day];
-    };
-  
-    unsigned int alarm_state(unsigned int alarm_num) {
-        if(alarm_num > ALARMS) return 0;
-        return _alarm_states[alarm_num];
-    }
-  
-    unsigned int alarm_melodie(unsigned int alarm_num) {
-        if(alarm_num > ALARMS) return 0;
-        return _alarm_melodies[alarm_num];
-    }
-  
-
     /* 
      * Setters
      */
@@ -1031,32 +1008,17 @@ class Config {
         lng.toCharArray(_lang, 3);
     }
 
-    void set_alarm_state(uint8_t alarm_num, uint8_t state) {
-        if(alarm_num > ALARMS) return;
-        _alarm_states[alarm_num] = state ? 1 : 0;
-    }
-
-    void set_alarm_time(uint8_t alarm_num, uint8_t level, uint8_t val) {
-        if(alarm_num > ALARMS || level > 1 || val > (level == 0 ? 23 : 59)) return;
-        _alarm_time[alarm_num][level] = val;
-    }
-  
-    void set_alarm_weekday(uint8_t alarm_num, uint8_t week_day, uint8_t val) {
-        if(alarm_num > ALARMS or week_day > 6) return;
-        _alarm_weekdays[alarm_num][week_day] = val ? 1 : 0;
-    };
-
-    void save_alarm_file() {
+    void saveAlarmFile() {
         String json = "{\"alarm\":{\"time\":[";
         for(uint8_t i=0; i<ALARMS; i++) {
-            json += "[" + String(_alarm_time[i][0]) + "," + String(_alarm_time[i][1]) + "]";
+            json += "[" + String(alarm._time[i][0]) + "," + String(alarm._time[i][1]) + "]";
             if(i < ALARMS - 1) json += ",";
         }
         json += "],\"weekdays\":[";
         for(uint8_t i=0; i<ALARMS; i++) {
             json += "[";
             for(uint8_t n=0; n<7; n++) {
-                json += String(_alarm_weekdays[i][n]);
+                json += String(alarm._weekdays[i][n]);
                 if(n < 6) json += ",";
             }
             json += "]";
@@ -1064,12 +1026,12 @@ class Config {
         }
         json += "],\"states\":[";
         for(uint8_t i=0; i<ALARMS; i++) {
-            json += String(_alarm_states[i]);
+            json += String(alarm._states[i]);
             if(i < ALARMS - 1) json += ",";
         }
         json += "],\"melodies\":[";
         for(uint8_t i=0; i<ALARMS; i++) {
-            json += String(_alarm_melodies[i]);
+            json += String(alarm._melodies[i]);
             if(i < ALARMS - 1) json += ",";
         }
         json += "]}}";

@@ -758,17 +758,17 @@ void Nextion::_alarms() {
         char buf[3];
         Serial1.print("Alarm.alarms.txt=\"");
         for(uint8_t i=0; i<12; i++) {
-            sprintf(buf, "%02d", config.alarm_time(i, 0));
+            sprintf(buf, "%02d", config.alarm.time(i, 0));
             for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j] = buf[j];
-            sprintf(buf, "%02d", config.alarm_time(i, 1));
+            sprintf(buf, "%02d", config.alarm.time(i, 1));
             for(uint8_t j=0; j<2; j++) alarmData[i * 4 + j + 2] = buf[j];
             for(uint8_t w=0; w<7; w++) {
-                sprintf(buf, "%d", config.alarm_weekday(i, w));
+                sprintf(buf, "%d", config.alarm.weekday(i, w));
                 alarmData[i * 7 + w + 48] = buf[0];
             }
-            sprintf(buf, "%d", config.alarm_state(i));
+            sprintf(buf, "%d", config.alarm.state(i));
             alarmData[i + 132] = buf[0];
-            alarmOn |= config.alarm_state(i);
+            alarmOn |= config.alarm.state(i);
         }
         for(uint8_t k=0; k<144; k++) Serial1.print(alarmData[k]);
         Serial1.print("\"");
@@ -821,14 +821,14 @@ void Nextion::dataReceive() {
                     for(uint8_t i=0; i<ALARMS; i++) {
                         for(uint8_t n=0; n<10; n++) {
                             uint8_t val = root["alarms"][i][n].as<int>();
-                            if(n == 0) config.set_alarm_state(i, val);
-                            if(n == 1) config.set_alarm_time(i, 0, val);
-                            if(n == 2) config.set_alarm_time(i, 1, val);
-                            if(n >= 3) config.set_alarm_weekday(i, n - 3, val);
+                            if(n == 0) config.alarm.setState(i, val);
+                            if(n == 1) config.alarm.setTime(i, 0, val);
+                            if(n == 2) config.alarm.setTime(i, 1, val);
+                            if(n >= 3) config.alarm.setWeekday(i, n - 3, val);
                         }
                     }
                     _forced = true;
-                    config.save_alarm_file();
+                    config.saveAlarmFile();
                 }
             }
             _receivedData = "";
