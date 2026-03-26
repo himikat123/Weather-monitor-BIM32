@@ -130,7 +130,7 @@ void Sensors::init(void) {
     _PCF8574Init();
     _DS3231Init();
     Serial.println(SEPARATOR);
-    Serial.println("Sensor initialization");
+    Serial.println("Sensors initialization");
     Serial.printf("%s %s%s\r\n", "DS18B20:  ", _ds18b20_det ? "" : "NOT ", "Detected");
     Serial.printf("%s %s%s\r\n", "BME280:   ", _bme280_det ? "" : "NOT ", "Detected");
     Serial.printf("%s %s%s\r\n", "BMP180:   ", _bmp180_det ? "" : "NOT ", "Detected");

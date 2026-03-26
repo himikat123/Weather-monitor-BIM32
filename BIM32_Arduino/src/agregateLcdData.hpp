@@ -113,7 +113,6 @@ class AgregateLcdData {
         int batteryLevel();
         String comfort();
         uint8_t windDirection(int deg);
-        String localDate();
 
     private:
         void _tempSequence(float* tempSequence);
@@ -123,6 +122,7 @@ class AgregateLcdData {
         String _iaq();
         String _absoluteHum(float temp, float hum);
         String _dewPoint(float temp, float hum);
+        String _localDate();
 };
 
 float AgregateLcdData::tempIn(float* tempSequence) {
@@ -332,7 +332,7 @@ String AgregateLcdData::voltage() {
     switch(config.display.source.volt.sens()) {
         case WSENSOR_VOLT: value = _voltageWsensor(); break; /* from wireless sensor */
         case THING_VOLT: value = _voltageThingspeak(); break; /* from thingspeak */
-        case DATE: value = localDate(); break; /* date */
+        case DATE: value = _localDate(); break; /* date */
         case BME680_IAQ: value = _iaq(); break; // iaq from BME680
         case BME680_ABS_HUM: value = _absoluteHum(sensors.get_bme680_temp(), sensors.get_bme680_hum()); break; // absolute humidity from BME680
         case BME680_DEW_POINT: value = _dewPoint(sensors.get_bme680_temp(), sensors.get_bme680_hum()); break; // dew point from BME680
@@ -487,11 +487,11 @@ String AgregateLcdData::_dewPoint(float temp, float hum) {
     else return "--";
 }
 
-String AgregateLcdData::localDate() {
+String AgregateLcdData::_localDate() {
     char buf[20];
-    if(config.lang() == "en") sprintf(buf, "%s %02d, %d", lang.monthShortName(month()), day(), year()); 
-    else if(config.lang() == "de") sprintf(buf, "%02d. %s %d", day(), lang.monthShortName(month()), year());
-    else sprintf(buf, "%02d %s %d", day(), lang.monthShortName(month()), year());
+    if(config.lang() == "en") sprintf(buf, "%s %02d", lang.monthShortName(month()), day()); 
+    else if(config.lang() == "de") sprintf(buf, "%02d. %s", day(), lang.monthShortName(month()));
+    else sprintf(buf, "%02d %s", day(), lang.monthShortName(month()));
 
     return String(buf);
 }

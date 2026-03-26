@@ -417,7 +417,7 @@ void Nextion::_showHumOut() {
  */
 void Nextion::_showPres() {
     if(_prevPresOut != _presOut or _forced) {
-        int presInt = round(_presOut);
+        int presInt = round(config.units_pres() ? _presOut : sensors.mmHg(_presOut));
         String buf = validate.pres(_presOut) ? String(presInt) : "--";
         buf += config.units_pres() ? lang.hpa() : lang.mm();
         nex.writeStr("Main.presOutside.txt", buf);
