@@ -112,7 +112,7 @@ WebSocket websocket(88, 1);
 
 #include "taskDisplay.hpp"
 #include "taskSensors.hpp"
-#include "taskserver.hpp"
+#include "taskServer.hpp"
 
 /**
  * Arduino setup

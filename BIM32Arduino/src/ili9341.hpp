@@ -26,8 +26,8 @@ class ILI9341 : LcdDisplay {
     #define TEXT_COLOR        0xFFFF // white
     #define TEMPERATURE_COLOR 0xFFE0 // yellow
     #define TEMP_MIN_COLOR    0xFBA0 // orange
-    #define HUMIDITY_COLOR    0x07FF // cyan
-    #define PRESSURE_COLOR    0xF81F // magenta
+    #define HUMIDITY_COLOR    0x759F // cyan
+    #define PRESSURE_COLOR    0xFC1F // magenta
     #define CLOCK_COLOR       0x07E0 // green
     #define BATTERY_COLOR     0x07E0 // green
     #define BATTERY_LOW_COLOR 0xF800 // red
@@ -51,9 +51,9 @@ class ILI9341 : LcdDisplay {
     #define PAGE_HISTORY_IN   7
     #define PAGE_ALARM        8
 
-    #define HOURLY      0
-    #define HISTORY_OUT 1
-    #define HISTORY_IN  2
+    #define HOURLY            0
+    #define HISTORY_OUT       1
+    #define HISTORY_IN        2
 
     public:
         void init();
