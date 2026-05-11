@@ -1,3 +1,6 @@
+#pragma once
+#include "agregateSendData.hpp"
+
 class Thingspeak {
     public:
         void receive();
@@ -378,3 +381,5 @@ boolean Thingspeak::_is_summertime(void) {
     if((month() == 3 && (hour() + 24 * day()) >= (1 + 24 * (31 - (5 * year() / 4 + 4) % 7))) || (month() == 10 && (hour() + 24 * day()) < (1 + 24 * (31 - (5 * year() / 4 + 1) % 7)))) return true;
     else return false;
 }
+
+extern Thingspeak thingspeak;

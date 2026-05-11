@@ -1,3 +1,5 @@
+#pragma once
+
 #if !defined(BIM32_CYD)
     uint8_t dummy = 1;
     /* 

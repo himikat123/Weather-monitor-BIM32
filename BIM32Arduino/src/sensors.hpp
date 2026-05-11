@@ -13,6 +13,7 @@
 #include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
 #include "DS3232.h" // v0.4.1 https://github.com/RobTillaart/DS3232
 
+#include "pinout.hpp"
 #include "state.hpp"
 extern State state;
 
@@ -662,3 +663,5 @@ float Sensors::dewPoint(float temp, float hum) {
 float Sensors::mmHg(float pres) {
     return pres * 0.75;
 }
+
+extern Sensors sensors;

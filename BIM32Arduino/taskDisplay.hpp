@@ -1,3 +1,6 @@
+#pragma once
+#include "src/nextion/nextion.hpp"
+
 #define HOUR      0
 #define MINUTE    1
 #define DISPLAY_1 0
@@ -21,7 +24,9 @@ void TaskDisplay1(void *pvParameters) {
                 config.display.model(DISPLAY_1) == D_NX4832T035 or
                 config.display.model(DISPLAY_1) == D_NX4827K043
             ) nextion.init();
-            if(config.display.model(DISPLAY_1) == D_ILI9341) ili9341.showHomeScreen();
+            if(config.display.model(DISPLAY_1) == D_ILI9341) {
+                ili9341.showHomeScreen();
+            }
         }
 
         /* Initialize WS2812b display 1 */

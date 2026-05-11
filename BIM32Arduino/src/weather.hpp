@@ -1,3 +1,5 @@
+#pragma once
+
 #include <JSON_Decoder.h> // https://github.com/Bodmer/JSON_Decoder
 #include <OpenWeather.h> // v0.3.0 https://github.com/Bodmer/OpenWeather/tree/main?tab=readme-ov-file
 
@@ -623,3 +625,5 @@ float Weather::get_hourlyPrec(unsigned int num) {
     if(num >= DAYS * 8) return -1.0;
     return state.weather.hourly.prec[num];
 }
+
+extern Weather weather;

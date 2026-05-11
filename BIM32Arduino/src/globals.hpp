@@ -1,3 +1,6 @@
+#pragma once
+#include <Arduino.h> 
+
 #define FW "v6.0a"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
@@ -5,6 +8,7 @@
 
 #define SEPARATOR "**********************************************************************"
 #define UNDEFINED_FLOAT  -40400.0
+
 #define UNDEFINED            0
 #define COMFORTABLE          1
 #define HOT                  2
@@ -27,12 +31,15 @@
 #define AIR_CLEAN            1
 #define AIR_POLLUTED         2
 #define AIR_HEAVILY_POLLUTED 3
+
 #define HC12                 0
 #define DFPlayer             1
+
 #define LCD_DISPLAY          1
 #define PIXEL_LEDS_DISPLAY   2
 #define SEGMENT_DISPLAY      3
 #define NUMITRON_DISPLAY     4
+
 #define D_NX4832K035         0
 #define D_NX4832T035         1
 #define D_NX4827K043         2

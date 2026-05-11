@@ -1,7 +1,18 @@
+#pragma once
+#include <Arduino.h>
+#include <WiFi.h> 
 #include <CRC32.h>
+#include <TimeLib.h>
+#include "config.hpp"
+#include "sensors.hpp"
+#include "agregateLcdData.hpp"
+#include "weather.hpp"
+#include "thingspeak.hpp"
 
 class LcdDisplay {
     protected:
+        CRC32 _crc;
+        AgregateLcdData agregateLcdData;
         virtual void _getData();
 
         bool _power = true;
@@ -145,43 +156,43 @@ void LcdDisplay::_getData() {
         _winds[i] = weather.get_dailyWindSpeed(i);
     }
 
-    CRC32 crc;
     for(uint8_t i=0; i<40; i++) {
-        crc.update(weather.get_hourlyTemp(i));
-        crc.update(weather.get_hourlyPres(i));
-        crc.update(weather.get_hourlyIcon(i));
-        crc.update(weather.get_hourlyDate(i));
-        crc.update(weather.get_hourlyWindSpeed(i));
-        crc.update(weather.get_hourlyWindDir(i));
-        crc.update(weather.get_hourlyPrec(i));
+        _crc.update(weather.get_hourlyTemp(i));
+        _crc.update(weather.get_hourlyPres(i));
+        _crc.update(weather.get_hourlyIcon(i));
+        _crc.update(weather.get_hourlyDate(i));
+        _crc.update(weather.get_hourlyWindSpeed(i));
+        _crc.update(weather.get_hourlyWindDir(i));
+        _crc.update(weather.get_hourlyPrec(i));
     }
-    _hourlyChecksum = crc.finalize();
+    _hourlyChecksum = _crc.finalize();
+    _crc.reset();
 
-    crc.reset();
     for(uint8_t i=0; i<24; i++) {
-        crc.update(thingspeak.get_historyField(0, i));
-        crc.update(thingspeak.get_historyField(1, i));
-        crc.update(thingspeak.get_historyField(2, i));
-        crc.update(thingspeak.get_historyUpdated(i));
+        _crc.update(thingspeak.get_historyField(0, i));
+        _crc.update(thingspeak.get_historyField(1, i));
+        _crc.update(thingspeak.get_historyField(2, i));
+        _crc.update(thingspeak.get_historyUpdated(i));
     }
-    _historyOutChecksum = crc.finalize();
+    _historyOutChecksum = _crc.finalize();
+    _crc.reset();
 
-    crc.reset();
     for(uint8_t i=0; i<24; i++) {
-        crc.update(thingspeak.get_historyField(3, i));
-        crc.update(thingspeak.get_historyField(4, i));
-        crc.update(thingspeak.get_historyUpdated(i));
+        _crc.update(thingspeak.get_historyField(3, i));
+        _crc.update(thingspeak.get_historyField(4, i));
+        _crc.update(thingspeak.get_historyUpdated(i));
     }
-    _historyInChecksum = crc.finalize();
+    _historyInChecksum = _crc.finalize();
+    _crc.reset();
 
-    crc.reset();
     for(uint8_t i=0; i<12; i++) {
-        crc.update(config.alarm.time(i, 0));
-        crc.update(config.alarm.time(i, 1));
-        crc.update(config.alarm.state(i));
+        _crc.update(config.alarm.time(i, 0));
+        _crc.update(config.alarm.time(i, 1));
+        _crc.update(config.alarm.state(i));
         for(uint8_t w=0; w<7; w++) {
-            crc.update(config.alarm.weekday(i, w));
+            _crc.update(config.alarm.weekday(i, w));
         }
     }
-    _alarmChecksum = crc.finalize();
+    _alarmChecksum = _crc.finalize();
+    _crc.reset();
 }

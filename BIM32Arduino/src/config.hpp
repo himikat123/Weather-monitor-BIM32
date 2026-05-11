@@ -1,3 +1,9 @@
+#pragma once
+#include <Arduino.h> 
+#include "FS.h"
+#include <LittleFS.h>
+#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+
 class Config {
     #define NETWORKS 3
     #define PROVIDERS 2
@@ -983,3 +989,5 @@ class Config {
         file.close();
     }
 };
+
+extern Config config;

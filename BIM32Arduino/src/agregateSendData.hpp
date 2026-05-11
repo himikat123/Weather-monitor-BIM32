@@ -1,3 +1,5 @@
+#pragma once
+
 class AgregateSendData {
     private:
         static constexpr int WEATHER_SOURCE = 1;
@@ -199,3 +201,5 @@ float AgregateSendData::sendingData(uint8_t field, uint8_t type, uint8_t wsensNu
 
     return data;
 }
+
+extern AgregateSendData agregateSendData;

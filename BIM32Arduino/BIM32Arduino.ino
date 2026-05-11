@@ -25,10 +25,10 @@ WiFiClient client;
 WebServer server(80);
 #include <WebSocketsServer.h>
 #include <ESPmDNS.h>
-#include <time.h>
+#include <time.h>              // DELETE
 
 /* External Libraries */
-#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties.   // DELETE
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 #include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
 #include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
@@ -66,8 +66,8 @@ WirelessSensor wsensor;
 Weather weather;
 #include "src/sound.hpp"
 Sound sound;
-#include "src/agregateSendData.hpp"
-AgregateSendData agregateSendData;
+//#include "src/agregateSendData.hpp"
+//AgregateSendData agregateSendData;
 #include "src/thingspeak.hpp"
 Thingspeak thingspeak;
 #include "src/narodmon.hpp"
@@ -77,8 +77,8 @@ MQTT mqtt;
 #include "src/fonts.hpp"
 #include "src/agregateLcdData.hpp"
 AgregateLcdData agregateLcdData;
-#include "src/lcdDisplay.hpp"
-#include "src/nextion.hpp"
+#include "src/lcdDisplay.hpp"               // DELETE
+#include "src/nextion/nextion.hpp"
 Nextion nextion;
 #include "src/ili9341.hpp"
 ILI9341 ili9341;
@@ -133,7 +133,7 @@ void setup() {
 
     Serial.println(SEPARATOR);
     Serial.println(SEPARATOR);
-    Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2025  *\r\n", FW);
+    Serial.printf("*  Weather Monitor BIM32 %s    © himikat123@gmail.com   2020-2026  *\r\n", FW);
     Serial.println(SEPARATOR);
     Serial.println();
 
