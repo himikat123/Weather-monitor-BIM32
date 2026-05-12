@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ESP32Ping.h> // v1.6 https://github.com/marian-craciunescu/ESP32Ping
 
 class Network {

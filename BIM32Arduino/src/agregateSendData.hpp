@@ -1,5 +1,7 @@
 #pragma once
 
+#include "validate.hpp"
+
 class AgregateSendData {
     private:
         static constexpr int WEATHER_SOURCE = 1;

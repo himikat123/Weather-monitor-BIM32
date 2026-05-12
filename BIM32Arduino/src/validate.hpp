@@ -1,3 +1,5 @@
+#pragma once
+
 class Validate {
     public:
         bool temp(float t);
@@ -161,3 +163,5 @@ bool Validate::absoluteHum(float ah) {
 bool Validate::dewPoint(float dp, float temp) {
     return dp >= -60.0 && dp <= 60.0 && dp <= temp;
 }
+
+extern Validate validate;

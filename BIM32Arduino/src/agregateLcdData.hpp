@@ -1,5 +1,9 @@
 #pragma once
 
+#include "weather.hpp"
+#include "wirelessSensor.hpp"
+#include "thingspeak.hpp"
+
 class AgregateLcdData {
     public:
         static constexpr int WEATHER_TEMP_IN       = 1;

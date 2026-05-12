@@ -1,3 +1,5 @@
+#pragma once
+
 #define CLOCK 0
 #define DATE 1
 #define TEMP 2

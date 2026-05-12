@@ -1,3 +1,5 @@
+#pragma once
+
 void display1_toggle();
 void display2_toggle();
 void alarm_button();

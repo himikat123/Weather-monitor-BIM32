@@ -1,3 +1,5 @@
+#pragma once
+
 const uint8_t FRAMES[3][8] = { // number of frames in effect
     {1, 5, 5, 8, 8, 4, 4, 4},
     {1, 7, 7, 12, 12, 6, 6, 6},

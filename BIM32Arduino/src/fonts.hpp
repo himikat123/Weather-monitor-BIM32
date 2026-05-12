@@ -1,3 +1,5 @@
+#pragma once
+
 #define SYMB_DEGREE 0x0A
 #define SYMB_A      0x0B
 #define SYMB_C      0x0C
