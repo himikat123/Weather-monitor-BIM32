@@ -1,3 +1,5 @@
+#pragma once
+
 class SoftI2C {
     protected:
         uint8_t _transmitting = 0;

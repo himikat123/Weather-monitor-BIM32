@@ -1,3 +1,5 @@
+#pragma once
+
 class Comfort {
     public:
         void calculate();

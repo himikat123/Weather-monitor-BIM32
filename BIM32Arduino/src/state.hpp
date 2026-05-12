@@ -391,3 +391,5 @@ struct State {
         filesystem.toJson(root);
     }
 };
+
+extern State state;

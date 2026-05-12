@@ -1,3 +1,5 @@
+#pragma once
+
 TFT_eSPI tft = TFT_eSPI();
 #if defined(BIM32_CYD)
     SPIClass touchscreenSPI = SPIClass(VSPI);

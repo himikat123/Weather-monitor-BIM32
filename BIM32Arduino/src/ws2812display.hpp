@@ -1,3 +1,5 @@
+#pragma once
+
 #include <LiteLED.h> // v1.2.0 https://github.com/Xylopyrographer/LiteLED/tree/main
 
 LiteLED strip_1(LED_STRIP_WS2812, false, RMT_CHANNEL_2);

@@ -15,23 +15,6 @@
 
 #include "pinout.hpp"
 #include "state.hpp"
-extern State state;
-
-OneWire             oneWire(ONE_WIRE_BUS_PIN);
-DallasTemperature   term(&oneWire);
-DeviceAddress       thermometer;
-SHT21               SHT21;
-DHTesp              dht;
-MAX44009            max_light;
-BH1750              lightMeter(0x23);
-Adafruit_BMP085     bmp;
-Adafruit_BME280     bme;
-Adafruit_Sensor     *bme_temp = bme.getTemperatureSensor();
-Adafruit_Sensor     *bme_pressure = bme.getPressureSensor();
-Adafruit_Sensor     *bme_humidity = bme.getHumiditySensor();
-Adafruit_PCF8574    pcf8574;
-Bsec                iaqSensor;
-DS3231              rtc;
 
 #ifdef __cplusplus
   extern "C"{
@@ -45,7 +28,32 @@ unsigned int temprature_sens_read();
 #define DS18B20_RESOLUTION    12 /* DS18B20 resolution 9,10,11 or 12 bits */
 
 class Sensors {
+    protected:
+        OneWire             oneWire;
+        DallasTemperature   term;
+        DeviceAddress       thermometer;
+        SHT21               sht21;
+        DHTesp              dht;
+        MAX44009            max_light;
+        BH1750              lightMeter;
+        Adafruit_BMP085     bmp;
+        Adafruit_BME280     bme;
+        Adafruit_Sensor     *bme_temp;
+        Adafruit_Sensor     *bme_pressure;
+        Adafruit_Sensor     *bme_humidity;
+        Adafruit_PCF8574    pcf8574;
+        Bsec                iaqSensor;
+        DS3231              rtc;
     public:
+        Sensors() : 
+            oneWire(ONE_WIRE_BUS_PIN), 
+            term(&oneWire), 
+            lightMeter(0x23), 
+            bme_temp(bme.getTemperatureSensor()), 
+            bme_pressure(bme.getPressureSensor()), 
+            bme_humidity(bme.getHumiditySensor()) 
+        { }
+
         void init(void);
         void read(void);
         void BME680Read(void);
@@ -260,7 +268,7 @@ void Sensors::_BMP180Init(void) {
  * Initialize SHT21 sensor
  */
 void Sensors::_SHT21Init(void) {
-    SHT21.begin();
+    sht21.begin();
     Wire.beginTransmission(SHT21_ADDRESS);
     Wire.write(0xE7);
     Wire.endTransmission();
@@ -484,8 +492,8 @@ void Sensors::_BMP180Read(void) {
  */
 void Sensors::_SHT21Read(void) {
     if(_sht21_det) {
-        state.sht21.temp = SHT21.getTemperature();
-        state.sht21.hum = SHT21.getHumidity();
+        state.sht21.temp = sht21.getTemperature();
+        state.sht21.hum = sht21.getHumidity();
         state.sht21.updated = true;
     }
     else {

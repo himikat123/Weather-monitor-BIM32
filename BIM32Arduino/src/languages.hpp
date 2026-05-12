@@ -1,3 +1,5 @@
+#pragma once
+
 /* English, German, Russian, Polish, Ukrainian, Bulgarian, Spanish */
 static const char* monthFullNameTxt[12][7] PROGMEM = {
     {"January", "Januar", "Январь", "Styczeń", "Січень", "Януари", "Enero"},
@@ -237,3 +239,5 @@ class Lang {
             return calibrationDoneTxt[_lang()];
         }
 };
+
+extern Lang lang;

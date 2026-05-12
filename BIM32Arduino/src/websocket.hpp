@@ -1,3 +1,5 @@
+#pragma once
+
 class WebSocket {
     private:
         WebSocketsServer* wsServer;

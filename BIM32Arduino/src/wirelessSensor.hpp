@@ -1,3 +1,5 @@
+#pragma once
+
 class WirelessSensor {
     #define WSENSORS 2
 
@@ -247,3 +249,5 @@ float WirelessSensor::get_batteryPercentage(unsigned int num) {
 char* WirelessSensor::get_rawData() {
     return _receivedData;
 }
+
+extern WirelessSensor wsensor; 

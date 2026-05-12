@@ -1,3 +1,5 @@
+#pragma once
+
 #include "./max7219driver.hpp"
 
 #define DISP4 0

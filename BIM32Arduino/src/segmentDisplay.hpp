@@ -1,3 +1,5 @@
+#pragma once
+
 #define DOT 100
 
 class SegmentDisplay {

@@ -1,3 +1,5 @@
+#pragma once
+
 #define DISP4 0
 #define DISP6 1
 #define DISP8 2

@@ -1,3 +1,5 @@
+#pragma once
+
 //img to array https://notisrac.github.io/FileToCArray/    Treat as binary
 // array size is 1452
 static const byte symb_home[] PROGMEM = {

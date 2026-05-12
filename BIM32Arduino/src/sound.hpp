@@ -1,3 +1,5 @@
+#pragma once
+
 class Sound {
     public:
         void init(void);

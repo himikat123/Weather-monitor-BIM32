@@ -1,4 +1,5 @@
 #pragma once
+
 #include "agregateSendData.hpp"
 
 class Thingspeak {

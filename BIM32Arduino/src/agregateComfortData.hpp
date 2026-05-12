@@ -1,3 +1,5 @@
+#pragma once
+
 class AgregateComfortData {
     private:
         static constexpr int WEATHER_TEMP = 1;

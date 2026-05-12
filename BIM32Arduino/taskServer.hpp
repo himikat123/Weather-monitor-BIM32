@@ -1,3 +1,5 @@
+#pragma once
+
 template<typename T>
 void updateIfNeeded(T& sensor, JsonObject& root) {
     if(sensor.updated) {
