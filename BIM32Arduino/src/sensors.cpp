@@ -1,0 +1,557 @@
+#include "sensors.hpp"
+
+#ifdef __cplusplus
+  extern "C"{
+#endif
+  unsigned int temprature_sens_read();
+#ifdef __cplusplus
+}
+#endif
+
+/**
+ * Initialize all sensors
+ */
+void Sensors::init(void) {
+    _DS18B20Init();
+    _DHT22Init();
+    _BME280Init();
+    _BMP180Init();
+    _SHT21Init();
+    _MAX44009Init();
+    _BH1750Init();
+    _BME680Init();
+    _PCF8574Init();
+    _DS3231Init();
+    Serial.println(SEPARATOR);
+    Serial.println("Sensors initialization");
+    Serial.printf("%s %s%s\r\n", "DS18B20:  ", _ds18b20_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "BME280:   ", _bme280_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "BMP180:   ", _bmp180_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "SHT21:    ", _sht21_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "DHT22:    ", _dht22_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "MAX44009: ", _max44009_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "BH1750:   ", _bh1750_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "BME680:   ", _bme680_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "PCF8574:  ", _pcf8574_det ? "" : "NOT ", "Detected");
+    Serial.printf("%s %s%s\r\n", "DS3231:   ", _ds3231_det ? "" : "NOT ", "Detected");
+}
+
+/**
+ * Reads all sensors
+ */
+void Sensors::read(void) {
+    _BME280Read();
+    _BMP180Read();
+    _SHT21Read();
+    _DHT22Read();
+    _DS18B20Read();
+    _MAX44009Read();
+    _BH1750Read();
+    _ESP32Read();
+    _AnalogRead();
+}
+
+/**
+ * Getters
+ */
+float Sensors::get_esp32_temp() {
+    return state.esp32core.temp + config.sensors.esp32.tempCorr();
+}
+
+float Sensors::get_bme280_temp() {
+    return state.bme280.temp + config.sensors.bme280.tempCorr();
+}
+
+float Sensors::get_bme280_hum() {
+    return state.bme280.hum + config.sensors.bme280.humCorr();
+}
+
+float Sensors::get_bme280_pres() {
+    float pres = state.bme280.pres;
+    return (config.units_pres() ? pres : mmHg(pres)) + config.sensors.bme280.presCorr();
+}
+
+float Sensors::get_bmp180_temp() {
+    return state.bmp180.temp + config.sensors.bmp180.tempCorr();
+}
+
+float Sensors::get_bmp180_pres() {
+    float pres = state.bmp180.pres;
+    return (config.units_pres() ? pres : mmHg(pres)) + config.sensors.bmp180.presCorr();
+}
+
+float Sensors::get_sht21_temp() {
+    return state.sht21.temp + config.sensors.sht21.tempCorr();
+}
+
+float Sensors::get_sht21_hum() {
+    return state.sht21.hum + config.sensors.sht21.humCorr();
+}
+
+float Sensors::get_dht22_temp() {
+    return state.dht22.temp + config.sensors.dht22.tempCorr();
+}
+
+float Sensors::get_dht22_hum() {
+    return state.dht22.hum + config.sensors.dht22.humCorr();
+}
+
+float Sensors::get_ds18b20_temp() {
+    return state.ds18b20.temp + config.sensors.ds18b20.tempCorr();
+}
+
+float Sensors::get_max44009_light() {
+    return state.max44009.light + config.sensors.max44009.lightCorr();
+}
+
+float Sensors::get_bh1750_light() {
+    return state.bh1750.light + config.sensors.bh1750.lightCorr();
+}
+
+float Sensors::get_analog_voltage() {
+    return state.analog.volt + config.sensors.analog.voltageCorr();
+}
+
+float Sensors::get_bme680_temp() {
+    return state.bme680.temp + config.sensors.bme680.tempCorr();
+}
+
+float Sensors::get_bme680_hum() {
+    return state.bme680.hum + config.sensors.bme680.humCorr();
+}
+
+float Sensors::get_bme680_pres() {
+    float pres = state.bme680.pres;
+    return (config.units_pres() ? pres : mmHg(pres)) + config.sensors.bme680.presCorr();
+}
+
+float Sensors::get_bme680_iaq() {
+    return state.bme680.iaq + config.sensors.bme680.iaqCorr();
+}
+
+unsigned int Sensors::get_bme680_iaq_accuracy() {
+    return state.bme680.iaqAccr;
+}
+
+/**
+ * Initialize BME280 sensor
+ */
+void Sensors::_BME280Init(void) {
+    _bme280_det = bme.begin(0x76, &Wire);
+    if(!_bme280_det) _bme280_det = bme.begin(0x77, &Wire);
+}
+
+/**
+ * Initialize BMP180 sensor
+ */
+void Sensors::_BMP180Init(void) {
+    if(bmp.begin()) _bmp180_det = true;
+}
+
+/**
+ * Initialize SHT21 sensor
+ */
+void Sensors::_SHT21Init(void) {
+    sht21.begin();
+    Wire.beginTransmission(SHT21_ADDRESS);
+    Wire.write(0xE7);
+    Wire.endTransmission();
+    delay(100);
+    Wire.requestFrom(SHT21_ADDRESS, 1);
+    if(Wire.available() == 1) {
+        Wire.read();
+        _sht21_det = true;
+    }
+}
+
+/**
+ * Initialize DHT22 sensor
+ */
+void Sensors::_DHT22Init(void) {
+    dht.setup(DHT22_PIN, DHTesp::DHT22);
+    dht.getTempAndHumidity();
+    dht.getStatus();
+    if(dht.getStatus() == 0) _dht22_det = true;
+}
+
+/**
+ * Initialize DS18B20 sensor
+ */
+void Sensors::_DS18B20Init(void) {
+    term.begin();
+    _ds18b20_det = term.getDeviceCount();
+    if(_ds18b20_det > 0) {
+        term.getAddress(thermometer, 0);
+        term.setResolution(thermometer, DS18B20_RESOLUTION);
+        term.requestTemperatures();
+    }
+}
+
+/**
+ * Initialize MAX44009 sensor
+ */
+void Sensors::_MAX44009Init(void) {
+    if(!max_light.begin()) _max44009_det = true;
+}
+
+/**
+ * Initialize BH1750 sensor
+ */
+void Sensors::_BH1750Init(void) {
+    if(lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE_2)) _bh1750_det = true;
+}
+
+/**
+ * Initialize PCF8574 port-expander
+ */
+void Sensors::_PCF8574Init(void) {
+    if(pcf8574.begin(0x20, &Wire)) {
+        _pcf8574_det = true;
+        for(uint8_t i=0; i<8; i++) pcf8574.pinMode(i, OUTPUT);
+        for(uint8_t i=0; i<8; i++) pcf8574.digitalWrite(i, LOW);
+    }
+}
+
+/**
+ * Initialize DS3231 RTC
+ */
+void Sensors::_DS3231Init() {
+    if(rtc.begin() == DS3232_OK) {
+        _ds3231_det = true;
+        get_ds3231_timeDate();
+    }
+}
+
+/**
+ * Initialize BME680 sensor
+ */
+void Sensors::_BME680Init(void) {
+    const uint8_t bsec_config_iaq[] = {
+        #include "config/generic_33v_3s_4d/bsec_iaq.txt"
+    };
+  
+    iaqSensor.begin(BME68X_I2C_ADDR_HIGH, Wire);
+    _bme680_det = _BME680_validateIaqSensorStatus();
+    if(_bme680_det) {
+        iaqSensor.setConfig(bsec_config_iaq);
+        _BME680_validateIaqSensorStatus();
+        _BME680_loadState();
+
+        bsec_virtual_sensor_t sensorList[4] = {
+            BSEC_OUTPUT_IAQ,
+            BSEC_OUTPUT_RAW_PRESSURE,
+            BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_TEMPERATURE,
+            BSEC_OUTPUT_SENSOR_HEAT_COMPENSATED_HUMIDITY
+        };
+        iaqSensor.updateSubscription(sensorList, 4, BSEC_SAMPLE_RATE_LP);
+        _BME680_validateIaqSensorStatus();
+    }
+}
+
+/*
+ * Check BME680 Status
+ * @return true if there are no problems
+ */
+bool Sensors::_BME680_validateIaqSensorStatus(void) {
+    if(iaqSensor.bsecStatus != BSEC_OK) return false;
+    if(iaqSensor.bme68xStatus != BME68X_OK) return false;
+    return true;
+}
+
+/**
+ * Load BME680 state from EEPROM
+ */
+void Sensors::_BME680_loadState(void) {
+    Serial.println(SEPARATOR);
+    Serial.print("Read BME680 state file... ");
+
+    File file = LittleFS.open("/bme680.json");
+    if(file) {
+        while(file.available()) {
+            String json = file.readString();
+
+            JsonDocument state;
+            DeserializationError errorState = deserializeJson(state, json);
+
+            if(!errorState) {
+                _bme680_stateTimestamp = state["timestamp"];
+                _bme680_stateCounter = state["counter"];
+                for(uint8_t i=0; i<BSEC_MAX_STATE_BLOB_SIZE; i++) {
+                    _bme680_bsecState[i] = state["data"][i];
+                }
+
+                if(_bme680_stateCounter > 0) {
+                    iaqSensor.setState(_bme680_bsecState);
+                    _BME680_validateIaqSensorStatus();
+
+                    Serial.println("done");
+                }
+                else Serial.println("state file is empty");
+            }
+            else Serial.println(" BME680 state file corrupted");
+        }
+    }
+    else Serial.println(" No BME680 file found");
+}
+
+/**
+ * Update BME680 status file
+ */
+void Sensors::_BME680_updateState(void) {
+    #define STATE_SAVE_PERIOD  UINT32_C(6 * 60 * 60)           /* 6 hours - 4 times a day */
+
+    if((now() - _bme680_stateTimestamp >= STATE_SAVE_PERIOD) and (iaqSensor.iaqAccuracy >= 3)) {
+        Serial.println(SEPARATOR);
+        Serial.print("Update BME680 state file... ");
+
+        if(LittleFS.exists("/bme680.json")) {
+            iaqSensor.getState(_bme680_bsecState);
+            _BME680_validateIaqSensorStatus();
+
+            _bme680_stateTimestamp = now();
+            _bme680_stateCounter++;
+
+            char datetime[20];
+            sprintf(datetime, "%02d.%02d.%d %02d:%02d:%02d", day(), month(), year(), hour(), minute(), second());
+
+            JsonDocument json;
+            json["timestamp"] = _bme680_stateTimestamp;
+            json["datetime"] = datetime;
+            json["counter"] = _bme680_stateCounter;
+            for(uint8_t i=0; i<BSEC_MAX_STATE_BLOB_SIZE; i++) {
+                json["data"][i] = _bme680_bsecState[i];
+            }
+
+            String data = "";
+            serializeJsonPretty(json, data);
+            //Serial.println(data);
+
+            File file = LittleFS.open("/bme680.json", "w");
+            if(file) {
+                file.print(data);
+                file.close();
+                data = String();
+                Serial.println("done");
+            }
+            else Serial.println("Failed to save BME680 state file");
+        }
+        else Serial.println("File /bme680.json does not extist");
+    }
+}
+
+/**
+ * Read data from BME280 sensor
+ */
+void Sensors::_BME280Read(void) {
+    if(_bme280_det) {
+        state.bme280.temp = bme.readTemperature();
+        state.bme280.hum = bme.readHumidity();
+        state.bme280.pres = bme.readPressure() / 100.0F;
+        state.bme280.updated = true;
+    }
+    else {
+        state.bme280.temp = 40400.0;
+        state.bme280.hum = 40400.0;
+        state.bme280.pres = 40400.0;
+    }
+}
+
+/**
+ * Read data from BMP180 sensor
+ */
+void Sensors::_BMP180Read(void) {
+    if(_bmp180_det) {
+        state.bmp180.temp = bmp.readTemperature();
+        state.bmp180.pres = bmp.readPressure() / 100.0F;
+        state.bmp180.updated = true;
+    }
+    else {
+        state.bmp180.temp = 40400.0;
+        state.bmp180.pres = 40400.0;
+    }
+}
+
+/**
+ * Read data from SHT21 sensor
+ */
+void Sensors::_SHT21Read(void) {
+    if(_sht21_det) {
+        state.sht21.temp = sht21.getTemperature();
+        state.sht21.hum = sht21.getHumidity();
+        state.sht21.updated = true;
+    }
+    else {
+        state.sht21.temp = 40400.0;
+        state.sht21.hum = 40400.0;
+    }
+}
+
+/**
+ * Read data from DHT22 sensor
+ */
+void Sensors::_DHT22Read(void) {
+    if(_dht22_det) {
+        state.dht22.temp = dht.getTemperature();
+        state.dht22.hum = dht.getHumidity();
+        state.dht22.updated = true;
+    }
+    else {
+        state.dht22.temp = 40400.0;
+        state.dht22.hum = 40400.0;
+    }
+}
+
+/**
+ * Read data from DS18B20 sensor
+ */
+void Sensors::_DS18B20Read(void) {
+    if(_ds18b20_det) {
+        state.ds18b20.temp = term.getTempC(thermometer);
+        state.ds18b20.updated = true;
+        term.requestTemperatures();
+    }
+    else state.ds18b20.temp = 40400.0;
+}
+
+/**
+ * Read data from MAX44009 sensor
+ */
+void Sensors::_MAX44009Read(void) {
+    if(_max44009_det) {
+        state.max44009.light = max_light.get_lux();
+        state.max44009.updated = true;
+    }
+    else state.max44009.light = -10000.0;
+}
+
+/**
+ * Read data from BH1750 sensor
+ */
+void Sensors::_BH1750Read(void) {
+    if(_bh1750_det) {
+        state.bh1750.light = lightMeter.readLightLevel();
+        state.bh1750.updated = true;
+    }
+    else state.bh1750.light = -10000.0;
+}
+
+/**
+ * Read data from analog ambient light sensor
+ */
+void Sensors::_AnalogRead(void) {
+    float adc = float(analogRead(PHOTORESISTOR_PIN));
+    #if defined(BIM32_CYD)
+        state.analog.volt = 3.3 - (adc / 1241.0);
+    #else
+        state.analog.volt = adc / 1241.0;
+    #endif
+    state.analog.updated = true;
+}
+
+/**
+ * Read ESP32 temperature
+ */
+void Sensors::_ESP32Read(void) {
+    state.esp32core.temp = (temprature_sens_read() - 32) / 1.8;
+    state.esp32core.updated = true;
+}
+
+/**
+ * Read data from BME680 sensor
+ */
+void Sensors::BME680Read(void) {
+    if(_bme680_det) {
+        if(iaqSensor.run()) {
+            state.bme680.temp = iaqSensor.temperature;
+            state.bme680.hum = iaqSensor.humidity;
+            state.bme680.pres = iaqSensor.pressure / 100.0F;
+            state.bme680.iaq = iaqSensor.iaq;
+            state.bme680.iaqAccr = iaqSensor.iaqAccuracy;
+            state.bme680.updated = true;
+            _BME680_updateState();
+        }
+        else _BME680_validateIaqSensorStatus();
+    }
+    else {
+        state.bme680.temp = 40400.0;
+        state.bme680.hum = 40400.0;
+        state.bme680.pres = 40400.0;
+        state.bme680.iaq = 40400.0;
+    }
+}
+
+/**
+ * Get time & date from DS3231 RTC
+ */
+void Sensors::get_ds3231_timeDate() {
+    if(_ds3231_det) {
+        rtc.read();
+        setTime(
+            rtc.hours(), 
+            rtc.minutes(), 
+            rtc.seconds(), 
+            rtc.day(), 
+            rtc.month(), 
+            2000 + rtc.year()
+        );
+    }
+}
+
+/**
+ * Set time & date to DS3231 RTC
+ */
+void Sensors::set_ds3231_timeDate() {
+    if(_ds3231_det) {
+        if(year() > 2000) rtc.setYear(year() - 2000);
+        rtc.setMonth(month());
+        rtc.setDay(day());
+        rtc.setWeekDay(weekday());
+        rtc.setHours(hour());
+        rtc.setMinutes(minute());
+        rtc.setSeconds(second());
+        rtc.write();
+    }
+}
+
+/**
+ * Send data to PCF8574
+ */
+void Sensors::comfortDevices(bool heater, bool cooler, bool humidifier, bool dehumidifier, bool purifier) {
+    if(_pcf8574_det) {
+        pcf8574.digitalWrite(0, heater);
+        pcf8574.digitalWrite(1, cooler);
+        pcf8574.digitalWrite(2, humidifier);
+        pcf8574.digitalWrite(3, dehumidifier);
+        pcf8574.digitalWrite(4, purifier);
+    }
+}
+
+/*
+ * Calculate absolute humidity
+ */
+float Sensors::absoluteHum(float temp, float hum) {
+    float sat = 6.112 * exp((17.67 * temp) / (temp + 243.5));
+    float vap = sat * (hum / 100.0);
+    float abs = (2.1674 * vap / (273.15 + temp)) * 100;
+
+    return abs;
+}
+
+/*
+ * Calculate dew point
+ */
+float Sensors::dewPoint(float temp, float hum) {
+    const float a = 17.67, b = 243.5;
+  
+    float alpha = log(hum / 100.0) + (a * temp) / (b + temp);
+    float dp = (b * alpha) / (a - alpha);
+
+    return dp;
+}
+
+/*
+ * Convert hPa to mmHg
+ */
+float Sensors::mmHg(float pres) {
+    return pres * 0.75;
+}

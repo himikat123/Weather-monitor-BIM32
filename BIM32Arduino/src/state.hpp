@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+
 #define SSID_COUNT   30
 #define SSID_LEN     33
 #define IP_LEN       16
