@@ -75,7 +75,7 @@ Narodmon narodmon;
 #include "src/mqtt.hpp"
 MQTT mqtt;
 #include "src/fonts.hpp"
-#include "src/agregateLcdData.hpp"
+#include "src/agregateData/lcdData/agregateLcdData.hpp"
 AgregateLcdData agregateLcdData;
 #include "src/lcdDisplay.hpp"               // DELETE
 #include "src/nextion/nextion.hpp"
@@ -103,9 +103,9 @@ PCF8575_S pcf8575_1;
 PCF8575_S pcf8575_2;
 #include "src/network.hpp"
 Network network;
-#include "src/agregateComfortData.hpp"
-AgregateComfortData agregateComfortData;
-#include "src/comfort.hpp"
+//#include "src/agregateComfortData.hpp"
+//AgregateComfortData agregateComfortData;
+#include "src/comfort/comfort.hpp"
 Comfort comfort;
 #include "src/websocket.hpp"
 WebSocket websocket(88, 1);

@@ -1,26 +1,8 @@
-#pragma once
+#include "./comfort.hpp"
 
-class Comfort {
-    public:
-        void calculate();
-        void soundNotify();
-        void devicesControl();
-
-    private:
-        float _temp = 40400.0;
-        float _hum = 40400.0;
-        float _iaq = 40400.0;
-        float _co2 = 40400.0;
-        int _tempLevel = TEMP_COMFORTABLE;
-        int _humLevel = HUM_COMFORTABLE;
-        int _iaqLevel = AIR_CLEAN;
-        int _co2Level = AIR_CLEAN;
-        bool _heater = false;
-        bool _cooler = false;
-        bool _humidifier = false;
-        bool _dehumidifier = false;
-        bool _purifier = false;
-};
+#include "../agregate/agregateComfortData.hpp"
+#include "../validate.hpp"
+#include "../config.hpp"
 
 /**
  * Calculate comfort level 
@@ -66,20 +48,20 @@ void Comfort::calculate() {
     }
 
     if(validate.iaq(_iaq)) {
-        if(_iaq < 90.0) _iaqLevel = AIR_CLEAN;
-        if(_iaq >= 90.0 and _iaq <= 100.0 and _iaqLevel == AIR_HEAVILY_POLLUTED) _iaqLevel = AIR_CLEAN;
-        if(_iaq > 100.0 and _iaq < 190.0) _iaqLevel = AIR_POLLUTED;
-        if(_iaq >= 190.0 and _iaq <= 200.0 and _iaqLevel == AIR_CLEAN) _iaqLevel = AIR_POLLUTED;
-        if(_iaq > 200.0) _iaqLevel = AIR_HEAVILY_POLLUTED;
+        if(_iaq < AIR_CLEAN_LEVEL_DN) _iaqLevel = AIR_CLEAN;
+        if(_iaq >= AIR_CLEAN_LEVEL_DN and _iaq <= AIR_CLEAN_LEVEL_UP and _iaqLevel == AIR_HEAVILY_POLLUTED) _iaqLevel = AIR_CLEAN;
+        if(_iaq > AIR_CLEAN_LEVEL_UP and _iaq < AIR_POLLUTED_LEVEL_DN) _iaqLevel = AIR_POLLUTED;
+        if(_iaq >= AIR_POLLUTED_LEVEL_DN and _iaq <= AIR_POLLUTED_LEVEL_UP and _iaqLevel == AIR_CLEAN) _iaqLevel = AIR_POLLUTED;
+        if(_iaq > AIR_POLLUTED_LEVEL_UP) _iaqLevel = AIR_HEAVILY_POLLUTED;
     }
     else _iaqLevel = AIR_UNDEFINED;
 
     if(validate.co2(_co2)) {
-        if(_co2 < 700.0) _co2Level = AIR_CLEAN;
-        if(_co2 >= 700.0 and _co2 <= 800.0 and _co2Level == AIR_HEAVILY_POLLUTED) _co2Level = AIR_CLEAN;
-        if(_co2 > 800.0 and _co2 < 1300.0) _co2Level = AIR_POLLUTED;
-        if(_co2 >= 1300.0 and _co2 <= 1400.0 and _co2Level == AIR_CLEAN) _co2Level = AIR_POLLUTED;
-        if(_co2 > 1400.0) _co2Level = AIR_HEAVILY_POLLUTED;
+        if(_co2 < CO2_CLEAN_LEVEL_DN) _co2Level = AIR_CLEAN;
+        if(_co2 >= CO2_CLEAN_LEVEL_DN and _co2 <= CO2_CLEAN_LEVEL_UP and _co2Level == AIR_HEAVILY_POLLUTED) _co2Level = AIR_CLEAN;
+        if(_co2 > CO2_CLEAN_LEVEL_UP and _co2 < CO2_POLLUTED_LEVEL_DN) _co2Level = AIR_POLLUTED;
+        if(_co2 >= CO2_POLLUTED_LEVEL_DN and _co2 <= CO2_POLLUTED_LEVEL_UP and _co2Level == AIR_CLEAN) _co2Level = AIR_POLLUTED;
+        if(_co2 > CO2_POLLUTED_LEVEL_UP) _co2Level = AIR_HEAVILY_POLLUTED;
     }
     else _co2Level = AIR_UNDEFINED;
 
@@ -98,15 +80,4 @@ void Comfort::calculate() {
     if(_tempLevel == TEMP_TOO_COLD && _humLevel == HUM_TOO_DRY) state.comfort = COLD_DRY;
     state.iaq_level = _iaqLevel;
     state.co2_level = _co2Level;
-}
-
-void Comfort::soundNotify() {
-    if(config.comfort.temp.sound()) sound.tempNotify(_tempLevel);
-    if(config.comfort.hum.sound()) sound.humNotify(_humLevel);
-    if(config.comfort.iaq.sound()) sound.airNotify(_iaqLevel);
-    else if(config.comfort.co2.sound()) sound.airNotify(_co2Level);
-}
-
-void Comfort::devicesControl() {
-    sensors.comfortDevices(_heater, _cooler, _humidifier, _dehumidifier, _purifier);
 }

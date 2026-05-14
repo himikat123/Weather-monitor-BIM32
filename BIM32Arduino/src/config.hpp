@@ -4,6 +4,7 @@
 #include "FS.h"
 #include <LittleFS.h>
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+#include "globals.hpp"
 
 class Config {
     #define NETWORKS 3

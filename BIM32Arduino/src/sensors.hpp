@@ -12,7 +12,10 @@
 #include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
 #include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
 #include "DS3232.h" // v0.4.1 https://github.com/RobTillaart/DS3232
+#include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 
+#include "config.hpp"
+#include "globals.hpp"
 #include "pinout.hpp"
 #include "state.hpp"
 

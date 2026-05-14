@@ -1,0 +1,141 @@
+#include "validate.hpp"
+
+/**
+ * Validate if temperature is within the normal range
+ */
+bool Validate::temp(float t) {
+    return (t >= -55.0 and t <= 100.0);
+}
+
+/**
+ * Validate if humidity is within the normal range
+ */
+bool Validate::hum(float h) {
+    return (h >= 0.0 and h <= 100.0);
+}
+
+/**
+ * Validate if pressure is within the normal range
+ */
+bool Validate::pres(float p) {
+    return (p >= 400.0 and p <= 1200.0);
+}
+
+/**
+ * Validate if wind speed is within the normal range
+ */
+bool Validate::windSpeed(float w) {
+    return (w >= 0.0 and w <= 100.0);
+}
+
+/**
+ * Validate if wind direction is within the normal range
+ */
+bool Validate::windDir(int w) {
+    return (w >= 0 and w <= 360.0);
+}
+
+/**
+ * Validate if ambient light is within the normal range
+ */
+bool Validate::light(float l) {
+    return (l >= 0.0 and l <= 120000.0);
+}
+
+/**
+ * Validate if analog voltage is within the normal range
+ */
+bool Validate::volt(float v) {
+    return (v >= 0.0 and v <= 3.3);
+}
+
+/**
+ * Validate if IAQ is within the normal range
+ */
+bool Validate::iaq(float i) {
+    return (i >= 0.0 and i <= 500.0);
+}
+
+/**
+ * Validate if battery voltage is within the normal range
+ */
+bool Validate::batVolt(float v) {
+    return (v >= 0.0 and v <= 12.0);
+}
+
+/**
+ * Validate if battery level is within the normal range
+ */
+bool Validate::batLvl(int l) {
+    return (l >= 1 and l <= 4);
+}
+
+/**
+ * Validate if battery percentage is within the normal range
+ */
+bool Validate::batPercent(int p) {
+    return (p >= 0 and p <= 100);
+}
+
+/**
+ * Validate if voltage from thingspeak is within the normal range
+ */
+bool Validate::thingVolt(float v) {
+    return (v >= 0.0 and v <= 260.0);
+}
+
+/**
+ * Validate if PZEM-004t voltage is within the normal range
+ */
+bool Validate::hVolt(float v) {
+    return (v >= 80.0 and v <= 260.0);
+}
+
+/**
+ * Validate if PZEM-004t current is within the normal range
+ */
+bool Validate::current(float c) {
+    return (c >= 0.0 and c <= 100.0);
+}
+
+/**
+ * Validate if PZEM-004t power is within the normal range
+ */
+bool Validate::power(float p) {
+    return (p >= 0.0 and p <= 23000.0);
+}
+
+/**
+ * Validate if PZEM-004t energy is within the normal range
+ */
+bool Validate::energy(float e) {
+    return (e >= 0.0 and e <= 10000.0);
+}
+
+/**
+ * Validate if PZEM-004t frequency is within the normal range
+ */
+bool Validate::frequence(float f) {
+    return (f >= 45.0 and f <= 65.0);
+}
+
+/**
+ * Validate if Senseair S8 CO2 is within the normal range
+ */
+bool Validate::co2(float c) {
+    return (c >= 400.0 and c <= 10000.0);
+}
+
+/*
+ * Validate if absolute humidity is within the normal range
+ */
+bool Validate::absoluteHum(float ah) {
+    return ah >= 0.0 && ah <= 60.0;
+}
+
+/*
+ * Validate if dew point is within the normal range
+ */
+bool Validate::dewPoint(float dp, float temp) {
+    return dp >= -60.0 && dp <= 60.0 && dp <= temp;
+}
