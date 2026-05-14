@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./agregateData/agregateSendData.hpp"
+#include "./agregateData/sendData/agregateSendData.hpp"
 
 class Thingspeak {
     public:

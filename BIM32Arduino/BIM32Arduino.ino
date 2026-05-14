@@ -35,18 +35,6 @@ WebServer server(80);
 #include <JPEGDecoder.h> // v2.0.0 https://github.com/Bodmer/JPEGDecoder
 #include <XPT2046_Touchscreen.h> // v1.4.0 https://github.com/PaulStoffregen/XPT2046_Touchscreen
 
-/* Pictures */
-#include "src/picturesAnts.hpp"
-#include "src/picturesBats.hpp"
-#include "src/picturesIconsBig.hpp"
-#include "src/picturesIconsSmall.hpp"
-#include "src/picturesIconsTiny.hpp"
-#include "src/picturesLogo.hpp"
-#include "src/picturesNumbers.hpp"
-#include "src/picturesSymbols.hpp"
-#include "src/picturesWind.hpp"
-#include "src/picturesWindTiny.hpp"
-
 /* Own classes */
 #include "src/state.hpp"
 State state;

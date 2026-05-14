@@ -1,0 +1,635 @@
+#include "./ili9341.hpp"
+
+/**
+ * Display initialisation
+ */
+void ILI9341::init(void) {
+    tft.begin();
+    #if defined(BIM32_CYD)
+        tft.setRotation(1);
+    #else
+        tft.setRotation(3);
+    #endif
+    tft.setSwapBytes(true);
+    tft.setTextWrap(false, false);
+    tft.fillScreen(0);
+
+    pinMode(TFT_BACKLIGHT, OUTPUT);
+    digitalWrite(TFT_BACKLIGHT, HIGH);
+
+    bool calDataValid = false;
+    for(uint8_t i=0; i<5; i++) {
+        _calData[i] = config.calData(i);
+        if(_calData[i]) calDataValid = true;
+    }
+
+    #if defined(BIM32_CYD)
+        touchscreenSPI.begin(XPT2046_CLK, XPT2046_MISO, XPT2046_MOSI, XPT2046_CS);
+        touchscreen.begin(touchscreenSPI);
+        touchscreen.setRotation(1);
+    #else
+        if(calDataValid) tft.setTouch(_calData);
+    #endif
+}
+
+void ILI9341::showLogo() {
+    _showImg(0, 0, logo, sizeof(logo));
+    vTaskDelay(2000);
+}
+
+void ILI9341::showHomeScreen() {
+    tft.fillScreen(BG_COLOR);
+    _drawSkeleton();
+}
+
+/**
+ * Toggles display (on/off)
+ */
+void ILI9341::displayToggle() {
+    _power = !_power;
+}
+
+/**
+ * Turns on the display
+ */
+void ILI9341::displayOn() {
+    _power = true;
+}
+
+/*
+ * Turns off the display
+ */
+void ILI9341::displayOff() {
+    _power = false;
+}
+
+/**
+ * Returns true if display is on
+ */
+bool ILI9341::isDisplayOn() {
+    return _power;
+}
+
+/**
+ * Display refresh
+ */
+void ILI9341::refresh() {
+    if(_power) {
+        _getData();
+
+        if(_page == PAGE_MAIN) {
+            _sequenceSlotSkip();
+            _showTemperatureInside();
+            _showTemperatureOutside();
+            _showHumidityInside();
+            _showHumidityOutside();
+            _showPressure();
+            _showWeekday();
+            _showForecastTemps();
+            _showDescription();
+            _showWeekdays();
+            _showForecastWinds();
+            _showVoltageOrPercentage();
+            _showComfort();
+            _showWindSpeed();
+            _showUpdTime();
+            _showTime();
+            _clockPoints();
+            _showBatteryLevel();
+            _showAntenna();
+            _showWeatherIcon();
+            _showWindDirection();
+            _showAlarmIcon();
+            _showForecastIcons();
+            _sequenceSlotNext();
+        }
+        if(_page == PAGE_NETWORK) _networkPage();
+        if(_page == PAGE_BIG_CLOCK) _bigClockPage();
+        if(_page == PAGE_SMALL_CLOCK) _smallClockPage();
+        if(_page == PAGE_CALENDAR) _calendarPage();
+        if(_page == PAGE_HOURLY) _hourlyPage();
+        if(_page == PAGE_HISTORY_IN) _historyInPage();
+        if(_page == PAGE_HISTORY_OUT) _historyOutPage();
+        if(_page == PAGE_ALARM) _alarmPage();
+    }
+}
+
+void ILI9341::brightness(unsigned int bright) {
+    if(_power) {
+        uint8_t brgt = state.reduc[0] ? round(bright / 2) : bright;
+        if(brgt < config.display.brightness.min(0)) brgt = config.display.brightness.min(0);
+        if(brgt > config.display.brightness.max(0)) brgt = config.display.brightness.max(0); 
+        float r = 100 * log10(2) / log10(255);
+        uint16_t br = round(pow(2, (brgt / r)));
+        if(br < 1023) analogWrite(TFT_BACKLIGHT, br);
+        _prevBright = bright;
+    }
+    else analogWrite(TFT_BACKLIGHT, 0);
+}
+
+void ILI9341::_showImg(uint16_t x, uint16_t y, const byte img[], uint16_t size) {
+    JpegDec.decodeArray(img, size);
+    uint16_t *pImg;
+    uint16_t mcu_w = JpegDec.MCUWidth;
+    uint16_t mcu_h = JpegDec.MCUHeight;
+    uint32_t max_x = JpegDec.width;
+    uint32_t max_y = JpegDec.height;
+    uint32_t min_w = minimum(mcu_w, max_x % mcu_w);
+    uint32_t min_h = minimum(mcu_h, max_y % mcu_h);
+    uint32_t win_w = mcu_w;
+    uint32_t win_h = mcu_h;
+    max_x += x;
+    max_y += y;
+
+    while(JpegDec.readSwappedBytes()) {
+        pImg = JpegDec.pImage;
+        int mcu_x = JpegDec.MCUx * mcu_w + x;
+        int mcu_y = JpegDec.MCUy * mcu_h + y;
+        if(mcu_x + mcu_w <= max_x) win_w = mcu_w;
+        else win_w = min_w;
+        if(mcu_y + mcu_h <= max_y) win_h = mcu_h;
+        else win_h = min_h;
+        if(win_w != mcu_w) {
+            uint16_t *cImg;
+            int p = 0;
+            cImg = pImg + win_w;
+            for(int h=1; h<win_h; h++) {
+                p += mcu_w;
+                for(int w=0; w<win_w; w++) {
+                    *cImg = *(pImg + w + p);
+                    cImg++;
+                }
+            }
+        }
+
+        if((mcu_x + win_w) <= tft.width() && (mcu_y + win_h) <= tft.height()) {
+            tft.pushRect(mcu_x, mcu_y, win_w, win_h, pImg);
+        }
+        else if((mcu_y + win_h) >= tft.height()) JpegDec.abort();
+    }
+}
+
+void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color) {
+    _printText(x, y, width, height, text, font, align, color, BG_COLOR, false);
+}
+
+void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor) {
+    _printText(x, y, width,  height, text, font, align, color, bgColor, false);
+}
+
+void ILI9341::_printText(uint16_t x, uint16_t y, uint16_t width, uint16_t height, String text, uint8_t font, uint8_t align, uint16_t color, uint16_t bgColor, bool valign) {
+    if(_prevFont != font) {
+        if(font == FONT_TINY) tft.loadFont(Ubuntu_9);
+        else if(font == FONT_SMALL) tft.loadFont(Ubuntu_11);
+        else if(font == FONT1) tft.loadFont(Ubuntu_14);
+        else if(font == FONT2) tft.loadFont(Ubuntu_21);
+        else if(font == FONT3) tft.loadFont(Ubuntu_29);
+        else if(font == FONTPR) tft.loadFont(Ubuntu_18);
+        else if(font == FONT_SEGMENTS_SML) tft.loadFont(segment_96);
+        else if(font == FONT_SEGMENTS_BIG) tft.loadFont(segment_140);
+        _prevFont = font;
+    }
+
+    tft.fillRect(x, y, width, height, bgColor);
+    tft.setTextColor(color, bgColor);
+
+    String croppedText = "";
+    for(size_t i = 0; i < text.length(); ) {
+        uint8_t c = text[i];
+        uint8_t charLength = 1;
+        if((c & 0x80) == 0x00) charLength = 1;
+        else if((c & 0xE0) == 0xC0) charLength = 2;
+        //else if((c & 0xF0) == 0xE0) charLength = 3;
+        //else if((c & 0xF8) == 0xF0) charLength = 4;
+        String currentChar = text.substring(i, i + charLength);
+        String testText = croppedText + currentChar;
+        uint16_t textWidth = tft.textWidth(testText);
+        if(textWidth > width) break;
+        croppedText = testText;
+        i += charLength;
+    }
+
+    if(align == CENTER || align == RIGHT) {
+        uint16_t w = tft.textWidth(croppedText);
+        if(align == RIGHT) x += width - w - 4;
+        else x += (width / 2) - (w / 2);
+    }
+
+    uint16_t h = tft.fontHeight();
+    tft.setCursor(x, valign ? (y + height / 2 - h / 2) : y);
+    tft.print(croppedText);
+}
+
+/**
+ * Display temperature
+ */
+void ILI9341::_showTemperature(float temp, uint16_t x, uint16_t y, uint8_t font, uint16_t color) {
+    String buf = validate.temp(temp) ? String((int)round(temp)) : "--";
+    buf += "°C";
+    _printText(x, y, font == FONT3 ? 70 : 56, font == FONT3 ? 26 : 20, buf, font, CENTER, color);
+}
+
+/**
+ * Display humidity
+ */
+void ILI9341::_showHumidity(int hum, uint16_t x, uint16_t y) {
+    String buf = validate.hum(hum) ? (String(hum)) : "--";
+    buf += "%";
+    _printText(x, y, 58, 20, buf, FONT2, CENTER, HUMIDITY_COLOR);
+}
+
+void ILI9341::_drawSkeleton() {
+    tft.drawFastHLine(0, 80, 319, FRAME_COLOR);
+    tft.drawFastVLine(143, 2, 75, FRAME_COLOR);
+    tft.drawSmoothRoundRect(0, 165, 10, 10, 106, 74, FRAME_COLOR, BG_COLOR);
+    tft.drawSmoothRoundRect(106, 165, 10, 10, 106, 74, FRAME_COLOR, BG_COLOR);
+    tft.drawSmoothRoundRect(212, 165, 10, 10, 107, 74, FRAME_COLOR, BG_COLOR);
+    _showImg(145, 48, symb_home, sizeof(symb_home));
+    _showImg(243, 48, symb_hum, sizeof(symb_hum));
+    _showImg(62, 104, symb_temp_plus, sizeof(symb_temp_plus));
+    _showImg(143, 109, symb_hum, sizeof(symb_hum));
+    _showImg(222, 109, symb_pres, sizeof(symb_pres));
+    _showImg(61, 146, symb_wind, sizeof(symb_wind));
+    _showTime();
+}
+
+const byte* ILI9341::_number_picture(uint8_t num) {
+    switch (num) {
+        case 1: return number_1;
+        case 2: return number_2;
+        case 3: return number_3;
+        case 4: return number_4;
+        case 5: return number_5;
+        case 6: return number_6;
+        case 7: return number_7;
+        case 8: return number_8;
+        case 9: return number_9;
+        default: return number_0;
+    }
+}
+
+uint16_t ILI9341::_number_picture_size(uint8_t num) {
+    switch (num) {
+        case 1: return sizeof(number_1);
+        case 2: return sizeof(number_2);
+        case 3: return sizeof(number_3);
+        case 4: return sizeof(number_4);
+        case 5: return sizeof(number_5);
+        case 6: return sizeof(number_6);
+        case 7: return sizeof(number_7);
+        case 8: return sizeof(number_8);
+        case 9: return sizeof(number_9);
+        default: return sizeof(number_0);
+    }
+}
+
+void ILI9341::_showTime() {
+    if(_prevTHour != _tHour || _prevTMinute != _tMinute || _forced) {
+        if(_tHour > 9) _showImg(0, 0, _number_picture(_tHour / 10), _number_picture_size(_tHour / 10));
+        else {
+            if(config.clock.format() % 2 == 0) tft.fillRect(0, 0, 32, 78, BG_COLOR);
+            else _showImg(0, 0, _number_picture(0), _number_picture_size(0));
+        }
+        _showImg(33, 0, _number_picture(_tHour % 10), _number_picture_size(_tHour % 10));
+        _prevTHour = _tHour;
+
+        _showImg(77, 0, _number_picture(_tMinute / 10), _number_picture_size(_tMinute / 10));
+        _showImg(109, 0, _number_picture(_tMinute % 10), _number_picture_size(_tMinute % 10));
+        _prevTMinute = _tMinute;
+    }
+}
+
+void ILI9341::_showWeekday() {
+    if(_prevTWeekday != _tWeekday || _forced) {
+        _printText(146, 6, 40, 20, lang.weekdayShortName(_tWeekday), FONT2, LEFT, CLOCK_COLOR);
+    }
+}
+
+void ILI9341::_showWeekdays() {
+    if(_prevTWeekday != _tWeekday || _forced) {
+        unsigned int wd = _tWeekday;
+        _printText(33, 168, 40, 16, lang.weekdayShortName(wd), FONT1, CENTER, TEXT_COLOR);
+        if(++wd > 7) wd = 1;
+        _printText(139, 168, 40, 16, lang.weekdayShortName(wd), FONT1, CENTER, TEXT_COLOR);
+        if(++wd > 7) wd = 1;
+        _printText(245, 168, 40, 16, lang.weekdayShortName(wd), FONT1, CENTER, TEXT_COLOR);
+        _prevTWeekday = _tWeekday;
+    }
+}
+
+/**
+ * Display clock points
+ */
+void ILI9341::_clockPoints() {
+    boolean points = millis() % 1000 > 500;
+    tft.fillSmoothCircle(70, 24, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+    tft.fillSmoothCircle(70, 52, 3, points ? HUMIDITY_COLOR : BG_COLOR, BG_COLOR);
+}
+
+/**
+ * Display antenna symbol
+ */
+void ILI9341::_showAntenna() {
+    if(_prevRssi != _rssi || _prevIsApMode != _isApMode || _forced) {
+        if(_isApMode) _showImg(292, 1, ant_acpoint, sizeof(ant_acpoint));
+        else {
+            if(_rssi > -51) _showImg(292, 1, ant4, sizeof(ant4));
+            if(_rssi < -50 && _rssi > -76) _showImg(292, 1, ant3, sizeof(ant3));
+            if(_rssi <- 75 && _rssi > -96) _showImg(292, 1, ant2, sizeof(ant2));
+            if(_rssi < -95) _showImg(292, 1, ant1, sizeof(ant1));
+            if(_rssi >= 0) _showImg(292, 1, ant0, sizeof(ant0));
+        }
+        _prevRssi = _rssi;
+        _prevIsApMode = _isApMode;
+    }
+}
+
+void ILI9341::_sequenceSlotSkip() {
+    for(uint8_t i=0; i<4; i++) {
+        if(config.display.source.sequence.name(_sequenceSlot) == "") {
+            if(_sequenceSlot < 3) _sequenceSlot++;
+            else _sequenceSlot = 0;
+        }
+        else i = 4;
+    }
+}
+
+void ILI9341::_sequenceSlotNext() {
+    if(millis() - _sequenceMillis > config.display.source.sequence.dur() * 1000) {
+        _sequenceMillis = millis();
+        if(_sequenceSlot < 3) _sequenceSlot++;
+        else _sequenceSlot = 0;
+    }
+}
+
+/**
+ * Display temperature inside
+ */
+void ILI9341::_showTemperatureInside() {
+    if(config.display.source.tempIn.sens() == 4) _tempIn = _tempSequence[_sequenceSlot];
+    if(_prevTempIn != _tempIn || _forced) {
+        _showTemperature(_tempIn, 173, 53, FONT3, TEMPERATURE_COLOR);
+        _prevTempIn = _tempIn;
+    }
+}
+
+/**
+ * Display temperature outside
+ */
+void ILI9341::_showTemperatureOutside() {
+    if(_prevTempOut != _tempOut || _forced) {
+        _showThermometer();
+        _showTemperature(_tempOut, 71, 113, FONT3, TEMPERATURE_COLOR);
+        _prevTempOut = _tempOut;
+    }
+}
+
+/**
+ * Display thermometer icon (red or blue)
+ */
+void ILI9341::_showThermometer() {
+    if(_tempOut < 0.0) _showImg(62, 104, symb_temp_minus, sizeof(symb_temp_minus));
+    else _showImg(62, 104, symb_temp_plus, sizeof(symb_temp_plus));
+}
+
+/**
+ * Display humidity inside
+ */
+void ILI9341::_showHumidityInside() {
+    if(config.display.source.humIn.sens() == 4) _humIn = _humSequence[_sequenceSlot];
+    if(_prevHumIn != _humIn || _forced) {
+        _showHumidity(int(round(_humIn)), 264, 58);
+        _prevHumIn = _humIn;
+    }
+}
+
+/**
+ * Display humidity outside
+ */
+void ILI9341::_showHumidityOutside() {
+    if(_prevHumOut != _humOut || _forced) {
+        _showHumidity(int(round(_humOut)), 164, 119);
+        _prevHumOut = _humOut;
+    }
+}
+
+/**
+ * Display comfort level
+ */
+void ILI9341::_showComfort() {
+    if(config.display.source.descr() == 2) _comfort = _nameSequence[_sequenceSlot];
+    else {
+        if(_comfort.indexOf(".") > 0) {
+            char buf[255];
+            _comfort.toCharArray(buf, 255);
+            char* cmf0 = strtok(buf, ".");
+            char* cmf1 = strtok(NULL, ".");
+            if(millis() - _prevCmfTime >= 2000) {
+                _prevCmfTime = millis();
+                _cmfType = !_cmfType;
+                for(size_t i = 0; cmf1[i] != '\0'; i++) cmf1[i] = cmf1[i + 1]; // remove first space character
+                _printText(145, 28, 174, 16, String(_cmfType ? cmf1 : cmf0), FONT1, CENTER, TEXT_COLOR);
+            }
+        }
+        if(_prevComfort != _comfort || _forced) {
+            _printText(145, 28, 174, 16, _comfort, FONT1, CENTER, TEXT_COLOR);
+            _prevComfort = _comfort;
+        }
+    }
+}
+
+/**
+ * Display battery symbol
+ */
+void ILI9341::_showBatteryLevel() {
+    if(_prevBatLevel != _batLevel || _forced) {
+        if(validate.batLvl(_batLevel)) {
+            switch(_batLevel) {
+                case 1: _showImg(258, 2, bat1, sizeof(bat1)); break;
+                case 2: _showImg(258, 2, bat2, sizeof(bat2)); break;
+                case 3: _showImg(258, 2, bat3, sizeof(bat3)); break;
+                case 4: _showImg(258, 2, bat4, sizeof(bat4)); break;
+                default: tft.fillRect(258, 2, 32, 21, BG_COLOR); break;
+            }
+        }
+        else tft.fillRect(258, 2, 32, 21, BG_COLOR);
+        _prevBatLevel = _batLevel;
+    }
+}
+
+/**
+ * Display voltage, percentage, CO2 or IAQ
+ */
+void ILI9341::_showVoltageOrPercentage() {
+    if(_prevVolt != _volt || _prevVoltColor != _voltColor || _forced) {
+        _printText(178, 10, 78, 16, _volt, FONT1, RIGHT, _air_color[_voltColor]);
+        _prevVolt = _volt;
+        _prevVoltColor = _voltColor;
+    }
+}
+
+/**
+ * Display current weather icon
+ */
+void ILI9341::_showWeatherIcon() {
+    if(_prevCurrIcon != _currIcon || _prevIsDay != _isDay || _forced) {
+        switch(_currIcon) {
+            case 1: _showImg(0, 104, _isDay ? icon_big_01_d : icon_big_01_n, _isDay ? sizeof(icon_big_01_d) : sizeof(icon_big_01_n)); break;
+            case 2: _showImg(0, 104, _isDay ? icon_big_02_d : icon_big_02_n, _isDay ? sizeof(icon_big_02_d) : sizeof(icon_big_02_n)); break;
+            case 3: _showImg(0, 104, icon_big_04, sizeof(icon_big_04)); break;
+            case 4: _showImg(0, 104, icon_big_09, sizeof(icon_big_09)); break;
+            case 5: _showImg(0, 104, icon_big_10, sizeof(icon_big_10)); break;
+            case 6: _showImg(0, 104, _isDay ? icon_big_11_d : icon_big_11_n, _isDay ? sizeof(icon_big_11_d) : sizeof(icon_big_11_n)); break;
+            case 7: _showImg(0, 104, icon_big_13, sizeof(icon_big_13)); break;
+            case 8: _showImg(0, 104, icon_big_50, sizeof(icon_big_50)); break;
+            default: _showImg(0, 104, icon_big_loading, sizeof(icon_big_loading)); break;
+        }
+        _prevCurrIcon = _currIcon;
+        _prevIsDay = _isDay;
+    }
+}
+
+/**
+ * Display weather description
+ */
+void ILI9341::_showDescription() {
+    if(_prevDescription != _description || _forced) {
+        tft.loadFont(Ubuntu_21);
+        uint16_t w = tft.textWidth(_description);
+        tft.unloadFont();
+        _prevFont = 5;
+        _printText(0, 84, 319, 20, _description, w > 319 ? FONT1 : FONT2, CENTER, TEXT_COLOR);
+        _prevDescription = _description;
+    }
+}
+
+/**
+ * Display pressure
+ */
+void ILI9341::_showPressure() {
+    if(_prevPresOut != _presOut || _forced) {
+        String buf = validate.pres(_presOut) ? String(int(round(_presOut))) : "--";
+        buf += config.units_pres() ? lang.hpa() : lang.mm();
+        _printText(250, (config.units_pres() ? 122 : 119), 70, (config.units_pres() ? 16 : 20), buf, FONTPR, CENTER, PRESSURE_COLOR);
+        _prevPresOut = _presOut;
+    }
+}
+
+/**
+ * Display wind speed
+ */
+void ILI9341::_showWindSpeed() {
+    if(_prevWindSpd != _windSpd || _forced) {
+        String wnd = validate.windSpeed(_windSpd) ? String(int(round(_windSpd))) + lang.ms() : "--";
+        _printText(93, 146, 40, 16, wnd, FONT1, CENTER, TEXT_COLOR);
+        _prevWindSpd = _windSpd;
+    }
+}
+
+/**
+ * Display wind direction
+ */
+void ILI9341::_showWindDirection() {
+    if(_prevWindDir != _windDir || _forced) {
+        switch(_windDir) {
+            case 1: _showImg(133, 143, wind_north_east, sizeof(wind_north_east)); break;
+            case 2: _showImg(133, 143, wind_east, sizeof(wind_east)); break;
+            case 3: _showImg(133, 143, wind_south_east, sizeof(wind_south_east)); break;
+            case 4: _showImg(133, 143, wind_south, sizeof(wind_south)); break;
+            case 5: _showImg(133, 143, wind_south_west, sizeof(wind_south_west)); break;
+            case 6: _showImg(133, 143, wind_west, sizeof(wind_west)); break;
+            case 7: _showImg(133, 143, wind_north_west, sizeof(wind_north_west)); break;
+            default: _showImg(133, 143, wind_north, sizeof(wind_north)); break;
+        }
+        _prevWindDir = _windDir;
+    }
+}
+
+/**
+ * Display the time and date of the last weather update
+ */
+void ILI9341::_showUpdTime() {
+    if(_prevWeatherUpdated != _weatherUpdated || _forced) {
+        time_t t = _weatherUpdated;
+        char buf[32] = "";
+        unsigned int hr = config.clock.format() > 1 ? hour(t) : hourFormat12(t);
+        if(config.clock.format() % 2 == 0) sprintf(buf, "%02d.%02d.%d %d:%02d", day(t), month(t), year(t), hr, minute(t));
+        else sprintf(buf, "%02d.%02d.%d %02d:%02d", day(t), month(t), year(t), hr, minute(t));
+        _printText(176, 148, 117, 16, t > 0 ? buf : " ", FONT1, LEFT, TEXT_COLOR);
+        if(t > 0) {
+            tft.drawCircle(167, 153, 5, TEXT_COLOR);
+            tft.drawFastHLine(166, 148, 4, BG_COLOR);
+            tft.drawFastHLine(162, 148, 3, TEXT_COLOR);
+            tft.drawFastVLine(165, 149, 3, TEXT_COLOR);
+        }
+        _prevWeatherUpdated = _weatherUpdated;
+    }
+}
+
+/**
+ * Display Alarm icon
+ */
+void ILI9341::_showAlarmIcon() {
+    uint8_t alarmOn = 0;
+    for(uint8_t i=0; i<12; i++) {
+        alarmOn |= config.alarm.state(i);
+    }
+    if(_prevAlarmOn != alarmOn || _forced) {
+        if(alarmOn) _showImg(294, 140, symb_alarm, sizeof(symb_alarm));
+        else _showImg(294, 140, symb_alarm_off, sizeof(symb_alarm_off));
+        _prevAlarmOn = alarmOn;
+    }
+}
+
+/**
+ * Display daily forecast icons
+ */
+void ILI9341::_showForecastIcons() {
+    for(uint8_t i=0; i<3; i++) {
+        if(_prevIcons[i] != _icons[i] || _forced) {
+            switch(_icons[i]) {
+                case 1: _showImg(i * 106 + 7, 183, icon_small_01, sizeof(icon_small_01)); break;
+                case 2: _showImg(i * 106 + 7, 183, icon_small_02, sizeof(icon_small_02)); break;
+                case 3: _showImg(i * 106 + 7, 183, icon_small_04, sizeof(icon_small_04)); break;
+                case 4: _showImg(i * 106 + 7, 183, icon_small_09, sizeof(icon_small_09)); break;
+                case 5: _showImg(i * 106 + 7, 183, icon_small_10, sizeof(icon_small_10)); break;
+                case 6: _showImg(i * 106 + 7, 183, icon_small_11, sizeof(icon_small_11)); break;
+                case 7: _showImg(i * 106 + 7, 183, icon_small_13, sizeof(icon_small_13)); break;
+                case 8: _showImg(i * 106 + 7, 183, icon_small_50, sizeof(icon_small_50)); break;
+                default: _showImg(i * 106 + 7, 183, icon_small_loading, sizeof(icon_small_loading)); break;
+            }
+            _prevIcons[i] = _icons[i];
+        }
+    }
+    _forced = false;
+}
+
+/**
+ * Display daily forecast temperatures
+ */
+void ILI9341::_showForecastTemps() {
+    for(uint8_t i=0; i<3; i++) {
+        if(_prevDTemps[i] != _dTemps[i] || _forced) {
+            _showTemperature(_dTemps[i], i * 106 + 49, 183, FONT2, TEMPERATURE_COLOR);
+            _prevDTemps[i] = _dTemps[i];
+        }
+
+        if(_prevNTemps[i] != _nTemps[i] || _forced) {
+            _showTemperature(_nTemps[i], i * 106 + 49, 203, FONT2, TEMP_MIN_COLOR);
+            _prevNTemps[i] = _nTemps[i];
+        }
+    }
+}
+
+/**
+ * Display daily forecast winds
+ */
+void ILI9341::_showForecastWinds() {
+    for(uint8_t i=0; i<3; i++) {
+        if(_prevWinds[i] != _winds[i] || _forced) {
+            String wnd = validate.windSpeed(_winds[i]) ? String(int(round(_winds[i]))) + lang.ms() : "--";
+            _printText(i * 106 + 31, 224, 44, 15, wnd, FONT1, CENTER, TEXT_COLOR);
+            _prevWinds[i] = _winds[i];
+        }
+    }
+}

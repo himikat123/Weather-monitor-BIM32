@@ -48,6 +48,10 @@
 #define D_TM1637             1
 #define D_MAX7219            2
 
+#define OPENWEATHERMAP       0
+#define WEATHERBIT           1
+#define OPEN_METEO           2
+
 TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_server_handle = NULL;

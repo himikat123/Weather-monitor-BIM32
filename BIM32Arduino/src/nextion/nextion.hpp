@@ -1,19 +1,10 @@
 #pragma once
 
 #include <Arduino.h>
-#include "../globals.hpp"
-#include "../lcdDisplay.hpp"
 #include <EasyNextionLibrary.h> // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
-
-#include "../config.hpp"
-#include "../globals.hpp"
-
+#include "../lcdDisplay.hpp"
 
 class Nextion : LcdDisplay {
-    #define OPENWEATHERMAP 0
-    #define WEATHERBIT 1
-    #define OPEN_METEO 2
-
     protected:
         EasyNex _nextion;
 
@@ -35,7 +26,7 @@ class Nextion : LcdDisplay {
         String _receivedData = "";
         uint16_t _air_color[4] = { 2016, 65520, 64512, 63488 };
 
-        void _NX4832K035_setRTC();
+        void _setRTC();
         void _NX4832T035_timeDate();
         void _networkPage();
         void _showVoltage();
