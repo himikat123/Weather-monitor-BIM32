@@ -1,8 +1,5 @@
 #pragma once
-
-#define DISP4 0
-#define DISP6 1
-#define DISP8 2
+#include <Arduino.h>
 
 class MAX7219_Driver {
     public:
@@ -13,6 +10,10 @@ class MAX7219_Driver {
         void clearDisplay();
 
     private:
+        static constexpr int DISP4 = 0;
+        static constexpr int DISP6 = 1;
+        static constexpr int DISP8 = 2;
+
         int8_t _clk = -1;
         int8_t _dat = -1;
         int8_t _load = -1;

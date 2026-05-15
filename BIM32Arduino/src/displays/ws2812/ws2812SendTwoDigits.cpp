@@ -1,0 +1,31 @@
+#include "./ws2812display.hpp"
+#include <LiteLED.h> // v1.2.0 https://github.com/Xylopyrographer/LiteLED/tree/main
+#include "../../config.hpp"
+
+uint8_t WS2812b::_sendTwoDigits(rgb_t black, uint8_t digShift, uint8_t pixelNr) {
+    uint8_t repeats = 1;
+
+    switch(config.display.model(_dispNum)) {
+        case 1: 
+        case 4: repeats = 2; break;
+        case 2:
+        case 5: repeats = 3; break;
+        default: ; break;
+    }
+
+    for(uint8_t digNr=0; digNr<2; digNr++) {
+        for(uint8_t bitNr=0; bitNr<7; bitNr++) {
+            for(uint8_t repeat=0; repeat<repeats; repeat++) {
+                uint8_t imgNr = digNr + digShift;
+
+                if(bitRead(_pixels[imgNr], bitNr) and _power) {
+                    rgb_t color = { .r = _reds[imgNr], .g = _greens[imgNr], .b = _blues[imgNr] };
+                    _strip->setPixel(pixelNr++, color, false);
+                }
+                else _strip->setPixel(pixelNr++, black, false);
+            }
+        }
+    }
+
+    return pixelNr;
+}

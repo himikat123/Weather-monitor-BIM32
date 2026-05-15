@@ -1,14 +1,8 @@
 #pragma once
-
 #include <Arduino.h>
-#include <WiFi.h> 
 #include <CRC32.h>
-#include <TimeLib.h>
-#include "config.hpp"
-#include "sensors.hpp"
-#include "agregateLcdData.hpp"
-#include "weather.hpp"
-#include "thingspeak.hpp"
+
+#include "../agregateData/lcdData/agregateLcdData.hpp"
 
 class LcdDisplay {
     protected:

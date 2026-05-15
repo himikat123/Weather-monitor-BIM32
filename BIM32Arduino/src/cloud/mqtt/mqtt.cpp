@@ -1,4 +1,9 @@
-#include "mqtt.hpp"
+#include <Arduino.h>
+#include "./mqtt.hpp"
+#include <PubSubClient.h> // v2.8.0 https://github.com/knolleary/pubsubclient
+
+#include "../../config.hpp"
+#include "../../agregateData/agregateSendData.hpp"
 
 /**
  * Initialize MQTT client

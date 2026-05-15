@@ -1,6 +1,5 @@
 #pragma once
-
-#include "./agregateData/sendData/agregateSendData.hpp"
+#include <Arduino.h>
 
 class Thingspeak {
     public:

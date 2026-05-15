@@ -1,4 +1,5 @@
-#include "max7219driver.hpp"
+#include <Arduino.h>
+#include "./max7219driver.hpp"
 
 /**
  * MAX7219 initialize

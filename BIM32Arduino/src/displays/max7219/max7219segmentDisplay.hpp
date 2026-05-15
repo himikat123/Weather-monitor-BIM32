@@ -1,10 +1,7 @@
 #pragma once
 
 #include "./max7219driver.hpp"
-
-#define DISP4 0
-#define DISP6 1
-#define DISP8 2
+#include "../segmentDisplay.hpp"
 
 class MAX7219_S : public SegmentDisplay {
     public:
@@ -15,8 +12,14 @@ class MAX7219_S : public SegmentDisplay {
         void displayOn();
         void displayOff();
 
-    private:
+    protected:
         MAX7219_Driver max7219;
+
+    private:
+        static constexpr int DISP4 = 0;
+        static constexpr int DISP6 = 1;
+        static constexpr int DISP8 = 2;
+
         int8_t _clk = -1;
         int8_t _dat = -1;
         int8_t _load = -1;

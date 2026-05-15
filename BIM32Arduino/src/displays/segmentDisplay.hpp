@@ -1,7 +1,5 @@
 #pragma once
 
-#define DOT 100
-
 class SegmentDisplay {
     public:
         void setDotFreq(unsigned int freq);
@@ -31,6 +29,15 @@ class SegmentDisplay {
         void _setModel(uint8_t model);
 
     private:
+        static constexpr int SYMB_DEGREE = 0x0A;
+        static constexpr int SYMB_A      = 0x0B;
+        static constexpr int SYMB_C      = 0x0C;
+        static constexpr int SYMB_P      = 0x0D;
+        static constexpr int SYMB_H      = 0x0E;
+        static constexpr int SYMB_F      = 0x11;
+        static constexpr int SYMB_SPACE  = 0x0F;
+        static constexpr int SYMB_MINUS  = 0x10;
+
         uint8_t _prevSlot = 0;
         uint8_t _animSlot = 0;
         uint32_t _animMillis = 0;

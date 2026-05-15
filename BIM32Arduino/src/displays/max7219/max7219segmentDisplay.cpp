@@ -1,4 +1,8 @@
-#include "max7219segmentDisplay.hpp"
+#include <Arduino.h>
+#include "./max7219segmentDisplay.hpp"
+
+#include "../config.hpp"
+#include "./fonts/max7219Segment.hpp"
 
 /**
  * Display initialize
