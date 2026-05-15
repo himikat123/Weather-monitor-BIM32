@@ -32,7 +32,7 @@ WebServer server(80);
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 #include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
 #include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
-#include <JPEGDecoder.h> // v2.0.0 https://github.com/Bodmer/JPEGDecoder
+
 #include <XPT2046_Touchscreen.h> // v1.4.0 https://github.com/PaulStoffregen/XPT2046_Touchscreen
 
 /* Own classes */

@@ -1,0 +1,18 @@
+#include <Arduino.h>
+#include "./ili9341.hpp"
+
+#include "../config.hpp"
+#include "../state.hpp"
+
+void ILI9341::brightness(unsigned int bright) {
+    if(_power) {
+        uint8_t brgt = state.reduc[0] ? round(bright / 2) : bright;
+        if(brgt < config.display.brightness.min(0)) brgt = config.display.brightness.min(0);
+        if(brgt > config.display.brightness.max(0)) brgt = config.display.brightness.max(0); 
+        float r = 100 * log10(2) / log10(255);
+        uint16_t br = round(pow(2, (brgt / r)));
+        if(br < 1023) analogWrite(TFT_BACKLIGHT, br);
+        _prevBright = bright;
+    }
+    else analogWrite(TFT_BACKLIGHT, 0);
+}
