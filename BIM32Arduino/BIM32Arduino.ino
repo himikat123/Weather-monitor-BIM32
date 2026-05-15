@@ -36,6 +36,8 @@ WebServer server(80);
 #include <XPT2046_Touchscreen.h> // v1.4.0 https://github.com/PaulStoffregen/XPT2046_Touchscreen
 
 /* Own classes */
+#include "src/time/time.hpp"
+Time time;
 #include "src/state.hpp"
 State state;
 #include "src/validate.hpp"

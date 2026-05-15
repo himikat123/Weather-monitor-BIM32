@@ -1,6 +1,5 @@
 #include "./ili9341.hpp"
 
-
 #include "../config.hpp"
 
 /**

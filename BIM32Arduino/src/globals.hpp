@@ -52,6 +52,28 @@
 #define WEATHERBIT           1
 #define OPEN_METEO           2
 
+#define NETWORKS             3
+#define PROVIDERS            2
+#define DISPLAYS             2
+#define SEQUENCES            4
+#define TIMESLOTS            8
+#define WSENSORS             2
+#define WSENSOR_TEMPS        5
+#define THNG_FIELDS          8
+#define NAROD_FIELDS         12
+#define MQTT_TOPICS          12
+
+// Division of time into hours and minutes
+inline unsigned int get_time(bool level, const char* time) {
+    if(!time || time[2] != ':') return 0;
+    unsigned int hour = (time[0] - '0') * 10 + (time[1] - '0');
+    unsigned int minute = (time[3] - '0') * 10 + (time[4] - '0');
+    if(hour > 23) hour = 0;
+    if(minute > 59) minute = 0;
+
+    return level ? minute : hour;
+}
+
 TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_server_handle = NULL;

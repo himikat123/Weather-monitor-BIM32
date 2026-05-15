@@ -16,7 +16,6 @@ class Thingspeak {
     private:
         String _fieldPrepare(unsigned int field);
         String _historyFieldPrepare(unsigned int fieldNum);
-        boolean _is_summertime();
 };
 
 extern Thingspeak thingspeak;
