@@ -1,4 +1,7 @@
 #pragma once
+#include <Arduino.h>
+
+#include "../globals.hpp"
 
 class Sound {
     public:

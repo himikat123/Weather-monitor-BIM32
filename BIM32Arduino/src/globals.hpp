@@ -63,6 +63,13 @@
 #define NAROD_FIELDS         12
 #define MQTT_TOPICS          12
 
+#define SSID_COUNT           30
+#define SSID_LEN             33
+#define IP_LEN               16
+#define MAC_LEN              18
+#define W_NAME_LEN           32
+#define HOURLY_COUNT         40
+
 // Division of time into hours and minutes
 inline unsigned int get_time(bool level, const char* time) {
     if(!time || time[2] != ':') return 0;

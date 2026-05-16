@@ -1,0 +1,74 @@
+#pragma once
+
+#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+#include "../globals.hpp"
+
+struct WeatherState {
+    float temp = 40400.0;
+    float hum = 40400.0;
+    float pres = 40400.0;
+    unsigned int icon = 1;
+    bool isDay = true;
+    char descript[128] = "----";
+    time_t time = 0;
+    bool updated = false;
+
+    struct Wind {
+        float speed = -1.0;
+        int dir = 0;
+
+        void toJson(JsonObject o) const {
+            o["speed"] = speed;
+            o["dir"] = dir;
+        }
+    } wind;
+
+    struct Daily {
+        float tMax[5] = { 40400.0, 40400.0, 40400.0, 40400.0, 40400.0 };
+        float tMin[5] = { 40400.0, 40400.0, 40400.0, 40400.0, 40400.0 };
+        float wind[5] = { -1.0, -1.0, -1.0, -1.0, -1.0 };
+        unsigned int icon[5] = { 0, 0, 0, 0, 0 };
+        time_t time = 0;
+
+        void toJson(JsonObject o) const {
+            JsonArray a_tMax = o.createNestedArray("tMax");
+            JsonArray a_tMin = o.createNestedArray("tMin");
+            JsonArray a_wind = o.createNestedArray("wind");
+            JsonArray a_icon = o.createNestedArray("icon");
+            for(int i=0; i<5; i++){
+                a_tMax.add(tMax[i]);
+                a_tMin.add(tMin[i]);
+                a_wind.add(wind[i]);
+                a_icon.add(icon[i]);
+            }
+        }
+    } daily;
+
+    struct Hourly {
+        time_t date[HOURLY_COUNT] = { 0 };
+        unsigned int icon[HOURLY_COUNT] = { 0 };
+        float temp[HOURLY_COUNT] = { 0 };
+        float pres[HOURLY_COUNT] = { 0 };
+        float windSpeed[HOURLY_COUNT] = { 0 };
+        int windDir[HOURLY_COUNT] = { 0 };
+        float prec[HOURLY_COUNT] = { 0 };
+        time_t time = 0;
+    } hourly;
+
+    void toJson(JsonObject obj) const {
+        JsonObject o = obj.createNestedObject("weather");
+        o["temp"] = temp;
+        o["hum"] = hum;
+        o["pres"] = pres;
+        o["icon"] = icon;
+        o["isDay"] = isDay;
+        o["descript"] = descript;
+        o["time"] = time;
+
+        JsonObject windObj = o.createNestedObject("wind");
+        wind.toJson(windObj);
+
+        JsonObject dailyObj = o.createNestedObject("daily");
+        daily.toJson(dailyObj);
+    }
+};

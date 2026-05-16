@@ -12,11 +12,10 @@
 #include "bsec.h" // v1.8.1492 https://www.bosch-sensortec.com/software-tools/software/bsec/
 #include <Adafruit_PCF8574.h> // v1.1.1 https://github.com/adafruit/Adafruit_PCF8574
 #include "DS3232.h" // v0.4.1 https://github.com/RobTillaart/DS3232
-#include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 
-#include "config.hpp"
-#include "globals.hpp"
-#include "pinout.hpp"
+#include "../config/config.hpp"
+#include "../globals.hpp"
+#include "../pinout.hpp"
 #include "state.hpp"
 
 #define DS18B20_RESOLUTION    12 /* DS18B20 resolution 9,10,11 or 12 bits */
@@ -38,6 +37,7 @@ class Sensors {
         Adafruit_PCF8574    pcf8574;
         Bsec                iaqSensor;
         DS3231              rtc;
+    
     public:
         Sensors() : 
             oneWire(ONE_WIRE_BUS_PIN), 

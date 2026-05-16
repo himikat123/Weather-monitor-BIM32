@@ -1,4 +1,10 @@
-#include "network.hpp"
+#include <Arduino.h>
+#include <WiFi.h>
+#include <ESP32Ping.h> // v1.6 https://github.com/marian-craciunescu/ESP32Ping
+
+#include "./network.hpp"
+#include "../config/config.hpp"
+#include "../state/state.hpp"
 
 /**
  * Checking for internet access
