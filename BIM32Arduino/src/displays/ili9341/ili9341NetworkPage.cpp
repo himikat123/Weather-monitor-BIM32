@@ -1,8 +1,8 @@
 #include "./ili9341.hpp"
 
 #include <WiFi.h>
-#include "../languages.hpp"
-#include "../config.hpp"
+#include "../../languages/languages.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Display Netoerk page

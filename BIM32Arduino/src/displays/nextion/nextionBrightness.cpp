@@ -1,7 +1,7 @@
 #include "./nextion.hpp"
 
-#include "../state.hpp"
-#include "../config.hpp"
+#include "../../state/state.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Change display brightness

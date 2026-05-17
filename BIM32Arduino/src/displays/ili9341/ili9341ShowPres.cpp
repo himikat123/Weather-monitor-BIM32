@@ -1,8 +1,8 @@
 #include "./ili9341.hpp"
 
-#include "../validate.hpp"
-#include "../languages.hpp"
-#include "../config.hpp"
+#include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Display pressure

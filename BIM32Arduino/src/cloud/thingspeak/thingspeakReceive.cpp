@@ -4,9 +4,9 @@
 #include "./thingspeak.hpp"
 
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include "../../time/time.hpp"
-#include "../../config.hpp"
-#include "../../state.hpp"
+#include "../../timeNTP/timeNTP.hpp"
+#include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 /**
  * Receive data from thingspeak
@@ -56,7 +56,7 @@ void Thingspeak::receive() {
         tmth.Second = atoi(strtok(NULL, ":"));
         state.thing.time = makeTime(tmth);
         state.thing.time += config.clock.utc() * 3600;
-        state.thing.time += config.clock.dlst() ? time.isSummertime() ? 3600 : 0 : 0;
+        state.thing.time += config.clock.dlst() ? timeNTP.isSummertime() ? 3600 : 0 : 0;
         Serial.printf("successfully updated at %02d:%02d:%02d\r\n", hour(), minute(), second());
         state.thing.updated = true;
     }

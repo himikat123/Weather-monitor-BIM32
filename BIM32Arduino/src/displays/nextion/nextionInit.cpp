@@ -1,6 +1,6 @@
 #include "nextion.hpp"
-#include "../languages.hpp"
-#include "../config.hpp"
+#include "../../languages/languages.hpp"
+#include "../../config/config.hpp"
 
 void Nextion::init() {
     _nextion.writeStr("Hourly.MM.txt", lang.mm());

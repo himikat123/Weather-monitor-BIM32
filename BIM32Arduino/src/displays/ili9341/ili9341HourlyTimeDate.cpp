@@ -1,7 +1,7 @@
 #include "./ili9341.hpp"
 
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include "../languages.hpp"
+#include "../../languages/languages.hpp"
 
 void ILI9341::_hourlyWeekday(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 20, BG_COLOR);

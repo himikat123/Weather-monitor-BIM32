@@ -1,8 +1,8 @@
 #include "agregateLcdData.hpp"
 
-#include "../../sensors.hpp"
-#include "../../validate.hpp"
-#include "../../languages.hpp"
+#include "../../sensors/sensors.hpp"
+#include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
 
 String AgregateLcdData::_absoluteHum(float temp, float hum) {
     float ah = sensors.absoluteHum(temp, hum);

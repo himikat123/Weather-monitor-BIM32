@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "./thingspeak.hpp"
 
-#include "../../config.hpp"
-#include "../../state.hpp"
+#include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 /**
  * check if data is not expired

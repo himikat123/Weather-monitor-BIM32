@@ -1,7 +1,7 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../state.hpp"
+#include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 /**
  * Voltage color

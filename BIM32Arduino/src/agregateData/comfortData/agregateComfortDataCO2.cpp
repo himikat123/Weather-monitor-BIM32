@@ -1,8 +1,8 @@
 #include "agregateComfortData.hpp"
 
 #include "../../globals.hpp"
-#include "../../config.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 float AgregateComfortData::co2() {
     int co2 = UNDEFINED_FLOAT;

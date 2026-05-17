@@ -1,8 +1,8 @@
 #include "./ili9341.hpp"
 
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include "../config.hpp"
-#include "../languages.hpp"
+#include "../../config/config.hpp"
+#include "../../languages/languages.hpp"
 
 void ILI9341::_dateWeekday() {
     if(_prevTWeekday != weekday() || _forced) {

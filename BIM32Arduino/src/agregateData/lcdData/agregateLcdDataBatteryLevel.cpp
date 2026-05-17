@@ -1,8 +1,8 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../thingspeak.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 int AgregateLcdData::batteryLevel() {
     int level = -1;

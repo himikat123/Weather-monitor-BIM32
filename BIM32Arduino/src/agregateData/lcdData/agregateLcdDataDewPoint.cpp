@@ -1,7 +1,7 @@
 #include "agregateLcdData.hpp"
 
-#include "../../validate.hpp"
-#include "../../sensors.hpp"
+#include "../../validation/validate.hpp"
+#include "../../sensors/sensors.hpp"
 
 String AgregateLcdData::_dewPoint(float temp, float hum) {
     float dp = sensors.dewPoint(temp, hum);

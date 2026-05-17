@@ -1,8 +1,8 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../validate.hpp"
-#include "../../thingspeak.hpp"
+#include "../../config/config.hpp"
+#include "../../validation/validate.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
 
 String AgregateLcdData::_voltageThingspeak() {
     String value = "--";

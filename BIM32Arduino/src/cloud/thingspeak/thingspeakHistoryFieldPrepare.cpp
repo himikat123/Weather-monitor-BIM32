@@ -1,12 +1,11 @@
 #include <Arduino.h>
 #include "./thingspeak.hpp"
 
-#include "../../time/time.hpp"
-#include "../../config.hpp"
-#include "../../validate.hpp"
-#include "../../sensors.hpp"
-#include "../../weather.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../validation/validate.hpp"
+#include "../../sensors/sensors.hpp"
+#include "../../weather/weather.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 /**
  * Prepare weather history data for the desired field according to the settings

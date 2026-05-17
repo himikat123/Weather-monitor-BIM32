@@ -1,6 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
+#include "../../timeNTP/timeNTP.hpp"
+
 class Thingspeak {
     public:
         void receive();
@@ -14,6 +16,7 @@ class Thingspeak {
         time_t get_historyUpdated(unsigned int slot);
 
     private:
+        TimeNTP timeNTP;
         String _fieldPrepare(unsigned int field);
         String _historyFieldPrepare(unsigned int fieldNum);
 };

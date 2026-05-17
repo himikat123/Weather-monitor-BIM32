@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include "./nextion.hpp"
 
-#include "../globals.hpp"
-#include "../config.hpp"
-#include "../weather.hpp"
-#include "../agregateData/lcdData/agregateLcdData.hpp"
+#include "../../globals.hpp"
+#include "../../config/config.hpp"
+#include "../../weather/weather.hpp"
+#include "../../agregateData/lcdData/agregateLcdData.hpp"
 
 /**
  * Sending data to display hourly forecast

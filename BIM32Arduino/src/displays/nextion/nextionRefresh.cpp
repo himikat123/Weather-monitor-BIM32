@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "./nextion.hpp"
-#include "../globals.hpp"
-#include "../config.hpp"
+#include "../../globals.hpp"
+#include "../../config/config.hpp"
 
 void Nextion::refresh() {
     if(millis() - _prevForced > 10000) {

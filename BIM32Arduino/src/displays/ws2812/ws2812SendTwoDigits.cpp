@@ -1,6 +1,7 @@
-#include "./ws2812display.hpp"
 #include <LiteLED.h> // v1.2.0 https://github.com/Xylopyrographer/LiteLED/tree/main
-#include "../../config.hpp"
+
+#include "./ws2812display.hpp"
+#include "../../config/config.hpp"
 
 uint8_t WS2812b::_sendTwoDigits(rgb_t black, uint8_t digShift, uint8_t pixelNr) {
     uint8_t repeats = 1;

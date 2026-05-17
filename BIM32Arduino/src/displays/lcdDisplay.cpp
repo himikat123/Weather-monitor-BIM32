@@ -1,10 +1,10 @@
 #include "lcdDisplay.hpp"
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include "../config.hpp"
+#include "../config/config.hpp"
 #include "../agregateData/lcdData/agregateLcdData.hpp"
-#include "../weather.hpp"
-#include "../thingspeak.hpp"
-#include "../state.hpp"
+#include "../weather/weather.hpp"
+#include "../cloud/thingspeak/thingspeak.hpp"
+#include "../state/state.hpp"
 
 void LcdDisplay::_getData() {
     _tHour = config.clock.format() > 1 ? hour() : hourFormat12();

@@ -1,15 +1,15 @@
 #include <Arduino.h>
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 
-#include "./time.hpp"
-#include "../state.hpp"
-#include "../config.hpp"
+#include "./timeNTP.hpp"
+#include "../state/state.hpp"
+#include "../config/config.hpp"
 #include "../displays/nextion/nextion.hpp"
 
 /**
  * Time synchronization with NTP server
  */
-void syncNTP(void) {
+void TimeNTP::syncNTP(void) {
     if(state.net_connected) {
         configTime(config.clock.utc() * 3600, 0, config.clock.ntp());
         struct tm tmstruct;
@@ -39,7 +39,7 @@ void syncNTP(void) {
 /**
  * Check the time and date for daylight saving time
  */
-boolean isSummertime() {
+boolean TimeNTP::isSummertime() {
     if(month() < 3 || month() > 10) return false;
     if(month() > 3 && month() < 10) return true;
     if(

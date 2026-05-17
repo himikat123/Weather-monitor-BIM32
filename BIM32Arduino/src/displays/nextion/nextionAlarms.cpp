@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "./nextion.hpp"
 
-#include "../config.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Sending alarms data

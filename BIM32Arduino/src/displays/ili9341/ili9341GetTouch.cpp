@@ -1,9 +1,9 @@
 #include "./ili9341.hpp"
 
-#include "../globals.hpp"
-#include "../state.hpp"
-#include "../config.hpp"
-#include "../weather.hpp"
+#include "../../globals.hpp"
+#include "../../state/state.hpp"
+#include "../../config/config.hpp"
+#include "../../weather/weather.hpp"
 
 void ILI9341::getTouch() {
     if(state.touch_calibrate) {

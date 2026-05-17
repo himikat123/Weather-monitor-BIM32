@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Arduino.h>
+#include <WebSocketsServer.h>
+
 class WebSocket {
     private:
         WebSocketsServer* wsServer;

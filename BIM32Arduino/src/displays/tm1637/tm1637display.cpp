@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "tm1637display.hpp"
 
-#include "../config.hpp"
+#include "../../config/config.hpp"
 #include "./tm1637driver.hpp"
 #include "./fonts/tm1637Segment.hpp"
 

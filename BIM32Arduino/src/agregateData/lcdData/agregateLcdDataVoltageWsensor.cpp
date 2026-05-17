@@ -1,8 +1,8 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../validate.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../validation/validate.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 String AgregateLcdData::_voltageWsensor() {
     String value = "--";

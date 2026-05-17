@@ -1,7 +1,7 @@
 #include "./ili9341.hpp"
 
-#include "../config.hpp"
-#include "../languages.hpp"
+#include "../../config/config.hpp"
+#include "../../languages/languages.hpp"
 
 void ILI9341::_alarmPage() {
     if(!_alarmSkeleton) {

@@ -1,6 +1,6 @@
 #include "./nextion.hpp"
 
-#include "../validate.hpp"
+#include "../../validation/validate.hpp"
 
 /**
  * Sending data to Network page

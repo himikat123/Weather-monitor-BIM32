@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "./ili9341.hpp"
 
-#include "../config.hpp"
-#include "../state.hpp"
+#include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 void ILI9341::brightness(unsigned int bright) {
     if(_power) {

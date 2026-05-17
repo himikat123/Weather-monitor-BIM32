@@ -2,8 +2,8 @@
 #include "./mqtt.hpp"
 #include <PubSubClient.h> // v2.8.0 https://github.com/knolleary/pubsubclient
 
-#include "../../config.hpp"
-#include "../../agregateData/agregateSendData.hpp"
+#include "../../config/config.hpp"
+#include "../../agregateData/sendData/agregateSendData.hpp"
 
 /**
  * Initialize MQTT client

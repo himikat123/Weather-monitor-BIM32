@@ -16,7 +16,7 @@
 #include "../config/config.hpp"
 #include "../globals.hpp"
 #include "../pinout.hpp"
-#include "state.hpp"
+#include "../state/state.hpp"
 
 #define DS18B20_RESOLUTION    12 /* DS18B20 resolution 9,10,11 or 12 bits */
 

@@ -1,7 +1,7 @@
 #include "./ili9341.hpp"
 
-#include "../validate.hpp"
-#include "../languages.hpp"
+#include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
 
 void ILI9341::_hourlyTemp(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 16, BG_COLOR);

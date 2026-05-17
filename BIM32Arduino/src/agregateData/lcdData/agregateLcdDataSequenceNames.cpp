@@ -1,6 +1,6 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
+#include "../../config/config.hpp"
 
 void AgregateLcdData::sequenceNames(String* nameSequence) {
     for(uint8_t i=0; i<4; i++) {

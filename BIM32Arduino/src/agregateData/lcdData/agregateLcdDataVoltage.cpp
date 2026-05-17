@@ -1,8 +1,8 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../sensors.hpp"
-#include "../../weather.hpp"
+#include "../../config/config.hpp"
+#include "../../sensors/sensors.hpp"
+#include "../../weather/weather.hpp"
 
 String AgregateLcdData::voltage() {
     String value = "";

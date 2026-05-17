@@ -1,8 +1,8 @@
 #include "./comfort.hpp"
 
-#include "../agregate/agregateComfortData.hpp"
-#include "../validate.hpp"
-#include "../config.hpp"
+#include "../agregateData/comfortData/agregateComfortData.hpp"
+#include "../validation/validate.hpp"
+#include "../config/config.hpp"
 
 /**
  * Calculate comfort level 

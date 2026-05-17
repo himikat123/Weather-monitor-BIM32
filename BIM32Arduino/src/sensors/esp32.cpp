@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "./sensors.hpp"
-#include "../config.hpp"
-#include "../state.hpp"
+#include "../config/config.hpp"
+#include "../state/state.hpp"
 
 #ifdef __cplusplus
   extern "C"{

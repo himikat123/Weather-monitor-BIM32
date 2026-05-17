@@ -1,8 +1,8 @@
 #include "agregateComfortData.hpp"
 
 #include "../../globals.hpp"
-#include "../../config.hpp"
-#include "../../sensors.hpp"
+#include "../../config/config.hpp"
+#include "../../sensors/sensors.hpp"
 
 float AgregateComfortData::iaq() {
     float iaq = UNDEFINED_FLOAT;

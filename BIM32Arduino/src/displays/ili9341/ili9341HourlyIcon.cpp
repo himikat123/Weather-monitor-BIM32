@@ -1,15 +1,15 @@
 #include "./ili9341.hpp"
 
-#include "../weather.hpp"
-#include "./pictures/iconsTiny/icon_tiny_01.hpp"
-#include "./pictures/iconsTiny/icon_tiny_02.hpp"
-#include "./pictures/iconsTiny/icon_tiny_04.hpp"
-#include "./pictures/iconsTiny/icon_tiny_09.hpp"
-#include "./pictures/iconsTiny/icon_tiny_10.hpp"
-#include "./pictures/iconsTiny/icon_tiny_11.hpp"
-#include "./pictures/iconsTiny/icon_tiny_13.hpp"
-#include "./pictures/iconsTiny/icon_tiny_50.hpp"
-#include "./pictures/iconsTiny/icon_tiny_loading.hpp"
+#include "../../weather/weather.hpp"
+#include "./pictures/iconsTiny/t01.hpp"
+#include "./pictures/iconsTiny/t02.hpp"
+#include "./pictures/iconsTiny/t04.hpp"
+#include "./pictures/iconsTiny/t09.hpp"
+#include "./pictures/iconsTiny/t10.hpp"
+#include "./pictures/iconsTiny/t11.hpp"
+#include "./pictures/iconsTiny/t13.hpp"
+#include "./pictures/iconsTiny/t50.hpp"
+#include "./pictures/iconsTiny/tLoading.hpp"
 
 void ILI9341::_hourlyIcon(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 32, BG_COLOR);

@@ -1,7 +1,7 @@
 #include "./nextion.hpp"
 
-#include "../validate.hpp"
-#include "../languages.hpp"
+#include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
 
 /**
  * Display wind speed

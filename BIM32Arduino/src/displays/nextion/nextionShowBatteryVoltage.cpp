@@ -1,6 +1,6 @@
 #include "./nextion.hpp"
 
-#include "../validate.hpp"
+#include "../../validation/validate.hpp"
 
 /**
  * Display voltage, percentage, CO2 or IAQ

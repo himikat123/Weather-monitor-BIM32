@@ -1,9 +1,8 @@
 #include <Arduino.h>
 #include "./thingspeak.hpp"
 
-#include "../../time/time.hpp"
 #include "../../agregateData/sendData/agregateSendData.hpp"
-#include "../../config.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Prepare data for the desired field according to the settings

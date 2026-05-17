@@ -3,7 +3,7 @@
 #include <TFT_eSPI.h>
 #include <XPT2046_Touchscreen.h>
 
-#include "lcdDisplay.hpp"
+#include "../lcdDisplay.hpp"
 
 class ILI9341 : LcdDisplay {
     static constexpr int LEFT              0

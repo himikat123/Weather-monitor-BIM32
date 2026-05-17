@@ -1,4 +1,4 @@
-#include "validate.hpp"
+#include "./validate.hpp"
 
 /**
  * Validate if temperature is within the normal range

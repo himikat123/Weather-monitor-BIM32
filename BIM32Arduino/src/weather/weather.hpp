@@ -1,16 +1,8 @@
 #pragma once
 
-#include <HTTPClient.h>
-#include <JSON_Decoder.h> // https://github.com/Bodmer/JSON_Decoder
-#include <OpenWeather.h> // v0.3.0 https://github.com/Bodmer/OpenWeather/tree/main?tab=readme-ov-file
-#include "languages.hpp"
+#include <Arduino.h>
 
 class Weather {
-    #define OPENWEATHERMAP 0
-    #define WEATHERBIT 1
-    #define OPEN_METEO 2
-    #define DAYS 5
-
     public:
         void update();
         float get_currentTemp();

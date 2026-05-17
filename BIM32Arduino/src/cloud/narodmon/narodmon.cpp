@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "./narodmon.hpp"
 
-#include "../../config.hpp"
-#include "../../agregateData/agregateSendData.hpp"
+#include "../../config/config.hpp"
+#include "../../agregateData/sendData/agregateSendData.hpp"
 
 /**
  * Send data to norodmon

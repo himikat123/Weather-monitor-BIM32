@@ -1,7 +1,7 @@
 #include "./ili9341.hpp"
 
-#include "../globals.hpp"
-#include "../languages.hpp"
+#include "../../globals.hpp"
+#include "../../languages/languages.hpp"
 
 int ILI9341::_avg(int a, int b) {
     return (a & b) + ((a ^ b) >> 1);

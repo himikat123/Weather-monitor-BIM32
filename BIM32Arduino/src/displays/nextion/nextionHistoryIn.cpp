@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include "./nextion.hpp"
 
-#include "../config.hpp"
-#include "../thingspeak.hpp"
+#include "../../config/config.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
 
 /**
  * Sending data to display indoor weather history

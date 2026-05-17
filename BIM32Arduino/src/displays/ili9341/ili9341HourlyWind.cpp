@@ -1,16 +1,16 @@
 #include "./ili9341.hpp"
 
-#include "../weather.hpp"
-#include "../validate.hpp"
-#include "../languages.hpp"
-#include "./pictures/symbols/wind_north_tiny.hpp"
-#include "./pictures/symbols/wind_north_east_tiny.hpp"
-#include "./pictures/symbols/wind_east_tiny.hpp"
-#include "./pictures/symbols/wind_south_east_tiny.hpp"
-#include "./pictures/symbols/wind_south_tiny.hpp"
-#include "./pictures/symbols/wind_south_west_tiny.hpp"
-#include "./pictures/symbols/wind_west_tiny.hpp"
-#include "./pictures/symbols/wind_north_west_tiny.hpp"
+#include "../../weather/weather.hpp"
+#include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
+#include "./pictures/windTiny/tNorth.hpp"
+#include "./pictures/windTiny/tNorthEast.hpp"
+#include "./pictures/windTiny/tEast.hpp"
+#include "./pictures/windTiny/tSouthEast.hpp"
+#include "./pictures/windTiny/tSouth.hpp"
+#include "./pictures/windTiny/tSouthWest.hpp"
+#include "./pictures/windTiny/tWest.hpp"
+#include "./pictures/windTiny/tNorthWest.hpp"
 
 void ILI9341::_hourlyWindSpeed(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);

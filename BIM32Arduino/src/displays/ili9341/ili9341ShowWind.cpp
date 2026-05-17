@@ -1,7 +1,7 @@
 #include "./ili9341.hpp"
 
-#include "../validate.hpp"
-#include "../languages.hpp"
+#include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
 #include "./pictures/wind/north.hpp"
 #include "./pictures/wind/northEast.hpp"
 #include "./pictures/wind/east.hpp"

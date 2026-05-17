@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "./ili9341.hpp"
 
-#include "../config.hpp"
+#include "../../config/config.hpp"
 
 void ILI9341::_sequenceSlotSkip() {
     for(uint8_t i=0; i<4; i++) {

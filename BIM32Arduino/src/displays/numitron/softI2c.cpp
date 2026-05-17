@@ -1,5 +1,5 @@
-#include <Arduino>
-#include "softi2c.hpp"
+#include <Arduino.h>
+#include "./softi2c.hpp"
 
 SoftI2C::SoftI2C(uint8_t sda, uint8_t scl) {
     Serial.print("sda: "); Serial.println(sda);

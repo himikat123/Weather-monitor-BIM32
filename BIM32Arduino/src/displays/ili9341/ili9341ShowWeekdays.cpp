@@ -1,6 +1,6 @@
 #include "./ili9341.hpp"
 
-#include "../languages.hpp"
+#include "../../languages/languages.hpp"
 
 void ILI9341::_showWeekday() {
     if(_prevTWeekday != _tWeekday || _forced) {

@@ -2,11 +2,11 @@
 #include "./agregateSegmentData.hpp"
 
 #include "../../globals.hpp"
-#include "../../config.hpp"
-#include "../../sensors.hpp"
-#include "../../weather.hpp"
-#include "../../thingspeak.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../sensors/sensors.hpp"
+#include "../../weather/weather.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType) {
     float data = UNDEFINED_FLOAT;

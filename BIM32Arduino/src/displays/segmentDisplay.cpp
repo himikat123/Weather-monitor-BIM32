@@ -1,4 +1,5 @@
-#include "segmentDisplay.hpp"
+#include "./segmentDisplay.hpp"
+#include "../config/config.hpp"
 
 /**
  * Set display model

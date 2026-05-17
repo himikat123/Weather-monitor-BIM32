@@ -1,7 +1,7 @@
 #include "./nextion.hpp"
 
-#include "../validate.hpp"
-#include "../config.hpp"
+#include "../../validation/validate.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Display humidity inside

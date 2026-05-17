@@ -2,9 +2,9 @@
 #include <ArduinoJson.h>
 #include "./nextion.hpp"
 
-#include "../globals.hpp"
-#include "../config.hpp"
-#include "../state.hpp"
+#include "../../globals.hpp"
+#include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 /**
  * Receive date and time from display

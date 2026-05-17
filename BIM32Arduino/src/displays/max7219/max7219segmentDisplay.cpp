@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "./max7219segmentDisplay.hpp"
 
-#include "../config.hpp"
+#include "../../config/config.hpp"
 #include "./fonts/max7219Segment.hpp"
 
 /**

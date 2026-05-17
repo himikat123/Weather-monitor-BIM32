@@ -1,9 +1,9 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../weather.hpp"
-#include "../../thingspeak.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../weather/weather.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 float AgregateLcdData::windSpeed() {
     float windSpeed = UNDEFINED_FLOAT;

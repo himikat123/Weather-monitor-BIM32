@@ -1,11 +1,11 @@
 #include "agregateLcdData.hpp"
 
 #include "../../globals.hpp"
-#include "../../config.hpp"
-#include "../../sensors.hpp"
-#include "../../weather.hpp"
-#include "../../thingspeak.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../sensors/sensors.hpp"
+#include "../../weather/weather.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 void AgregateLcdData::_humSequence(float* humSequence) {
     for(uint8_t i=0; i<4; i++) {

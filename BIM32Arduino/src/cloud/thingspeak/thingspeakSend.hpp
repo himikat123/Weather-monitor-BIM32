@@ -2,7 +2,7 @@
 #include <HTTPClient.h>
 #include "./thingspeak.hpp"
 
-#include "../../config.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Send data to thingspeak

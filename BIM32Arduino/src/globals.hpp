@@ -51,6 +51,7 @@
 #define OPENWEATHERMAP       0
 #define WEATHERBIT           1
 #define OPEN_METEO           2
+#define DAYS                 5
 
 #define NETWORKS             3
 #define PROVIDERS            2
@@ -69,6 +70,9 @@
 #define MAC_LEN              18
 #define W_NAME_LEN           32
 #define HOURLY_COUNT         40
+
+#define DISPLAY_1             0
+#define DISPLAY_2             1
 
 // Division of time into hours and minutes
 inline unsigned int get_time(bool level, const char* time) {

@@ -1,7 +1,7 @@
 #include "./agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../languages.hpp"
+#include "../../config/config.hpp"
+#include "../../languages/languages.hpp"
 
 String AgregateLcdData::_localDate() {
     char buf[20];

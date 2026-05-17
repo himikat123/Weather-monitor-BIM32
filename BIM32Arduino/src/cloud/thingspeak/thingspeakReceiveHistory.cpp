@@ -4,9 +4,9 @@
 #include "./thingspeak.hpp"
 
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include "../../time/time.hpp"
-#include "../../config.hpp"
-#include "../../state.hpp"
+#include "../../timeNTP/timeNTP.hpp"
+#include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 /**
  * Receive data from weather history repository
@@ -58,7 +58,7 @@ void Thingspeak::receiveHistory() {
             tmth.Second = atoi(strtok(NULL, ":"));
             state.thing.historyTime[i] = makeTime(tmth);
             state.thing.historyTime[i] += config.clock.utc() * 3600;
-            state.thing.historyTime[i] += config.clock.dlst() ? time.isSummertime() ? 3600 : 0 : 0;
+            state.thing.historyTime[i] += config.clock.dlst() ? timeNTP.isSummertime() ? 3600 : 0 : 0;
         }
         Serial.println("successfull");
     }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "src/nextion/nextion.hpp"
+#include "./src/displays/nextion/nextion.hpp"
 
 #define HOUR      0
 #define MINUTE    1

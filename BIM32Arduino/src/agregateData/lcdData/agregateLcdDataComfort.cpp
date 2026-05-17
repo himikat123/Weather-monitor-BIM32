@@ -1,8 +1,8 @@
 #include "agregateLcdData.hpp"
 
-#include "../../config.hpp"
-#include "../../languages.hpp"
-#include "../../state.hpp"
+#include "../../config/config.hpp"
+#include "../../languages/languages.hpp"
+#include "../../state/state.hpp"
 
 String AgregateLcdData::comfort() {
     String comfort = "";

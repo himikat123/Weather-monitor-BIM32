@@ -1,6 +1,6 @@
 #include "./ili9341.hpp"
 
-#include "../config.hpp"
+#include "../../config/config.hpp"
 #include "./pictures/symbols/alarm.hpp"
 #include "./pictures/symbols/alarmOff.hpp"
 

@@ -1,6 +1,6 @@
 #include "./ili9341.hpp"
 
-#include "../weather.hpp"
+#include "../../weather/weather.hpp"
 
 void ILI9341::_hourlyPage() {
     if(!_hourlySkeleton) {

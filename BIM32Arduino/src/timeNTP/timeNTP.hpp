@@ -1,10 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
-class Time {
+class TimeNTP {
     public:
         void syncNTP(void);
         boolean isSummertime();
 };
-
-extern Time time;

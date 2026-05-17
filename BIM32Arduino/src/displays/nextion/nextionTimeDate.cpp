@@ -1,7 +1,7 @@
 #include "./nextion.hpp"
 
-#include "../config.hpp"
-#include "../languages.hpp"
+#include "../../config/config.hpp"
+#include "../../languages/languages.hpp"
 
 /**
  * Sending time and date to the NX4832T035 display that does not have a built-in RTC

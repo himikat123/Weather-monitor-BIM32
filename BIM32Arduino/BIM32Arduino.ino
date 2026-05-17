@@ -23,81 +23,81 @@
 WiFiClient client;
 #include <WebServer.h>
 WebServer server(80);
-#include <WebSocketsServer.h>
+//#include <WebSocketsServer.h>
 #include <ESPmDNS.h>
-#include <time.h>              // DELETE
+//#include <time.h>              // DELETE
 
 /* External Libraries */
-#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties.   // DELETE
-#include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
+//#include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties.   // DELETE
+//#include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
 #include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
-#include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
+//#include <TFT_eSPI.h> // v2.5.34 https://github.com/Bodmer/TFT_eSPI
 
-#include <XPT2046_Touchscreen.h> // v1.4.0 https://github.com/PaulStoffregen/XPT2046_Touchscreen
+//#include <XPT2046_Touchscreen.h> // v1.4.0 https://github.com/PaulStoffregen/XPT2046_Touchscreen
 
 /* Own classes */
-#include "src/time/time.hpp"
-Time time;
-#include "src/state.hpp"
+// #include "src/time/time.hpp"
+// Time time;
+#include "src/state/state.hpp"
 State state;
-#include "src/validate.hpp"
+#include "src/validation/validate.hpp"
 Validate validate;
-#include "src/pinout.hpp"
+//#include "src/pinout.hpp"
 #include "src/globals.hpp"
-#include "src/config.hpp"
+#include "src/config/config.hpp"
 Config config;
-#include "src/sensors.hpp"
+#include "src/sensors/sensors.hpp"
 Sensors sensors;
-#include "src/languages.hpp"
+#include "src/languages/languages.hpp"
 Lang lang;
-#include "src/wirelessSensor.hpp"
+#include "src/wsensor/wirelessSensor.hpp"
 WirelessSensor wsensor;
-#include "src/weather.hpp"
+#include "src/weather/weather.hpp"
 Weather weather;
-#include "src/sound.hpp"
-Sound sound;
+//#include "src/sound.hpp"
+//Sound sound;
 //#include "src/agregateSendData.hpp"
 //AgregateSendData agregateSendData;
-#include "src/thingspeak.hpp"
+#include "src/cloud/thingspeak/thingspeak.hpp"
 Thingspeak thingspeak;
-#include "src/narodmon.hpp"
+#include "src/cloud/narodmon/narodmon.hpp"
 Narodmon narodmon;
-#include "src/mqtt.hpp"
+#include "src/cloud/mqtt/mqtt.hpp"
 MQTT mqtt;
-#include "src/fonts.hpp"
+//#include "src/fonts.hpp"
 #include "src/agregateData/lcdData/agregateLcdData.hpp"
 AgregateLcdData agregateLcdData;
-#include "src/lcdDisplay.hpp"               // DELETE
-#include "src/nextion/nextion.hpp"
+//#include "src/lcdDisplay.hpp"               // DELETE
+#include "src/displays/nextion/nextion.hpp"
 Nextion nextion;
-#include "src/ili9341.hpp"
+#include "src/displays/ili9341/ili9341.hpp"
 ILI9341 ili9341;
-#include "src/agregateSegmentData.hpp"
-AgregateSegmentData agregateSegmentData;
-#include "src/segmentAnimationsShifts.hpp"
-#include "src/segmentDisplay.hpp"
-#include "src/ws2812display.hpp"
-WS2812b ws2812b_1;
-WS2812b ws2812b_2;
-#include "src/softi2c.hpp"
-SoftI2C Wire_1 = SoftI2C(PCF8575_1_SDA_PIN, PCF8575_1_SCL_PIN);
-SoftI2C Wire_2 = SoftI2C(PCF8575_2_SDA_PIN, PCF8575_2_SCL_PIN);
-#include "src/tm1637display.hpp"
-TM1637 tm1637_1;
-TM1637 tm1637_2;
-#include "src/max7219segmentDisplay.hpp"
-MAX7219_S max7219_1;
-MAX7219_S max7219_2;
-#include "src/pcf8575SegmentDisplay.hpp"
-PCF8575_S pcf8575_1;
-PCF8575_S pcf8575_2;
-#include "src/network.hpp"
-Network network;
-//#include "src/agregateComfortData.hpp"
-//AgregateComfortData agregateComfortData;
-#include "src/comfort/comfort.hpp"
-Comfort comfort;
-#include "src/websocket.hpp"
+//#include "src/agregateSegmentData.hpp"
+//AgregateSegmentData agregateSegmentData;
+//#include "src/segmentAnimationsShifts.hpp"
+//#include "src/segmentDisplay.hpp"
+//#include "src/ws2812display.hpp"
+//WS2812b ws2812b_1;
+//WS2812b ws2812b_2;
+//#include "src/softi2c.hpp"
+//SoftI2C Wire_1 = SoftI2C(PCF8575_1_SDA_PIN, PCF8575_1_SCL_PIN);
+//SoftI2C Wire_2 = SoftI2C(PCF8575_2_SDA_PIN, PCF8575_2_SCL_PIN);
+//#include "src/tm1637display.hpp"
+//TM1637 tm1637_1;
+//TM1637 tm1637_2;
+// #include "src/max7219segmentDisplay.hpp"
+// MAX7219_S max7219_1;
+// MAX7219_S max7219_2;
+// #include "src/pcf8575SegmentDisplay.hpp"
+// PCF8575_S pcf8575_1;
+// PCF8575_S pcf8575_2;
+// #include "src/network.hpp"
+// Network network;
+// //#include "src/agregateComfortData.hpp"
+// //AgregateComfortData agregateComfortData;
+// #include "src/comfort/comfort.hpp"
+// Comfort comfort;
+#include "src/websockets/websocket.hpp"
 WebSocket websocket(88, 1);
 
 #include "taskDisplay.hpp"

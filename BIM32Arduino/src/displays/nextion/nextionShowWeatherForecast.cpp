@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "./nextion.hpp"
 
-#include "../validate.hpp"
+#include "../../validation/validate.hpp"
 
 /**
  * Display daily weather forecast

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "./time/time.hpp"
+#include "./src/timeNTP/timeNTP.hpp"
+TimeNTP timeNTP;
 
 void display1_toggle();
 void display2_toggle();
@@ -100,7 +101,7 @@ void TaskSensors(void *pvParameters) {
                     ntp_update = millis();
                     Serial.println(SEPARATOR);
                     Serial.println("NTP synchronization... ");
-                    if(network.isConnected()) time.syncNTP();
+                    if(network.isConnected()) timeNTP.syncNTP();
                     else {
                         state.clockSynchronized = false;
                         Serial.println("No internet connection");

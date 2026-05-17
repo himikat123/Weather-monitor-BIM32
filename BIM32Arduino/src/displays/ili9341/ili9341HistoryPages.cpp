@@ -1,7 +1,7 @@
 #include "./ili9341.hpp"
 
-#include "../languages.hpp"
-#include "../thingspeak.hpp"
+#include "../../languages/languages.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
 
 void ILI9341::_historyInPage() {
     if(!_historyInSkeleton) {

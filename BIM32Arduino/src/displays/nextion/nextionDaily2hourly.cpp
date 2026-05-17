@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "nextion.hpp"
 
-#include "../weather.hpp"
+#include "../../weather/weather.hpp"
 
 /**
  * Initialize daily forecast links to hourly forecast

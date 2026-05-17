@@ -1,7 +1,7 @@
 #include "./nextion.hpp"
 
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
-#include "../config.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Set the time and date of the display with built-in RTC

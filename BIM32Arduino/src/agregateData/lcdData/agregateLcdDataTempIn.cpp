@@ -1,11 +1,11 @@
 #include "agregateLcdData.hpp"
 
 #include "../../globals.hpp"
-#include "../../config.hpp"
-#include "../../sensors.hpp"
-#include "../../weather.hpp"
-#include "../../thingspeak.hpp"
-#include "../../wirelessSensor.hpp"
+#include "../../config/config.hpp"
+#include "../../sensors/sensors.hpp"
+#include "../../weather/weather.hpp"
+#include "../../cloud/thingspeak/thingspeak.hpp"
+#include "../../wsensor/wirelessSensor.hpp"
 
 float AgregateLcdData::tempIn(float* tempSequence) {
     float temp = UNDEFINED_FLOAT;
