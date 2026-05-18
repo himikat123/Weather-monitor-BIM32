@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TimeLib.h>
 
 #include "./weather.hpp"
 #include "../state/state.hpp"

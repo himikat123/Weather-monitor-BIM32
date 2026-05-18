@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TimeLib.h>
 #include <OpenWeather.h> // v0.3.0 https://github.com/Bodmer/OpenWeather/tree/main?tab=readme-ov-file
 #include <JSON_Decoder.h> // https://github.com/Bodmer/JSON_Decoder
 

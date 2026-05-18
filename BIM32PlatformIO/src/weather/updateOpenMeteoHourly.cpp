@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <HTTPClient.h>
 #include <JSON_Decoder.h> // https://github.com/Bodmer/JSON_Decoder
+#include <TimeLib.h>
 
 #include "./weather.hpp"
 #include "../config/config.hpp"

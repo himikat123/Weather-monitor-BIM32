@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <HTTPClient.h>
 
 class Weather {
     public:
@@ -31,6 +32,7 @@ class Weather {
     private:
         float _lon = 0.0;
         float _lat = 0.0;
+        WiFiClient client;
 
         unsigned int _convertIcon(int code);
         const char* _openMeteoCode2Description(uint8_t code);

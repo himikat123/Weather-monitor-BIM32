@@ -2,6 +2,7 @@
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
 #include "FS.h"
 #include <LittleFS.h>
+#include <TimeLib.h>
 
 #include "./sensors.hpp"
 #include "../config/config.hpp"
