@@ -2,6 +2,7 @@
 #include "./nextion.hpp"
 #include "../../globals.hpp"
 #include "../../config/config.hpp"
+#include "../../state/state.hpp"
 
 void Nextion::refresh() {
     if(millis() - _prevForced > 10000) {

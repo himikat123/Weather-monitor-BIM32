@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TimeLib.h>
 #include "./nextion.hpp"
 
 #include "../../globals.hpp"

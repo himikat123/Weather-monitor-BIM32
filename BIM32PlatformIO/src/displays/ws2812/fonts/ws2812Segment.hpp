@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-const uint8_t font_ws2912[] PROGMEM = {
+const uint8_t font_ws2812[18] PROGMEM = {
     // g e d c b a f
     0x3F, //0x00 0
     0x0C, //0x01 1 

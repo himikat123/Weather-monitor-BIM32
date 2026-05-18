@@ -1,3 +1,16 @@
+#include <Arduino.h>
+#include <ArduinoOTA.h>
+#include <Update.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+WiFiClient client;
+#include <WebServer.h>
+WebServer server(80);
+#include <ESPmDNS.h>
+#include "ESP32SSDP.h" // v1.2.1 https://github.com/luc-github/ESP32SSDP
+#include "./websockets/websocket.hpp"
+WebSocket websocket(88, 1);
+
 size_t content_len;
 File fsUploadFile;
 

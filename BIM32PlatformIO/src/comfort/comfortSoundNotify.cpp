@@ -1,7 +1,6 @@
 #include "./comfort.hpp"
-#include "../agregateData/comfortData/agregateComfortData.hpp"
-#include "../validation/validate.hpp"
 #include "../config/config.hpp"
+#include "../sound/sound.hpp"
 
 void Comfort::soundNotify() {
     if(config.comfort.temp.sound()) sound.tempNotify(_tempLevel);

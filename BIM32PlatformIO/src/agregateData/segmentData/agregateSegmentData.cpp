@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TimeLib.h>
 #include "./agregateSegmentData.hpp"
 
 #include "../../globals.hpp"
@@ -13,7 +14,7 @@ float AgregateSegmentData::slotData(uint8_t sensor, uint8_t type, uint8_t timeSl
 
     switch(sensor) {
         case CLOCK_SOURCE: { // Clock
-            *dType = CLOCK;
+            *dType = CLOCK_TYPE;
         }; break;
         case DATE_SOURCE: { // Date
             *dType = DATE_TYPE;

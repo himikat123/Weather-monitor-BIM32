@@ -7,6 +7,7 @@ struct DS18B20State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["ds18b20"]["temp"] = temp;
+        JsonObject ds = o["ds18b20"].to<JsonObject>();
+        ds["temp"] = temp;
     }
 };

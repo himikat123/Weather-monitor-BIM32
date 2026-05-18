@@ -40,6 +40,13 @@ class Config {
         }
 
     public:
+        uint16_t calData(uint8_t num);
+        String lang();
+        uint8_t units_pres();
+        void readConfig(void);
+        void set_lang(String lng);
+        void saveAlarmFile();
+
         ComfortStruct comfort;
         NetworkStruct network;
         AccessPointStruct accessPoint;

@@ -8,7 +8,8 @@ struct SHT21State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["sht21"]["temp"] = temp;
-        o["sht21"]["hum"] = hum;
+        JsonObject sht = o["sht21"].to<JsonObject>();
+        sht["temp"] = temp;
+        sht["hum"] = hum;
     }
 };

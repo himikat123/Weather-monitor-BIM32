@@ -31,10 +31,11 @@ struct WeatherState {
         time_t time = 0;
 
         void toJson(JsonObject o) const {
-            JsonArray a_tMax = o.createNestedArray("tMax");
-            JsonArray a_tMin = o.createNestedArray("tMin");
-            JsonArray a_wind = o.createNestedArray("wind");
-            JsonArray a_icon = o.createNestedArray("icon");
+            JsonArray a_tMax = o["tMax"].to<JsonArray>();
+            JsonArray a_tMin = o["tMin"].to<JsonArray>();
+            JsonArray a_wind = o["wind"].to<JsonArray>();
+            JsonArray a_icon = o["icon"].to<JsonArray>();
+            
             for(int i=0; i<5; i++){
                 a_tMax.add(tMax[i]);
                 a_tMin.add(tMin[i]);
@@ -56,7 +57,7 @@ struct WeatherState {
     } hourly;
 
     void toJson(JsonObject obj) const {
-        JsonObject o = obj.createNestedObject("weather");
+        JsonObject o = obj["weather"].to<JsonObject>();
         o["temp"] = temp;
         o["hum"] = hum;
         o["pres"] = pres;
@@ -65,10 +66,10 @@ struct WeatherState {
         o["descript"] = descript;
         o["time"] = time;
 
-        JsonObject windObj = o.createNestedObject("wind");
+        JsonObject windObj = o["wind"].to<JsonObject>();
         wind.toJson(windObj);
 
-        JsonObject dailyObj = o.createNestedObject("daily");
+        JsonObject dailyObj = o["daily"].to<JsonObject>();
         daily.toJson(dailyObj);
     }
 };

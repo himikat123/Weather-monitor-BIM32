@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "./ili9341.hpp"
 
+#include "../../pinout.hpp"
 #include "../../config/config.hpp"
 #include "../../state/state.hpp"
 

@@ -1,10 +1,14 @@
-#include "lcdDisplay.hpp"
+#include <Arduino.h>
+#include <WiFi.h>
 #include <TimeLib.h> // v1.6.1 https://playground.arduino.cc/Code/Time/
+
+#include "./lcdDisplay.hpp"
 #include "../config/config.hpp"
-#include "../agregateData/lcdData/agregateLcdData.hpp"
-#include "../weather/weather.hpp"
-#include "../cloud/thingspeak/thingspeak.hpp"
 #include "../state/state.hpp"
+#include "../weather/weather.hpp"
+#include "../sensors/sensors.hpp"
+#include "../agregateData/lcdData/agregateLcdData.hpp"
+#include "../cloud/thingspeak/thingspeak.hpp"
 
 void LcdDisplay::_getData() {
     _tHour = config.clock.format() > 1 ? hour() : hourFormat12();

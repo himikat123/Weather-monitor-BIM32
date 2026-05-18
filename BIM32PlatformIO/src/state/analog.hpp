@@ -7,6 +7,7 @@ struct AnalogState {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["analog"]["volt"] = volt;
+        JsonObject an = o["analog"].to<JsonObject>();
+        an["volt"] = volt;
     }
 };

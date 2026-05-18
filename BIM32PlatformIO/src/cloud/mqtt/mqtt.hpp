@@ -1,5 +1,6 @@
 #pragma once
 
+#include <HTTPClient.h>
 #include <PubSubClient.h> // v2.8.0 https://github.com/knolleary/pubsubclient
 
 class MQTT {
@@ -7,6 +8,7 @@ class MQTT {
         PubSubClient mqttClient;
     
     public:
+        WiFiClient client;
         MQTT() : mqttClient(client) {}
         void init();
         bool loop();

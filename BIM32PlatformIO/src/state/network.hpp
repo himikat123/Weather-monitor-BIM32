@@ -20,19 +20,20 @@ struct NetworkState {
     int rssis[SSID_COUNT] = { 0 }; // List of signal strengths of available networks
 
     void toJson(JsonObject o) const {
-        o["network"]["ssid"] = ssid;
-        o["network"]["ch"] = ch;
-        o["network"]["sig"] = sig;
-        o["network"]["mac"] = mac;
-        o["network"]["ip"] = ip;
-        o["network"]["mask"] = mask;
-        o["network"]["gw"] = gw;
-        o["network"]["dns1"] = dns1;
-        o["network"]["dns2"] = dns2;
+        JsonObject net = o["network"].to<JsonObject>();
+        net["ssid"] = ssid;
+        net["ch"] = ch;
+        net["sig"] = sig;
+        net["mac"] = mac;
+        net["ip"] = ip;
+        net["mask"] = mask;
+        net["gw"] = gw;
+        net["dns1"] = dns1;
+        net["dns2"] = dns2;
 
-        JsonArray a_ssids = o.createNestedArray("ssids");
+        JsonArray a_ssids = o["ssids"].to<JsonArray>();
         for(int i=0; i<nets; i++) {
-            JsonArray s = a_ssids.createNestedArray();
+            JsonArray s = a_ssids.add<JsonArray>();
             s.add(ssids[i]);
             s.add(rssis[i]);
         }

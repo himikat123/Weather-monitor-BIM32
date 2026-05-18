@@ -8,7 +8,8 @@ struct DHT22State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["dht22"]["temp"] = temp;
-        o["dht22"]["hum"] = hum;
+        JsonObject dht = o["dht22"].to<JsonObject>();
+        dht["temp"] = temp;
+        dht["hum"] = hum;
     }
 };

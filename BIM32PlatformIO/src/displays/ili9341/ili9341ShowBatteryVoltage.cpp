@@ -1,5 +1,6 @@
 #include "./ili9341.hpp"
 
+#include "../../validation/validate.hpp"
 #include "./pictures/bats/bat1.hpp"
 #include "./pictures/bats/bat2.hpp"
 #include "./pictures/bats/bat3.hpp"

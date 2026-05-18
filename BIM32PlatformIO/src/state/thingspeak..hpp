@@ -10,9 +10,11 @@ struct ThingState {
     bool updated = false;
 
     void toJson(JsonObject obj) const {
-        JsonObject o = obj.createNestedObject("thing");
+        JsonObject o = obj["thing"].to<JsonObject>();
         o["time"] = time;
-        JsonArray a = o.createNestedArray("data");
-        for(int i=0;i<8;i++) a.add(data[i]);
+        JsonArray a = o["data"].to<JsonArray>();
+        for(int i=0; i<8; i++) {
+            a.add(data[i]);
+        }
     }
 };

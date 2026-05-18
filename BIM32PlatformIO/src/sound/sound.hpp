@@ -31,3 +31,5 @@ class Sound {
         unsigned int _prevAirLevel = AIR_CLEAN;
         boolean _mp3_found = false;
 };
+
+extern Sound sound;

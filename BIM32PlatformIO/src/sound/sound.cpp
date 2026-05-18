@@ -5,6 +5,8 @@
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 
+Sound sound;
+
 /**
  * DF player initialization
  */

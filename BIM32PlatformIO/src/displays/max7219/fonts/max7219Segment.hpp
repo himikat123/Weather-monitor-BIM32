@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-const uint8_t font_max7219[][] PROGMEM = {
+const uint8_t font_max7219[2][18] PROGMEM = {
     { // h a b c d e f g
         0x7E, //0x00 0
         0x30, //0x01 1

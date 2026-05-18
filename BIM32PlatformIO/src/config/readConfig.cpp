@@ -1,21 +1,9 @@
 #include <Arduino.h>
 #include <ArduinoJson.h> // v7.0.3 https://arduinojson.org/?utm_source=meta&utm_medium=library.properties
+
 #include "./config.hpp"
 
-// #include "structures/comfort.hpp"
-// #include "structures/network.hpp"
-// #include "structures/accessPoint.hpp"
-// #include "structures/weather.hpp"
-// #include "structures/clock.hpp"
-// #include "structures/display/display.hpp"
-// #include "structures/sound.hpp"
-// #include "structures/sensors.hpp"
-// #include "structures/wsensor.hpp"
-// #include "structures/cloud/cloud.hpp"
-// #include "structures/alarm.hpp"
-// #include "structures/account.hpp"
-
-void readConfig(void) {
+void Config::readConfig(void) {
     /* Read config file */
     Serial.println(SEPARATOR);
     Serial.print("Read config file... ");

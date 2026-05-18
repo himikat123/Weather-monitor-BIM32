@@ -1,6 +1,7 @@
 #include "./ili9341.hpp"
 
 #include "../../config/config.hpp"
+#include "../../languages/languages.hpp"
 #include "./pictures/symbols/drop.hpp"
 
 void ILI9341::_hourlyPrec(uint8_t num, uint16_t y) {

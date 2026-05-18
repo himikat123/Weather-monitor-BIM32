@@ -74,11 +74,6 @@ class ILI9341 : LcdDisplay {
         void getTouch();
 
     private:
-        template <typename T>
-        inline T minimum(T a, T b) {
-            return (a < b) ? a : b;
-        }
-
         uint8_t _prevFont = 5;
         unsigned int _prevBright = 40400;
         uint16_t _air_color[4] = { BATTERY_COLOR, 0xFFE0, 0xFD20, 0xF800 };

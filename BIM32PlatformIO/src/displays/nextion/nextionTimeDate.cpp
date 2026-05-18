@@ -1,3 +1,4 @@
+#include <TimeLib.h>
 #include "./nextion.hpp"
 
 #include "../../config/config.hpp"

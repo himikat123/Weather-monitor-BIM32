@@ -1,4 +1,6 @@
 #include "./ws2812display.hpp"
+#include "./fonts/ws2812Segment.hpp"
+#include "../../globals.hpp"
 
 /**
  * Display data on the display

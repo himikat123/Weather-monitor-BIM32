@@ -1,3 +1,6 @@
+#include <Arduino.h>
+#include "FS.h"
+#include <LittleFS.h>
 #include "./ili9341.hpp"
 
 #include "../../globals.hpp"

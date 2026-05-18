@@ -7,6 +7,7 @@ struct ESP32State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["esp32"]["temp"] = temp;
+        JsonObject esp = o["esp32"].to<JsonObject>();
+        esp["temp"] = temp;
     }
 };

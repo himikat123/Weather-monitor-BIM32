@@ -1,4 +1,5 @@
 #include "./nextion.hpp"
+#include "../../config/config.hpp"
 
 /**
  * Display comfort level

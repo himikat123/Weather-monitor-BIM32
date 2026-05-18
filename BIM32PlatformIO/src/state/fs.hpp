@@ -10,7 +10,7 @@ struct FilesystemState {
     bool fsInfoUpdate = true;
 
     void toJson(JsonObject obj) const {
-        JsonObject o = obj.createNestedObject("fs");
+        JsonObject o = obj["fs"].to<JsonObject>();
         o["total"] = total;
         o["free"] = free;
         o["list"] = list;

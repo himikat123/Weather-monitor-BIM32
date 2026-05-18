@@ -8,7 +8,8 @@ struct BMP180State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["bmp180"]["temp"] = temp;
-        o["bmp180"]["pres"] = pres;
+        JsonObject bmp = o["bmp180"].to<JsonObject>();
+        bmp["temp"] = temp;
+        bmp["pres"] = pres;
     }
 };

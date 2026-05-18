@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../globals.hpp"
+#include "../agregateData/comfortData/agregateComfortData.hpp"
 
 class Comfort {
     public:
@@ -9,6 +10,7 @@ class Comfort {
         void devicesControl();
 
     private:
+        AgregateComfortData agregateComfortData;
         static constexpr float AIR_CLEAN_LEVEL_DN = 90.0;
         static constexpr float AIR_CLEAN_LEVEL_UP = 100.0;
         static constexpr float AIR_POLLUTED_LEVEL_DN = 190.0;

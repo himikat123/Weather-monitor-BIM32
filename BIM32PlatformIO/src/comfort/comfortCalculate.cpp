@@ -3,6 +3,7 @@
 #include "../agregateData/comfortData/agregateComfortData.hpp"
 #include "../validation/validate.hpp"
 #include "../config/config.hpp"
+#include "../state/state.hpp"
 
 /**
  * Calculate comfort level 

@@ -1,6 +1,7 @@
+#include <TimeLib.h>
 #include "./ili9341.hpp"
 
-#include "../../globals.hpp"
+#include "../../pinout.hpp"
 #include "../../state/state.hpp"
 #include "../../config/config.hpp"
 #include "../../weather/weather.hpp"

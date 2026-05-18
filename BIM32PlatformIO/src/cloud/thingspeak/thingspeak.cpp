@@ -1,4 +1,6 @@
 #include <Arduino.h>
+#include <HTTPClient.h>
+#include <TimeLib.h>
 #include "./thingspeak.hpp"
 
 #include "../../config/config.hpp"

@@ -9,8 +9,8 @@ void ILI9341::_showImg(uint16_t x, uint16_t y, const byte img[], uint16_t size) 
     uint16_t mcu_h = JpegDec.MCUHeight;
     uint32_t max_x = JpegDec.width;
     uint32_t max_y = JpegDec.height;
-    uint32_t min_w = minimum(mcu_w, max_x % mcu_w);
-    uint32_t min_h = minimum(mcu_h, max_y % mcu_h);
+    uint32_t min_w = ((mcu_w < (max_x % mcu_w)) ? mcu_w : (max_x % mcu_w));
+    uint32_t min_h = ((mcu_h < (max_y % mcu_h)) ? mcu_h : (max_y % mcu_h));
     uint32_t win_w = mcu_w;
     uint32_t win_h = mcu_h;
     max_x += x;

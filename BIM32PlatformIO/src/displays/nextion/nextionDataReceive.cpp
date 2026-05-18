@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
+#include <TimeLib.h>
 #include "./nextion.hpp"
 
 #include "../../globals.hpp"

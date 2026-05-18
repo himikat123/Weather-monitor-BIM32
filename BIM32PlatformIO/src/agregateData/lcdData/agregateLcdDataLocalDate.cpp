@@ -1,3 +1,4 @@
+#include <TimeLib.h>
 #include "./agregateLcdData.hpp"
 
 #include "../../config/config.hpp"

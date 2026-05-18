@@ -1,6 +1,8 @@
 #include "./ili9341.hpp"
 
+#include "../../pinout.hpp"
 #include "../../config/config.hpp"
+#include "./pictures/logo.hpp"
 
 ILI9341 ili9341;
 

@@ -1,5 +1,6 @@
 #include "./ili9341.hpp"
 
+#include "../../config/config.hpp"
 #include "../../validation/validate.hpp"
 #include "../../languages/languages.hpp"
 

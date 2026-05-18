@@ -1,5 +1,6 @@
 #include "agregateLcdData.hpp"
 
+#include "../../languages/languages.hpp"
 #include "../../config/config.hpp"
 #include "../../validation/validate.hpp"
 #include "../../wsensor/wirelessSensor.hpp"

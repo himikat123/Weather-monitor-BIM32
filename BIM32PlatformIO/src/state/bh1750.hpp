@@ -7,6 +7,7 @@ struct BH1750State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["bh1750"]["light"] = light;
+        JsonObject bh = o["bh1750"].to<JsonObject>();
+        bh["light"] = light;
     }
 };

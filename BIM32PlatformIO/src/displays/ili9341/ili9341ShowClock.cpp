@@ -1,6 +1,18 @@
 #include <Arduino.h>
 #include "./ili9341.hpp"
 
+#include "../../config/config.hpp"
+#include "./pictures/numbers/n0.hpp"
+#include "./pictures/numbers/n1.hpp"
+#include "./pictures/numbers/n2.hpp"
+#include "./pictures/numbers/n3.hpp"
+#include "./pictures/numbers/n4.hpp"
+#include "./pictures/numbers/n5.hpp"
+#include "./pictures/numbers/n6.hpp"
+#include "./pictures/numbers/n7.hpp"
+#include "./pictures/numbers/n8.hpp"
+#include "./pictures/numbers/n9.hpp"
+
 const byte* ILI9341::_number_picture(uint8_t num) {
     switch (num) {
         case 1: return number_1;

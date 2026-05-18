@@ -7,6 +7,7 @@ struct MAX44009State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["max44009"]["light"] = light;
+        JsonObject max = o["max44009"].to<JsonObject>();
+        max["light"] = light;
     }
 };

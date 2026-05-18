@@ -2,6 +2,7 @@
 #include "./nextion.hpp"
 
 #include "../../validation/validate.hpp"
+#include "../../languages/languages.hpp"
 
 /**
  * Display daily weather forecast

@@ -3,6 +3,8 @@
 #include <WiFi.h>
 #include "../../languages/languages.hpp"
 #include "../../config/config.hpp"
+#include "../../state/state.hpp"
+#include "../../sensors/sensors.hpp"
 
 /**
  * Display Netoerk page

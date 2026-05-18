@@ -11,10 +11,11 @@ struct BME680State {
     bool updated = false;
 
     void toJson(JsonObject o) const {
-        o["bme680"]["temp"] = temp;
-        o["bme680"]["hum"] = hum;
-        o["bme680"]["pres"] = pres;
-        o["bme680"]["iaq"] = iaq;
-        o["bme680"]["iaqAccr"] = iaqAccr;
+        JsonObject bme = o["bme680"].to<JsonObject>();
+        bme["temp"] = temp;
+        bme["hum"] = hum;
+        bme["pres"] = pres;
+        bme["iaq"] = iaq;
+        bme["iaqAccr"] = iaqAccr;
     }
 };

@@ -14,7 +14,7 @@ void TM1637_Driver::init(int8_t clk, int8_t dat) {
 /**
  * Send a byte to display
  */
-void TM1637_Driver::_writeByte(byte data) {
+void TM1637_Driver::writeByte(byte data) {
     if(_clk > 0 && _dat > 0) {
         for(uint8_t i=0; i<8; i++) {
             digitalWrite(_clk, LOW);
