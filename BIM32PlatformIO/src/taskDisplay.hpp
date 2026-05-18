@@ -1,17 +1,17 @@
 #pragma once
 
-#include "./src/globals.hpp"
-#include "./src/pinout.hpp"
-#include "./src/config/config.hpp"
-#include "./src/state/state.hpp"
-#include "./src/sensors/sensors.hpp"
-#include "./src/weather/weather.hpp"
-#include "./src/displays/nextion/nextion.hpp"
-#include "./src/displays/ili9341/ili9341.hpp"
-#include "./src/displays/ws2812/ws2812display.hpp"
-#include "./src/displays/max7219/max7219segmentDisplay.hpp"
-#include "./src/displays/tm1637/tm1637display.hpp"
-#include "./src/displays/numitron/numitronSegmentDisplay.hpp"
+#include "./globals.hpp"
+#include "./pinout.hpp"
+#include "./config/config.hpp"
+#include "./state/state.hpp"
+#include "./sensors/sensors.hpp"
+#include "./weather/weather.hpp"
+#include "./displays/nextion/nextion.hpp"
+#include "./displays/ili9341/ili9341.hpp"
+#include "./displays/ws2812/ws2812display.hpp"
+#include "./displays/max7219/max7219segmentDisplay.hpp"
+#include "./displays/tm1637/tm1637display.hpp"
+#include "./displays/numitron/numitronSegmentDisplay.hpp"
 
 ILI9341 ili9341;
 WS2812b ws2812b_1;

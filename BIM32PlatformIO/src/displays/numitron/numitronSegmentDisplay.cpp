@@ -4,6 +4,7 @@
 #include "../../globals.hpp"
 #include "../../config/config.hpp"
 #include "../../state/state.hpp"
+#include "./fonts/numitronSegment.hpp"
 
 /**
  * Display initialize
@@ -22,7 +23,7 @@ void Numitron::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t 
 
     _setModel(config.display.model(dispNum));
 
-    _wire = dispNum == 0 ? &Wire_1 : &Wire_2;
+    _wire = dispNum == 0 ? &wire_1 : &wire_2;
     _clearDisplay();
 
     _strip = dispNum == 0 ? &strip_1 : &strip_2;
@@ -86,8 +87,8 @@ void Numitron::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<8; i++) {
-        if(_dispImg[i] >= DOT) _pixels[i] = font_pcf8575[WITH_DOT][_dispImg[i] - DOT];
-        else _pixels[i] = font_pcf8575[SYMBOLS][_dispImg[i]];
+        if(_dispImg[i] >= DOT) _pixels[i] = font_numitron[WITH_DOT][_dispImg[i] - DOT];
+        else _pixels[i] = font_numitron[SYMBOLS][_dispImg[i]];
 
         if(_prevPixels[i] != _pixels[i]) {
             _prevPixels[i] = _pixels[i];

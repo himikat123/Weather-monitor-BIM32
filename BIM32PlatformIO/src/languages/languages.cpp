@@ -2,6 +2,7 @@
 
 #include "./languages.hpp"
 #include "../config/config.hpp"
+#include "./translates/comfort.hpp"
 #include "./translates/monthFullName.hpp"
 #include "./translates/monthShortName.hpp"
 #include "./translates/monthDay.hpp"

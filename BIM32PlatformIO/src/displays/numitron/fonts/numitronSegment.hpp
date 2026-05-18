@@ -1,7 +1,7 @@
 #pragma once
 #include <Arduino.h>
 
-const uint8_t font_numitron[][] PROGMEM = {
+const uint8_t font_numitron[2][18] PROGMEM = {
     { // !e !d !g !f !a !c !b !h
         0x21, // 0
         0xF9, // 1
