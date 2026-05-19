@@ -1,7 +1,7 @@
 #pragma once
 
 #include "./max7219driver.hpp"
-#include "../segmentDisplay.hpp"
+#include "../segmentDisplay/segmentDisplay.hpp"
 
 class MAX7219_S : public SegmentDisplay {
     public:

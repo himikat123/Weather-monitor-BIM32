@@ -1,5 +1,3 @@
-#include <TimeLib.h>
-
 #include "./segmentDisplay.hpp"
 #include "../../config/config.hpp"
 #include "../../state/state.hpp"

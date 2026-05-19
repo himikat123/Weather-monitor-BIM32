@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 #include "./tm1637driver.hpp"
-#include "../segmentDisplay.hpp"
+#include "../segmentDisplay/segmentDisplay.hpp"
 
 class TM1637 : public SegmentDisplay {
     public:

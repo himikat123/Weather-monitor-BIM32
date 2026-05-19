@@ -1,5 +1,3 @@
-#include <TimeLib.h>
-
 #include "./segmentDisplay.hpp"
 
 /**

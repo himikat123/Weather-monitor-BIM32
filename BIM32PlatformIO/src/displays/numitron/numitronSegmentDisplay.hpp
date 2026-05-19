@@ -3,7 +3,7 @@
 #include <LiteLED.h> // v1.2.0 https://github.com/Xylopyrographer/LiteLED/tree/main
 
 #include "./softi2c.hpp"
-#include "../segmentDisplay.hpp"
+#include "../segmentDisplay/segmentDisplay.hpp"
 #include "../../pinout.hpp"
 
 class Numitron : public SegmentDisplay {

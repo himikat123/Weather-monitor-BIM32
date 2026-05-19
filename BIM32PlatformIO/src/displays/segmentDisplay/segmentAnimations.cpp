@@ -1,5 +1,3 @@
-#include <TimeLib.h>
-
 #include "./segmentDisplay.hpp"
 #include "./segmentAnimationsShifts.hpp"
 #include "../../config/config.hpp"
