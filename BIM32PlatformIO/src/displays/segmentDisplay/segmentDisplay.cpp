@@ -1,5 +1,11 @@
+#include <TimeLib.h>
+
 #include "./segmentDisplay.hpp"
 #include "../config/config.hpp"
+#include "../state/state.hpp"
+#include "../validation/validate.hpp"
+#include "../agregateData/segmentData/agregateSegmentData.hpp"
+#include "./segmentAnimationsShifts.hpp"
 
 /**
  * Set display model
@@ -316,109 +322,5 @@ void SegmentDisplay::_co2(float c, int* segImg) {
 
     for(uint8_t i=0; i<8; i++) {
         segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
-    }
-}
-
-/**
- * Preparing data for displaying AP mode
- */
-void SegmentDisplay::_apMode(int* segImg) {
-    int disp4Img[8] = {SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
-    int disp6Img[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
-    int disp8Img[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_A, SYMB_P, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
-
-    for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
-    }
-}
-
-void SegmentDisplay::_slotSwitch() {
-    unsigned int period = config.display.timeSlot.period(_slot, _dispNum);
-    if((millis() - _prevSlotMillis) > (period * 1000) or period == 0) {
-        _prevSlot = _slot;
-        _slot++;
-        _animSlot = 0;
-        _animMillis = millis();
-        for(uint8_t i=_slot; i<8; i++) {
-            if(config.display.timeSlot.period(_slot, _dispNum) == 0) {
-                _slot++;
-                _animSlot = 0;
-                _animMillis = millis();
-            }
-            else break;
-        }
-        if(_slot > 7) {
-            _slot = 0;
-            _animSlot = 0;
-            _animMillis = millis();
-        }
-        _prevSlotMillis = millis();
-    }
-    if(_prevSecond != second()) {
-        _millisShift = millis() % 1000;
-        _prevSecond = second();
-    }
-    _pointsState = !((millis() - _millisShift) % (_dotfreq * 2) > _dotfreq);
-}
-
-void SegmentDisplay::_segAnimations() {
-    int segImg[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE};
-    int segImgPrev[8] = {SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE}; 
-
-    _segGetData(segImgPrev, _prevSlot, false);
-    _segGetData(segImg, _slot, true);
-    String color = config.display.timeSlot.color(_slot, _dispNum);
-    String prevColor = config.display.timeSlot.color(_prevSlot, _dispNum);
-    if(state.apMode) {
-        color = "#FFFFFF";
-        prevColor = "#FFFFFF";
-    }
-
-    _animIsRunnung = true;
-    unsigned int type = config.display.animation.type(_dispNum);
-    uint8_t dl = _dispLength == 4 ? 0 : _dispLength == 6 ? 1 : 2;
-
-    for(uint8_t i=0; i<(_dispLength); i++) {
-        uint8_t shf = abs(SHIFTS[dl][type][_animSlot][i]) - 1;
-        if(SHIFTS[dl][type][_animSlot][i] == 0) _dispImg[i] = SYMB_SPACE;
-        else {
-            if(SHIFTS[dl][type][_animSlot][i] < 0) _dispImg[i] = segImgPrev[shf]; 
-            else _dispImg[i] = segImg[shf];
-        }
-        
-        if(SHIFTS[dl][type][_animSlot][i] < 0) prevColor.toCharArray(_dispColors[i], 8);
-        else color.toCharArray(_dispColors[i], 8);
-    }
-
-    if(millis() - _animMillis > 1000 / config.display.animation.speed(_dispNum)) {
-        _animMillis = millis();
-        if(_animSlot < FRAMES[dl][type] - 1) _animSlot++;
-    }
-
-    if(_animSlot >= FRAMES[dl][type] - 1) _animIsRunnung = false;
-}
-
-void SegmentDisplay::_segGetData(int* segImg, uint8_t slot, bool dots) {
-    if(state.apMode) {
-        _apMode(segImg);
-    }
-    else if(config.display.timeSlot.period(slot, _dispNum) > 0) {
-        uint8_t dType = 0;
-        float data = agregateSegmentData.slotData(
-            config.display.timeSlot.sensor(slot, _dispNum),
-            config.display.timeSlot.data(slot, _dispNum),
-            slot, _dispNum, &dType
-        );
-
-        switch(dType) {
-            case CLOCK: _clock(segImg, slot); break;
-            case DATE: _date(segImg, slot); break;
-            case TEMP: _temp(data, segImg); break;
-            case HUM: _hum(data, segImg); break;
-            case PRES: _pres(data, segImg); break;
-            case CO2: _co2(data, segImg); break;
-            case IAQ: _iaq(data, segImg); break;
-            default: ; break;
-        }
     }
 }

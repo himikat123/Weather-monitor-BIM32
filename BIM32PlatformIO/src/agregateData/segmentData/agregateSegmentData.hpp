@@ -1,7 +1,7 @@
 #pragma once
 
 class AgregateSegmentData {
-    private:
+    public:
         static constexpr int CLOCK_SOURCE   = 0;
         static constexpr int DATE_SOURCE    = 1;
         static constexpr int BME280_SOURCE  = 2;
@@ -23,7 +23,5 @@ class AgregateSegmentData {
         static constexpr int CO2_TYPE = 5;
         static constexpr int IAQ_TYPE = 6;
 
-
-    public:
         float slotData(uint8_t sensor, uint8_t type, uint8_t timeSlot, uint8_t dispNum, uint8_t* dType);
 };

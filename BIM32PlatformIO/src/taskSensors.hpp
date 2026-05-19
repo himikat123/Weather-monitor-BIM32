@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./src/timeNTP/timeNTP.hpp"
+#include "./timeNTP/timeNTP.hpp"
 TimeNTP timeNTP;
 
 void display1_toggle();

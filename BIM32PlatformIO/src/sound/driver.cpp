@@ -4,6 +4,7 @@
 #include "../pinout.hpp"
 #include "../globals.hpp"
 #include "../config/config.hpp"
+#include "../state/state.hpp"
 
 void Sound::_reset() {
     _sendCommand(0x0C, 0x00, 0x00);

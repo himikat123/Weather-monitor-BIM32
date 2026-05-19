@@ -13,3 +13,5 @@ class Network {
         void runAccessPoint();
         void scanNetworks();
 };
+
+extern Network network;

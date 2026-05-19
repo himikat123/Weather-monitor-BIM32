@@ -2,8 +2,10 @@
 
 #include "./sound.hpp"
 #include "../globals.hpp"
+#include "../pinout.hpp"
 #include "../config/config.hpp"
 #include "../state/state.hpp"
+#include "../weather/weather.hpp"
 
 Sound sound;
 

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "./websockets/websocket.hpp"
+WebSocket websocket(88, 1);
+
 template<typename T>
 void updateIfNeeded(T& sensor, JsonObject& root) {
     if(sensor.updated) {

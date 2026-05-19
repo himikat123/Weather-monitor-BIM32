@@ -6,6 +6,8 @@
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 
+Network network;
+
 /**
  * Checking for internet access
  */

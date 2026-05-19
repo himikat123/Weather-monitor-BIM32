@@ -12,6 +12,7 @@
 #include "./globals.hpp"
 #include "./pinout.hpp"
 #include "./config/config.hpp"
+#include "./network/network.hpp"
 #include "./wsensor/wirelessSensor.hpp"
 #include "./displays/ili9341/ili9341.hpp"
 #include "./displays/nextion/nextion.hpp"

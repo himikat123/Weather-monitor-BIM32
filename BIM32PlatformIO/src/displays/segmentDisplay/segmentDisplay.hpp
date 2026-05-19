@@ -1,6 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
+#include "../../agregateData/segmentData/agregateSegmentData.hpp"
+
 class SegmentDisplay {
     public:
         void setDotFreq(unsigned int freq);
@@ -30,6 +32,7 @@ class SegmentDisplay {
         void _setModel(uint8_t model);
 
     private:
+        AgregateSegmentData agregateSegmentData;
         static constexpr int SYMB_DEGREE = 0x0A;
         static constexpr int SYMB_A      = 0x0B;
         static constexpr int SYMB_C      = 0x0C;

@@ -4,6 +4,7 @@
 #include "./timeNTP.hpp"
 #include "../state/state.hpp"
 #include "../config/config.hpp"
+#include "../sensors/sensors.hpp"
 #include "../displays/nextion/nextion.hpp"
 
 /**
