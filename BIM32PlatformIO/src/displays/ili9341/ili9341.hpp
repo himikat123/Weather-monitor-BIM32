@@ -6,6 +6,8 @@
 #include "../lcdDisplay.hpp"
 
 class ILI9341 : LcdDisplay {
+    ILI9341() {}
+
     static constexpr int LEFT              = 0;
     static constexpr int CENTER            = 1;
     static constexpr int RIGHT             = 2;
@@ -62,6 +64,14 @@ class ILI9341 : LcdDisplay {
 #endif
 
     public:
+        static ILI9341& getInstance() {
+            static ILI9341 instance;
+            return instance;
+        }
+
+        ILI9341(const ILI9341&) = delete;
+        void operator=(const ILI9341&) = delete;
+
         void init();
         void showLogo();
         void showHomeScreen();
@@ -166,3 +176,5 @@ class ILI9341 : LcdDisplay {
         int _avg(int a, int b);
         void _touch_calibrate();
 };
+
+inline ILI9341& ili9341 = ILI9341::getInstance();

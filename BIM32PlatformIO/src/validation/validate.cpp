@@ -1,7 +1,5 @@
 #include "./validate.hpp"
 
-Validate validate;
-
 /**
  * Validate if temperature is within the normal range
  */

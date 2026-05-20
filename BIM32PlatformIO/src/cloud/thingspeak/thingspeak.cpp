@@ -6,8 +6,6 @@
 #include "../../config/config.hpp"
 #include "../../state/state.hpp"
 
-Thingspeak thingspeak;
-
 /**
  * check if data is not expired
  */

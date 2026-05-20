@@ -2,9 +2,18 @@
 #include <Arduino.h>
 
 #include "../../timeNTP/timeNTP.hpp"
+#include "../../agregateData/sendData/agregateSendData.hpp"
 
 class Thingspeak {
     public:
+        static Thingspeak& getInstance() {
+            static Thingspeak instance;
+            return instance;
+        }
+
+        Thingspeak(const Thingspeak&) = delete;
+        void operator=(const Thingspeak&) = delete;
+
         void receive();
         void send();
         void sendHistory();
@@ -16,9 +25,12 @@ class Thingspeak {
         time_t get_historyUpdated(unsigned int slot);
 
     private:
+        Thingspeak() {}
+
+        AgregateSendData agregateSendData;
         TimeNTP timeNTP;
         String _fieldPrepare(unsigned int field);
         String _historyFieldPrepare(unsigned int fieldNum);
 };
 
-extern Thingspeak thingspeak;
+inline Thingspeak& thingspeak = Thingspeak::getInstance();

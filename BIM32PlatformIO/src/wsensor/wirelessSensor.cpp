@@ -5,8 +5,6 @@
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 
-WirelessSensor wsensor;
-
 void WirelessSensor::handleReceive() {
     while(Serial2.available()) {
         char c = Serial2.read();

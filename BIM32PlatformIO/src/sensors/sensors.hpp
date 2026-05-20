@@ -39,14 +39,13 @@ class Sensors {
         DS3231              rtc;
     
     public:
-        Sensors() : 
-            oneWire(ONE_WIRE_BUS_PIN), 
-            term(&oneWire), 
-            lightMeter(0x23), 
-            bme_temp(bme.getTemperatureSensor()), 
-            bme_pressure(bme.getPressureSensor()), 
-            bme_humidity(bme.getHumiditySensor()) 
-        { }
+        static Sensors& getInstance() {
+            static Sensors instance;
+            return instance;
+        }
+
+        Sensors(const Sensors&) = delete;
+        void operator=(const Sensors&) = delete;
 
         void init(void);
         void read(void);
@@ -78,6 +77,15 @@ class Sensors {
         float mmHg(float pres);
 
     private:
+        Sensors() : 
+            oneWire(ONE_WIRE_BUS_PIN), 
+            term(&oneWire), 
+            lightMeter(0x23), 
+            bme_temp(bme.getTemperatureSensor()), 
+            bme_pressure(bme.getPressureSensor()), 
+            bme_humidity(bme.getHumiditySensor()) 
+        { }
+
         bool _bme280_det = false;
         bool _bmp180_det = false;
         bool _sht21_det = false;
@@ -118,4 +126,4 @@ class Sensors {
         void _ESP32Read(void);
 };
 
-extern Sensors sensors;
+inline Sensors& sensors = Sensors::getInstance();

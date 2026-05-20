@@ -5,6 +5,14 @@ class WirelessSensor {
     #define WSENSORS 2
 
     public:
+        static WirelessSensor& getInstance() {
+            static WirelessSensor instance;
+            return instance;
+        }
+
+        WirelessSensor(const WirelessSensor&) = delete;
+        void operator=(const WirelessSensor&) = delete;
+
         void handleReceive();
         void receive();
         bool dataRelevance(uint8_t wsensNum);
@@ -28,8 +36,10 @@ class WirelessSensor {
         char* get_rawData();
 
     private:
+        WirelessSensor() {}
+
         uint16_t _receivedIndex = 0;
         char _receivedData[1024];
 };
 
-extern WirelessSensor wsensor; 
+inline WirelessSensor& wsensor = WirelessSensor::getInstance();

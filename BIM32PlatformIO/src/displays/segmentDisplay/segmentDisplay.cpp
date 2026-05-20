@@ -1,11 +1,5 @@
-//#include <TimeLib.h>
-
 #include "./segmentDisplay.hpp"
 #include "../../config/config.hpp"
-//#include "../../state/state.hpp"
-//#include "../../validation/validate.hpp"
-//#include "../../agregateData/segmentData/agregateSegmentData.hpp"
-//#include "./segmentAnimationsShifts.hpp"
 
 /**
  * Set display model

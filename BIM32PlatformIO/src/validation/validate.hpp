@@ -2,6 +2,14 @@
 
 class Validate {
     public:
+        static Validate& getInstance() {
+            static Validate instance;
+            return instance;
+        }
+
+        Validate(const Validate&) = delete;
+        void operator=(const Validate&) = delete;
+
         bool temp(float t);
         bool hum(float h);
         bool pres(float p);
@@ -22,6 +30,9 @@ class Validate {
         bool co2(float c);
         bool absoluteHum(float ah);
         bool dewPoint(float dp, float temp);
+
+    private:
+        Validate() {}
 };
 
-extern Validate validate;
+inline Validate& validate = Validate::getInstance();

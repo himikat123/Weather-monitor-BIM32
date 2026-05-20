@@ -6,8 +6,6 @@
 #include "../languages/languages.hpp"
 #include "../globals.hpp"
 
-Weather weather;
-
 /**
  * Weather icon code conversion
  */

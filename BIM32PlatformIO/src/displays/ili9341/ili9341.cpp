@@ -4,8 +4,6 @@
 #include "../../config/config.hpp"
 #include "./pictures/logo.hpp"
 
-ILI9341 ili9341;
-
 /**
  * Display initialisation
  */

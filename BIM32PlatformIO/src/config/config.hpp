@@ -21,6 +21,8 @@
 
 class Config {
     private:
+        Config() {}
+
         uint16_t _calData[5] = { 0 }; // Touch calibration data
         char _lang[3] = "en"; // Localization
         uint8_t _units_pres = 0;
@@ -40,6 +42,14 @@ class Config {
         }
 
     public:
+        static Config& getInstance() {
+            static Config instance;
+            return instance;
+        }
+
+        Config(const Config&) = delete;
+        void operator=(const Config&) = delete;
+
         uint16_t calData(uint8_t num);
         String lang();
         uint8_t units_pres();
@@ -61,4 +71,4 @@ class Config {
         AccountStruct account;
 };
 
-extern Config config;
+inline Config& config = Config::getInstance();

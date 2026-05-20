@@ -64,5 +64,3 @@ class AgregateSendData {
     public:
         float sendingData(uint8_t field, uint8_t type, uint8_t wsensNum, uint8_t wsensType);
 };
-
-extern AgregateSendData agregateSendData;

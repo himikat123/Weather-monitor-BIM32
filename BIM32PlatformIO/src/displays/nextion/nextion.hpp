@@ -9,7 +9,14 @@ class Nextion : LcdDisplay {
         EasyNex _nextion;
 
     public:
-        Nextion() : _nextion(Serial1) {}
+        static Nextion& getInstance() {
+            static Nextion instance;
+            return instance;
+        }
+
+        Nextion(const Nextion&) = delete;
+        void operator=(const Nextion&) = delete;
+
         void init();
         void showLogo();
         void refresh();
@@ -22,6 +29,8 @@ class Nextion : LcdDisplay {
         void dataReceive();
 
     private:
+        Nextion() : _nextion(Serial1) {}
+
         int _customData = -1; // flag of key symbols of receive from the display
         String _receivedData = "";
         uint16_t _air_color[4] = { 2016, 65520, 64512, 63488 };
@@ -53,4 +62,4 @@ class Nextion : LcdDisplay {
         void _alarms();
 };
 
-extern Nextion nextion;
+inline Nextion& nextion = Nextion::getInstance();

@@ -12,8 +12,6 @@
 #include "./translates/airQuality.hpp"
 #include "./translates/texts.hpp"
 
-Lang lang;
-
 uint8_t Lang::_lang() {
     if(config.lang() == "de") return 1;
     if(config.lang() == "ru") return 2;

@@ -3,9 +3,19 @@
 
 class Lang {
     private:
+        Lang() {}
+
         uint8_t _lang();
 
     public:
+         static Lang& getInstance() {
+            static Lang instance;
+            return instance;
+        }
+
+        Lang(const Lang&) = delete;
+        void operator=(const Lang&) = delete;
+
         const char* monthFullName(uint8_t num);
         const char* monthDay(uint8_t num);
         const char* monthShortName(uint8_t num);
@@ -32,4 +42,4 @@ class Lang {
         const char* calibrationDone();
 };
 
-extern Lang lang;
+inline Lang& lang = Lang::getInstance();

@@ -17,10 +17,13 @@
 #include "./displays/ili9341/ili9341.hpp"
 #include "./displays/nextion/nextion.hpp"
 
-#include "./taskDisplay.hpp"
+#include "./taskDisplay/taskDisplay.hpp"
 #include "./taskSensors.hpp"
 #include "./taskServer.hpp"
 #include "./web.hpp"
+
+TaskDisplay taskDisplay1;
+TaskDisplay taskDisplay2;
 
 /**
  * Arduino setup
@@ -68,15 +71,25 @@ void setup() {
     #endif
 
 
-    xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, -1, &task_display1_handle, 1);
-    xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, -1, &task_display2_handle, 1);
+    if(taskDisplay1.start("TaskDisplay1", 32768, 1, 1, 1)) {
+        Serial.println("Display1 task pinned to core 1 successfully!");
+    } else {
+        Serial.println("Failed to start display1 task!");
+    }
+    if(taskDisplay2.start("TaskDisplay2", 32768, 1, 1, 2)) {
+        Serial.println("Display2 task pinned to core 1 successfully!");
+    } else {
+        Serial.println("Failed to start display2 task!");
+    }
+    //xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, -1, &task_display1_handle, 1);
+    //xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, -1, &task_display2_handle, 1);
 
     WiFi.mode(WIFI_STA);
     network.connect();
 
-    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, 1);
+    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, DISPLAY_1);
     webInterface_init();
-    xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, 1);
+    xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, DISPLAY_2);
 }
 
 void loop() {

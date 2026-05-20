@@ -5,6 +5,14 @@
 
 class Weather {
     public:
+        static Weather& getInstance() {
+            static Weather instance;
+            return instance;
+        }
+
+        Weather(const Weather&) = delete;
+        void operator=(const Weather&) = delete;
+
         void update();
         float get_currentTemp();
         float get_currentHum();
@@ -30,6 +38,8 @@ class Weather {
         float get_hourlyPrec(unsigned int num); 
 
     private:
+        Weather() {}
+
         float _lon = 0.0;
         float _lat = 0.0;
         WiFiClient client;
@@ -45,4 +55,4 @@ class Weather {
         void _calculateDaily(void);
 };
 
-extern Weather weather;
+inline Weather& weather = Weather::getInstance();

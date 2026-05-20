@@ -127,5 +127,3 @@ class AgregateLcdData {
         String _dewPoint(float temp, float hum);
         String _localDate();
 };
-
-extern AgregateLcdData agregateLcdData;

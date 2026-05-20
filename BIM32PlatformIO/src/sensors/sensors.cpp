@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include "./sensors.hpp"
 
-Sensors sensors;
-
 /**
  * Initialize all sensors
  */

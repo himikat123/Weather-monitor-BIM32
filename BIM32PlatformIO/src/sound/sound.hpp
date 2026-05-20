@@ -5,6 +5,14 @@
 
 class Sound {
     public:
+        static Sound& getInstance() {
+            static Sound instance;
+            return instance;
+        }
+
+        Sound(const Sound&) = delete;
+        void operator=(const Sound&) = delete;
+
         void init(void);
         void volume(unsigned int vol);
         void equalizer(unsigned int eq);
@@ -17,6 +25,8 @@ class Sound {
         void airNotify(unsigned int airLevel);
 
     private:
+        Sound() {}
+
         bool _isAllowed();
         bool _hourlyCheck();
         void _playHourlySignal();
@@ -32,4 +42,4 @@ class Sound {
         boolean _mp3_found = false;
 };
 
-extern Sound sound;
+inline Sound& sound = Sound::getInstance();

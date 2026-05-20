@@ -7,8 +7,6 @@
 #include "../state/state.hpp"
 #include "../weather/weather.hpp"
 
-Sound sound;
-
 /**
  * DF player initialization
  */
