@@ -95,9 +95,9 @@ inline unsigned int getTime(bool level, const char* time) {
     return level ? minute : hour;
 }
 
-TaskHandle_t task_display1_handle = NULL;
-TaskHandle_t task_display2_handle = NULL;
-TaskHandle_t task_server_handle = NULL;
-TaskHandle_t task_sensors_handle = NULL;
+extern TaskHandle_t task_display1_handle;
+extern TaskHandle_t task_display2_handle;
+extern TaskHandle_t task_server_handle;
+extern TaskHandle_t task_sensors_handle;
 
-SemaphoreHandle_t sensorsSemaphore = NULL;
+extern SemaphoreHandle_t sensorsSemaphore;

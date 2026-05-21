@@ -1,7 +1,7 @@
 #pragma once
 
 #if !defined(BIM32_CYD)
-    uint8_t dummy = 1;
+    extern uint8_t dummy;
     /* 
     * BIM32 pinout 
     */

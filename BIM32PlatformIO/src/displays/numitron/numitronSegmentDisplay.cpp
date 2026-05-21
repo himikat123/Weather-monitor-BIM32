@@ -58,7 +58,7 @@ void Numitron::displayToggle() {
 /**
  * Turn display on
  */
-void Numitron::displayOn() {
+void Numitron::displayOn(bool doinit) {
     _power = true;
     _sendToDisplay();
 }

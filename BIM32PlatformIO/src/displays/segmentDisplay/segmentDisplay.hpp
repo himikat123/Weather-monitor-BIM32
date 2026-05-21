@@ -9,8 +9,8 @@ class SegmentDisplay : public BaseDisplay {
         void setDotFreq(unsigned int freq);
         void displayToggle();
         virtual void displayOff() override;
-        virtual void displayOn() override;
-        virtual bool isDisplayOn() const override;
+        virtual void displayOn(bool doinit) override;
+        virtual bool isdisplayOn() const override;
         void brightness(uint8_t intensity, bool reduc);
 
     protected:

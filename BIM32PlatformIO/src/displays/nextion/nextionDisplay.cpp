@@ -28,6 +28,6 @@ void Nextion::displayOff() {
 /**
  * Return true if display is on
  */
-bool Nextion::isDisplayOn() const {
+bool Nextion::isdisplayOn() const {
     return _power;
 }

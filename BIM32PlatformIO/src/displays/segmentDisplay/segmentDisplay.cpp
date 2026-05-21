@@ -31,7 +31,7 @@ void SegmentDisplay::displayToggle() {
 /**
  * Turn display on
  */
-void SegmentDisplay::displayOn() {
+void SegmentDisplay::displayOn(bool doinit) {
     _power = true;
 }
 
@@ -45,7 +45,7 @@ void SegmentDisplay::displayOff() {
 /**
  * Return true if display is on
  */
-bool SegmentDisplay::isDisplayOn() const {
+bool SegmentDisplay::isdisplayOn() const {
     return _power;
 }
 

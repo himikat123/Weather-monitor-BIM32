@@ -24,7 +24,7 @@ class Numitron : public SegmentDisplay {
         void init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws);
         void brightness(uint8_t intensity, bool reduc);
         void displayToggle();
-        void displayOn();
+        void displayOn(bool doinit);
         void displayOff();
         void refresh();
 

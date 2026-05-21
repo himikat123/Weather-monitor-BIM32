@@ -82,7 +82,7 @@ void MAX7219_S::displayToggle() {
 /**
  * Turn on the display
  */
-void MAX7219_S::displayOn() {
+void MAX7219_S::displayOn(bool doinit) {
     _power = true;
     max7219.power(true);
 }
@@ -94,6 +94,11 @@ void MAX7219_S::displayOff() {
     _power = false;
     max7219.power(false);
 }
+
+bool MAX7219_S::isdisplayOn() const {
+    return _power;
+}
+
 
 /**
  * Set display brightness

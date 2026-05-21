@@ -29,58 +29,10 @@ void TaskDisplay::_itsOffTime() {
             state.display_state[_dispNum] = 0;
         }
         if(itsOffTime) {
-            //if(config.display.type(_dispNum) == LCD_DISPLAY) {
-                //if(config.display.model(_dispNum) <= D_NX4827K043) {
-                    if(_display->isDisplayOn()) _display->displayOff();
-                //}
-                //if(config.display.model(_dispNum) == D_ILI9341) {
-                //    if(ili9341.isDisplayOn()) ili9341.displayOff();
-                //}
-            //}
-
-            // if(config.display.type(_dispNum) == PIXEL_LEDS_DISPLAY) {
-            //     if(_ws2812b->isDisplayOn()) _ws2812b->displayOff();
-            // }
-
-            // if(config.display.type(_dispNum) == SEGMENT_DISPLAY) {
-            //     if(config.display.model(_dispNum) <= D_TM1637) {
-            //         if(_tm1637->isDisplayOn()) _tm1637->displayOff();
-            //     }
-            //     if(config.display.model(_dispNum) >= D_MAX7219) {
-            //         if(_max7219s->isDisplayOn()) _max7219s->displayOff();
-            //     }
-            // }
-
-            // if(config.display.type(_dispNum) == NUMITRON_DISPLAY) {
-            //     if(_numitron->isDisplayOn()) _numitron->displayOff();
-            // }
+            if(_display->isdisplayOn()) _display->displayOff();
         }
         else {
-            //if(config.display.type(_dispNum) == LCD_DISPLAY) {
-                //if(config.display.model(_dispNum) <= D_NX4827K043) {
-                    if(!_display->isDisplayOn()) _display->displayOn();
-                // }
-                // if(config.display.model(_dispNum) == D_ILI9341) {
-                //     if(!ili9341.isDisplayOn()) ili9341.displayOn();
-                // }
-            //}
-
-            // if(config.display.type(_dispNum) == PIXEL_LEDS_DISPLAY) {
-            //     if(!_ws2812b->isDisplayOn()) _ws2812b->displayOn();
-            // }
-
-            // if(config.display.type(_dispNum) == SEGMENT_DISPLAY) {
-            //     if(config.display.model(_dispNum) <= D_TM1637) {
-            //         if(!_tm1637->isDisplayOn()) _tm1637->displayOn();
-            //     }
-            //     if(config.display.model(_dispNum) >= D_MAX7219) {
-            //         if(!_max7219s->isDisplayOn()) _max7219s->displayOn();
-            //     }
-            // }
-
-            // if(config.display.type(_dispNum) == NUMITRON_DISPLAY) {
-            //     if(!_numitron->isDisplayOn()) _numitron->displayOn();
-            // }
+            if(!_display->isdisplayOn()) _display->displayOn(false);
         }
     }
 }

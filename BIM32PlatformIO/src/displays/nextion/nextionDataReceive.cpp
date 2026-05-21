@@ -15,7 +15,7 @@ void Nextion::dataReceive() {
         char nextionChar = Serial1.read();
         if(nextionChar == '{' or nextionChar == '\x87') {
             state.disp_autoOff[0] = millis();
-            if(!isDisplayOn()) displayOn(true);
+            if(!isdisplayOn()) displayOn(true);
         }
         if(nextionChar == '{') _customData = 1;
         if(nextionChar == '}') {

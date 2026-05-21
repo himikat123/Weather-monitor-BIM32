@@ -17,9 +17,9 @@ class WS2812b : public SegmentDisplay {
         {}
         void init(uint8_t dispNum, uint8_t pin);
         void refresh();
-        virtual bool isDisplayOn() const override { return false; }
+        virtual bool isdisplayOn() const override { return false; }
         virtual void displayOff() override {}
-        virtual void displayOn() override {}
+        virtual void displayOn(bool doinit) override {}
     
     private:
         LiteLED* _strip = nullptr;

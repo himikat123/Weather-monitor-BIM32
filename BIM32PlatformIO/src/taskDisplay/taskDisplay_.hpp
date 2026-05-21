@@ -77,7 +77,7 @@ void TaskDisplay1(void *pvParameters) {
                 ili9341.brightness(get_brightness(DISPLAY_1));
 
                 if(isTimeoutOffTime(DISPLAY_1)) {
-                    if(ili9341.isDisplayOn()) ili9341.displayOff();
+                    if(ili9341.isdisplayOn()) ili9341.displayOff();
                 }
 
                 uint8_t itsOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
@@ -87,8 +87,8 @@ void TaskDisplay1(void *pvParameters) {
                         itsOffTime = state.display_state[DISPLAY_1] - 1;
                         state.display_state[DISPLAY_1] = 0;
                     }
-                    if(itsOffTime) if(ili9341.isDisplayOn()) ili9341.displayOff();
-                    else if(!ili9341.isDisplayOn()) ili9341.displayOn();
+                    if(itsOffTime) if(ili9341.isdisplayOn()) ili9341.displayOff();
+                    else if(!ili9341.isdisplayOn()) ili9341.displayOn(bool doinit);
                 }
             }
 
@@ -187,25 +187,25 @@ void TaskDisplay1(void *pvParameters) {
                                 config.display.model(DISPLAY_1) == D_NX4832T035 or
                                 config.display.model(DISPLAY_1) == D_NX4827K043
                             ) {
-                                if(nextion.isDisplayOn()) nextion.displayOff();
+                                if(nextion.isdisplayOn()) nextion.displayOff();
                             }
                             if(config.display.model(DISPLAY_1) == D_ILI9341) {
-                                if(ili9341.isDisplayOn()) ili9341.displayOff();
+                                if(ili9341.isdisplayOn()) ili9341.displayOff();
                             }
                         }
                         if(config.display.type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
-                            if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
+                            if(ws2812b_1.isdisplayOn()) ws2812b_1.displayOff();
                         }
                         if(config.display.type(DISPLAY_1) == SEGMENT_DISPLAY) {
                             if(config.display.model(DISPLAY_1) <= D_TM1637) {
-                                if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
+                                if(tm1637_1.isdisplayOn()) tm1637_1.displayOff();
                             }
                             if(config.display.model(DISPLAY_1) >= D_MAX7219) {
-                                if(max7219_1.isDisplayOn()) max7219_1.displayOff();
+                                if(max7219_1.isdisplayOn()) max7219_1.displayOff();
                             }
                         }
                         if(config.display.type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                            if(numitron_1.isDisplayOn()) numitron_1.displayOff();
+                            if(numitron_1.isdisplayOn()) numitron_1.displayOff();
                         }
                     }
 
@@ -340,18 +340,18 @@ void TaskDisplay2(void *pvParameters) {
                 /* Check if need and it's time to turn off the display */
                 if(isTimeoutOffTime(DISPLAY_2)) {
                     if(config.display.type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) { 
-                        if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
+                        if(ws2812b_2.isdisplayOn()) ws2812b_2.displayOff();
                     }
                     if(config.display.type(DISPLAY_2) == SEGMENT_DISPLAY) {
                         if(config.display.model(DISPLAY_2) <= D_TM1637) {
-                            if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
+                            if(tm1637_2.isdisplayOn()) tm1637_2.displayOff();
                         }
                         if(config.display.model(DISPLAY_2) >= D_MAX7219) {
-                            if(max7219_2.isDisplayOn()) max7219_2.displayOff();
+                            if(max7219_2.isdisplayOn()) max7219_2.displayOff();
                         }
                     }
                     if(config.display.type(DISPLAY_2) == NUMITRON_DISPLAY) {
-                        if(numitron_2.isDisplayOn()) numitron_2.displayOff();
+                        if(numitron_2.isdisplayOn()) numitron_2.displayOff();
                     }
                 }
 

@@ -10,7 +10,7 @@ void ILI9341::displayToggle() {
 /**
  * Turns on the display
  */
-void ILI9341::displayOn() {
+void ILI9341::displayOn(bool doinit) {
     _power = true;
 }
 
@@ -24,6 +24,6 @@ void ILI9341::displayOff() {
 /**
  * Returns true if display is on
  */
-bool ILI9341::isDisplayOn() const {
+bool ILI9341::isdisplayOn() const {
     return _power;
 }

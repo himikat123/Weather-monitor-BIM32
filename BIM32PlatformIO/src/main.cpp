@@ -23,6 +23,13 @@
 //#include "./taskServer.hpp"
 //#include "./web.hpp"
 
+TaskHandle_t task_display1_handle = NULL;
+TaskHandle_t task_display2_handle = NULL;
+TaskHandle_t task_server_handle = NULL;
+TaskHandle_t task_sensors_handle = NULL;
+SemaphoreHandle_t sensorsSemaphore = NULL;
+uint8_t dummy = 0;
+
 TaskDisplay taskDisplay1;
 TaskDisplay taskDisplay2;
 

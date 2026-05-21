@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#include "./src/WebSockets/WebSocketsServer.h"
+#include <WebSocketsServer.h>
 #include "./websocket.hpp"
 
 void WebSocket::_handleEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
