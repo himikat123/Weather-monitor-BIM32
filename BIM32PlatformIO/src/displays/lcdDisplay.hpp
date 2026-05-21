@@ -2,9 +2,10 @@
 #include <Arduino.h>
 #include <CRC32.h>
 
+#include "./baseDisplay.hpp"
 #include "../agregateData/lcdData/agregateLcdData.hpp"
 
-class LcdDisplay {
+class LcdDisplay : public BaseDisplay {
     protected:
         CRC32 _crc;
         AgregateLcdData agregateLcdData;

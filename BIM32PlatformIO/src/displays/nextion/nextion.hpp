@@ -22,8 +22,9 @@ class Nextion : LcdDisplay {
         void refresh();
         void displayToggle();
         void displayOn(bool doinit = true);
-        void displayOff();
-        bool isDisplayOn();
+        virtual void displayOn() override { displayOn(true); }
+        virtual bool isDisplayOn() const override { return false; }
+        virtual void displayOff() override {}
         void brightness(unsigned int bright);
         void setDisplayRTC();
         void dataReceive();

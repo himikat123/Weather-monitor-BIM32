@@ -1,3 +1,7 @@
+#include <Arduino.h>
+
+#include "../globals.hpp"
+#include "../config/config.hpp"
 #include "./taskDisplay.hpp"
 
 TaskDisplay::TaskDisplay() {}
@@ -10,6 +14,24 @@ TaskDisplay::~TaskDisplay() {
 
 bool TaskDisplay::start(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId, int dispNum) {
     _dispNum = dispNum;
+
+    if(config.display.type(_dispNum) == LCD_DISPLAY) {
+        if(config.display.model(_dispNum) <= D_NX4827K043) _display = &_nextion;
+        if(config.display.model(_dispNum) == D_ILI9341) _display = &_ili9341;
+        if(config.display.type(_dispNum) == PIXEL_LEDS_DISPLAY) {
+            _display = (_dispNum == DISPLAY_1) ? &_ws2812_1 : &_ws2812_2;
+        }
+        if(config.display.type(_dispNum) == SEGMENT_DISPLAY) {
+            if(config.display.model(_dispNum) <= D_TM1637) {
+                _display = (_dispNum == DISPLAY_1) ? &_tm1637_1 : &_tm1637_2;
+            }
+            if(config.display.model(_dispNum) >= D_MAX7219) {
+                _display = (_dispNum == DISPLAY_1) ? &_max7219s_1 : &_max7219s_2;
+            }
+        }
+        if(config.display.type(_dispNum) == NUMITRON_DISPLAY) {
+            _display = (_dispNum == DISPLAY_1) ? &_numitron_1 : &_numitron_2;
+        }
 
     BaseType_t result = xTaskCreatePinnedToCore(
         TaskDisplay::_taskWrapper,

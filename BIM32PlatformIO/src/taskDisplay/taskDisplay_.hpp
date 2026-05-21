@@ -209,70 +209,7 @@ void TaskDisplay1(void *pvParameters) {
                         }
                     }
 
-                    uint8_t itsOffTime = isNightOffTime(DISPLAY_1) ? 1 : 0;
-                    if((state.disp_night_state[DISPLAY_1] != itsOffTime) || (state.display_state[DISPLAY_1] > 0)) {
-                        state.disp_night_state[DISPLAY_1] = itsOffTime;
-                        if(state.display_state[DISPLAY_1] > 0) {
-                            itsOffTime = state.display_state[DISPLAY_1] - 1;
-                            state.display_state[DISPLAY_1] = 0;
-                        }
-                        if(itsOffTime) {
-                            if(config.display.type(DISPLAY_1) == LCD_DISPLAY) {
-                                if(
-                                    config.display.model(DISPLAY_1) == D_NX4832K035 or 
-                                    config.display.model(DISPLAY_1) == D_NX4832T035 or
-                                    config.display.model(DISPLAY_1) == D_NX4827K043
-                                ) {
-                                    if(nextion.isDisplayOn()) nextion.displayOff();
-                                }
-                                if(config.display.model(DISPLAY_1) == D_ILI9341) {
-                                    if(ili9341.isDisplayOn()) ili9341.displayOff();
-                                }
-                            }
-                            if(config.display.type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
-                                if(ws2812b_1.isDisplayOn()) ws2812b_1.displayOff();
-                            }
-                            if(config.display.type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                                if(config.display.model(DISPLAY_1) <= D_TM1637) {
-                                    if(tm1637_1.isDisplayOn()) tm1637_1.displayOff();
-                                }
-                                if(config.display.model(DISPLAY_1) >= D_MAX7219) {
-                                    if(max7219_1.isDisplayOn()) max7219_1.displayOff();
-                                }
-                            }
-                            if(config.display.type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                                if(numitron_1.isDisplayOn()) numitron_1.displayOff();
-                            }
-                        }
-                        else {
-                            if(config.display.type(DISPLAY_1) == LCD_DISPLAY) {
-                                if(
-                                    config.display.model(DISPLAY_1) == D_NX4832K035 or 
-                                    config.display.model(DISPLAY_1) == D_NX4832T035 or
-                                    config.display.model(DISPLAY_1) == D_NX4827K043
-                                ) {
-                                    if(!nextion.isDisplayOn()) nextion.displayOn(false);
-                                }
-                                if(config.display.model(DISPLAY_1) == D_ILI9341) {
-                                    if(!ili9341.isDisplayOn()) ili9341.displayOn();
-                                }
-                            }
-                            if(config.display.type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
-                                if(!ws2812b_1.isDisplayOn()) ws2812b_1.displayOn();
-                            }
-                            if(config.display.type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                                if(config.display.model(DISPLAY_1) <= D_TM1637) {
-                                    if(!tm1637_1.isDisplayOn()) tm1637_1.displayOn();
-                                }
-                                if(config.display.model(DISPLAY_1) >= D_MAX7219) {
-                                    if(!max7219_1.isDisplayOn()) max7219_1.displayOn();
-                                }
-                            }
-                            if(config.display.type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                                if(!numitron_1.isDisplayOn()) numitron_1.displayOn();
-                            }
-                        }
-                    }
+                    _itsOffTime(); // new
                 }
 
                 /* WS2812b display 1 update */
@@ -418,46 +355,7 @@ void TaskDisplay2(void *pvParameters) {
                     }
                 }
 
-                uint8_t itsOffTime = isNightOffTime(DISPLAY_2) ? 1 : 0;
-                if((state.disp_night_state[DISPLAY_2] != itsOffTime) || (state.display_state[DISPLAY_2] > 0)) {
-                    state.disp_night_state[DISPLAY_2] = itsOffTime;
-                    if(state.display_state[DISPLAY_2] > 0) {
-                        itsOffTime = state.display_state[DISPLAY_2] - 1;
-                        state.display_state[DISPLAY_2] = 0;
-                    }
-                    if(itsOffTime) {
-                        if(config.display.type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
-                            if(ws2812b_2.isDisplayOn()) ws2812b_2.displayOff();
-                        }
-                        if(config.display.type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                            if(config.display.model(DISPLAY_2) <= D_TM1637) {
-                                if(tm1637_2.isDisplayOn()) tm1637_2.displayOff();
-                            }
-                            if(config.display.model(DISPLAY_2) >= D_MAX7219) {
-                                if(max7219_2.isDisplayOn()) max7219_2.displayOff();
-                            }
-                        }
-                        if(config.display.type(DISPLAY_2) == NUMITRON_DISPLAY) {
-                            if(numitron_2.isDisplayOn()) numitron_2.displayOff();
-                        }
-                    }
-                    else {
-                        if(config.display.type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
-                            if(!ws2812b_2.isDisplayOn()) ws2812b_2.displayOn();
-                        }
-                        if(config.display.type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                            if(config.display.model(DISPLAY_2) <= D_TM1637) {
-                                if(!tm1637_2.isDisplayOn()) tm1637_2.displayOn();
-                            }
-                            if(config.display.model(DISPLAY_2) >= D_MAX7219) {
-                                if(!max7219_2.isDisplayOn()) max7219_2.displayOn();
-                            }
-                        }
-                        if(config.display.type(DISPLAY_2) == NUMITRON_DISPLAY) {
-                            if(!numitron_2.isDisplayOn()) numitron_2.displayOn();
-                        }
-                    }
-                }
+                _itsOffTime(); // new
             }
         }
 

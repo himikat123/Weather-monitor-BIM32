@@ -1,15 +1,16 @@
 #pragma once
 #include <Arduino.h>
 
+#include "../baseDisplay.hpp"
 #include "../../agregateData/segmentData/agregateSegmentData.hpp"
 
-class SegmentDisplay {
+class SegmentDisplay : public SegmentDisplay {
     public:
         void setDotFreq(unsigned int freq);
         void displayToggle();
-        void displayOn();
-        void displayOff();
-        bool isDisplayOn();
+        virtual bool isDisplayOn() const override { return false; }
+        virtual void displayOff() override {}
+        virtual void displayOn() override {}
         void brightness(uint8_t intensity, bool reduc);
 
     protected:

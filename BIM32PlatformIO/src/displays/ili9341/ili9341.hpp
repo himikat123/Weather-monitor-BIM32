@@ -78,9 +78,9 @@ class ILI9341 : LcdDisplay {
         void refresh();
         void brightness(unsigned int bright);
         void displayToggle();
-        void displayOn();
-        void displayOff();
-        bool isDisplayOn();
+        virtual bool isDisplayOn() const override { return false; }
+        virtual void displayOff() override {}
+        virtual void displayOn() override {}
         void getTouch();
 
     private:
