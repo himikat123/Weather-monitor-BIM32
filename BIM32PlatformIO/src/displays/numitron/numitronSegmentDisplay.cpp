@@ -23,10 +23,10 @@ void Numitron::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t 
 
     _setModel(config.display.model(dispNum));
 
-    _wire = dispNum == 0 ? &wire_1 : &wire_2;
+    _wire = dispNum == DISPLAY_1 ? &wire_1 : &wire_2;
     _clearDisplay();
 
-    _strip = dispNum == 0 ? &strip_1 : &strip_2;
+    _strip = dispNum == DISPLAY_1 ? &strip_1 : &strip_2;
     _strip->begin(ws, 8);
     _strip->clear(true);
 }

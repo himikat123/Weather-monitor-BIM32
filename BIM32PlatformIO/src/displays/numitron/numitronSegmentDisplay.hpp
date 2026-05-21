@@ -12,7 +12,15 @@ class Numitron : public SegmentDisplay {
         SoftI2C wire_2;
         LiteLED strip_1;
         LiteLED strip_2;
+
     public:
+        Numitron() : 
+            wire_1(NUMITRON_1_SDA_PIN, NUMITRON_1_SCL_PIN),
+            wire_2(NUMITRON_2_SDA_PIN, NUMITRON_2_SCL_PIN),
+            strip_1(LED_STRIP_WS2812, false, RMT_CHANNEL_2), 
+            strip_2(LED_STRIP_WS2812, false, RMT_CHANNEL_3)
+        {}
+
         void init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws);
         void brightness(uint8_t intensity, bool reduc);
         void displayToggle();
@@ -21,12 +29,6 @@ class Numitron : public SegmentDisplay {
         void refresh();
 
     private:
-        Numitron() : 
-            wire_1(NUMITRON_1_SDA_PIN, NUMITRON_1_SCL_PIN),
-            wire_2(NUMITRON_2_SDA_PIN, NUMITRON_2_SCL_PIN),
-            strip_1(LED_STRIP_WS2812, false, RMT_CHANNEL_2), 
-            strip_2(LED_STRIP_WS2812, false, RMT_CHANNEL_3)
-        {}
         SoftI2C* _wire = nullptr;
         LiteLED* _strip = nullptr;
         int8_t _pwm = -1;

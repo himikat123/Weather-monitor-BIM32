@@ -24,6 +24,6 @@ void ILI9341::displayOff() {
 /**
  * Returns true if display is on
  */
-bool ILI9341::isDisplayOn() {
+bool ILI9341::isDisplayOn() const {
     return _power;
 }

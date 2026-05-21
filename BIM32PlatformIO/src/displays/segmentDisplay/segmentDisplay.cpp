@@ -45,7 +45,7 @@ void SegmentDisplay::displayOff() {
 /**
  * Return true if display is on
  */
-bool SegmentDisplay::isDisplayOn() {
+bool SegmentDisplay::isDisplayOn() const {
     return _power;
 }
 

@@ -7,6 +7,7 @@
  */
 
 #include <Arduino.h>
+#include <WiFi.h>
 #include "FS.h"
 #include <LittleFS.h>
 #include "./globals.hpp"
@@ -18,9 +19,9 @@
 #include "./displays/nextion/nextion.hpp"
 
 #include "./taskDisplay/taskDisplay.hpp"
-#include "./taskSensors.hpp"
-#include "./taskServer.hpp"
-#include "./web.hpp"
+//#include "./taskSensors.hpp"
+//#include "./taskServer.hpp"
+//#include "./web.hpp"
 
 TaskDisplay taskDisplay1;
 TaskDisplay taskDisplay2;
@@ -87,9 +88,9 @@ void setup() {
     WiFi.mode(WIFI_STA);
     network.connect();
 
-    xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, DISPLAY_1);
-    webInterface_init();
-    xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, DISPLAY_2);
+    //xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, DISPLAY_1);
+    //webInterface_init();
+    //xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, DISPLAY_2);
 }
 
 void loop() {

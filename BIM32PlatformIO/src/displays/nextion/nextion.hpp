@@ -4,7 +4,7 @@
 #include <EasyNextionLibrary.h> // v1.0.6 https://github.com/Seithan/EasyNextionLibrary
 #include "../lcdDisplay.hpp"
 
-class Nextion : LcdDisplay {
+class Nextion : public LcdDisplay {
     protected:
         EasyNex _nextion;
 
@@ -21,10 +21,10 @@ class Nextion : LcdDisplay {
         void showLogo();
         void refresh();
         void displayToggle();
-        void displayOn(bool doinit = true);
-        virtual void displayOn() override { displayOn(true); }
-        virtual bool isDisplayOn() const override { return false; }
-        virtual void displayOff() override {}
+        void displayOn(bool doinit);
+        virtual void displayOn() override;
+        virtual void displayOff() override;
+        virtual bool isDisplayOn() const override;
         void brightness(unsigned int bright);
         void setDisplayRTC();
         void dataReceive();

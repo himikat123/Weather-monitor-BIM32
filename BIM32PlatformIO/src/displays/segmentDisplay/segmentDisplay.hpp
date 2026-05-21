@@ -4,13 +4,13 @@
 #include "../baseDisplay.hpp"
 #include "../../agregateData/segmentData/agregateSegmentData.hpp"
 
-class SegmentDisplay : public SegmentDisplay {
+class SegmentDisplay : public BaseDisplay {
     public:
         void setDotFreq(unsigned int freq);
         void displayToggle();
-        virtual bool isDisplayOn() const override { return false; }
-        virtual void displayOff() override {}
-        virtual void displayOn() override {}
+        virtual void displayOff() override;
+        virtual void displayOn() override;
+        virtual bool isDisplayOn() const override;
         void brightness(uint8_t intensity, bool reduc);
 
     protected:

@@ -9,9 +9,9 @@ class MAX7219_S : public SegmentDisplay {
         void refresh();
         void brightness(uint8_t intensity, bool reduc);
         void displayToggle();
-        virtual bool isDisplayOn() const override { return false; }
-        virtual void displayOff() override {}
-        virtual void displayOn() override {}
+        virtual void displayOff() override;
+        virtual void displayOn() override;
+        virtual bool isDisplayOn() const override;
 
     protected:
         MAX7219_Driver max7219;

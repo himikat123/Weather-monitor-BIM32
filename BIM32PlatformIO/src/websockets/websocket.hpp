@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
-#include <WebSocketsServer.h>
+#include "./src/WebSockets/WebSocketsServer.h"
 
 class WebSocket {
     private:

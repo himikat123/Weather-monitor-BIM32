@@ -27,16 +27,16 @@ class TaskDisplay {
         void _run();
 
         BaseDisplay* _display = nullptr;
-        Nextion _nextion;
-        ILI9341 _ili9341;
-        WS2812b ws2812b_1;
-        WS2812b ws2812b_2;
-        MAX7219_S max7219s_1;
-        MAX7219_S max7219s_2;
-        TM1637 tm1637_1;
-        TM1637 tm1637_2;
-        Numitron numitron_1;
-        Numitron numitron_2;
+        //Nextion _nextion;
+        //ILI9341 _ili9341;
+        WS2812b _ws2812b_1;
+        WS2812b _ws2812b_2;
+        MAX7219_S _max7219s_1;
+        MAX7219_S _max7219s_2;
+        TM1637 _tm1637_1;
+        TM1637 _tm1637_2;
+        Numitron _numitron_1;
+        Numitron _numitron_2;
 
         int _dispNum = 0;
 
