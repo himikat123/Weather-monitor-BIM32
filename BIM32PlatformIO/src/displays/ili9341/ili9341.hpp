@@ -76,11 +76,12 @@ class ILI9341 : public LcdDisplay {
         void showLogo();
         void showHomeScreen();
         void refresh();
-        void brightness(unsigned int bright);
         void displayToggle();
         virtual bool isdisplayOn() const override;
         virtual void displayOff() override;
         virtual void displayOn(bool doinit) override;
+        virtual void setDotFreq(uint16_t dotFreq) override;
+        virtual void brightness(unsigned int bright, bool reduc) override;
         void getTouch();
 
     private:

@@ -105,9 +105,18 @@ bool MAX7219_S::isdisplayOn() const {
  * @param brightness intensity
  * @param reduc brightness is reduced or not
  */
-void MAX7219_S::brightness(uint8_t intensity, bool reduc) {
+void MAX7219_S::brightness(unsigned int intensity, bool reduc) {
     _brightness = reduc ? round(intensity / 2) : intensity;
     uint8_t bright = map(_brightness, 0, 100, 0, 15);
     bright = constrain(bright, 0, 15);
     max7219.setIntensity(bright);
+}
+
+
+/**
+ * Set time points frequency (period)
+ * @param frequency (period)
+ */
+void MAX7219_S::setDotFreq(uint16_t freq) {
+    _dotfreq = freq;
 }

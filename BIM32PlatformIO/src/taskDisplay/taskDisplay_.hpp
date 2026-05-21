@@ -147,69 +147,8 @@ void TaskDisplay1(void *pvParameters) {
                         }
                     }
 
-                    /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
-                    uint16_t dotFreq = state.net_connected ? 500 : 1000;
-                    ws2812b_1.setDotFreq(dotFreq);
-                    tm1637_1.setDotFreq(dotFreq);
-                    max7219_1.setDotFreq(dotFreq);
-                    numitron_1.setDotFreq(dotFreq);
-
-                    /* WS2812b brightness change */
-                    if(config.display.type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
-                        ws2812b_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
-                    }
-
-                    if(config.display.type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                        /* tm1637 brightness change */
-                        if(config.display.model(DISPLAY_1) <= D_TM1637) {
-                            tm1637_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
-                        }
-                        /* max7219 brightness change */
-                        if(config.display.model(DISPLAY_1) >= D_MAX7219) {
-                            max7219_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
-                        }
-                    }
-
-                    if(config.display.type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                        numitron_1.brightness(get_brightness(DISPLAY_1), state.reduc[DISPLAY_1]);
-                    }
-
-                    /* LCD/TFT display brightness change */
-                    unsigned int br = get_brightness(DISPLAY_1);
-                    nextion.brightness(br);
-                    ili9341.brightness(br);
-
-                    /* Check if need and it's time to turn off the display */
-                    if(isTimeoutOffTime(DISPLAY_1)) {
-                        if(config.display.type(DISPLAY_1) == LCD_DISPLAY) {
-                            if(
-                                config.display.model(DISPLAY_1) == D_NX4832K035 or 
-                                config.display.model(DISPLAY_1) == D_NX4832T035 or
-                                config.display.model(DISPLAY_1) == D_NX4827K043
-                            ) {
-                                if(nextion.isdisplayOn()) nextion.displayOff();
-                            }
-                            if(config.display.model(DISPLAY_1) == D_ILI9341) {
-                                if(ili9341.isdisplayOn()) ili9341.displayOff();
-                            }
-                        }
-                        if(config.display.type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) {
-                            if(ws2812b_1.isdisplayOn()) ws2812b_1.displayOff();
-                        }
-                        if(config.display.type(DISPLAY_1) == SEGMENT_DISPLAY) {
-                            if(config.display.model(DISPLAY_1) <= D_TM1637) {
-                                if(tm1637_1.isdisplayOn()) tm1637_1.displayOff();
-                            }
-                            if(config.display.model(DISPLAY_1) >= D_MAX7219) {
-                                if(max7219_1.isdisplayOn()) max7219_1.displayOff();
-                            }
-                        }
-                        if(config.display.type(DISPLAY_1) == NUMITRON_DISPLAY) {
-                            if(numitron_1.isdisplayOn()) numitron_1.displayOff();
-                        }
-                    }
-
-                    _itsOffTime(); // new
+                    //_brightnessAndDotFreq();
+                    //_itsOffTime(); // new
                 }
 
                 /* WS2812b display 1 update */
@@ -309,53 +248,8 @@ void TaskDisplay2(void *pvParameters) {
             if((millis() - bright_update) > 1000) {
                 bright_update = millis();
 
-                /* 7 segment display slow down points blinking frequency if the device isn't connected to the network */
-                uint16_t dotFreq = state.net_connected ? 500 : 1000;
-                ws2812b_2.setDotFreq(dotFreq);
-                tm1637_2.setDotFreq(dotFreq);
-                max7219_2.setDotFreq(dotFreq);
-                numitron_2.setDotFreq(dotFreq);
-
-                /* WS2812b brightness change */
-                if(config.display.type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) {
-                    ws2812b_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                }
-
-                if(config.display.type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                    /* tm1637 brightness change */
-                    if(config.display.model(DISPLAY_2) <= D_TM1637) {
-                        tm1637_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                    }
-                    /* max7219 brightness change */
-                    if(config.display.model(DISPLAY_2) >= D_MAX7219) {
-                        max7219_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                    }
-                }
-
-                /* Numitron brightness change */
-                if(config.display.type(DISPLAY_2) == NUMITRON_DISPLAY) {
-                    numitron_2.brightness(get_brightness(DISPLAY_2), state.reduc[DISPLAY_2]);
-                }
-
-                /* Check if need and it's time to turn off the display */
-                if(isTimeoutOffTime(DISPLAY_2)) {
-                    if(config.display.type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) { 
-                        if(ws2812b_2.isdisplayOn()) ws2812b_2.displayOff();
-                    }
-                    if(config.display.type(DISPLAY_2) == SEGMENT_DISPLAY) {
-                        if(config.display.model(DISPLAY_2) <= D_TM1637) {
-                            if(tm1637_2.isdisplayOn()) tm1637_2.displayOff();
-                        }
-                        if(config.display.model(DISPLAY_2) >= D_MAX7219) {
-                            if(max7219_2.isdisplayOn()) max7219_2.displayOff();
-                        }
-                    }
-                    if(config.display.type(DISPLAY_2) == NUMITRON_DISPLAY) {
-                        if(numitron_2.isdisplayOn()) numitron_2.displayOff();
-                    }
-                }
-
-                _itsOffTime(); // new
+                //_brightnessAndDotFreq();
+                //_itsOffTime();
             }
         }
 

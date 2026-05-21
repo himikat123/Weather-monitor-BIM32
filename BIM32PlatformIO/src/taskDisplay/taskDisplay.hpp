@@ -27,8 +27,6 @@ class TaskDisplay {
         void _run();
 
         BaseDisplay* _display = nullptr;
-        //Nextion _nextion;
-        //ILI9341 _ili9341;
         WS2812b _ws2812b_1;
         WS2812b _ws2812b_2;
         MAX7219_S _max7219s_1;
@@ -40,8 +38,9 @@ class TaskDisplay {
 
         int _dispNum = 0;
 
+        void _brightnessAndDotFreq();
+        unsigned int _get_brightness();
         bool _isNightOffTime();
         void _itsOffTime();
         bool _isTimeoutOffTime();
-        unsigned int _get_brightness();
 };

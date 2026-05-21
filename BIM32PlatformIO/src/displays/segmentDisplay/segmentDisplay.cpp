@@ -17,7 +17,7 @@ void SegmentDisplay::_setModel(uint8_t model) {
  * Set time points frequency (period)
  * @param frequency (period)
  */
-void SegmentDisplay::setDotFreq(unsigned int freq) {
+void SegmentDisplay::setDotFreq(uint16_t freq) {
     _dotfreq = freq;
 }
 
@@ -54,6 +54,6 @@ bool SegmentDisplay::isdisplayOn() const {
  * @param intensity brightness
  * @param reduc brightness is reduced or not
  */
-void SegmentDisplay::brightness(uint8_t intensity, bool reduc) {
+void SegmentDisplay::brightness(unsigned int intensity, bool reduc) {
     _brightness = reduc ? round(intensity / 2) : intensity;
 }

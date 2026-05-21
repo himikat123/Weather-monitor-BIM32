@@ -7,11 +7,12 @@ class MAX7219_S : public SegmentDisplay {
     public:
         void init(uint8_t dispNum, int8_t clk, int8_t dat, int8_t load);
         void refresh();
-        void brightness(uint8_t intensity, bool reduc);
         void displayToggle();
         virtual void displayOff() override;
         virtual void displayOn(bool doinit) override;
         virtual bool isdisplayOn() const override;
+        virtual void setDotFreq(uint16_t dotFreq) override;
+        virtual void brightness(unsigned int bright, bool reduc) override;
 
     protected:
         MAX7219_Driver max7219;

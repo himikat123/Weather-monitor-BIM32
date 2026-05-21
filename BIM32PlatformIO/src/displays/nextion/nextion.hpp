@@ -24,7 +24,8 @@ class Nextion : public LcdDisplay {
         virtual void displayOn(bool doinit) override;
         virtual void displayOff() override;
         virtual bool isdisplayOn() const override;
-        void brightness(unsigned int bright);
+        virtual void setDotFreq(uint16_t dotFreq) override;
+        virtual void brightness(unsigned int bright, bool reduc) override;
         void setDisplayRTC();
         void dataReceive();
 

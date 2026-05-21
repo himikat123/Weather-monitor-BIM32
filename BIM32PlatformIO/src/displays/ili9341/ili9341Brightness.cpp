@@ -5,9 +5,9 @@
 #include "../../config/config.hpp"
 #include "../../state/state.hpp"
 
-void ILI9341::brightness(unsigned int bright) {
+void ILI9341::brightness(unsigned int bright, bool reduc) {
     if(_power) {
-        uint8_t brgt = state.reduc[0] ? round(bright / 2) : bright;
+        uint8_t brgt = reduc ? round(bright / 2) : bright;
         if(brgt < config.display.brightness.min(0)) brgt = config.display.brightness.min(0);
         if(brgt > config.display.brightness.max(0)) brgt = config.display.brightness.max(0); 
         float r = 100 * log10(2) / log10(255);
@@ -17,3 +17,5 @@ void ILI9341::brightness(unsigned int bright) {
     }
     else analogWrite(TFT_BACKLIGHT, 0);
 }
+
+void ILI9341::setDotFreq(uint16_t dotFreq) {}

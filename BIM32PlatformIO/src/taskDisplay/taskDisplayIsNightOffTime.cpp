@@ -21,6 +21,13 @@ bool TaskDisplay::_isNightOffTime() {
 }
 
 void TaskDisplay::_itsOffTime() {
+    /* Check if need and it's time to turn off the display */
+    if(_isTimeoutOffTime()) {
+        if(config.display.type(DISPLAY_2) == PIXEL_LEDS_DISPLAY) { 
+            if(_display->isdisplayOn()) _display->displayOff();
+        }
+    }
+
     uint8_t itsOffTime = _isNightOffTime() ? 1 : 0;
     if((state.disp_night_state[_dispNum] != itsOffTime) || (state.display_state[_dispNum] > 0)) {
         state.disp_night_state[_dispNum] = itsOffTime;
