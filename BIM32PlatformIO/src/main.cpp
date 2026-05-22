@@ -19,7 +19,7 @@
 #include "./displays/nextion/nextion.hpp"
 
 #include "./taskDisplay/taskDisplay.hpp"
-//#include "./taskSensors.hpp"
+#include "./taskSensors/taskSensors.hpp"
 //#include "./taskServer.hpp"
 //#include "./web.hpp"
 
@@ -32,6 +32,7 @@ uint8_t dummy = 0;
 
 TaskDisplay taskDisplay1;
 TaskDisplay taskDisplay2;
+TaskSensors taskSensors;
 
 /**
  * Arduino setup
@@ -39,10 +40,10 @@ TaskDisplay taskDisplay2;
 void setup() {
     pinMode(HC12_SET_PIN, OUTPUT);
     digitalWrite(HC12_SET_PIN, HIGH);
-    pinMode(DISPLAY1_BUTTON_PIN, INPUT);
-    pinMode(DISPLAY2_BUTTON_PIN, INPUT);
-    pinMode(ALARM_BUTTON_PIN, INPUT);
-    pinMode(MP3_BUSY_PIN, INPUT);
+    pinMode(DISPLAY1_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(DISPLAY2_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(ALARM_BUTTON_PIN, INPUT_PULLUP);
+    pinMode(MP3_BUSY_PIN, INPUT_PULLUP);
 
     Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);
@@ -62,44 +63,41 @@ void setup() {
     }
     config.readConfig();
 
-    #if defined(BIM32_CYD)
-        ili9341.init();
-        ili9341.showLogo();
-    #else
-        if(config.display.type(DISPLAY_1) == LCD_DISPLAY) {
-            if(config.display.model(DISPLAY_1) == D_NX4832K035 or config.display.model(0) == D_NX4832T035) {
-                Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
-                nextion.showLogo();
-            }
-            if(config.display.model(DISPLAY_1) == D_ILI9341) {
-                ili9341.init();
-                ili9341.showLogo();
-            }
+    int disp1type = config.display.type(DISPLAY_1);
+    int disp1model = config.display.model(DISPLAY_1); 
+    if(disp1type == LCD_DISPLAY) {
+        if(disp1model == D_NX4832K035 or disp1model == D_NX4832T035 or disp1model == D_NX4827K043) {
+            Serial1.begin(115200, SERIAL_8N1, NEXTION_RX_PIN, NEXTION_TX_PIN);
+            nextion.showLogo();
         }
-    #endif
+        if(disp1model == D_ILI9341) {
+            ili9341.init();
+            ili9341.showLogo();
+        }
+    }
 
-
-    if(config.display.type(DISPLAY_1) && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1)) {
+    if(disp1type && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1)) {
         Serial.println("Display1 task pinned to core 1 successfully!");
     } else {
         Serial.println("Failed to start display1 task!");
     }
-    if(config.display.type(DISPLAY_2) && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2)) {
+    if(disp1type && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2)) {
         Serial.println("Display2 task pinned to core 1 successfully!");
     } else {
         Serial.println("Failed to start display2 task!");
     }
-    //xTaskCreatePinnedToCore(TaskDisplay1, "TaskDisplay1", 32768, NULL, -1, &task_display1_handle, 1);
-    //xTaskCreatePinnedToCore(TaskDisplay2, "TaskDisplay2", 8192, NULL, -1, &task_display2_handle, 1);
 
     WiFi.mode(WIFI_STA);
     network.connect();
 
+    if(taskSensors.start("TaskSensors", 32768, 1, 1)) {
+        Serial.println("Sensors task pinned to core 1 successfully!");
+    } else {
+        Serial.println("Failed to start Sensors task!");
+    }
     //xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, DISPLAY_1);
     //webInterface_init();
     //xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, DISPLAY_2);
 }
 
-void loop() {
-
-}
+void loop() {}

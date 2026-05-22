@@ -1,27 +1,39 @@
-#pragma once
+#include <Arduino.h>
 
-#include "./timeNTP/timeNTP.hpp"
-TimeNTP timeNTP;
+#include "../globals.hpp"
+#include "../pinout.hpp"
+#include "../config/config.hpp"
+#include "../state/state.hpp"
+#include "./taskSensors.hpp"
 
-void display1_toggle();
-void display2_toggle();
-void alarm_button();
-void mp3_busy();
+TaskSensors::TaskSensors() {}
 
-void TaskSensors(void *pvParameters) {
-    (void) pvParameters;
-    attachInterrupt(DISPLAY1_BUTTON_PIN, display1_toggle, FALLING);
-    attachInterrupt(DISPLAY2_BUTTON_PIN, display2_toggle, FALLING);
+TaskSensors::~TaskSensors() {
+    if(_taskHandle != nullptr) {
+        vTaskDelete(_taskHandle);
+    }
+}
+
+bool TaskSensors::start(const char* name, uint32_t stackSize, UBaseType_t priority, BaseType_t coreId) {
+    //int type = config.display.type(_dispNum);
+    //int model = config.display.model(_dispNum);
+
+    BaseType_t result = xTaskCreatePinnedToCore(TaskSensors::_taskWrapper, name, stackSize, this, priority, &_taskHandle, coreId);
+    return (result == pdPASS);
+}
+
+void TaskSensors::_taskWrapper(void* pvParameters) {
+    TaskSensors* instance = static_cast<TaskSensors*>(pvParameters);
+    instance->_run(); 
+}
+
+void TaskSensors::_run() {
+    attachInterruptArg(DISPLAY1_BUTTON_PIN, isr_display1, this, FALLING);
+    attachInterruptArg(DISPLAY2_BUTTON_PIN, isr_display2, this, FALLING);
+    attachInterruptArg(ALARM_BUTTON_PIN, isr_alarm, this, FALLING);
+    attachInterruptArg(MP3_BUSY_PIN, isr_mp3, this, FALLING);
 
     sensors.init();
-
-    unsigned int ntp_update = 0;
-    unsigned int sensors_update = 0;
-    unsigned int thingspeakReceive = 0;
-    unsigned int thingspeakSend = 0;
-    unsigned int narodmonSend = 0;
-    unsigned int mqttSend = 0;
-    unsigned int historyUpdate = 0;
 
     // HC12 wireless module channel number request
     digitalWrite(HC12_SET_PIN, LOW);
@@ -30,10 +42,6 @@ void TaskSensors(void *pvParameters) {
     Serial2.flush();
     delay(100);
     digitalWrite(HC12_SET_PIN, HIGH);
-
-    pinMode(ALARM_BUTTON_PIN, INPUT);
-    attachInterrupt(ALARM_BUTTON_PIN, alarm_button, FALLING);
-    attachInterrupt(MP3_BUSY_PIN, mp3_busy, FALLING);
 
     sound.init();
     mqtt.init();
@@ -142,70 +150,11 @@ void TaskSensors(void *pvParameters) {
                 }
             }
 
-            /**
-             * Send data to narodmon
-             */
-            if(config.cloud.narodmonSend.period() > 0) {
-                if((millis() - narodmonSend) > (config.cloud.narodmonSend.period() * 60000) or narodmonSend == 0) {
-                    narodmonSend = millis();
-                    Serial.println(SEPARATOR);
-                    Serial.println("Send data to narodmon.ru... ");
-                    if(network.isConnected()) narodmon.send();
-                    else {
-                        narodmonSend = 0;
-                        Serial.println("No internet connection");
-                    }
-                }
-            }
 
-            /**
-             * Send data via MQTT
-             */
-            if(config.cloud.mqttSend.period() > 0 and network.isConnected()) {
-                if(mqtt.loop()) {
-                    if((millis() - mqttSend) > (config.cloud.mqttSend.period() * 1000) or mqttSend == 0) {
-                        mqttSend = millis();
-                        Serial.println(SEPARATOR);
-                        Serial.println("Send data via MQTT...");
-                        if(network.isConnected()) mqtt.send();
-                        else {
-                            mqttSend = 0;
-                            Serial.println("No internet connection");
-                        }
-                    }
-                }
-            }
-    
-            /**
-             * Weather update
-             * every 20 minutes, or every hour for weatherbit.io
-             */
-            uint32_t weatherUpd = config.weather.provider() == 1 ? 3600 : 1200;
-            if(state.debugWether || (now() - weather.get_currentUpdated() > weatherUpd)) {
-                Serial.println(SEPARATOR);
-                Serial.println("Current weather update... ");
-                if(network.isConnected()) weather.update();
-                else Serial.println("No internet connection");
-                sensors.get_ds3231_timeDate();
-                state.debugWether = false;
-            }
-
-            /**
-             * Update history repository
-             */
-            if(config.cloud.history.period() > 0) {
-                if(now() - historyUpdate > config.cloud.history.period() * 60) {
-                    historyUpdate = now();
-                    Serial.println(SEPARATOR);
-                    Serial.println("Send data to weather history repository... ");
-                    if(network.isConnected()) thingspeak.sendHistory();
-                    else Serial.println("No internet connection");
-                    Serial.println(SEPARATOR);
-                    Serial.println("Receive data from weather history repository... ");
-                    if(network.isConnected()) thingspeak.receiveHistory();
-                    else Serial.println("No internet connection");
-                }
-            }
+            _sendNarodmon();
+            _sendMqtt();
+            _updateWeather();
+            _updateHistoryRepository();
         }
 
         comfort.soundNotify();
@@ -215,39 +164,4 @@ void TaskSensors(void *pvParameters) {
 
         vTaskDelay(50);
     }
-}
-
-/**
- * Interrupt from display 1 button
- */
-void display1_toggle() {
-    if(millis() - state.btnMillis[0] > 500) {
-        state.btnMillis[0] = millis();
-        state.display_btn_pressed[0] = true;
-    }
-}
-
-/**
- * Interrupt from display 2 button
- */
-void display2_toggle() {
-    if(millis() - state.btnMillis[1] > 500) {
-        state.btnMillis[1] = millis();
-        state.display_btn_pressed[1] = true;
-    }
-}
-
-/**
- * Interrupt from alarm button
- */
-void alarm_button() {
-    state.alarm_but_pressed = true;
-    //sound.stopPlaying();
-}
-
-/**
- * Interrupt from mp3 player busy pin
- */
-void mp3_busy() {
-    state.mp3_busy = false;
 }

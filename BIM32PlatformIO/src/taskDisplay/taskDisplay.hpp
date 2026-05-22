@@ -12,9 +12,6 @@
 #include "./displays/numitron/numitronSegmentDisplay.hpp"
 
 class TaskDisplay {
-    protected:
-        
-
     public:
         TaskDisplay();
         ~TaskDisplay();
