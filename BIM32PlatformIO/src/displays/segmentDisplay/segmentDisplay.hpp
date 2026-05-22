@@ -6,7 +6,7 @@
 
 class SegmentDisplay : public BaseDisplay {
     public:
-        void displayToggle();
+        virtual void displayToggle() override;
         virtual void displayOff() override;
         virtual void displayOn(bool doinit) override;
         virtual bool isdisplayOn() const override;

@@ -19,8 +19,8 @@ class Nextion : public LcdDisplay {
 
         void init();
         void showLogo();
-        void refresh();
-        void displayToggle();
+        virtual void refresh() override;
+        virtual void displayToggle() override;
         virtual void displayOn(bool doinit) override;
         virtual void displayOff() override;
         virtual bool isdisplayOn() const override;

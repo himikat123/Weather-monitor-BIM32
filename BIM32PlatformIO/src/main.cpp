@@ -79,12 +79,12 @@ void setup() {
     #endif
 
 
-    if(taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1)) {
+    if(config.display.type(DISPLAY_1) && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1)) {
         Serial.println("Display1 task pinned to core 1 successfully!");
     } else {
         Serial.println("Failed to start display1 task!");
     }
-    if(taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2)) {
+    if(config.display.type(DISPLAY_2) && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2)) {
         Serial.println("Display2 task pinned to core 1 successfully!");
     } else {
         Serial.println("Failed to start display2 task!");

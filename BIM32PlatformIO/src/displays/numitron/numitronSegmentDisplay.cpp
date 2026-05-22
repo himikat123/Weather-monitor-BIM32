@@ -36,7 +36,7 @@ void Numitron::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t 
  * @param intensity brightness
  * @param reduc brightness is reduced or not
  */
-void Numitron::brightness(uint8_t intensity, bool reduc) {
+void Numitron::brightness(unsigned int intensity, bool reduc) {
     _brightness = reduc ? round(intensity / 2) : intensity;
     uint8_t bright = (uint8_t)map(_brightness, 1, 100, 180, 1);
     bright = constrain(bright, 1, 180);

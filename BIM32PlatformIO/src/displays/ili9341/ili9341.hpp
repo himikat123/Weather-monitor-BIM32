@@ -75,8 +75,8 @@ class ILI9341 : public LcdDisplay {
         void init();
         void showLogo();
         void showHomeScreen();
-        void refresh();
-        void displayToggle();
+        virtual void refresh() override;
+        virtual void displayToggle() override;
         virtual bool isdisplayOn() const override;
         virtual void displayOff() override;
         virtual void displayOn(bool doinit) override;

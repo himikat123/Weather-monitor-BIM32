@@ -22,11 +22,11 @@ class Numitron : public SegmentDisplay {
         {}
 
         void init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t ws);
-        void brightness(uint8_t intensity, bool reduc);
-        void displayToggle();
-        void displayOn(bool doinit);
-        void displayOff();
-        void refresh();
+        virtual void brightness(unsigned int intensity, bool reduc) override;
+        virtual void displayToggle() override;
+        virtual void displayOn(bool doinit) override;
+        virtual void displayOff() override;
+        virtual void refresh() override;
 
     private:
         SoftI2C* _wire = nullptr;

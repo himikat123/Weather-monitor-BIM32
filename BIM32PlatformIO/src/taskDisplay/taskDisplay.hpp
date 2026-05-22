@@ -38,6 +38,7 @@ class TaskDisplay {
 
         int _dispNum = 0;
 
+        void _initDisplay();
         void _brightnessAndDotFreq();
         unsigned int _get_brightness();
         bool _isNightOffTime();

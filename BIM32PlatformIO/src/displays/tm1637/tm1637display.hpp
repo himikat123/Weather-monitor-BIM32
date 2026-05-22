@@ -7,7 +7,7 @@
 class TM1637 : public SegmentDisplay {
     public:
         void init(uint8_t dispNum, int8_t clk, int8_t dat);
-        void refresh();
+        virtual void refresh() override;
         virtual bool isdisplayOn() const override { return false; }
         virtual void displayOff() override {}
         virtual void displayOn(bool doinit) override {}

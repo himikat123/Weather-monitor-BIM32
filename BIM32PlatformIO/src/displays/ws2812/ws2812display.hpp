@@ -16,7 +16,7 @@ class WS2812b : public SegmentDisplay {
             strip_2(LED_STRIP_WS2812, false, RMT_CHANNEL_3) 
         {}
         void init(uint8_t dispNum, uint8_t pin);
-        void refresh();
+        virtual void refresh() override;
         virtual bool isdisplayOn() const override { return false; }
         virtual void displayOff() override {}
         virtual void displayOn(bool doinit) override {}
