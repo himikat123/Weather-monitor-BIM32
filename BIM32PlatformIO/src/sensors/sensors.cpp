@@ -30,17 +30,23 @@ void Sensors::init(void) {
 }
 
 /**
- * Reads all sensors
+ * Reads all Temperature, Humidity and Pressure sensors
  */
-void Sensors::read(void) {
+void Sensors::readTHP(void) {
     _BME280Read();
     _BMP180Read();
     _SHT21Read();
     _DHT22Read();
     _DS18B20Read();
+    _ESP32Read();
+}
+
+/**
+ * Reads all Light sensors
+ */
+void Sensors::readL(void) {
     _MAX44009Read();
     _BH1750Read();
-    _ESP32Read();
     _AnalogRead();
 }
 

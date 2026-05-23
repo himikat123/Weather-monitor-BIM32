@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "./taskSensors.hpp"
+#include "../globals.hpp"
 #include "../config/config.hpp"
 #include "../network/network.hpp"
 

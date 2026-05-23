@@ -15,11 +15,18 @@
  * Read data from analog ambient light sensor
  */
 void Sensors::_AnalogRead(void) {
-    float adc = float(analogRead(PHOTORESISTOR_PIN));
+    float rawLight = 0;
+    uint32_t adcSum = 0;
+    for(int i=0; i<32; i++) {
+        adcSum += analogRead(PHOTORESISTOR_PIN);
+        delayMicroseconds(50);
+    }
+    rawLight = adcSum / 32.0;
+
     #if defined(BIM32_CYD)
-        state.analog.volt = 3.3 - (adc / 1241.0);
+        state.analog.volt = 3.3 - (rawLight / 1241.0);
     #else
-        state.analog.volt = adc / 1241.0;
+        state.analog.volt = rawLight / 1241.0;
     #endif
     state.analog.updated = true;
 }

@@ -40,7 +40,15 @@ unsigned int TaskDisplay::_get_brightness() {
             bright *= (float)config.display.lightSensor.sensitivity(_dispNum) / 20.0;
             if(bright < 1.0) bright = 1.0;
             if(bright > 100.0) bright = 100.0;
-            return round(bright);
+            _lightFilter[_lightFilterIndex] = bright;
+            _lightFilterIndex = (_lightFilterIndex + 1) % LIGHT_FILTER_SIZE;
+            float smoothLight = 0;
+            for(int i=0; i<LIGHT_FILTER_SIZE; i++) {
+                smoothLight += _lightFilter[i];
+            }
+            smoothLight /= LIGHT_FILTER_SIZE;
+
+            return round(smoothLight);
         };
 
         /* By user defined time */

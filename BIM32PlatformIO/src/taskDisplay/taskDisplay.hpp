@@ -34,6 +34,9 @@ class TaskDisplay {
         Numitron _numitron_2;
 
         int _dispNum = 0;
+        static const int LIGHT_FILTER_SIZE = 100;
+        float _lightFilter[LIGHT_FILTER_SIZE] = { 0 };
+        int _lightFilterIndex = 0;
 
         void _initDisplay();
         void _brightnessAndDotFreq();

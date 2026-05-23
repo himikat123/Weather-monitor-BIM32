@@ -48,7 +48,8 @@ class Sensors {
         void operator=(const Sensors&) = delete;
 
         void init(void);
-        void read(void);
+        void readTHP(void);
+        void readL(void);
         void BME680Read(void);
         float get_esp32_temp();
         float get_bme280_temp();
