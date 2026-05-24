@@ -6,9 +6,9 @@
 
 String AgregateLcdData::_localDate() {
     char buf[20];
-    if(config.lang() == "en") sprintf(buf, "%s %02d", lang.monthShortName(month()), day()); 
-    else if(config.lang() == "de") sprintf(buf, "%02d. %s", day(), lang.monthShortName(month()));
-    else sprintf(buf, "%02d %s", day(), lang.monthShortName(month()));
+    if(config.lang() == "en") sprintf(buf, "%s %02d %d", lang.monthShortName(month()), day(), year()); 
+    else if(config.lang() == "de") sprintf(buf, "%02d. %s %d", day(), lang.monthShortName(month()), year());
+    else sprintf(buf, "%02d %s %d", day(), lang.monthShortName(month()), year());
 
     return String(buf);
 }
