@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "./nextion.hpp"
 
+#include "../../globals.hpp"
+#include "../../config/config.hpp"
 #include "../../validation/validate.hpp"
 #include "../../languages/languages.hpp"
 
@@ -8,7 +10,7 @@
  * Display daily weather forecast
  */
 void Nextion::_showWeatherForecast() {
-    for(uint8_t i=0; i<4; i++) {
+    for(uint8_t i=0; i<(config.display.model(DISPLAY_1) == D_NX4827K043 ? 5 : 4); i++) {
         if(_prevIcons[i] != _icons[i] or _forced) {
             _nextion.writeNum("Main.icon" + String(i + 1) + ".pic", _icons[i] == 0 ? 29 : (_icons[i] + 20));
             _prevIcons[i] = _icons[i];

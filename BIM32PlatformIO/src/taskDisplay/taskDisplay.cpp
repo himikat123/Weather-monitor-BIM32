@@ -44,18 +44,20 @@ void TaskDisplay::_taskWrapper(void* pvParameters) {
 }
 
 void TaskDisplay::_run() {
-    _initDisplay();
+    if(_display != nullptr) _initDisplay();
 
     while(true) {
-        if(state.display_btn_pressed[_dispNum]) {
-            state.display_btn_pressed[_dispNum] = false;
-            state.disp_autoOff[_dispNum] = millis();
-            _display->displayToggle();
-            vTaskDelay(500);
+        if(_display != nullptr) {
+            if(state.display_btn_pressed[_dispNum]) {
+                state.display_btn_pressed[_dispNum] = false;
+                state.disp_autoOff[_dispNum] = millis();
+                _display->displayToggle();
+                vTaskDelay(500);
+            }
+            _display->refresh();
+            _brightnessAndDotFreq();
+            _itsOffTime();
         }
-        _display->refresh();
-        _brightnessAndDotFreq();
-        _itsOffTime();
 
         if(config.display.type(_dispNum) == LCD_DISPLAY) {
             int model = config.display.model(_dispNum);

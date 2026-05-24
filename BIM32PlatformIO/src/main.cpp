@@ -20,8 +20,7 @@
 
 #include "./taskDisplay/taskDisplay.hpp"
 #include "./taskSensors/taskSensors.hpp"
-//#include "./taskServer.hpp"
-//#include "./web.hpp"
+#include "./taskServer/taskServer.hpp"
 
 TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;
@@ -33,11 +32,14 @@ uint8_t dummy = 0;
 TaskDisplay taskDisplay1;
 TaskDisplay taskDisplay2;
 TaskSensors taskSensors;
+TaskServer taskServer;
 
 /**
  * Arduino setup
  */
 void setup() {
+    sensorsSemaphore = xSemaphoreCreateMutex(); 
+
     pinMode(HC12_SET_PIN, OUTPUT);
     digitalWrite(HC12_SET_PIN, HIGH);
     pinMode(DISPLAY1_BUTTON_PIN, INPUT_PULLUP);
@@ -76,28 +78,19 @@ void setup() {
         }
     }
 
-    if(disp1type && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1)) {
-        Serial.println("Display1 task pinned to core 1 successfully!");
-    } else {
-        Serial.println("Failed to start display1 task!");
-    }
-    if(disp1type && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2)) {
-        Serial.println("Display2 task pinned to core 1 successfully!");
-    } else {
-        Serial.println("Failed to start display2 task!");
-    }
+    if(disp1type && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1));
+    else Serial.println("Failed to start display1 task!");
+    if(disp1type && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2));
+    else Serial.println("Failed to start display2 task!");
 
     WiFi.mode(WIFI_STA);
     network.connect();
 
-    if(taskSensors.start("TaskSensors", 32768, 1, 1)) {
-        Serial.println("Sensors task pinned to core 1 successfully!");
-    } else {
-        Serial.println("Failed to start Sensors task!");
-    }
-    //xTaskCreatePinnedToCore(TaskSensors, "TaskSensors", 32768, NULL, 1, &task_sensors_handle, DISPLAY_1);
-    //webInterface_init();
-    //xTaskCreatePinnedToCore(TaskServer, "TaskServer", 16384, NULL, 1, &task_server_handle, DISPLAY_2);
+    if(taskSensors.start("TaskSensors", 32768, 1, 1));
+    else Serial.println("Failed to start Sensors task!");
+
+    if(taskServer.start("TaskServer", 16384, 1, 1)):
+    else Serial.println("Failed to start Server task!");
 }
 
 void loop() {}

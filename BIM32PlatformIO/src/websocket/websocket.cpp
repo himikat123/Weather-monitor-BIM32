@@ -6,17 +6,17 @@
 void WebSocket::_handleEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
     switch(type) {
         case WStype_DISCONNECTED:
-            Serial.printf("[WS %u] Disconnected\n", num);
+            //Serial.printf("[WS %u] Disconnected\n", num);
             _active[num] = false;
             break;
         case WStype_CONNECTED: {
-            IPAddress ip = wsServer->remoteIP(num);
-            Serial.printf("[WS %u] Connected from %d.%d.%d.%d\n", num, ip[0], ip[1], ip[2], ip[3]);
+            //IPAddress ip = wsServer->remoteIP(num);
+            //Serial.printf("[WS %u] Connected from %d.%d.%d.%d\n", num, ip[0], ip[1], ip[2], ip[3]);
             _active[num] = true;
             break;
         }
         case WStype_TEXT:
-            Serial.printf("[WS %u] Received: %s\n", num, payload);
+            //Serial.printf("[WS %u] Received: %s\n", num, payload);
             _lastReceived = String((char*)payload);
             _hasNewMessage = true;
             break;

@@ -61,24 +61,24 @@ struct WSensorState {
     Block1D hum, pres, light, voltage, current, power, energy, freq, co2;
 
     void toJson(JsonObject obj) const {
-        JsonObject o = obj["wsensor"].add<JsonObject>();
-        JsonArray aTime = o["time"].add<JsonArray>();
+        JsonObject o = obj["wsensor"].to<JsonObject>();
+        JsonArray aTime = o["time"].to<JsonArray>();
         aTime.add(time[0]);
         aTime.add(time[1]);
 
-        temp.toJson(o["temp"].add<JsonObject>());
-        hum.toJson(o["hum"].add<JsonObject>());
-        pres.toJson(o["pres"].add<JsonObject>());
-        light.toJson(o["light"].add<JsonObject>());
-        voltage.toJson(o["voltage"].add<JsonObject>());
-        current.toJson(o["current"].add<JsonObject>());
-        power.toJson(o["power"].add<JsonObject>());
-        energy.toJson(o["energy"].add<JsonObject>());
-        freq.toJson(o["freq"].add<JsonObject>());
-        co2.toJson(o["co2"].add<JsonObject>()); 
-        wind.toJson(o["wind"].add<JsonObject>());
+        temp.toJson(o["temp"].to<JsonObject>());
+        hum.toJson(o["hum"].to<JsonObject>());
+        pres.toJson(o["pres"].to<JsonObject>());
+        light.toJson(o["light"].to<JsonObject>());
+        voltage.toJson(o["voltage"].to<JsonObject>());
+        current.toJson(o["current"].to<JsonObject>());
+        power.toJson(o["power"].to<JsonObject>());
+        energy.toJson(o["energy"].to<JsonObject>());
+        freq.toJson(o["freq"].to<JsonObject>());
+        co2.toJson(o["co2"].to<JsonObject>()); 
+        wind.toJson(o["wind"].to<JsonObject>());
 
-        JsonArray b = o["bat"].add<JsonArray>();
+        JsonArray b = o["bat"].to<JsonArray>();
         for(int i=0; i<2; i++) b.add(battery.adc[i]);
     }
 };
