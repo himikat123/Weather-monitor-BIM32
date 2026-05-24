@@ -79,17 +79,16 @@ void setup() {
     }
 
     if(disp1type && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1));
-    else Serial.println("Failed to start display1 task!");
+    else Serial.println("Failed to start Display1 task!");
     if(disp1type && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2));
-    else Serial.println("Failed to start display2 task!");
+    else Serial.println("Failed to start Display2 task!");
 
     WiFi.mode(WIFI_STA);
     network.connect();
 
     if(taskSensors.start("TaskSensors", 32768, 1, 1));
     else Serial.println("Failed to start Sensors task!");
-
-    if(taskServer.start("TaskServer", 16384, 1, 1)):
+    if(taskServer.start("TaskServer", 16384, 1, 1));
     else Serial.println("Failed to start Server task!");
 }
 

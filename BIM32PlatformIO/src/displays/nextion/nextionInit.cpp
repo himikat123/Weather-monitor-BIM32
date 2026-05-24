@@ -1,4 +1,5 @@
-#include "nextion.hpp"
+#include "./nextion.hpp"
+#include "../../globals.hpp"
 #include "../../languages/languages.hpp"
 #include "../../config/config.hpp"
 
@@ -24,8 +25,7 @@ void Nextion::init() {
     /* Alarm */
     _nextion.writeStr("Texts.ALARM.txt", lang.alarm());
     
-    /* Initialize NX4832K035 display  */
-    if(config.display.model(0) == D_NX4832K035) {
+    if(config.display.model(DISPLAY_1) == D_NX4832K035 || config.display.model(DISPLAY_1) == D_NX4827K043) {
         // config
         unsigned int langCode = 0;
         if(config.lang() == "de") langCode = 1;
