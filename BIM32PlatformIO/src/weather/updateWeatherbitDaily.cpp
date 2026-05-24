@@ -14,7 +14,7 @@ void Weather::_updateWeatherbitDaily(void) {
     Serial.println(SEPARATOR);
     Serial.println("Weatherbit.io: daily forecast update... ");
   
-    String url = "http://api.weatherbit.io/v2.0/forecast/daily?days=4";
+    String url = "http://api.weatherbit.io/v2.0/forecast/daily?days=5";
     if(config.weather.citysearch() == 0) url += "&city=" + String(config.weather.city());
     if(config.weather.citysearch() == 1) url += "&city_id=" + String(config.weather.cityid());
     if(config.weather.citysearch() == 2) url += "&lat=" + String(config.weather.lat()) + "&lon=" + String(config.weather.lon());

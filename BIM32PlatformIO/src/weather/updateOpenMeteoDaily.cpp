@@ -19,7 +19,7 @@ void Weather::_updateOpenMeteoDaily() {
     url += "?latitude=" + String(config.weather.lat());
     url += "&longitude=" + String(config.weather.lon());
     url += "&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max";
-    url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=4";
+    url += "&wind_speed_unit=ms&timeformat=unixtime&timezone=auto&forecast_days=5";
     HTTPClient clientDaily;
     if(state.debugWether) {
         Serial.println(url);
