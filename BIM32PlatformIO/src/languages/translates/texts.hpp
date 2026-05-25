@@ -18,4 +18,4 @@ static const char* historyInTxt[7] PROGMEM = {"Weather indoor history", "Hauswet
 static const char* historyOutTxt[7] PROGMEM = {"Weather outdoor history", "Außenwettergeschichte", "История погоды на улице", "Historia pogody na zewnątrz", "Історія погоди на вулиці", "История на времето навън", "Historial clima exterior"};
 static const char* touchCalibrateTxt[7] PROGMEM = {"Touch corners as indicated", "Berühren Sie die Ecken wie angegeben", "Прикоснитесь к углам, как указано", "Dotknij narożników zgodnie ze wskazaniem", "Торкніться кутів, як зазначено", "Докоснете ъглите, както е показано", "Toca esquinas según se indica"};
 static const char* calibrationDoneTxt[7] PROGMEM = {"Calibration complete", "Die Kalibrierung ist abgeschlossen", "Калибровка завершена", "Kalibracja została zakończona", "Калібрування закінчено", "Калибрирането е завършено", "Calibración terminada"};
-static const char* unknownTxt PROGMEM = "???";
+static const char* unknownTxt PROGMEM = "--";

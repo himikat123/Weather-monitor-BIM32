@@ -4,7 +4,7 @@
 #include "../../config/config.hpp"
 
 void Nextion::init() {
-    _nextion.writeStr("Hourly.MM.txt", lang.mm());
+    _nextion.writeStr("Hourly.MM.txt", config.units_pres() == HPA ? lang.hpa() : lang.mm());
     _nextion.writeStr("Hourly.MS.txt", lang.ms());
     _nextion.writeStr("HistoryIn.In.txt", lang.historyIn());
     _nextion.writeStr("HistoryOut.Out.txt", lang.historyOut());

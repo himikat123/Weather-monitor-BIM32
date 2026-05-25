@@ -21,5 +21,5 @@ void ILI9341::_hourlyHum(uint8_t num, uint16_t y) {
 void ILI9341::_hourlyPres(uint8_t num, uint16_t y) {
     tft.fillRect(num * 32 + 30, y, 32, 14, BG_COLOR);
     String p = validate.pres(_hrPres[num]) ? String((int)round(_hrPres[num])) : "--";
-    _printText(num * 32 + 30, y, 32, 12, p + (config.units_pres() ? String(lang.hpa()[0]) : lang.mm()), FONT_TINY, CENTER, PRESSURE_COLOR);
+    _printText(num * 32 + 30, y, 32, 12, p + (config.units_pres() == HPA ? String(lang.hpa()[0]) : lang.mm()), FONT_TINY, CENTER, PRESSURE_COLOR);
 }

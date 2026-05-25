@@ -84,6 +84,9 @@
 #define SYMBOLS               0
 #define WITH_DOT              1
 
+#define MMHG                  0
+#define HPA                   1
+
 // Division of time into hours and minutes
 inline unsigned int getTime(bool level, const char* time) {
     if(!time || time[2] != ':') return 0;
