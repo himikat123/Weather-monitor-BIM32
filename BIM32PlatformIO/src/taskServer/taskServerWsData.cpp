@@ -3,6 +3,7 @@
 #include <TimeLib.h>
 
 #include "./taskServer.hpp"
+#include "../config/config.hpp"
 #include "../state/state.hpp"
 #include "../wsensor/wirelessSensor.hpp"
 
@@ -13,7 +14,7 @@ void TaskServer::_wsData() {
     if(_websocket.available()) {
         String msg = _websocket.read();
         if(msg.length()) {
-            doc["state"] = (String(state.secretCode) == msg) ? "OK" : "LOGIN";
+            doc["state"] = config.account.required() ? ((String(state.secretCode) == msg) ? "OK" : "LOGIN") : "OK";
             //Serial.println(String(state.secretCode));
             //Serial.println(msg);
         }
