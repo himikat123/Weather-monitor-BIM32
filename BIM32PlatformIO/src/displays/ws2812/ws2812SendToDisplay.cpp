@@ -21,7 +21,7 @@ void WS2812b::_sendToDisplay() {
     _strip->setPixel(lastPixel++, (_power && _points[1] && !_animIsRunnung) ? dotsColor : black, false);
     lastPixel = _sendTwoDigits(black, 2, lastPixel++);
 
-    if(config.display.model(_dispNum) > 2) {
+    if(config.display.model(_dispNum) == 1) {
         _strip->setPixel(lastPixel++, (_power && _points[2] && !_animIsRunnung) ? dotsColor : black, false);
         _strip->setPixel(lastPixel++, (_power && _points[3] && !_animIsRunnung) ? dotsColor : black, false);
         lastPixel = _sendTwoDigits(black, 4, lastPixel++);

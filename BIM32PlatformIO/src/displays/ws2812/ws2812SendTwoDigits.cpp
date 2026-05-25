@@ -4,15 +4,7 @@
 #include "../../config/config.hpp"
 
 uint8_t WS2812b::_sendTwoDigits(rgb_t black, uint8_t digShift, uint8_t pixelNr) {
-    uint8_t repeats = 1;
-
-    switch(config.display.model(_dispNum)) {
-        case 1: 
-        case 4: repeats = 2; break;
-        case 2:
-        case 5: repeats = 3; break;
-        default: ; break;
-    }
+    uint8_t repeats = config.display.cntLeds(_dispNum) + 1;
 
     for(uint8_t digNr=0; digNr<2; digNr++) {
         for(uint8_t bitNr=0; bitNr<7; bitNr++) {
