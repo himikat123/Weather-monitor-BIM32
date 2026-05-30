@@ -1,11 +1,11 @@
-#include "./ws2812display.hpp"
+#include "./pixelLedDisplay.hpp"
 #include "./fonts/ws2812Segment.hpp"
 #include "../../globals.hpp"
 
 /**
  * Display data on the display
  */
-void WS2812b::_print() {
+void PixelLed::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<6; i++) {

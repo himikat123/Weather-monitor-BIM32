@@ -26,9 +26,9 @@ void Numitron::init(uint8_t dispNum, int8_t scl, int8_t sda, int8_t pwm, int8_t 
     _wire = dispNum == DISPLAY_1 ? &wire_1 : &wire_2;
     _clearDisplay();
 
-    _strip = dispNum == DISPLAY_1 ? &strip_1 : &strip_2;
-    _strip->begin(ws, 8);
-    _strip->clear(true);
+    //_strip = dispNum == DISPLAY_1 ? &strip_1 : &strip_2;
+    //_strip->begin(ws, 8);
+    //_strip->clear(true);
 }
 
 /**
@@ -44,7 +44,7 @@ void Numitron::brightness(unsigned int intensity, bool reduc) {
 
     bright = (uint8_t)map(_brightness, 1, 100, 1, 60);
     bright = constrain(bright, 1, 60);
-    _strip->brightness(bright, true);
+    //_strip->brightness(bright, true);
 }
 
 /**
@@ -119,19 +119,19 @@ void Numitron::_sendToDisplay() {
     }
 
     /* Backlight */
-    rgb_t black = { .r = 0, .g = 0, .b = 0 };
+    //rgb_t black = { .r = 0, .g = 0, .b = 0 };
 
     for(uint8_t i=0; i<8; i++) {
         unsigned int colors = strtol(&_dispColors[i][1], NULL, 16);
-        rgb_t pixelColor = { 
-            .r = uint8_t(colors >> 16), 
-            .g = uint8_t(colors >> 8 & 0x00FF), 
-            .b = uint8_t(colors & 0x00FF) 
-        };
-        _strip->setPixel(i, _power ? pixelColor : black, false);
+        //rgb_t pixelColor = { 
+        //    .r = uint8_t(colors >> 16), 
+        //    .g = uint8_t(colors >> 8 & 0x00FF), 
+        //    .b = uint8_t(colors & 0x00FF) 
+        //};
+        //_strip->setPixel(i, _power ? pixelColor : black, false);
     }
 
-    _strip->show();
+    //_strip->show();
 }
 
 /**

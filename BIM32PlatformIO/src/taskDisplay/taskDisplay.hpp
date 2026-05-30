@@ -6,7 +6,7 @@
 #include "../displays/baseDisplay.hpp"
 #include "./displays/nextion/nextion.hpp"
 #include "./displays/ili9341/ili9341.hpp"
-#include "./displays/ws2812/ws2812display.hpp"
+#include "./displays/pixelLed/pixelLedDisplay.hpp"
 #include "./displays/max7219/max7219segmentDisplay.hpp"
 #include "./displays/tm1637/tm1637display.hpp"
 #include "./displays/numitron/numitronSegmentDisplay.hpp"
@@ -24,8 +24,8 @@ class TaskDisplay {
         void _run();
 
         BaseDisplay* _display = nullptr;
-        WS2812b _ws2812b_1;
-        WS2812b _ws2812b_2;
+        PixelLed _pixelLed_1;
+        PixelLed _pixelLed_2;
         MAX7219_S _max7219s_1;
         MAX7219_S _max7219s_2;
         TM1637 _tm1637_1;

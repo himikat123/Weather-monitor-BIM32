@@ -18,6 +18,11 @@
     #define WS2812_1_DAT_PIN       33 // WS2812b display 1 pin
     #define WS2812_2_DAT_PIN       12 // WS2812b display 2 pin
 
+    #define SK9822_1_CLK_PIN       32 // SK9822 display 1 CLK pin
+    #define SK9822_1_DAT_PIN       14 // SK9822 display 1 DAT pin
+    #define SK9822_2_CLK_PIN       19 // SK9822 display 2 CLK pin
+    #define SK9822_2_DAT_PIN       15 // SK9822 display 2 DAT pin
+
     #define TM1637_1_CLK_PIN       32 // TM1637 display 1 CLK pin
     #define TM1637_1_DAT_PIN       14 // TM1637 display 1 DAT pin
     #define TM1637_2_CLK_PIN       19 // TM1637 display 2 CLK pin

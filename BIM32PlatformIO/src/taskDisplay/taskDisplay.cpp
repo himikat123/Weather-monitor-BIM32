@@ -25,7 +25,7 @@ bool TaskDisplay::start(const char* name, uint32_t stackSize, UBaseType_t priori
             if(model <= D_NX4827K043) _display = &nextion;
             if(model == D_ILI9341) _display = &ili9341;
             break;
-        case PIXEL_LEDS_DISPLAY: _display = isDisp1 ? &_ws2812b_1 : &_ws2812b_2; break;
+        case PIXEL_LEDS_DISPLAY: _display = isDisp1 ? &_pixelLed_1 : &_pixelLed_2; break;
         case SEGMENT_DISPLAY:
             if(config.display.model(_dispNum) <= D_TM1637) _display = isDisp1 ? &_tm1637_1 : &_tm1637_2;
             if(config.display.model(_dispNum) >= D_MAX7219) _display = isDisp1 ? &_max7219s_1 : &_max7219s_2;

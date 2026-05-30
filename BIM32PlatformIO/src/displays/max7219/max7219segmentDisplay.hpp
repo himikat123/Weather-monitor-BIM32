@@ -21,8 +21,8 @@ class MAX7219_S : public SegmentDisplay {
         int8_t _clk = -1;
         int8_t _dat = -1;
         int8_t _load = -1;
-        byte _pixels[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-        byte _pixelsPrev[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        byte _pixels[8] = { 0 };
+        byte _pixelsPrev[8] = { 0 };
 
         void _print();
         void _sendToDisplay();

@@ -62,6 +62,7 @@ void Config::readConfig(void) {
                     _copy(conf["display"]["type"][i], display._type[i]);
                     _copy(conf["display"]["model"][i], display._model[i]);
                     _copy(conf["display"]["cntLeds"][i], display._cntLeds[i]);
+                    _copy(conf["display"]["sLed"][i], display._sLed[i]);
                     for(unsigned int o=0; o<8; o++) {
                         _copy(conf["display"]["order"][i][o], display._order[i][o]);
                     }

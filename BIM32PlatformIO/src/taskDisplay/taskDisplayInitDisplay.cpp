@@ -14,8 +14,8 @@ void TaskDisplay::_initDisplay() {
     }
 
     if(type == PIXEL_LEDS_DISPLAY) {
-        if(_dispNum == DISPLAY_1) _ws2812b_1.init(DISPLAY_1, WS2812_1_DAT_PIN);
-        if(_dispNum == DISPLAY_2) _ws2812b_2.init(DISPLAY_2, WS2812_2_DAT_PIN);
+        if(_dispNum == DISPLAY_1) _pixelLed_1.init(DISPLAY_1, WS2812_1_DAT_PIN);
+        if(_dispNum == DISPLAY_2) _pixelLed_2.init(DISPLAY_2, WS2812_2_DAT_PIN);
     }
 
     if(type == SEGMENT_DISPLAY) {

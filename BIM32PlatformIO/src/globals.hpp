@@ -47,6 +47,12 @@
 #define D_ILI9341            3
 #define D_TM1637             1
 #define D_MAX7219            2
+#define D_WS2812_4           0
+#define D_WS2812_6           1
+#define D_SK9822_4           2
+#define D_SK9822_6           3
+#define D_SK9822_8           4
+
 
 #define OPENWEATHERMAP       0
 #define WEATHERBIT           1
