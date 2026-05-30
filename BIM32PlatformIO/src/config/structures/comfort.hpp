@@ -7,17 +7,18 @@ struct ComfortStruct {
     struct Iaq {
         private:
             unsigned int _source = 0;
-            bool _sound = false;
+            unsigned int _sound = false;
             friend class Config;
 
         public:
             unsigned int source() const { return _source; }
-            bool sound() const { return _sound; }
+            bool sound() const { return _sound ? true : false; }
     };
 
     struct CO2 : public Iaq {
         private: 
             unsigned int _wsensNum = 0; friend class Config;
+
         public: 
             unsigned int wsensNum() const { return _wsensNum; }
     };
@@ -42,6 +43,7 @@ struct ComfortStruct {
     struct Temp : public Hum {
         private: 
             unsigned int _sens = 0; friend class Config;
+
         public: 
             unsigned int sens() const { return _sens; }
     };

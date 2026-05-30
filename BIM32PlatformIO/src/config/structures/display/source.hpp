@@ -21,6 +21,7 @@ struct SourceStruct {
     struct TempSensor : public BaseSensor {
         private: 
             unsigned int _temp = 0; friend class Config;
+        
         public: 
             const unsigned int temp() const { if(_temp >= WSENSOR_TEMPS) return 0; return _temp; }
     };
