@@ -1,19 +1,21 @@
 #include "./nextion.hpp"
+#include "../../state/state.hpp"
+#include "../../globals.hpp"
 
 /**
  * Toggle display (on/off)
  */
 void Nextion::displayToggle() {
-    if(_power) _nextion.writeNum("dim", 0);
+    if(state.disp_on_off[DISPLAY_1]) _nextion.writeNum("dim", 0);
     else init();
-    _power = !_power;
+    state.disp_on_off[DISPLAY_1] = !state.disp_on_off[DISPLAY_1];
 }
 
 /**
  * Turn on the display
  */
 void Nextion::displayOn(bool doinit) {
-    _power = true;
+    state.disp_on_off[DISPLAY_1] = true;
     if(doinit) init();
 }
 
@@ -22,12 +24,12 @@ void Nextion::displayOn(bool doinit) {
  */
 void Nextion::displayOff() {
     _nextion.writeNum("dim", 0);
-    _power = false;
+    state.disp_on_off[DISPLAY_1] = false;
 }
 
 /**
  * Return true if display is on
  */
 bool Nextion::isdisplayOn() const {
-    return _power;
+    return state.disp_on_off[DISPLAY_1];
 }

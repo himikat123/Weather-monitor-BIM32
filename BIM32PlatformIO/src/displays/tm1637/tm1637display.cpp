@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "tm1637display.hpp"
 
+#include "../../state/state.hpp"
+#include "../../globals.hpp"
 #include "../../config/config.hpp"
 #include "./tm1637driver.hpp"
 #include "./fonts/tm1637Segment.hpp"
@@ -59,7 +61,7 @@ void TM1637::_sendToDisplay() {
     uint8_t bright = map(_brightness, 0, 100, 0, 7);
     bright = constrain(bright, 0, 7);
     byte seg[6] = { 0, 0, 0, 0, 0, 0 };
-    if(_power) {
+    if(state.disp_on_off[_dispNum]) {
         for(uint8_t i=0; i<6; i++) seg[i] = _pixels[config.display.order(_dispNum, i) - 1];
     }
     tm1637.start();

@@ -1,29 +1,31 @@
 #include "./ili9341.hpp"
+#include "../../state/state.hpp"
+#include "../../globals.hpp"
 
 /**
  * Toggles display (on/off)
  */
 void ILI9341::displayToggle() {
-    _power = !_power;
+    state.disp_on_off[DISPLAY_1] = !state.disp_on_off[DISPLAY_1];
 }
 
 /**
  * Turns on the display
  */
 void ILI9341::displayOn(bool doinit) {
-    _power = true;
+    state.disp_on_off[DISPLAY_1] = true;
 }
 
 /*
  * Turns off the display
  */
 void ILI9341::displayOff() {
-    _power = false;
+    state.disp_on_off[DISPLAY_1] = false;
 }
 
 /**
  * Returns true if display is on
  */
 bool ILI9341::isdisplayOn() const {
-    return _power;
+    return state.disp_on_off[DISPLAY_1];
 }

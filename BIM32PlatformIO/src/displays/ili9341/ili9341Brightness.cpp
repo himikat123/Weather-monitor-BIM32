@@ -6,7 +6,7 @@
 #include "../../state/state.hpp"
 
 void ILI9341::brightness(unsigned int bright, bool reduc) {
-    if(_power) {
+    if(state.disp_on_off[DISPLAY_1]) {
         uint8_t brgt = reduc ? round(bright / 2) : bright;
         if(brgt < config.display.brightness.min(0)) brgt = config.display.brightness.min(0);
         if(brgt > config.display.brightness.max(0)) brgt = config.display.brightness.max(0); 

@@ -11,7 +11,6 @@ class LcdDisplay : public BaseDisplay {
         AgregateLcdData agregateLcdData;
         virtual void _getData();
 
-        bool _power = true;
         bool _forced = false;
         uint8_t _tHour = 24;
         uint8_t _tMinute = 60;

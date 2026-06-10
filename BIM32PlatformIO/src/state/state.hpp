@@ -34,8 +34,9 @@ struct State {
         bool clockSynchronized = false; // Is the time synchronized with the ntp server?
         bool clockSynchronize = false; // Should the display RTC be updated?
         bool net_connected = false; // Is the device connected to the network?
+        bool disp_on_off[2] = {true, true}; // Display on/off state flag
         uint32_t disp_autoOff[2] = {0, 0}; // Displays auto off interval counter
-        bool reduc[2] = {false, false};
+        bool reduc[2] = {false, false}; // Display brightness reduction flag
         bool apMode = false; // Access point mode
         uint8_t display_state[2] = {1, 1}; // display on/off: 0: nothing do, 1: turn on, 2: turn off
         volatile bool display_btn_pressed[2] = {false, false}; // display (1, 2) button pressed flag

@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "./max7219segmentDisplay.hpp"
 
+#include "../../state/state.hpp"
+#include "../../globals.hpp"
 #include "../../config/config.hpp"
 #include "./fonts/max7219Segment.hpp"
 
@@ -57,7 +59,7 @@ void MAX7219_S::_print() {
  */
 void MAX7219_S::_sendToDisplay() {
     byte seg[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-    if(_power) {
+    if(state.disp_on_off[_dispNum]) {
         for(uint8_t i=0; i<8; i++) seg[i] = _pixels[config.display.order(_dispNum, i) - 1];
     }
     max7219.print(seg);
@@ -75,15 +77,15 @@ void MAX7219_S::_clearDisplay() {
  * Toggle display on/off
  */
 void MAX7219_S::displayToggle() {
-    _power = !_power;
-    max7219.power(_power);
+    state.disp_on_off[_dispNum]= !state.disp_on_off[_dispNum];
+    max7219.power(state.disp_on_off[_dispNum]);
 }
 
 /**
  * Turn on the display
  */
 void MAX7219_S::displayOn(bool doinit) {
-    _power = true;
+    state.disp_on_off[_dispNum]= true;
     max7219.power(true);
 }
 
@@ -91,12 +93,12 @@ void MAX7219_S::displayOn(bool doinit) {
  * Turn off the display
  */
 void MAX7219_S::displayOff() {
-    _power = false;
+    state.disp_on_off[_dispNum]= false;
     max7219.power(false);
 }
 
 bool MAX7219_S::isdisplayOn() const {
-    return _power;
+    return state.disp_on_off[_dispNum];
 }
 
 

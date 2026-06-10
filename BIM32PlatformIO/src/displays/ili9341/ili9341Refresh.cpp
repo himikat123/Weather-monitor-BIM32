@@ -1,10 +1,12 @@
 #include "./ili9341.hpp"
+#include "../../state/state.hpp"
+#include "../../globals.hpp"
 
 /**
  * Display refresh
  */
 void ILI9341::refresh() {
-    if(_power) {
+    if(state.disp_on_off[DISPLAY_1]) {
         _getData();
 
         if(_page == PAGE_MAIN) {

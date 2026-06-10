@@ -11,12 +11,12 @@ void Nextion::refresh() {
         _nextion.writeNum("BigClock.clockFormat.val", config.clock.format());
     }
 
-    if(_prevPower != _power or _forced) {
-        _nextion.writeNum("sleep", _power ? 0 : 1);
-        _prevPower = _power;
+    if(_prevPower != state.disp_on_off[DISPLAY_1] or _forced) {
+        _nextion.writeNum("sleep", state.disp_on_off[DISPLAY_1] ? 0 : 1);
+        _prevPower = state.disp_on_off[DISPLAY_1];
     }
 
-    if(_power) {
+    if(state.disp_on_off[DISPLAY_1]) {
         _getData();
 
         if(config.display.model(DISPLAY_1) == D_NX4832T035) {

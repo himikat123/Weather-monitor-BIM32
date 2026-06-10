@@ -17,9 +17,14 @@ void TaskServer::_webSens() {
     json["runtime"] = esp_timer_get_time() / 1000ULL;
     json["heap"] = ESP.getFreeHeap();
     json["time"] = now();
+    JsonArray dispState = json["dispState"].to<JsonArray>();
+    dispState.add(state.disp_on_off[0] ? 1 : 0);
+    dispState.add(state.disp_on_off[1] ? 1 : 0);
+
     #if defined(BIM32_CYD)
         json["cyd"] = 1;
     #endif
+
     String data = "";
     serializeJson(json, data);
     _server.send(200, "application/json", data);

@@ -1,5 +1,7 @@
 #include "./segmentDisplay.hpp"
 #include "../../config/config.hpp"
+#include "../../state/state.hpp"
+#include "../../globals.hpp"
 
 /**
  * Set display model
@@ -25,28 +27,28 @@ void SegmentDisplay::setDotFreq(uint16_t freq) {
  * Toggle display (on/off)
  */
 void SegmentDisplay::displayToggle() {
-    _power = !_power;
+    state.disp_on_off[_dispNum] = !state.disp_on_off[_dispNum];
 }
 
 /**
  * Turn display on
  */
 void SegmentDisplay::displayOn(bool doinit) {
-    _power = true;
+    state.disp_on_off[_dispNum] = true;
 }
 
 /*
  * Turn display off
  */
 void SegmentDisplay::displayOff() {
-    _power = false;
+    state.disp_on_off[_dispNum] = false;
 }
 
 /**
  * Return true if display is on
  */
 bool SegmentDisplay::isdisplayOn() const {
-    return _power;
+    return state.disp_on_off[_dispNum];
 }
 
 /**

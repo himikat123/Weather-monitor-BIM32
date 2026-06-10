@@ -51,7 +51,7 @@ void Numitron::brightness(unsigned int intensity, bool reduc) {
  * Toggle display (on/off)
  */
 void Numitron::displayToggle() {
-    _power = !_power;
+    state.disp_on_off[_dispNum] = !state.disp_on_off[_dispNum];
     _sendToDisplay();
 }
 
@@ -59,7 +59,7 @@ void Numitron::displayToggle() {
  * Turn display on
  */
 void Numitron::displayOn(bool doinit) {
-    _power = true;
+    state.disp_on_off[_dispNum] = true;
     _sendToDisplay();
 }
 
@@ -67,7 +67,7 @@ void Numitron::displayOn(bool doinit) {
  * Turn display off
  */
 void Numitron::displayOff() {
-    _power = false;
+    state.disp_on_off[_dispNum] = false;
     _sendToDisplay();
 }
 
@@ -107,7 +107,7 @@ void Numitron::_print() {
  */
 void Numitron::_sendToDisplay() {
     byte seg[8] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-    if(_power) {
+    if(state.disp_on_off[_dispNum]) {
         for(uint8_t i=0; i<8; i++) seg[i] = _pixels[i];
     }
 
@@ -128,7 +128,7 @@ void Numitron::_sendToDisplay() {
         //    .g = uint8_t(colors >> 8 & 0x00FF), 
         //    .b = uint8_t(colors & 0x00FF) 
         //};
-        //_strip->setPixel(i, _power ? pixelColor : black, false);
+        //_strip->setPixel(i, state.disp_on_off[_dispNum] ? pixelColor : black, false);
     }
 
     //_strip->show();
