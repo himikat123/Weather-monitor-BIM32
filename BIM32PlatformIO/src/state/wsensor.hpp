@@ -8,7 +8,7 @@ struct WSensorState {
     bool updated = false;
 
     struct Block1D {
-        float data[2] = { 0 };
+        float data[2] = { UNDEFINED_FLOAT, UNDEFINED_FLOAT };
         char name[2][W_NAME_LEN] = { 0 };
 
         void toJson(JsonObject o) const {
@@ -22,7 +22,13 @@ struct WSensorState {
     };
 
     struct Block2D {
-        float data[5][2] = { 0 };
+        float data[5][2] = { 
+            {UNDEFINED_FLOAT, UNDEFINED_FLOAT}, 
+            {UNDEFINED_FLOAT, UNDEFINED_FLOAT}, 
+            {UNDEFINED_FLOAT, UNDEFINED_FLOAT}, 
+            {UNDEFINED_FLOAT, UNDEFINED_FLOAT}, 
+            {UNDEFINED_FLOAT, UNDEFINED_FLOAT} 
+        };
         char name[5][2][W_NAME_LEN] = { 0 };
 
         void toJson(JsonObject o) const {
@@ -50,9 +56,9 @@ struct WSensorState {
 
     struct BlockBattery {
         int adc[2] = {-1, -1};
-        float voltage[2] = {-1.0, -1.0};
         int level[2] = {-1, -1};
-        float percentage[2] = {-1, -1};
+        float voltage[2] = {UNDEFINED_FLOAT, UNDEFINED_FLOAT};
+        float percentage[2] = {UNDEFINED_FLOAT, UNDEFINED_FLOAT};
     };
 
     BlockBattery battery;
