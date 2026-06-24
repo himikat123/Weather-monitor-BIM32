@@ -4,9 +4,9 @@
 
 struct ThingState {
     time_t time = 0;
-    unsigned int historyTime[24] = { 0 };
     float data[8] = { -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0, -40400.0 };
     float historyData[7][24] = { 0 };
+    unsigned int historyTime[24] = { 0 };
     bool updated = false;
 
     void toJson(JsonObject obj) const {
@@ -22,6 +22,9 @@ struct ThingState {
             for(int n=0; n<24; n++) {
                 row.add(historyData[i][n]);
             }
+        }
+        for(int n=0; n<24; n++) {
+            b.add(historyTime[n]);
         }
     }
 };
