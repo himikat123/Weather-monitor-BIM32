@@ -16,5 +16,12 @@ struct ThingState {
         for(int i=0; i<8; i++) {
             a.add(data[i]);
         }
+        JsonArray b = o["history"].to<JsonArray>();
+        for(int i=0; i<7; i++) {
+            JsonArray row = b.add<JsonArray>();
+            for(int n=0; n<24; n++) {
+                row.add(historyData[i][n]);
+            }
+        }
     }
 };

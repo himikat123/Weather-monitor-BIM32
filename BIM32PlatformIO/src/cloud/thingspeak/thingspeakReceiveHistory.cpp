@@ -60,6 +60,7 @@ void Thingspeak::receiveHistory() {
             state.thing.historyTime[i] += config.clock.utc() * 3600;
             state.thing.historyTime[i] += config.clock.dlst() ? timeNTP.isSummertime() ? 3600 : 0 : 0;
         }
+        state.thing.updated = true;
         Serial.println("successfull");
     }
     else Serial.println("error, code: " + String(httpCode));
