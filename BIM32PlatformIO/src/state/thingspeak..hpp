@@ -23,8 +23,9 @@ struct ThingState {
                 row.add(historyData[i][n]);
             }
         }
+        JsonArray row = b.add<JsonArray>();
         for(int n=0; n<24; n++) {
-            b.add(historyTime[n]);
+            row.add(historyTime[n]);
         }
     }
 };
