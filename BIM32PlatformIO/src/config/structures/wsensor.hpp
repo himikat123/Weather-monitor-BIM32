@@ -10,7 +10,7 @@ struct WsensorStruct {
         float _humCorr[WSENSORS] = { 0 }; // Wireless sensor humidity correction
         float _presCorr[WSENSORS] = { 0 }; // Wireless sensor pressure correction
         float _windSpeedCorr[WSENSORS] = { 0 }; // Wireless sensor wind speed correction
-        float _windDirCorr[WSENSORS]= { 0 }; // Wireless sensor wind direction correction
+        int _windDirCorr[WSENSORS]= { 0 }; // Wireless sensor wind direction correction
         float _lightCorr[WSENSORS] = { 0 }; // Wireless sensor ambient light correction
         float _voltCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t voltage correction
         float _currCorr[WSENSORS] = { 0 }; // Wireless sensor PZEM-004t current correction
@@ -29,7 +29,7 @@ struct WsensorStruct {
         const float humCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _humCorr[num]; }
         const float presCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _presCorr[num]; }
         const float windSpeedCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _windSpeedCorr[num]; }
-        const float windDirCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _windDirCorr[num]; }
+        const int windDirCorr(unsigned int num) const { if(num >= WSENSORS) return 0; return _windDirCorr[num]; }
         const float lightCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _lightCorr[num]; }
         const float voltCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _voltCorr[num]; }
         const float currCorr(unsigned int num) const { if(num >= WSENSORS) return 0.0; return _currCorr[num]; }

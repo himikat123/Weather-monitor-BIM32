@@ -32,7 +32,9 @@ float WirelessSensor::get_windSpeed(unsigned int num) {
 
 int WirelessSensor::get_windDir(unsigned int num) {
     if(num >= WSENSORS) return 40400.0;
-    return state.wsensor.wind.dir.data[num] + config.wsensor.windDirCorr(num); 
+    unsigned int wdir = state.wsensor.wind.dir.data[num];
+    int corr = config.wsensor.windDirCorr(num);
+    return ((wdir + corr) % 360 + 360) % 360;
 }
 
 float WirelessSensor::get_light(unsigned int num) {
