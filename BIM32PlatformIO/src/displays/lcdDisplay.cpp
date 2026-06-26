@@ -40,8 +40,8 @@ void LcdDisplay::_getData() {
     _description = weather.get_description();
     _currIcon = weather.get_currentIcon();
     _isDay = weather.get_isDay();
-    _windSpd = weather.get_currentWindSpeed();
-    _windDir = agregateLcdData.windDirection(weather.get_currentWindDir());
+    _windSpd = agregateLcdData.windSpeed();
+    _windDir = agregateLcdData.windDirection(agregateLcdData.windDir());
     _weatherUpdated = weather.get_currentUpdated();
     for(uint8_t i=0; i<DAYS; i++) {
         _icons[i] = weather.get_dailyIcon(i);

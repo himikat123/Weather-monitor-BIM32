@@ -110,12 +110,12 @@ class AgregateLcdData {
         float presOut();
         float windSpeed();
         int windDir();
+        uint8_t windDirection(int deg);
         void sequenceNames(String* nameSequence);
         String voltage();
         uint8_t voltageColor();
         int batteryLevel();
         String comfort();
-        uint8_t windDirection(int deg);
 
     private:
         void _tempSequence(float* tempSequence);
