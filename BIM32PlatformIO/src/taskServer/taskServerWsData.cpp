@@ -24,7 +24,7 @@ void TaskServer::_wsData() {
     doc["heap"] = ESP.getFreeHeap();
     doc["time"] = now();
 
-    JsonArray dispState = doc["dispState"].to<JsonArray>();
+    JsonArray dispState = root.createNestedArray("dispState");
     dispState.add(state.disp_on_off[0] ? 1 : 0);
     dispState.add(state.disp_on_off[1] ? 1 : 0);
 
