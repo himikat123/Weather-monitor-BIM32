@@ -41,21 +41,22 @@ void TaskServer::_webAnimation() {
  */
 void TaskServer::_webShowOrder() {
     if(_webIsLogged(true)) {
-        if(_server.hasArg("order") && _server.hasArg("showOrder") && _server.hasArg("num")) {
+        if(_server.hasArg("order") && _server.hasArg("num") && _server.hasArg("show")) {
             uint8_t num = (_server.arg("num")).toInt();
-            uint8_t showOrder = (_server.arg("showOrder")).toInt();
-            String order = _server.arg("order");
-            Serial.println(order);
-            int arr[16];
-            int count = 0;
-            char buf[64];
-            order.toCharArray(buf, sizeof(buf));
-            char *p = strtok(buf, ",");
-            while(p != NULL) {
-                arr[count++] = atoi(p);
-                p = strtok(NULL, ",");
+            uint8_t show = (_server.arg("show")).toInt();
+            if(num == 0 || num == 1) {
+                String order = _server.arg("order");
+                //Serial.println(order);
+                int count = 0;
+                char buf[32];
+                order.toCharArray(buf, sizeof(buf));
+                char *p = strtok(buf, ",");
+                while(p != NULL && count < 8) {
+                    state.segmentDispOrder[num][count++] = atoi(p);
+                    p = strtok(NULL, ",");
+                }
+                state.segmentDispOrder[num][8] = (show == 1) ? 1 : 0;
             }
-            // SHOW_ORDER(num, showOrder, arr);
         }
         else _server.send(200, "text/plain", "error");
     }

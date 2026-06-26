@@ -51,6 +51,7 @@ struct State {
         int8_t disp_night_state[2] = {-1, -1}; // state of displays night off: -1-undefined, 0-off, 1-on
         bool touch_calibrate = false; // touch calibrate modus
         bool colorChanged = false; // timeslot color has been changed from web interface
+        int segmentDispOrder[2][9] = { 0 }; // 7 segment display digits order for test
         bool debugTouch = false;
         bool debugWether = false;
         double secretCode = esp_random();

@@ -42,8 +42,13 @@ void TM1637::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<6; i++) {
-        if(_dispImg[i] >= DOT) _pixels[i] = font_tm1637[WITH_DOT][_dispImg[i] - DOT];
-        else _pixels[i] = font_tm1637[SYMBOLS][_dispImg[i]];
+        uint8_t activeValue;
+
+        if(state.segmentDispOrder[_dispNum][8] == 1) activeValue = state.segmentDispOrder[_dispNum][i];
+        else activeValue = _dispImg[i];
+
+        if(activeValue >= 100) _pixels[i] = font_tm1637[WITH_DOT][activeValue - DOT];
+        else _pixels[i] = font_tm1637[SYMBOLS][activeValue];
 
         if(_pixelsPrev[i] != _pixels[i]) {
             _pixelsPrev[i] = _pixels[i];

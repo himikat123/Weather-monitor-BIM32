@@ -42,8 +42,13 @@ void MAX7219_S::_print() {
     bool updated = false;
 
     for(uint8_t i=0; i<8; i++) {
-        if(_dispImg[i] >= 100) _pixels[i] = font_max7219[1][_dispImg[i] - 100];
-        else _pixels[i] = font_max7219[0][_dispImg[i]];
+        uint8_t activeValue;
+
+        if(state.segmentDispOrder[_dispNum][8] == 1) activeValue = state.segmentDispOrder[_dispNum][i];
+        else activeValue = _dispImg[i];
+
+        if(activeValue >= 100) _pixels[i] = font_max7219[WITH_DOT][activeValue - DOT];
+        else _pixels[i] = font_max7219[SYMBOLS][activeValue];
 
         if(_pixelsPrev[i] != _pixels[i]) {
             _pixelsPrev[i] = _pixels[i];
