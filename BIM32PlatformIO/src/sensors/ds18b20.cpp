@@ -10,11 +10,13 @@
  */
 void Sensors::_DS18B20Init(void) {
     term.begin();
+    term.setWaitForConversion(false); 
+
     _ds18b20_det = term.getDeviceCount();
     if(_ds18b20_det > 0) {
         term.getAddress(thermometer, 0);
         term.setResolution(thermometer, DS18B20_RESOLUTION);
-        term.requestTemperatures();
+        term.requestTemperatures(); 
     }
 }
 
