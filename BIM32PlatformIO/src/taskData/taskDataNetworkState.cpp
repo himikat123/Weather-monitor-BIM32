@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 #include "../network/network.hpp"
 
-void TaskSensors::_networkState() {
+void TaskData::_networkState() {
     if(state.apMode) strlcpy(state.network.ssid, config.accessPoint.ssid(), sizeof(state.network.ssid));
     else WiFi.SSID().toCharArray(state.network.ssid, sizeof(state.network.ssid));
 

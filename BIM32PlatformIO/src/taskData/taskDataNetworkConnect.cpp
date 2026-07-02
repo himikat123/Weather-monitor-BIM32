@@ -1,13 +1,13 @@
 #include <WiFi.h>
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../state/state.hpp"
 #include "../network/network.hpp"
 
 /**
  * Network connection if not connected and if not Access point mode
  */
-void TaskSensors::_networkConnect() {
+void TaskData::_networkConnect() {
     if(!state.apMode && (WiFi.localIP().toString() == "0.0.0.0" or !network.isConnected())) {
         state.net_connected = false;
         network.connect();

@@ -1,6 +1,6 @@
 #include <Arduino.h> 
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../globals.hpp"
 #include "../config/config.hpp"
 #include "../state/state.hpp"
@@ -9,7 +9,7 @@
 /**
  * Time synchronization with NTP server
  */
-void TaskSensors::_timeSyncNTP() {
+void TaskData::_timeSyncNTP() {
     if(config.clock.ntpPeriod() > 0) {
         if((millis() - _ntp_update) > config.clock.ntpPeriod() * 60000 or !state.clockSynchronized) {
             _ntp_update = millis();

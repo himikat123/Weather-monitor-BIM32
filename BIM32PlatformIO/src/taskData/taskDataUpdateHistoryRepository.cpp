@@ -1,12 +1,12 @@
 #include <Arduino.h>
 #include <TimeLib.h> 
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../config/config.hpp"
 #include "../cloud/thingspeak/thingspeak.hpp"
 #include "../network/network.hpp"
 
-void TaskSensors::_updateHistoryRepository() {
+void TaskData::_updateHistoryRepository() {
     if(config.cloud.history.period() > 0) {
         if(now() - _historyUpdate > config.cloud.history.period() * 60) {
             _historyUpdate = now();

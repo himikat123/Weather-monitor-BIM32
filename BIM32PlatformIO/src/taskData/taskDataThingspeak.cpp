@@ -1,6 +1,6 @@
 #include <Arduino.h> 
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../globals.hpp"
 #include "../config/config.hpp"
 #include "../network/network.hpp"
@@ -9,7 +9,7 @@
 /**
  * Receive data from thingspeak
  */
-void TaskSensors::_receiveThingspeak() {
+void TaskData::_receiveThingspeak() {
     if(config.cloud.thingspeakReceive.period() > 0) {
         if((millis() - _thingspeakReceive) > (config.cloud.thingspeakReceive.period() * 60000) or _thingspeakReceive == 0) {
             _thingspeakReceive = millis();
@@ -27,7 +27,7 @@ void TaskSensors::_receiveThingspeak() {
 /**
  * Send data to thingspeak
  */
-void TaskSensors::_sendThingspeak() {
+void TaskData::_sendThingspeak() {
     if(config.cloud.thingspeakSend.period() > 0) {
         if((millis() - _thingspeakSend) > (config.cloud.thingspeakSend.period() * 60000) or _thingspeakSend == 0) {
             _thingspeakSend = millis();

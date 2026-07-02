@@ -102,13 +102,6 @@ void TaskServer::_run() {
         }
 
         _fsInfoUpdate();
-
-        if(sensorsSemaphore != NULL) {
-            if(xSemaphoreTake(sensorsSemaphore, (TickType_t)100) == pdTRUE) {
-                sensors.BME680Read();
-                xSemaphoreGive(sensorsSemaphore);
-            }
-        }
         
         vTaskDelay(10);
     }

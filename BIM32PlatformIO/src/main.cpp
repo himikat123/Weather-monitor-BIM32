@@ -19,18 +19,20 @@
 #include "./displays/nextion/nextion.hpp"
 
 #include "./taskDisplay/taskDisplay.hpp"
+#include "./taskData/taskData.hpp"
 #include "./taskSensors/taskSensors.hpp"
 #include "./taskServer/taskServer.hpp"
 
 TaskHandle_t task_display1_handle = NULL;
 TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_server_handle = NULL;
+TaskHandle_t task_data_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
-SemaphoreHandle_t sensorsSemaphore = NULL;
 uint8_t dummy = 0;
 
 TaskDisplay taskDisplay1;
 TaskDisplay taskDisplay2;
+TaskData taskData;
 TaskSensors taskSensors;
 TaskServer taskServer;
 
@@ -38,8 +40,6 @@ TaskServer taskServer;
  * Arduino setup
  */
 void setup() {
-    sensorsSemaphore = xSemaphoreCreateMutex(); 
-
     pinMode(HC12_SET_PIN, OUTPUT);
     digitalWrite(HC12_SET_PIN, HIGH);
     pinMode(DISPLAY1_BUTTON_PIN, INPUT_PULLUP);
@@ -78,18 +78,16 @@ void setup() {
         }
     }
 
-    if(disp1type && taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1));
-    else Serial.println("Failed to start Display1 task!");
-    if(disp1type && taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2));
-    else Serial.println("Failed to start Display2 task!");
+    taskSensors.start("TaskSensors", 8192, 1, 1);
+
+    if(disp1type) taskDisplay1.start("TaskDisplay1", 32768, 1, 1, DISPLAY_1);
+    if(disp1type) taskDisplay2.start("TaskDisplay2", 8192, 1, 1, DISPLAY_2);
 
     WiFi.mode(WIFI_STA);
     network.connect();
 
-    if(taskSensors.start("TaskSensors", 32768, 1, 1));
-    else Serial.println("Failed to start Sensors task!");
-    if(taskServer.start("TaskServer", 16384, 1, 1));
-    else Serial.println("Failed to start Server task!");
+    taskData.start("TaskData", 32768, 1, 1);
+    taskServer.start("TaskServer", 16384, 1, 1);
 }
 
 void loop() {}

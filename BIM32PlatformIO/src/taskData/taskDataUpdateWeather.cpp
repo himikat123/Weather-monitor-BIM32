@@ -1,14 +1,14 @@
 #include <Arduino.h>
 #include <TimeLib.h> 
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 #include "../network/network.hpp"
 #include "../weather/weather.hpp"
 #include "../sensors/sensors.hpp"
 
-void TaskSensors::_updateWeather() { 
+void TaskData::_updateWeather() { 
     uint32_t weatherUpd = config.weather.provider() == 1 ? 3600 : 1200;
     if(state.debugWether || (now() - weather.get_currentUpdated() > weatherUpd)) {
         Serial.println(SEPARATOR);

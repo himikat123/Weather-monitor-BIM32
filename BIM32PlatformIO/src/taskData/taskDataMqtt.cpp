@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
-#include "./taskSensors.hpp"
+#include "./taskData.hpp"
 #include "../globals.hpp"
 #include "../config/config.hpp"
 #include "../network/network.hpp"
 
-void TaskSensors::_sendMqtt() {
+void TaskData::_sendMqtt() {
     if(config.cloud.mqttSend.period() > 0 and network.isConnected()) {
         if(mqtt.loop()) {
             if((millis() - _mqttSend) > (config.cloud.mqttSend.period() * 1000) or _mqttSend == 0) {
