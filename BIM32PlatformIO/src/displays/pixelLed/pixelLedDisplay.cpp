@@ -20,8 +20,15 @@ void PixelLed::init(uint8_t dispNum, uint8_t pin) {
 
     if(_driver) delete _driver;
     
-    if(config.display.model(dispNum) <= D_WS2812_6) _driver = new Ws2812Drive();
-    if(config.display.model(dispNum) >= D_SK9822_4) _driver = new Sk9822Drive();
+    if(config.display.model(dispNum) <= D_WS2812_6) {
+        if(dispNum == DISPLAY_1) _driver = new Ws2812DriveI2S();
+        else _driver = new Ws2812DriveRMT();
+    }
+    
+    if(config.display.model(dispNum) >= D_SK9822_4) {
+        if(dispNum == DISPLAY_1) _driver = new Sk9822DriveSPI2();
+        else _driver = new Sk9822DriveSPI3();
+    }
 
     _driver->begin(dispNum, _pixelCount);
     _driver->clearTo(ColorType(0, 0, 0));
