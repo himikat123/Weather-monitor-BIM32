@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "driver/rmt.h"
 
 #include "../globals.hpp"
 
@@ -33,6 +34,7 @@ class Sound {
         void _reset();
         uint16_t _chckSum(uint8_t *sdata);
         void _sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte);
+        void _sendRmt(const uint8_t *data, size_t len);
 
         unsigned int _alarm_rang = 60;
         unsigned int _hourly_rang = 0;

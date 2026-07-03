@@ -47,7 +47,6 @@ struct State {
         unsigned int iaq_level = 0; // IAQ level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
         unsigned int co2_level = 0; // CO2 level code: 0-undefined, 1-Air clean, 2-Air pulluted, 3-Air heavily polluted
         bool clockPoints = false; // ILI9341 clock points state
-        uint8_t uart2_tx = 0; // What is UART2 connected to (HC12 or DFPlayer)
         int8_t disp_night_state[2] = {-1, -1}; // state of displays night off: -1-undefined, 0-off, 1-on
         bool touch_calibrate = false; // touch calibrate modus
         bool colorChanged = false; // timeslot color has been changed from web interface

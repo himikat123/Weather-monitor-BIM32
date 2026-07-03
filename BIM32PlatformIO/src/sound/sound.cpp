@@ -14,6 +14,19 @@ void Sound::init(void) {
     Serial.println(SEPARATOR);
     Serial.println("Initialize DF Player...");
 
+    rmt_config_t rmt_tx;
+    rmt_tx.rmt_mode = RMT_MODE_TX;
+    rmt_tx.channel = RMT_CHANNEL_4;
+    rmt_tx.gpio_num = (gpio_num_t)MP3_TX_PIN;
+    rmt_tx.mem_block_num = 1;
+    rmt_tx.clk_div = 80;
+    rmt_tx.tx_config.loop_en = false;
+    rmt_tx.tx_config.carrier_en = false;
+    rmt_tx.tx_config.idle_output_en = true;
+    rmt_tx.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH;
+    rmt_config(&rmt_tx);
+    rmt_driver_install(rmt_tx.channel, 0, 0);
+
     if(digitalRead(MP3_BUSY_PIN)) {
         time_t mils = millis();
         _reset();
@@ -30,7 +43,7 @@ void Sound::init(void) {
 }
 
 /**
- * Change voilume
+ * Change volume
  */
 void Sound::volume(unsigned int vol) {
     if(vol <= 30) _sendCommand(0x06, 0x00, vol);
