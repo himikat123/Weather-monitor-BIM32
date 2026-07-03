@@ -24,7 +24,4 @@ class TM1637 : public SegmentDisplay {
         void _print();
         void _sendToDisplay();
         void _clearDisplay();
-        void _writeByte(byte data);
-        void _start();
-        void _stop(void);
 };
