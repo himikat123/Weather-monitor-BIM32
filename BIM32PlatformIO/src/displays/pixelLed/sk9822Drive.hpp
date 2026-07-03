@@ -16,7 +16,7 @@ class Sk9822DriveSPI2 : public BasePixelLed {
         
         void begin(uint8_t dispNum, uint16_t count) override {
             bus = new NeoPixelBus<DotStarBgrFeature, DotStarEsp32DmaSpiMethod>(count);
-            bus->Begin(SK9822_1_DAT_PIN, -1, SK9822_1_CLK_PIN, -1);
+            bus->Begin(SK9822_1_CLK_PIN, -1, SK9822_1_DAT_PIN, -1);
         }
 
         void setPixelColor(uint16_t index, RgbColor color) override {
@@ -41,7 +41,7 @@ class Sk9822DriveSPI3 : public BasePixelLed {
         
         void begin(uint8_t dispNum, uint16_t count) override {
             bus = new NeoPixelBus<DotStarBgrFeature, DotStarEsp32DmaSpi3Method>(count);
-            bus->Begin(SK9822_2_DAT_PIN, -1, SK9822_2_CLK_PIN, -1);
+            bus->Begin(SK9822_2_CLK_PIN, -1, SK9822_2_DAT_PIN, -1);
         }
 
         void setPixelColor(uint16_t index, RgbColor color) override {

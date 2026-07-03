@@ -15,7 +15,7 @@ struct BrightnessStruct {
 
     public:
         const unsigned int method(unsigned int num) const { if(num >= DISPLAYS) return 3; if(_method[num] > 3) return 3; return _method[num]; }
-        const unsigned int day(unsigned int num) const { if(num >= DISPLAYS) return 1; if(_day[num] < 1 or _day[num] > 1) return 1; return _day[num]; }
+        const unsigned int day(unsigned int num) const { if(num >= DISPLAYS) return 1; if(_day[num] < 1 or _day[num] > 100) return 1; return _day[num]; }
         const unsigned int night(unsigned int num) const { if(num >= DISPLAYS) return 1; if(_night[num] < 1 or _night[num] > 100) return 1; return _night[num]; }
         const unsigned int min(unsigned int num) const { if(num >= DISPLAYS) return 1; return _min[num]; }
         const unsigned int max(unsigned int num) const { if(num >= DISPLAYS) return 50; return _max[num]; }
