@@ -18,6 +18,7 @@ class PixelLed : public SegmentDisplay {
         virtual bool isdisplayOn() const override { return false; }
         virtual void displayOff() override {}
         virtual void displayOn(bool doinit) override {}
+        virtual void brightness(unsigned int bright, bool reduc) override;
     
     private:
         BasePixelLed* _driver;
