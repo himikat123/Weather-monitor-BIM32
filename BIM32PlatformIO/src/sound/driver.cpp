@@ -36,26 +36,29 @@ void Sound::_sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte) {
 void Sound::_sendRmt(const uint8_t *data, size_t len) {
     if(len == 0 || data == nullptr) return;
 
-    size_t total_bits = len * 10;
+    size_t total_bits = len * 10; 
     
     rmt_item32_t* items = (rmt_item32_t*)malloc(total_bits * sizeof(rmt_item32_t));
     if(!items) return;
 
     size_t item_idx = 0;
-    uint32_t bit_duration = 104;
+    
+    const uint32_t half_bit = 52; 
 
     for(size_t i=0; i<len; i++) {
         uint8_t byte = data[i];
-        items[item_idx++] = {{{ bit_duration, 0, 0, 0 }}};
+
+        items[item_idx++] = {{{ half_bit, 0, half_bit, 0 }}};
 
         for(int b=0; b<8; b++) {
             uint32_t level = (byte & (1 << b)) ? 1 : 0;
-            items[item_idx++] = {{{ bit_duration, level, 0, level }}};
+            items[item_idx++] = {{{ half_bit, level, half_bit, level }}};
         }
 
-        items[item_idx++] = {{{ bit_duration, 1, 0, 1 }}};
+        items[item_idx++] = {{{ half_bit, 1, half_bit, 1 }}};
     }
 
-    rmt_write_items(RMT_CHANNEL_4, items, total_bits, false);
+    rmt_write_items(RMT_CHANNEL_4, items, total_bits, true);
+    
     free(items);
 }

@@ -35,12 +35,12 @@
     #define MAX7219_2_DAT_PIN      15 // MAX7219 display 2 DAT pin
     #define MAX7219_2_LOAD_PIN      2 // MAX7219 display 2 LOAD pin
 
-    #define NUMITRON_1_SCL_PIN      32 // NUMITRON display 1 SCL pin
-    #define NUMITRON_1_SDA_PIN      14 // NUMITRON display 1 SDA pin
-    #define NUMITRON_1_PWM_PIN       5 // NUMITRON display 1 PWM pin
-    #define NUMITRON_2_SCL_PIN      19 // NUMITRON display 2 SCL pin
-    #define NUMITRON_2_SDA_PIN      15 // NUMITRON display 2 SDA pin
-    #define NUMITRON_2_PWM_PIN       2 // NUMITRON display 2 PWM pin
+    #define NUMITRON_1_SCL_PIN     32 // NUMITRON display 1 SCL pin
+    #define NUMITRON_1_SDA_PIN     14 // NUMITRON display 1 SDA pin
+    #define NUMITRON_1_PWM_PIN      5 // NUMITRON display 1 PWM pin
+    #define NUMITRON_2_SCL_PIN     19 // NUMITRON display 2 SCL pin
+    #define NUMITRON_2_SDA_PIN     15 // NUMITRON display 2 SDA pin
+    #define NUMITRON_2_PWM_PIN      2 // NUMITRON display 2 PWM pin
 
     #define DHT22_PIN               4 // DHT22 sensor pin
     #define PHOTORESISTOR_PIN      36 // Photoresistor pin
