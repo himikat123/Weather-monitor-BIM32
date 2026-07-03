@@ -1,10 +1,10 @@
 #pragma once
 
 #include <Wire.h>
+#include "driver/rmt.h"
 #include <Adafruit_BME280.h> // v2.2.4 https://github.com/adafruit/Adafruit_BME280_Library
 #include <Adafruit_BMP085.h> // v1.2.4 https://github.com/adafruit/Adafruit-BMP085-Library
 #include "SHT21.h" // https://github.com/markbeee/SHT21
-#include "DHTesp.h" // v1.19.0 http://desire.giesecke.tk/index.php/2018/01/30/esp32-dht11/
 #include <MAX44009.h> // v1.2.3 https://github.com/dantudose/MAX44009
 #include <BH1750.h> // v1.3.0 https://github.com/claws/BH1750
 #include <OneWire.h> // v2.3.7 https://github.com/PaulStoffregen/OneWire
@@ -26,7 +26,6 @@ class Sensors {
         DallasTemperature   term;
         DeviceAddress       thermometer;
         SHT21               sht21;
-        DHTesp              dht;
         MAX44009            max_light;
         BH1750              lightMeter;
         Adafruit_BMP085     bmp;
@@ -120,6 +119,7 @@ class Sensors {
         void _BMP180Read(void);
         void _SHT21Read(void);
         void _DHT22Read(void);
+        bool _readDht22Rmt(float *targetTemp, float *targetHum);
         void _DS18B20Read(void);
         void _MAX44009Read(void);
         void _BH1750Read(void);
