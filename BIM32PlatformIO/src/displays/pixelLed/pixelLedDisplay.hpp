@@ -23,6 +23,7 @@ class PixelLed : public SegmentDisplay {
     private:
         BasePixelLed* _driver;
         uint8_t _currentBrightness = 1;
+        uint8_t _prevBrightness = 0;
         uint8_t _pixelCount = 1;
         byte _pixels[6] = { 0 }; 
         byte _pixelsPrev[6] = { 0 };

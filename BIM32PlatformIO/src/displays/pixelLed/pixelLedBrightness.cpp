@@ -10,5 +10,8 @@
  */
 void PixelLed::brightness(unsigned int bright, bool reduc) {
     _brightness = reduc ? round(bright / 2) : bright;
-    _sendToDisplay();
+    if(_brightness != _prevBrightness) {
+        _prevBrightness = _brightness;
+        _sendToDisplay();
+    }
 }

@@ -18,7 +18,7 @@ class SegmentDisplay : public BaseDisplay {
         bool _points[8] = {false, false, false, false, false, false, false, false};
         bool _prevPoints[8] = {false, false, false, false, false, false, false, false};
         unsigned int _dotfreq = 500;    // time points period
-        uint8_t _brightness = 40;       // display brightness
+        uint8_t _brightness = 1;        // display brightness
         int _dispImg[8] = {             // display digits
             SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
         };
