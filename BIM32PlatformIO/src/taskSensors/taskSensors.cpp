@@ -3,6 +3,7 @@
 #include "./taskSensors.hpp"
 #include "../state/state.hpp"
 #include "../sensors/sensors.hpp"
+#include "../wsensor/wirelessSensor.hpp"
 #include "../sound/sound.hpp"
 #include "../comfort/comfort.hpp"
 
@@ -44,6 +45,8 @@ void TaskSensors::_run() {
         }
 
         sensors.BME680Read();
+
+        wsensor.receive();
 
         comfort.soundNotify();
         sound.hourlySignal();

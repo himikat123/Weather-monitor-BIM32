@@ -1,6 +1,7 @@
 #pragma once
 
-#include <Arduino.h> 
+#include <Arduino.h>
+#include <freertos/queue.h>
 
 #define FW "v6.0a"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
@@ -33,9 +34,6 @@
 #define AIR_POLLUTED         2
 #define AIR_HEAVILY_POLLUTED 3
 
-#define HC12                 0
-#define DFPlayer             1
-
 #define LCD_DISPLAY          1
 #define PIXEL_LEDS_DISPLAY   2
 #define SEGMENT_DISPLAY      3
@@ -52,7 +50,6 @@
 #define D_SK9822_4           2
 #define D_SK9822_6           3
 #define D_SK9822_8           4
-
 
 #define OPENWEATHERMAP       0
 #define WEATHERBIT           1
@@ -109,3 +106,5 @@ extern TaskHandle_t task_display2_handle;
 extern TaskHandle_t task_server_handle;
 extern TaskHandle_t task_data_handle;
 extern TaskHandle_t task_sensors_handle;
+
+extern QueueHandle_t wirelessSensorQueue;

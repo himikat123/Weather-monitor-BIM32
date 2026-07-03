@@ -45,7 +45,7 @@ void TaskData::_run() {
     while(1) {
         if(digitalRead(SETTINGS_BUTTON_PIN) == 0) network.runAccessPoint(); // Enter access point mode if "Settings" button is pressed
 
-        wsensor.receive();
+        wsensor.parse();
         _networkConnect();
         
         if(!state.apMode) {

@@ -5,14 +5,6 @@
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 
-void WirelessSensor::handleReceive() {
-    while(Serial2.available()) {
-        char c = Serial2.read();
-        _receivedData[_receivedIndex] = c;
-        if(_receivedIndex < 1023) _receivedIndex++;
-    }
-}
-
 /**
  * check if data is not expired
  */

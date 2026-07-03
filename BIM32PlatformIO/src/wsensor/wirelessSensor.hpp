@@ -13,8 +13,8 @@ class WirelessSensor {
         WirelessSensor(const WirelessSensor&) = delete;
         void operator=(const WirelessSensor&) = delete;
 
-        void handleReceive();
         void receive();
+        void parse();
         bool dataRelevance(uint8_t wsensNum);
         time_t get_updated(unsigned int num);
         float get_temperature(unsigned int num, unsigned int sensor);

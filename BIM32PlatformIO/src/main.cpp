@@ -28,6 +28,9 @@ TaskHandle_t task_display2_handle = NULL;
 TaskHandle_t task_server_handle = NULL;
 TaskHandle_t task_data_handle = NULL;
 TaskHandle_t task_sensors_handle = NULL;
+
+QueueHandle_t wirelessSensorQueue = NULL;
+
 uint8_t dummy = 0;
 
 TaskDisplay taskDisplay1;
@@ -49,9 +52,6 @@ void setup() {
 
     Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);
-    Serial2.onReceive([]() {
-        wsensor.handleReceive();
-    });
 
     Serial.println(SEPARATOR);
     Serial.println(SEPARATOR);
@@ -64,6 +64,9 @@ void setup() {
         while(1) yield();
     }
     config.readConfig();
+
+    wirelessSensorQueue = xQueueCreate(4, sizeof(String));
+    if(wirelessSensorQueue == NULL) Serial.println("Error creating Wireless Sensor Queue");
 
     int disp1type = config.display.type(DISPLAY_1);
     int disp1model = config.display.model(DISPLAY_1); 
