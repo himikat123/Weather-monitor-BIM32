@@ -22,7 +22,10 @@ void PixelLed::init(uint8_t dispNum, uint8_t pin) {
     
     if(config.display.model(dispNum) <= D_WS2812_6) {
         if(dispNum == DISPLAY_1) _driver = new Ws2812DriveI2S();
-        else _driver = new Ws2812DriveRMT();
+        else {
+            if(config.display.type(DISPLAY_1) == PIXEL_LEDS_DISPLAY) _driver = new Ws2812DriveRMT();
+            else _driver = new Ws2812DriveI2S();
+        }
     }
     
     if(config.display.model(dispNum) >= D_SK9822_4) {
