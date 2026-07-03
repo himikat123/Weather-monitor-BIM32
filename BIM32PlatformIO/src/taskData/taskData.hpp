@@ -37,7 +37,6 @@ class TaskData {
         void IRAM_ATTR alarm_button();
         void IRAM_ATTR mp3_busy();
 
-        void _HC12channelNrRequest();
         void _networkState();
         void _networkConnect();
         void _timeSyncNTP();

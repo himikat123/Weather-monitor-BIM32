@@ -35,9 +35,6 @@ void TaskData::_run() {
     attachInterruptArg(ALARM_BUTTON_PIN, isr_alarm, this, FALLING);
     attachInterruptArg(MP3_BUSY_PIN, isr_mp3, this, FALLING);
 
-    sensors.init();
-    _HC12channelNrRequest();
-    sound.init();
     mqtt.init();
 
     network.scanNetworks();

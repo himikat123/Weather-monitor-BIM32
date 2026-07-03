@@ -19,6 +19,5 @@ class TaskSensors {
         unsigned int _sensorsTHP_update = 0;
         unsigned int _sensorsL_update = 0;
 
-        void _updateTempHumPresSensors();
-        void _updateLightSensors();
+        void _HC12channelNrRequest();
 };

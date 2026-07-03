@@ -27,6 +27,8 @@ void TaskSensors::_taskWrapper(void* pvParameters) {
 
 void TaskSensors::_run() {
     sensors.init();
+    sound.init();
+    _HC12channelNrRequest();
 
     while(1) {
         if(millis() - _sensorsTHP_update > 5000) {
