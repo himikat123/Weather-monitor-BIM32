@@ -27,7 +27,6 @@ void TaskSensors::_taskWrapper(void* pvParameters) {
 
 void TaskSensors::_run() {
     sensors.init();
-    sound.init();
     _HC12channelNrRequest();
 
     while(1) {
@@ -48,12 +47,15 @@ void TaskSensors::_run() {
 
         sensors.BME680Read();
 
-        wsensor.receive();
+       wsensor.receive();
 
-        comfort.soundNotify();
-        sound.hourlySignal();
-        sound.alarm();
+        _DfPlayerInit();
+        if(_sound_init_step == 3) {
+            comfort.soundNotify();
+            sound.hourlySignal();
+            sound.alarm();
+        }
 
-        vTaskDelay(50);
+        vTaskDelay(pdMS_TO_TICKS(50));
     }
 }

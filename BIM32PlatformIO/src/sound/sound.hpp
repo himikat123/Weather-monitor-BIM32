@@ -31,6 +31,7 @@ class Sound {
         bool _isAllowed();
         bool _hourlyCheck();
         void _playHourlySignal();
+        void _initRMT();
         void _reset();
         uint16_t _chckSum(uint8_t *sdata);
         void _sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte);
@@ -41,7 +42,6 @@ class Sound {
         int _prevTempLevel = TEMP_COMFORTABLE;
         int _prevHumLevel = HUM_COMFORTABLE;
         unsigned int _prevAirLevel = AIR_CLEAN;
-        boolean _mp3_found = false;
 };
 
 inline Sound& sound = Sound::getInstance();

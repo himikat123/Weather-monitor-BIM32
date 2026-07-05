@@ -18,6 +18,10 @@ class TaskSensors {
 
         unsigned int _sensorsTHP_update = 0;
         unsigned int _sensorsL_update = 0;
+        unsigned int _sound_init = 0;
+        unsigned int _sound_init_step = 0;
+        int _sound_init_attempts = 3;
 
         void _HC12channelNrRequest();
+        void _DfPlayerInit();
 };

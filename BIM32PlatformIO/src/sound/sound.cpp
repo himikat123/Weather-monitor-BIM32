@@ -11,49 +11,23 @@
  * DF player initialization
  */
 void Sound::init(void) {
-    Serial.println(SEPARATOR);
     Serial.println("Initialize DF Player...");
-
-    rmt_config_t rmt_tx;
-    rmt_tx.rmt_mode = RMT_MODE_TX;
-    rmt_tx.channel = RMT_CHANNEL_4;
-    rmt_tx.gpio_num = (gpio_num_t)MP3_TX_PIN;
-    rmt_tx.mem_block_num = 1;
-    rmt_tx.clk_div = 80;
-    rmt_tx.tx_config.loop_en = false;
-    rmt_tx.tx_config.carrier_en = false;
-    rmt_tx.tx_config.idle_output_en = true;
-    rmt_tx.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH;
-    rmt_config(&rmt_tx);
-    rmt_driver_install(rmt_tx.channel, 0, 0);
-
-    if(digitalRead(MP3_BUSY_PIN)) {
-        time_t mils = millis();
-        _reset();
-        while(1) { 
-            if(!state.mp3_busy) {
-                state.mp3_busy = true;
-                _mp3_found = true;
-                break;
-            }
-            if(millis() - mils > 2000) break;
-        }
-    }
-    Serial.printf("DFPlayer %sfound\r\n", _mp3_found ? "" : "NOT ");
+    _initRMT();
+    _reset(); 
 }
 
 /**
  * Change volume
  */
 void Sound::volume(unsigned int vol) {
-    if(vol <= 30) _sendCommand(0x06, 0x00, vol);
+    if(state.mp3_found && vol <= 30) _sendCommand(0x06, 0x00, vol);
 }
 
 /**
  * Change equalizer
  */
 void Sound::equalizer(unsigned int eq) {
-    if(eq <= 5) _sendCommand(0x07, 0x00, eq);
+    if(state.mp3_found && eq <= 5) _sendCommand(0x07, 0x00, eq);
 }
 
 /**
@@ -62,6 +36,8 @@ void Sound::equalizer(unsigned int eq) {
  * @param track number
  */
 void Sound::play(unsigned int folder, unsigned int track) {
+    if(!state.mp3_found) return;
+
     equalizer(config.sound.eq());
     vTaskDelay(100);
     volume(config.sound.vol());
@@ -81,6 +57,7 @@ void Sound::play(unsigned int folder, unsigned int track) {
         else folder = 2;
         if(track == 0) track = 24;
     }
+
     for(uint8_t i=0; i<5; i++) {
         _sendCommand(0x0F, folder, track);
         time_t mils = millis();
@@ -102,14 +79,14 @@ void Sound::play(unsigned int folder, unsigned int track) {
  * Stop playing
  */
 void Sound::stopPlaying(void) {
-    _sendCommand(0x16, 0x00, 0x00);
+    if(state.mp3_found) _sendCommand(0x16, 0x00, 0x00);
 }
 
 /**
  * Check if sound is allowed
  */
 bool Sound::_isAllowed() {
-    if(_mp3_found and digitalRead(MP3_BUSY_PIN)) {
+    if(state.mp3_found and digitalRead(MP3_BUSY_PIN)) {
         switch(config.sound.hourly()) {
             case 0: return true;
             case 2: if(weather.get_isDay()) return true;

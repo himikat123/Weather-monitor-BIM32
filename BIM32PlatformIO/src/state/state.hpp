@@ -54,6 +54,7 @@ struct State {
         bool debugTouch = false;
         bool debugWether = false;
         double secretCode = esp_random();
+        bool mp3_found = false;
 
         ESP32State esp32core;
         NetworkState network;

@@ -9,7 +9,7 @@
  * Check if it's time to ring the alarm
  */
 void Sound::alarm() {
-    if(_mp3_found) {
+    if(state.mp3_found) {
         for(int i=0; i<ALARMS; i++) {
             if(config.alarm.state(i) and config.alarm.weekday(i, weekday() == 1 ? 6 : weekday() - 2)) {
                 if(config.alarm.time(i, 0) == hour() and config.alarm.time(i, 1) == minute() and _alarm_rang != minute()) { 

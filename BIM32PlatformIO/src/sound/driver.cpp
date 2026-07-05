@@ -6,14 +6,24 @@
 #include "../config/config.hpp"
 #include "../state/state.hpp"
 
+void Sound::_initRMT() {
+    rmt_config_t rmt_tx;
+    rmt_tx.rmt_mode = RMT_MODE_TX;
+    rmt_tx.channel = RMT_CHANNEL_4;
+    rmt_tx.gpio_num = (gpio_num_t)MP3_TX_PIN;
+    rmt_tx.mem_block_num = 1;
+    rmt_tx.clk_div = 80;
+    rmt_tx.tx_config.loop_en = false;
+    rmt_tx.tx_config.carrier_en = false;
+    rmt_tx.tx_config.idle_output_en = true;
+    rmt_tx.tx_config.idle_level = RMT_IDLE_LEVEL_HIGH;
+    rmt_config(&rmt_tx);
+    rmt_driver_install(rmt_tx.channel, 0, 0);
+}
+
 void Sound::_reset() {
     _sendCommand(0x0C, 0x00, 0x00);
     _sendCommand(0x09, 0x00, 0x02);
-    vTaskDelay(200);
-    equalizer(config.sound.eq());
-    vTaskDelay(100);
-    volume(config.sound.vol());
-    vTaskDelay(100);
 }
 
 uint16_t Sound::_chckSum(uint8_t *sdata) {
@@ -36,14 +46,11 @@ void Sound::_sendCommand(uint8_t command, uint8_t hByte, uint8_t lByte) {
 void Sound::_sendRmt(const uint8_t *data, size_t len) {
     if(len == 0 || data == nullptr) return;
 
-    size_t total_bits = len * 10; 
-    
-    rmt_item32_t* items = (rmt_item32_t*)malloc(total_bits * sizeof(rmt_item32_t));
-    if(!items) return;
+    if(len > 10) len = 10; 
+    rmt_item32_t items[100]; 
 
     size_t item_idx = 0;
-    
-    const uint32_t half_bit = 52; 
+    const uint32_t half_bit = 52;
 
     for(size_t i=0; i<len; i++) {
         uint8_t byte = data[i];
@@ -58,7 +65,5 @@ void Sound::_sendRmt(const uint8_t *data, size_t len) {
         items[item_idx++] = {{{ half_bit, 1, half_bit, 1 }}};
     }
 
-    rmt_write_items(RMT_CHANNEL_4, items, total_bits, true);
-    
-    free(items);
+    rmt_write_items(RMT_CHANNEL_4, items, item_idx, true);
 }
