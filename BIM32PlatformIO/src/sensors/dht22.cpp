@@ -59,7 +59,7 @@ bool Sensors::_readDht22Rmt(float *targetTemp, float *targetHum) {
     delayMicroseconds(30);
 
     pinMode(DHT22_PIN, INPUT_PULLUP);
-    rmt_set_pin(RMT_CHANNEL_3, RMT_MODE_RX, (gpio_num_t)DHT22_PIN);
+    rmt_set_gpio(RMT_CHANNEL_3, RMT_MODE_RX, (gpio_num_t)DHT22_PIN, false);
 
     RingbufHandle_t rmt_rx_ringbuf = NULL;
     rmt_get_ringbuf_handle(RMT_CHANNEL_3, &rmt_rx_ringbuf);
