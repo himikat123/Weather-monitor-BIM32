@@ -33,7 +33,6 @@ class WirelessSensor {
         float get_batteryVoltage(unsigned int num);
         int get_batteryLevel(unsigned int num);
         float get_batteryPercentage(unsigned int num);
-        char* get_rawData();
 
     private:
         WirelessSensor() {}

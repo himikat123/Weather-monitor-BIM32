@@ -65,7 +65,7 @@ void setup() {
     }
     config.readConfig();
 
-    wirelessSensorQueue = xQueueCreate(4, sizeof(String));
+    wirelessSensorQueue = xQueueCreate(10, sizeof(WsensorPacket));
     if(wirelessSensorQueue == NULL) Serial.println("Error creating Wireless Sensor Queue");
 
     int disp1type = config.display.type(DISPLAY_1);

@@ -1,4 +1,3 @@
-// #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <TimeLib.h>
 
@@ -11,13 +10,15 @@
 void WirelessSensor::parse() {
     if(wirelessSensorQueue == NULL) return;
 
-    String wsensorStr = "";
+    WsensorPacket packet;
 
-    if(xQueueReceive(wirelessSensorQueue, &wsensorStr, 0) == pdPASS) {
+    while(xQueueReceive(wirelessSensorQueue, &packet, 0) == pdPASS) {
+        String wsensorStr = String(packet.data);
+
         int startJson = wsensorStr.indexOf("{");
         int endJson = wsensorStr.indexOf("}");
 
-        while(startJson != -1 && endJson != -1) {
+        while(startJson != -1 && endJson != -1 && endJson > startJson) {
             JsonDocument root;
             String js = wsensorStr.substring(startJson, endJson + 1);
             wsensorStr = wsensorStr.substring(endJson + 1);
@@ -25,6 +26,7 @@ void WirelessSensor::parse() {
             DeserializationError error = deserializeJson(root, js);
             if(!error) {
                 int number = root["num"];
+                if(number > 1) number = 1;
                 if(number >= 0 && number < WSENSORS) {
                     state.wsensor.time[number] = now();
 

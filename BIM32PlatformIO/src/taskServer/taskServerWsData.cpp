@@ -28,8 +28,6 @@ void TaskServer::_wsData() {
     dispState.add(state.disp_on_off[0] ? 1 : 0);
     dispState.add(state.disp_on_off[1] ? 1 : 0);
 
-    if(state.wsensor.updated) doc["wsensRaw"] = String(wsensor.get_rawData());
-
     updateIfNeeded(state.network, root);
     updateIfNeeded(state.bme280, root);
     updateIfNeeded(state.bmp180, root);

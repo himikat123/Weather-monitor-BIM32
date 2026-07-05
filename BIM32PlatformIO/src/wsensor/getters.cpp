@@ -91,7 +91,3 @@ float WirelessSensor::get_batteryPercentage(unsigned int num) {
     if(num >= WSENSORS) return -1.0;
     return state.wsensor.battery.percentage[num];
 }
-
-char* WirelessSensor::get_rawData() {
-    return _receivedData;
-}

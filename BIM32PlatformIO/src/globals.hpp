@@ -101,6 +101,12 @@ inline unsigned int getTime(bool level, const char* time) {
     return level ? minute : hour;
 }
 
+#define WSENSOR_MAX_PACKET_LEN 256
+
+struct WsensorPacket {
+    char data[WSENSOR_MAX_PACKET_LEN];
+};
+
 extern TaskHandle_t task_display1_handle;
 extern TaskHandle_t task_display2_handle;
 extern TaskHandle_t task_server_handle;
