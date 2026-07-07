@@ -5,4 +5,8 @@ app0,     app,  ota_0,   0x10000, 0x2E0000,
 eeprom,   data, 0x99,    ,        0x1000,
 spiffs,   data, fat,     ,        0x10F000,
 
-#partitions.bin 0x8000   firmware.bin 0x10000   littlefs.bin 0x2F0000
+#bootloader - 0x1000
+#partitions - 0x8000
+#boot_app0  - 0xE000
+#firmware   - 0x10000
+#littlefs   - 0x2f1000
