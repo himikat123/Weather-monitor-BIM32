@@ -273,7 +273,10 @@ void Config::readConfig(void) {
 
                 Serial.println("done");
             }
-            else Serial.println(" Configuration file corrupted");
+            else {
+                Serial.println(" Configuration file corrupted");
+                break;
+            }
         }
     }
     else Serial.println(" No configuration file found");
@@ -298,7 +301,10 @@ void Config::readConfig(void) {
 
                 Serial.println("done");
             }
-            else Serial.println(" Alarm file corrupted");
+            else {
+                Serial.println(" Alarm file corrupted");
+                break;
+            }
         }
     }
     else Serial.println(" No alarm file found");
@@ -315,7 +321,10 @@ void Config::readConfig(void) {
                 _copy(conf["pass"], account._pass);
                 Serial.println("done");
             }
-            else Serial.println(" User file corrupted");
+            else {
+                Serial.println(" User file corrupted");
+                break;
+            }
         }
     }
     else Serial.println(" No user file found");
@@ -334,7 +343,10 @@ void Config::readConfig(void) {
                 }
                 Serial.println("done");
             }
-            else Serial.println(" Touch calibration file corrupted");
+            else {
+                Serial.println(" Touch calibration file corrupted");
+                break;
+            }
         }
     }
     else Serial.println(" No touch calibration file found");

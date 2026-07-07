@@ -74,7 +74,10 @@ void Sensors::_BME680_loadState(void) {
                 }
                 else Serial.println("state file is empty");
             }
-            else Serial.println(" BME680 state file corrupted");
+            else {
+                Serial.println(" BME680 state file corrupted");
+                break;
+            }
         }
     }
     else Serial.println(" No BME680 file found");
