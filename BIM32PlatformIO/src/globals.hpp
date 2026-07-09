@@ -54,6 +54,7 @@
 #define OPENWEATHERMAP       0
 #define WEATHERBIT           1
 #define OPEN_METEO           2
+#define GISMETEO             3
 #define DAYS                 5
 
 #define NETWORKS             3

@@ -53,6 +53,10 @@ class Weather {
         void _updateOpenMeteoDaily(void);
         void _updateOpenMeteoHourly(void);
         void _calculateDaily(void);
+        void _updateGismeteo(void);
+        void _parseGismeteoStream(WiFiClient* stream);
+        String _getXmlAttr(const String& block, const String& attrName);
+        int _parseGismeteoWindDir(int id);
 };
 
 inline Weather& weather = Weather::getInstance();

@@ -29,17 +29,9 @@ void Weather::update() {
             url += "&q=" + city;
         }
         if(config.weather.citysearch() == 1) {
-            //if(config.weather.cityid() == "") {
-            //    Serial.println("No City ID");
-            //    return;
-            //}
             url += "&id=" + String(config.weather.cityid());
         }
         if(config.weather.citysearch() == 2) {
-            //if(config.weather.lat() == "" || config.weather.lon() == "") {
-            //    Serial.println("No Coordinates");
-            //    return;
-            //}
             url += "&lat=" + String(config.weather.lat()) + "&lon=" + String(config.weather.lon());
         }
         url += "&units=metric&lang=" + config.lang();
@@ -60,17 +52,9 @@ void Weather::update() {
             url += "&city=" + city;
         }
         if(config.weather.citysearch() == 1) {
-            //if(config.weather.cityid() == "") {
-            //    Serial.println("No City ID");
-            //    return;
-            //}
             url += "&city_id=" + String(config.weather.cityid());
         }
         if(config.weather.citysearch() == 2) {
-            //if(config.weather.lat() == "" || config.weather.lon() == "") {
-            //    Serial.println("No Coordinates");
-            //    return;
-            //}
             url += "&lat=" + String(config.weather.lat()) + "&lon=" + String(config.weather.lon());
         }
         url += "&lang=" + config.lang();
@@ -82,10 +66,6 @@ void Weather::update() {
 
     else if(config.weather.provider() == OPEN_METEO) {
         if(config.weather.citysearch() == 2) {
-            //if(config.weather.lat() == "" || config.weather.lon() == "") {
-            //    Serial.println("No Coordinates");
-            //    return;
-            //}
             url = "http://api.open-meteo.com/v1/forecast";
             url += "?latitude=" + String(config.weather.lat());
             url += "&longitude=" + String(config.weather.lon());
@@ -96,6 +76,10 @@ void Weather::update() {
             Serial.println("OPEN_METEO");
             Serial.println(url);
         }
+    }
+
+    else if(config.weather.provider() == GISMETEO) {
+        _updateGismeteo();
     }
 
     else {
