@@ -26,6 +26,7 @@ class TaskData {
         unsigned int _narodmonSend = 0;
         unsigned int _mqttSend = 0;
         unsigned int _historyUpdate = 0;
+        unsigned int _netStateUpdate = 0;
 
         static void IRAM_ATTR isr_display1(void* arg);
         static void IRAM_ATTR isr_display2(void* arg);

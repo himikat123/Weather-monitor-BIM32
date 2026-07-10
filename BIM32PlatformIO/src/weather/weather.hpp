@@ -57,6 +57,8 @@ class Weather {
         void _parseGismeteoStream(WiFiClient* stream);
         String _getXmlAttr(const String& block, const String& attrName);
         int _parseGismeteoWindDir(int id);
+        int _convertGismeteoIcon(const String& gisIcon);
+        int _getDescIdxFromIcon(int iconId);
 };
 
 inline Weather& weather = Weather::getInstance();
