@@ -48,7 +48,7 @@ void setup() {
     pinMode(DISPLAY1_BUTTON_PIN, INPUT_PULLUP);
     pinMode(DISPLAY2_BUTTON_PIN, INPUT_PULLUP);
     pinMode(ALARM_BUTTON_PIN, INPUT_PULLUP);
-    pinMode(MP3_BUSY_PIN, INPUT_PULLUP);
+    pinMode(MP3_BUSY_PIN, INPUT_PULLDOWN);
 
     Serial.begin(115200, SERIAL_8N1, -1, 1);
     Serial2.begin(9600);

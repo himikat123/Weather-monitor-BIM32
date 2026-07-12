@@ -77,5 +77,5 @@ float Sensors::dewPoint(float temp, float hum) {
  * Convert hPa to mmHg
  */
 float Sensors::mmHg(float pres) {
-    return pres * 0.75;
+    return pres * 0.750062;
 }

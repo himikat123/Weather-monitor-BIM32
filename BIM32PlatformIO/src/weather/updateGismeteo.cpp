@@ -20,11 +20,12 @@ void Weather::_updateGismeteo() {
     url += "&city=";
     url += String(config.weather.cityid());
 
-    Serial.print("URL: ");
-    Serial.println(url);
-    static WiFiClient client;
+    //Serial.print("URL: "); Serial.println(url);
+    WiFiClient client;
     HTTPClient http;
-    http.begin(client, url);
+    http.end(); 
+
+    if(!http.begin(client, url)) return;
     http.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
     http.setTimeout(5000); 
 
@@ -33,29 +34,42 @@ void Weather::_updateGismeteo() {
     if(httpCode == HTTP_CODE_OK) {
         WiFiClient* stream = http.getStreamPtr();
         _parseGismeteoStream(stream);
-    } 
-    else Serial.printf("Ошибка HTTP запроса: %d\n", httpCode);
+        state.weather.time = now();
+        state.weather.daily.time = now();
+        state.weather.hourly.time = now();
+        state.weather.updated = true;
+        Serial.print("Current weather updated successfully at: ");
+        Serial.printf("%02d:%02d:%02d\r\n", hour(), minute(), second());
+    }
+    else Serial.printf("Weather update error: %d\n", httpCode);
     http.end();
 }
 
 void Weather::_parseGismeteoStream(WiFiClient* stream) {
-    int forecastCount = 0;
     String currentBlockType = ""; 
     String dateOrTime = "";       
     bool insideDayBlock = false;
+    unsigned int dayNr = 0;
+    unsigned int forecastCount = 0;
+    time_t current = now(); 
+    time_t midnight = previousMidnight(current); 
 
     stream->setTimeout(2000);
 
     while(stream->connected() || stream->available()) {
-        if(!stream->available()) {
+        int retry = 0;
+        while(!stream->available() && stream->connected() && retry < 50) {
             vTaskDelay(10);
-            continue;
+            retry++;
         }
+
+        if(!stream->available()) break;
 
         String block = stream->readStringUntil('>');
         block.trim();
 
         if(block.length() == 0) continue;
+        if(block.indexOf("</weather") != -1 || block.indexOf("</location") != -1) break;
 
         if(block.indexOf("<fact") != -1) {
             currentBlockType = "fact";
@@ -78,7 +92,7 @@ void Weather::_parseGismeteoStream(WiFiClient* stream) {
             String windDirId = _getXmlAttr(block, "wd");
             String desc = _getXmlAttr(block, "descr");
             String icon = _getXmlAttr(block, "icon");
-            String precip = _getXmlAttr(block, "pr"); // ДОБАВЛЕНО: Чтение осадков часового прогноза
+            String precip = _getXmlAttr(block, "pr");
 
             if(currentBlockType == "fact") {
                 state.weather.temp       = temp.toFloat();
@@ -98,46 +112,37 @@ void Weather::_parseGismeteoStream(WiFiClient* stream) {
                 else {
                     desc.toCharArray(state.weather.descript, sizeof(state.weather.descript));
                 }
-                
-                state.weather.time = now();
 
-                Serial.printf("Температура: %f °C\n", state.weather.temp);
-                Serial.printf("Давление: %f hPa\n", state.weather.pres);
-                Serial.printf("Влажность: %f %%\n", state.weather.hum);
-                Serial.printf("Ветер: %f м/с, направление: %d\n", state.weather.wind.speed, state.weather.wind.dir);
-                Serial.printf("Описание: %s\n", state.weather.descript);
-                Serial.printf("Иконка: %d\n", state.weather.icon);
+                state.weather.time = now();
             }
             else if(currentBlockType == "forecast") {
-                forecastCount++;
-                int hourIconId = _convertGismeteoIcon(icon); // Конвертируем иконку для часа
+                int hourIconId = _convertGismeteoIcon(icon);
+                unsigned long offsetSeconds = forecastCount * 10800UL;
+                time_t targetTimestamp = midnight + offsetSeconds;
                 
-                // ИСПРАВЛЕНО: В printf добавлены Иконка (ID OWM) и Осадки (precip)
-                Serial.printf("%02d. Время: %s | Т: %s°C | Давление: %s | Ветер: %s м/с (%d) | Иконка OWM: %d | Осадки: %s мм\n", 
-                    forecastCount, dateOrTime.c_str(), temp.c_str(), pressure.c_str(), 
-                    windSpeed.c_str(), _parseGismeteoWindDir(windDirId.toInt()), hourIconId, precip.c_str());
+                state.weather.hourly.date[forecastCount] = targetTimestamp;
+                state.weather.hourly.icon[forecastCount] = hourIconId;
+                state.weather.hourly.temp[forecastCount] = temp.toFloat();
+                state.weather.hourly.pres[forecastCount] = pressure.toFloat() / 0.750062;
+                state.weather.hourly.windSpeed[forecastCount] = windSpeed.toFloat();
+                state.weather.hourly.windDir[forecastCount] = _parseGismeteoWindDir(windDirId.toInt());
+                state.weather.hourly.prec[forecastCount] = precip.toFloat();
+                forecastCount++;
             }
         }
         else if(block.indexOf("<day") != -1) {
             String dayDate = _getXmlAttr(block, "date");
             if(dayDate != "") {
-                if(!insideDayBlock) {
-                    Serial.println("-----------------------------------------");
-                    Serial.println("[ ДОЛГОСРОЧНЫЙ ПРОГНОЗ ПО ДНЯМ ]");
-                    insideDayBlock = true;
-                }
-                
-                // ДОБАВЛЕНО: Извлекаем иконку дня и сразу конвертируем её в OWM формат
+                if(!insideDayBlock) insideDayBlock = true;
                 String dayIconRaw = _getXmlAttr(block, "icon");
                 int dayIconId = _convertGismeteoIcon(dayIconRaw);
 
-                // ИСПРАВЛЕНО: Добавлен вывод иконки дня в консоль
-                Serial.printf("Дата: %s | temp min: %f | temp max: %f | max wind: %f | Иконка OWM: %d\n", 
-                    dayDate.c_str(),
-                    _getXmlAttr(block, "tmin").toFloat(), 
-                    _getXmlAttr(block, "tmax").toFloat(), 
-                    _getXmlAttr(block, "wsmax").toFloat(),
-                    dayIconId);
+                if(dayNr < DAYS) {
+                    state.weather.daily.tMax[dayNr] = _getXmlAttr(block, "tmax").toFloat();
+                    state.weather.daily.tMin[dayNr] = _getXmlAttr(block, "tmin").toFloat();
+                    state.weather.daily.wind[dayNr] = _getXmlAttr(block, "wsmax").toFloat();
+                    state.weather.daily.icon[dayNr++] = dayIconId;
+                }
             }
         }
     }
@@ -170,51 +175,31 @@ int Weather::_parseGismeteoWindDir(int id) {
 }
 
 int Weather::_convertGismeteoIcon(const String& gisIcon) {
-    if (gisIcon.length() == 0) return 1; // По умолчанию ясно
-
-    // Проверяем на грозу (обычно содержит 'ts' или 't')
-    if (gisIcon.indexOf("ts") != -1 || gisIcon.indexOf("t") != -1) {
-        return 11; // Гроза
+    if(gisIcon.length() == 0) return 1;
+    if(gisIcon.indexOf("ts") != -1 || gisIcon.indexOf("t") != -1) return 11;
+    else if(gisIcon.indexOf("s") != -1) return 13;
+    else if(gisIcon.indexOf("r") != -1) {
+        if(gisIcon.indexOf("r3") != -1 || gisIcon.indexOf("r2") != -1) return 9;
+        return 10;
     }
-    // Проверяем на снег (содержится 's')
-    else if (gisIcon.indexOf("s") != -1) {
-        return 13; // Снег
+    else if(gisIcon.indexOf("f") != -1) return 50;
+    else if(gisIcon.indexOf("c") != -1) {
+        if(gisIcon.indexOf("c3") != -1 || gisIcon.indexOf("c4") != -1) return 3;
+        return 2;
     }
-    // Проверяем на дождь ('r')
-    else if (gisIcon.indexOf("r") != -1) {
-        // r3 или r2 - сильный/ливневый дождь
-        if (gisIcon.indexOf("r3") != -1 || gisIcon.indexOf("r2") != -1) {
-            return 9;  // Сильный дождь
-        }
-        return 10;     // Легкий дождь (r1 или просто r)
-    }
-    // Проверяем на туман ('f' от fog)
-    else if (gisIcon.indexOf("f") != -1) {
-        return 50; // Туман
-    }
-    // Проверяем на облачность ('c' от cloud)
-    else if (gisIcon.indexOf("c") != -1) {
-        // c3, c4 - пасмурно, c1, c2 - облачно/малооблачно
-        if (gisIcon.indexOf("c3") != -1 || gisIcon.indexOf("c4") != -1) {
-            return 3;  // Пасмурно
-        }
-        return 2;      // Облачно
-    }
-    
-    // Если ничего из вышеперечисленного не подошло (остались чистые 'd' и 'n')
-    return 1; // Ясно
+    return 1;
 }
 
 int Weather::_getDescIdxFromIcon(int iconId) {
     switch (iconId) {
-        case 1:  return 0;  // Clear sky / Ясно
-        case 2:  return 2;  // Partly cloudy / Переменная облачность
-        case 3:  return 3;  // Overcast / Пасмурно
-        case 9:  return 12; // Rain showers / Ливень (сильный дождь)
-        case 10: return 8;  // Rain / Дождь (легкий дождь)
-        case 11: return 14; // Thunderstorm / Гроза
-        case 13: return 10; // Snowfall / Снегопад
-        case 50: return 4;  // Fog / Туман
+        case 1:  return 0;  // Clear sky
+        case 2:  return 2;  // Partly cloudy
+        case 3:  return 3;  // Overcast
+        case 9:  return 12; // Rain showers
+        case 10: return 8;  // Rain
+        case 11: return 14; // Thunderstorm
+        case 13: return 10; // Snowfall
+        case 50: return 4;  // Fog
         default: return 0;
     }
 }
