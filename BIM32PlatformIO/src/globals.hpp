@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <freertos/queue.h>
 
-#define FW "v6.0a"                    // Firmware version
+#define FW "v6.0b"                    // Firmware version
 #define REMOTE_HOST "www.google.com" // Remote host to ping
 
 #define ALARMS              12       // Number of alarms
