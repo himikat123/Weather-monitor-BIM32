@@ -9,11 +9,11 @@ void PixelLed::init(uint8_t dispNum, uint8_t pin) {
  
     uint8_t cntLeds = config.display.cntLeds(dispNum) + 1;
     switch(config.display.model(dispNum)) {
-        case 0: _pixelCount = 4 * 7 * cntLeds + 2; break; 
-        case 1: _pixelCount = 6 * 7 * cntLeds + 4; break;
-        case 2: _pixelCount = 4 * 7 * cntLeds + 2; break; 
-        case 3: _pixelCount = 6 * 7 * cntLeds + 4; break;
-        case 4: _pixelCount = 8 * 7 * cntLeds + 6; break; 
+        case D_WS2812_4: _pixelCount = 4 * 7 * cntLeds + 2; break; 
+        case D_WS2812_6: _pixelCount = 6 * 7 * cntLeds + 4; break;
+        case D_SK9822_4: _pixelCount = 4 * 7 * cntLeds + 2; break; 
+        case D_SK9822_6: _pixelCount = 6 * 7 * cntLeds + 4; break;
+        case D_SK9822_8: _pixelCount = 8 * 7 * cntLeds + 6; break; 
         default: _pixelCount = 1; break;
     }
     if(config.display.sLed(dispNum)) _pixelCount++;

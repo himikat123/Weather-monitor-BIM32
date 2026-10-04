@@ -22,12 +22,18 @@ void PixelLed::_sendToDisplay() {
     lastPixel = _sendTwoDigits(black, 0, lastPixel);
     _driver->setPixelColor(lastPixel++, (state.disp_on_off[_dispNum] && _points[0] && !_animIsRunnung) ? dotsColor : black);
     _driver->setPixelColor(lastPixel++, (state.disp_on_off[_dispNum] && _points[1] && !_animIsRunnung) ? dotsColor : black);
-    lastPixel = _sendTwoDigits(black, 2, lastPixel++); 
+    lastPixel = _sendTwoDigits(black, 2, lastPixel); 
     
-    if(config.display.model(_dispNum) == 1) {
+    if(config.display.model(_dispNum) == D_WS2812_6 || config.display.model(_dispNum) == D_SK9822_6) {
         _driver->setPixelColor(lastPixel++, (state.disp_on_off[_dispNum] && _points[2] && !_animIsRunnung) ? dotsColor : black);
         _driver->setPixelColor(lastPixel++, (state.disp_on_off[_dispNum] && _points[3] && !_animIsRunnung) ? dotsColor : black);
-        lastPixel = _sendTwoDigits(black, 4, lastPixel++);
+        lastPixel = _sendTwoDigits(black, 4, lastPixel);
+    }
+
+    if(config.display.model(_dispNum) == D_SK9822_8) {
+        _driver->setPixelColor(lastPixel++, (state.disp_on_off[_dispNum] && _points[4] && !_animIsRunnung) ? dotsColor : black);
+        _driver->setPixelColor(lastPixel++, (state.disp_on_off[_dispNum] && _points[5] && !_animIsRunnung) ? dotsColor : black);
+        lastPixel = _sendTwoDigits(black, 6, lastPixel);
     }
 
     _driver->show();

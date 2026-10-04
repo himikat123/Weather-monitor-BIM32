@@ -25,14 +25,14 @@ class PixelLed : public SegmentDisplay {
         uint8_t _currentBrightness = 1;
         uint8_t _prevBrightness = 0;
         uint8_t _pixelCount = 1;
-        byte _pixels[6] = { 0 }; 
-        byte _pixelsPrev[6] = { 0 };
-        uint8_t _reds[6] = { 0 };
-        uint8_t _redsPrev[6] = { 0 };
-        uint8_t _greens[6] = { 0 };
-        uint8_t _greensPrev[6] = { 0 };
-        uint8_t _blues[6] = { 0 };
-        uint8_t _bluesPrev[6] = { 0 };
+        byte _pixels[8] = { 0 }; 
+        byte _pixelsPrev[8] = { 0 };
+        uint8_t _reds[8] = { 0 };
+        uint8_t _redsPrev[8] = { 0 };
+        uint8_t _greens[8] = { 0 };
+        uint8_t _greensPrev[8] = { 0 };
+        uint8_t _blues[8] = { 0 };
+        uint8_t _bluesPrev[8] = { 0 };
 
         void _print();
         void _sendToDisplay();

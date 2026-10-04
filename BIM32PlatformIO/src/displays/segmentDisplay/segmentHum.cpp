@@ -12,21 +12,36 @@ void SegmentDisplay::_hum(float h, int* segImg) {
     if(hh == 0) hh = SYMB_SPACE;
 
     int disp4Img[8] = {
-        valid ? (hm > 99 ? 1 : hh) : SYMB_MINUS, valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS,
-        valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE, SYMB_H, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+        valid ? (hm > 99 ? 1 : hh) : SYMB_MINUS, 
+        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS,
+        valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE, 
+        SYMB_H, 
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE
     };
 
     int disp6Img[8] = {
-        SYMB_SPACE, valid ? (hm > 9 ? hm > 99 ? 1 : hh : SYMB_SPACE) : SYMB_MINUS,
-        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS, valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE,
-        valid ? (hm > 99 ? SYMB_SPACE : SYMB_H) : SYMB_H, valid ? (hm > 99 ? SYMB_H : SYMB_SPACE) : SYMB_SPACE, 
-        SYMB_SPACE, SYMB_SPACE
+        SYMB_SPACE, 
+        valid ? (hm > 9 ? hm > 99 ? 1 : hh : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS, 
+        valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE,
+        valid ? (hm > 99 ? SYMB_SPACE : SYMB_H) : SYMB_H, 
+        valid ? (hm > 99 ? SYMB_H : SYMB_SPACE) : SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE
     };
 
     int disp8Img[8] = {
-        SYMB_SPACE, SYMB_SPACE, valid ? (hm > 9 ? hm > 99 ? 1 : hh : SYMB_SPACE) : SYMB_MINUS,
-        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS, valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE,
-        valid ? (hm > 99 ? SYMB_SPACE : SYMB_H) : SYMB_H, valid ? (hm > 99 ? SYMB_H : SYMB_SPACE) : SYMB_SPACE, SYMB_SPACE
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        valid ? (hm > 9 ? hm > 99 ? 1 : hh : SYMB_SPACE) : SYMB_MINUS,
+        valid ? (hm > 99 ? 0 : hl) : SYMB_MINUS, 
+        valid ? (hm > 99 ? 0 : SYMB_SPACE) : SYMB_SPACE,
+        valid ? (hm > 99 ? SYMB_SPACE : SYMB_H) : SYMB_H, 
+        valid ? (hm > 99 ? SYMB_H : SYMB_SPACE) : SYMB_SPACE, 
+        SYMB_SPACE
     };
 
     for(uint8_t i=0; i<8; i++) {

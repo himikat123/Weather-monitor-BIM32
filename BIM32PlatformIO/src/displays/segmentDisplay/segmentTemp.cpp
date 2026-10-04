@@ -10,33 +10,37 @@ void SegmentDisplay::_temp(float t, int* segImg) {
     int tmp = round(t);
     uint8_t th = floor(abs(tmp) / 10), tl = abs(tmp) % 10;
     if(th == 0) th = SYMB_SPACE;
-    uint8_t c = SYMB_C;
 
     int disp4Img[8] = {
         valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
         valid ? (tmp < 0 ? tmp < -9 ? th : tl : tl) : SYMB_MINUS,
         valid ? (tmp < 0 ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE) : SYMB_DEGREE,
-        valid ? (tmp < 0 ? tmp < -9 ? SYMB_DEGREE : c : c) : c,
-        SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+        valid ? (tmp < 0 ? tmp < -9 ? SYMB_DEGREE : SYMB_C : SYMB_C) : SYMB_C,
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE
     };
 
-    int disp6Img[8] = {
+    int disp6Img[8] = { 
         SYMB_SPACE,
-        valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
-        valid ? (tmp < 0 ? tmp < -9 ? th : tl : tl) : SYMB_MINUS,
-        valid ? (tmp < 0 ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE) : SYMB_DEGREE,
-        valid ? (tmp < -9 ? SYMB_DEGREE : c) : c,
-        valid ? (tmp < -9 ? c : SYMB_SPACE) : SYMB_SPACE,
-        SYMB_SPACE, SYMB_SPACE
+        valid ? (tmp < 0 ? (tmp < -9 ? SYMB_MINUS : SYMB_SPACE) : SYMB_SPACE) : SYMB_SPACE, 
+        valid ? (tmp < 0 ? (tmp < -9 ? th : SYMB_MINUS) : (tmp > 9 ? th : SYMB_SPACE)) : SYMB_MINUS,
+        valid ? tl : SYMB_MINUS,
+        SYMB_DEGREE,
+        SYMB_C,
+        SYMB_SPACE, 
+        SYMB_SPACE
     };
 
     int disp8Img[8] = {
-        SYMB_SPACE, SYMB_SPACE,
-        valid ? (tmp < 0 ? SYMB_MINUS : tmp > 9 ? th : SYMB_SPACE) : SYMB_MINUS,
-        valid ? (tmp < 0 ? tmp < -9 ? th : tl : tl) : SYMB_MINUS,
-        valid ? (tmp < 0 ? tmp < -9 ? tl : SYMB_DEGREE : SYMB_DEGREE) : SYMB_DEGREE,
-        valid ? (tmp < -9 ? SYMB_DEGREE : c) : c,
-        valid ? (tmp < -9 ? c : SYMB_SPACE) : SYMB_SPACE,
+        SYMB_SPACE, 
+        SYMB_SPACE,
+        valid ? (tmp < 0 ? (tmp < -9 ? SYMB_MINUS : SYMB_SPACE) : SYMB_SPACE) : SYMB_SPACE,
+        valid ? (tmp < 0 ? (tmp < -9 ? th : SYMB_MINUS) : (tmp > 9 ? th : SYMB_SPACE)) : SYMB_MINUS,
+        valid ? tl : SYMB_MINUS,
+        valid ? SYMB_DEGREE : SYMB_DEGREE,
+        SYMB_C,
         SYMB_SPACE
     };
 

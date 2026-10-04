@@ -13,20 +13,36 @@ void SegmentDisplay::_iaq(float i, int* segImg) {
     uint8_t i1 = valid ? iaq % 10 : SYMB_MINUS;
 
     int disp4Img[8] = {
-        iaq < 10 ? SYMB_SPACE : SYMB_A, iaq < 100 ? iaq < 10 ? SYMB_A : SYMB_SPACE : i100, 
-        iaq < 10 ? SYMB_SPACE : i10, i1, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+        iaq < 10 ? SYMB_SPACE : SYMB_A, 
+        iaq < 100 ? iaq < 10 ? SYMB_A : SYMB_SPACE : i100, 
+        iaq < 10 ? SYMB_SPACE : i10, 
+        i1, 
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        SYMB_SPACE
     };
 
     int disp6Img[8] = {
-        SYMB_SPACE, iaq < 10 ? SYMB_SPACE : SYMB_A, 
-        iaq < 10 ? SYMB_A : SYMB_SPACE, iaq < 100 ? iaq < 10 ? SYMB_SPACE : i10 : i100,
-        iaq < 100 ? i1 : i10, iaq < 100 ? SYMB_SPACE : i1, SYMB_SPACE, SYMB_SPACE
+        SYMB_SPACE, 
+        iaq < 10 ? SYMB_SPACE : SYMB_A, 
+        iaq < 10 ? SYMB_A : SYMB_SPACE, 
+        iaq < 100 ? iaq < 10 ? SYMB_SPACE : i10 : i100,
+        iaq < 100 ? i1 : i10, 
+        iaq < 100 ? SYMB_SPACE : i1, 
+        SYMB_SPACE, 
+        SYMB_SPACE
     };
 
     int disp8Img[8] = {
-        SYMB_SPACE, SYMB_SPACE, iaq < 10 ? SYMB_SPACE : SYMB_A, 
-        iaq < 10 ? SYMB_A : SYMB_SPACE, iaq < 100 ? iaq < 10 ? SYMB_SPACE : i10 : i100, 
-        iaq < 100 ? i1 : i10, iaq < 100 ? SYMB_SPACE : i1, SYMB_SPACE
+        SYMB_SPACE, 
+        SYMB_SPACE, 
+        iaq < 10 ? SYMB_SPACE : SYMB_A, 
+        iaq < 10 ? SYMB_A : SYMB_SPACE, 
+        iaq < 100 ? iaq < 10 ? SYMB_SPACE : i10 : i100, 
+        iaq < 100 ? i1 : i10, 
+        iaq < 100 ? SYMB_SPACE : i1, 
+        SYMB_SPACE
     };
 
     for(uint8_t i=0; i<8; i++) {

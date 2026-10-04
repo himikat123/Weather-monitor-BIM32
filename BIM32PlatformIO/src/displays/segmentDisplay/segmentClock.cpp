@@ -47,26 +47,92 @@ void SegmentDisplay::_clock(int* segImg, uint8_t slot) {
 
     int disp6Img[3][8] = {
         {
-            SYMB_SPACE, SYMB_SPACE, config.display.type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
-            point2 ? (hrL + DOT) : hrL, mnH, mnL, SYMB_SPACE, SYMB_SPACE
+            SYMB_SPACE, 
+            SYMB_SPACE, 
+            config.display.type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, 
+            point2 ? (hrL + DOT) : hrL, 
+            mnH, 
+            mnL, 
+            SYMB_SPACE, 
+            SYMB_SPACE
         },
         {
             config.display.type(_dispNum) == 2 && point1 ? (hrH + DOT) : hrH, point2 ? (hrL + DOT) : hrL, 
             config.display.type(_dispNum) == 2 && point1 ? (mnH + DOT) : mnH, point2 ? (mnL + DOT) : mnL, 
-            scH, scL, SYMB_SPACE, SYMB_SPACE
+            scH, 
+            scL, 
+            SYMB_SPACE, 
+            SYMB_SPACE
         },
-        {SYMB_SPACE, hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL}
+        {
+            SYMB_SPACE, 
+            hrH, 
+            hrL, 
+            point1 ? SYMB_MINUS : SYMB_SPACE, 
+            mnH, 
+            mnL, 
+            SYMB_SPACE, 
+            SYMB_SPACE
+        }
     };
 
     int disp8Img[5][8] = {
-        {SYMB_SPACE, SYMB_SPACE, hrH, point1 ? hrL + DOT : hrL, mnH, mnL, SYMB_SPACE, SYMB_SPACE},
-        {SYMB_SPACE, hrH, point1 ? hrL + DOT : hrL, mnH, point1 ? mnL + DOT : mnL, scH, scL, SYMB_SPACE},
-        {SYMB_SPACE, SYMB_SPACE, hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL, SYMB_SPACE},
-        {hrH, hrL, point1 ? SYMB_MINUS : SYMB_SPACE, mnH, mnL, point1 ? SYMB_MINUS : SYMB_SPACE, scH, scL},
-        {hrH, point1 ? hrL + DOT : hrL, mnH, point1 ? mnL + DOT : mnL, scH, point1 ? scL + DOT : scL, msH, msL}
+        {
+            SYMB_SPACE, 
+            SYMB_SPACE, 
+            hrH, 
+            point1 ? hrL + DOT : hrL, 
+            mnH, 
+            mnL, 
+            SYMB_SPACE, 
+            SYMB_SPACE
+        },
+        {
+            SYMB_SPACE, 
+            hrH, 
+            point1 ? hrL + DOT : hrL, 
+            mnH, 
+            point1 ? mnL + DOT : mnL, 
+            scH, 
+            scL, 
+            SYMB_SPACE
+        },
+        {
+            SYMB_SPACE, 
+            SYMB_SPACE, 
+            hrH, 
+            hrL, 
+            point1 ? SYMB_MINUS : SYMB_SPACE, 
+            mnH, 
+            mnL, 
+            SYMB_SPACE
+        },
+        {
+            hrH, 
+            hrL, 
+            point1 ? SYMB_MINUS : SYMB_SPACE, 
+            mnH, 
+            mnL, 
+            point1 ? SYMB_MINUS : SYMB_SPACE, 
+            scH, 
+            scL
+        },
+        {
+            hrH, 
+            point1 ? hrL + DOT : hrL, 
+            mnH, 
+            point1 ? mnL + DOT : mnL, 
+            scH, 
+            point1 ? scL + DOT : scL, 
+            msH, 
+            msL
+        }
     };
 
     uint8_t sens = config.display.timeSlot.data(slot, _dispNum);
+    if(_dispLength == 4) sens = 0;
+    if(_dispLength == 6 && sens > 1) sens = 0;
+    if(_dispLength == 8 && sens > 2) sens = 0;
     for(uint8_t i=0; i<8; i++) {
         segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[sens][i] : disp8Img[sens][i];
     }

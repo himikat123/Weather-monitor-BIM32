@@ -8,7 +8,7 @@
 void PixelLed::_print() {
     bool updated = false;
 
-    for(uint8_t i=0; i<6; i++) {
+    for(uint8_t i=0; i<_dispLength; i++) {
         _points[i] = _dispImg[i] >= DOT;
         _pixels[i] = font_ws2812[_dispImg[i] >= DOT ? _dispImg[i] - DOT : _dispImg[i]];
         unsigned int colors = strtol(&_dispColors[i][1], NULL, 16);
@@ -27,7 +27,7 @@ void PixelLed::_print() {
         }
     }
 
-    for(uint8_t i=0; i<4; i++) {
+    for(uint8_t i=0; i<_dispLength; i++) {
         if(_prevPoints[i] != _points[i]) {
             _prevPoints[i] = _points[i];
             updated |= true;

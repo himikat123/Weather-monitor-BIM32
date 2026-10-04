@@ -8,37 +8,91 @@
 void SegmentDisplay::_co2(float c, int* segImg) {
     bool valid = validate.co2(c);
     int co2 = round(c);
-    uint8_t c1000 = co2 < 1000 ? SYMB_SPACE : floor(co2 / 1000);
-    uint8_t c100 = co2 < 100 ? SYMB_SPACE : floor(co2 % 1000 / 100);
-    uint8_t c10 = co2 < 10 ? SYMB_SPACE : floor(co2 % 100 / 10);
-    uint8_t c1 = co2 % 10;
 
-    int disp4Img[8] = {
-        valid ? co2 < 1000 ? SYMB_C : c1000 : SYMB_C, valid ? co2 < 100 ? 0 : c100 : 0, 
-        valid ? co2 < 10 ? SYMB_SPACE : c10 : 2, valid ? c1 : SYMB_MINUS, 
-        SYMB_SPACE, SYMB_SPACE, SYMB_SPACE, SYMB_SPACE
+    for(uint8_t i=0; i<8; i++) segImg[i] = SYMB_SPACE;
+
+    if(!valid || co2 < 0 || (_dispLength == 4 && co2 > 9999)) {
+        segImg[0] = SYMB_C; 
+        segImg[1] = 0; 
+        segImg[2] = 2; 
+        segImg[3] = SYMB_MINUS;
+        if(_dispLength >= 6) { 
+            segImg[3] = SYMB_SPACE; 
+            segImg[4] = SYMB_MINUS; 
+            segImg[5] = SYMB_MINUS; 
+        }
+        if(_dispLength == 8) { 
+            segImg[6] = SYMB_MINUS; 
+            segImg[7] = SYMB_MINUS; 
+        }
+        return;
+    }
+
+    uint8_t digits[5] = {
+        (uint8_t)(co2 / 10000),
+        (uint8_t)((co2 % 10000) / 1000),
+        (uint8_t)((co2 % 1000) / 100),
+        (uint8_t)((co2 % 100) / 10),
+        (uint8_t)(co2 % 10)
     };
 
-    int disp6Img[8] = {
-        co2 < 10 ? SYMB_SPACE : SYMB_C, co2 < 10 ? SYMB_C : 0, 
-        valid ? co2 < 1000 ? co2 < 100 ? co2 < 10 ? 0 : 2 : SYMB_SPACE : c1000 : 2, 
-        valid ? co2 < 100 ? co2 < 10 ? 2 : SYMB_SPACE : c100 : SYMB_SPACE, 
-        valid ? co2 < 10 ? SYMB_SPACE : c10 : SYMB_MINUS, valid ? c1 : SYMB_MINUS, 
-        SYMB_SPACE, SYMB_SPACE
-    };
+    uint8_t len = co2 < 10 ? 1 : co2 < 100 ? 2 : co2 < 1000 ? 3 : co2 < 10000 ? 4 : 5;
 
-    int disp8Img[8] = {
-        valid ? co2 < 1000 ? SYMB_SPACE : SYMB_C : SYMB_C,
-        valid ? co2 < 1000 ? co2 < 10 ? SYMB_SPACE : SYMB_C : 0 : 0,
-        valid ? co2 < 1000 ? co2 < 10 ? SYMB_C : 0 : 2 : 2,
-        valid ? co2 < 1000 ? co2 < 10 ? 0 : 2 : SYMB_SPACE : SYMB_SPACE,
-        valid ? co2 < 1000 ? co2 < 10 ? 2 : SYMB_SPACE : c1000 : SYMB_MINUS,
-        valid ? co2 < 100 ? co2 < 10 ? SYMB_SPACE : c10 : c100 : SYMB_MINUS,
-        valid ? co2 < 100 ? c1 : c10 : SYMB_MINUS,
-        valid ? co2 < 100 ? SYMB_SPACE : c1 : SYMB_MINUS
-    };
+    if(_dispLength == 4) {
+        if(len == 1) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = 0; 
+            segImg[2] = SYMB_SPACE; 
+            segImg[3] = digits[4]; 
+        }
+        if(len == 2) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = SYMB_SPACE; 
+            segImg[2] = digits[3]; 
+            segImg[3] = digits[4]; 
+        }
+        if(len == 3) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = digits[2]; 
+            segImg[2] = digits[3]; 
+            segImg[3] = digits[4]; 
+        }
+        if(len == 4) { 
+            segImg[0] = digits[1]; 
+            segImg[1] = digits[2]; 
+            segImg[2] = digits[3]; 
+            segImg[3] = digits[4]; 
+        }
+    }
 
-    for(uint8_t i=0; i<8; i++) {
-        segImg[i] = _dispLength == 4 ? disp4Img[i] : _dispLength == 6 ? disp6Img[i] : disp8Img[i];
+    else if(_dispLength == 6) {
+        uint8_t numStart = 6 - len; 
+        for(uint8_t i=0; i<len; i++) segImg[numStart + i] = digits[5 - len + i];
+        if(len == 1 || len == 2) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = 0; 
+            segImg[2] = 2; 
+        }
+        if(len == 3) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = 0; 
+        }
+        if(len == 4) { 
+            segImg[0] = SYMB_C; 
+        }
+    }
+
+    else if(_dispLength == 8) {
+        uint8_t numStart = 8 - len;
+        for(uint8_t i=0; i<len; i++) segImg[numStart + i] = digits[5 - len + i];
+        if(len >= 1 && len <= 4) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = 0; 
+            segImg[2] = 2; 
+        }
+        if(len == 5) { 
+            segImg[0] = SYMB_C; 
+            segImg[1] = 0; 
+        }
     }
 }
